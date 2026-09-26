@@ -1426,8 +1426,8 @@ static u8 addShaderLayerStages(GameObject* obj, Shader* shader, ModelRenderOpTex
                     color.b = 0xff;
                     if (textureRefs->texture0 != 0 ||
                         (shader->pad00[0] == 0xff && shader->pad00[1] == 0xff && shader->pad00[2] == 0xff)) {
-                        addTexLayerStageSwizzled(texture, textureMatrix, blendMode, &color,
-                                                 textureRefs->swapSelector, 1);
+                        addTexLayerStageSwizzled(texture, textureMatrix, blendMode, &color, textureRefs->swapSelector,
+                                                 1);
                     } else if (useChannelColor != 0) {
                         channelColor->a = color.a;
                         if (shader->vtxAttrFlags & 0x10) {
