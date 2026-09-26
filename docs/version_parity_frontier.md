@@ -284,6 +284,29 @@ produced a match anywhere, so a new idea for this frontier should not start here
   loop 2 its own function-scope local costs **one instruction** at every declaration position, so
   retail's is one variable whose web the allocator splits, and the split is not a source fossil.
 
+## Stream-neutral perturbations — the right idea, and it is also exhausted
+
+Identical stream + identical band + a deterministic compiler means the colouring should be identical
+too, so a source difference must exist that is **invisible in the final stream**. That is the correct
+deduction and it is worth keeping, because it says the defect is real rather than unreachable. Every
+mechanism that produces such a difference has now been tried, all gated on EN at 0 diffs:
+
+- **Coalescing copies** (`b = a;` then use `b`): verified emit-nothing, and inert wherever placed —
+  gameloop's two loops in every combination, WCLevelCont, and aliases in v1.1's atlas arms, which MWCC
+  folds away without allocating anything.
+- **Redundant CSE-folded occurrences** (lever 9): duplicating pauseMenuDraw's PAL-only division once or
+  twice is inert at 4; duplicating the PAL-only `lineHeight` statement costs an instruction.
+- **Perturbing version-exclusive code through an existing local** rather than a new one: routing v1.1's
+  atlas `glyphCount` stores through the function's own `glyphCount`, in either arm or both, is inert
+  at 36.
+- **Block-scoping the macro-aliased measurement locals on PAL** (the hypothesis that retail declared 12
+  and MWCC overlapped them into the 4 slots PAL actually uses): MWCC does **not** overlap them, giving
+  151 diffs. The `#define tokenLeft boundsLeft` aliasing really is the faithful representation of PAL's
+  4-slot group, ugly as it looks.
+
+So the invisible difference exists but is not in any construct reachable from these five functions'
+sources. That is where this frontier stands.
+
 ## Reference mining — what the projects do and do not give
 
 - `reference_projects/rena-tools/sfadebug` is a decomp of the SFA **PAL debug build** (from
