@@ -1330,7 +1330,8 @@ static inline void objGetShaderLayerScroll(GameObject* obj, const ShaderLayer* l
     *offsetT = *offsetS = 0.0f;
 }
 
-static u8 addShaderLayerStages(GameObject* obj, Shader* shader, ModelRenderOpTextureRefs* textureRefs, int layerMask, int useChannelColor, int lightCount) {
+static u8 addShaderLayerStages(GameObject* obj, Shader* shader, ModelRenderOpTextureRefs* textureRefs, int layerMask,
+                               int useChannelColor, int lightCount) {
     u16 alpha;
     GXColor* channelColor;
     Texture* texture;
@@ -1409,7 +1410,8 @@ static u8 addShaderLayerStages(GameObject* obj, Shader* shader, ModelRenderOpTex
                         }
                     }
                     if (layerIndex == 0) {
-                        if ((textureRefs->texture0 != 0 || textureRefs->texture1 != 0 || lightCount != 0) && combineLighting) {
+                        if ((textureRefs->texture0 != 0 || textureRefs->texture1 != 0 || lightCount != 0) &&
+                            combineLighting) {
                             blendMode = 8;
                         } else {
                             blendMode = 0;
@@ -1422,14 +1424,17 @@ static u8 addShaderLayerStages(GameObject* obj, Shader* shader, ModelRenderOpTex
                     color.r = 0xff;
                     color.g = 0xff;
                     color.b = 0xff;
-                    if (textureRefs->texture0 != 0 || (shader->pad00[0] == 0xff && shader->pad00[1] == 0xff && shader->pad00[2] == 0xff)) {
-                        addTexLayerStageSwizzled(texture, textureMatrix, (u8)blendMode, &color, textureRefs->swapSelector, 1);
+                    if (textureRefs->texture0 != 0 ||
+                        (shader->pad00[0] == 0xff && shader->pad00[1] == 0xff && shader->pad00[2] == 0xff)) {
+                        addTexLayerStageSwizzled(texture, textureMatrix, (u8)blendMode, &color,
+                                                 textureRefs->swapSelector, 1);
                     } else if (useChannelColor != 0) {
                         channelColor->a = color.a;
                         if (shader->vtxAttrFlags & 0x10) {
                             addTexLayerStageKColor(texture, textureMatrix, (u8)blendMode, &gObjCurChanColor);
                         } else {
-                            addTexLayerStageSwizzled(texture, textureMatrix, (u8)blendMode, &gObjCurChanColor, textureRefs->swapSelector, 1);
+                            addTexLayerStageSwizzled(texture, textureMatrix, (u8)blendMode, &gObjCurChanColor,
+                                                     textureRefs->swapSelector, 1);
                         }
                     } else {
                         if (shader->vtxAttrFlags & 0x10) {
@@ -1446,7 +1451,8 @@ static u8 addShaderLayerStages(GameObject* obj, Shader* shader, ModelRenderOpTex
                     color.g = shader->pad00[5];
                     color.b = shader->pad00[6];
                     color.a = alpha;
-                    if (textureRefs->texture0 != 0 || (shader->pad00[0] == 0xff && shader->pad00[1] == 0xff && shader->pad00[2] == 0xff)) {
+                    if (textureRefs->texture0 != 0 ||
+                        (shader->pad00[0] == 0xff && shader->pad00[1] == 0xff && shader->pad00[2] == 0xff)) {
                         addKColorModulateStage(&color);
                     } else if (useChannelColor != 0) {
                         channelColor->a = alpha;
