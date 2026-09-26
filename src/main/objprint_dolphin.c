@@ -1307,57 +1307,64 @@ static void modelRenderFn_setVtxDescr(ModelFileHeader* modelHeader, Shader* shad
         }
     }
 }
-static inline void texSlotGetScroll(GameObject* obj, u32 jid, f32* txp, f32* typ) {
-    ObjTextureRuntimeSlot* slots = obj->anim.textureSlots;
-    ObjDef* modelDef = obj->anim.modelInstance;
-    ObjTextureSlotDef* q = modelDef->textureSlotDefs;
-    int n = modelDef->textureSlotCount;
-    int k;
-    for (k = 0; k < n; k++) {
-        if ((int)jid == q->materialIndex) {
-            *txp = 0.0001f * slots[k].offsetS;
-            *typ = 0.0001f * slots[k].offsetT;
+static inline void objGetShaderLayerScroll(GameObject* obj, const ShaderLayer* layer, f32* offsetS, f32* offsetT) {
+    ObjDef* objectDef;
+    ObjTextureSlotDef* slotDefs;
+    u32 materialId;
+    int slotCount;
+    int slotIndex;
+    ObjTextureRuntimeSlot* textureSlots;
+    materialId = layer->materialId;
+    textureSlots = obj->anim.textureSlots;
+    objectDef = obj->anim.modelInstance;
+    slotDefs = objectDef->textureSlotDefs;
+    slotCount = objectDef->textureSlotCount;
+    for (slotIndex = 0; slotIndex < slotCount; slotIndex++) {
+        if ((int)materialId == slotDefs->materialIndex) {
+            *offsetS = 0.0001f * textureSlots[slotIndex].offsetS;
+            *offsetT = 0.0001f * textureSlots[slotIndex].offsetT;
             return;
         }
-        q++;
+        slotDefs++;
     }
-    *typ = *txp = 0.0f;
+    *offsetT = *offsetS = 0.0f;
 }
-static u8 addShaderLayerStages(GameObject* obj, u8* shader, u32* p3, int mask, int p5, int p6) {
-    u16 alpha;
-    u8* colp;
-    void* tex;
-    u8* prev;
-    u8* layer;
-    u8 ok;
-    int layerIdx;
-    u8 color[4];
-    f32 m[12];
 
-    ok = 1;
-    if (p3[0] != 0 || p3[1] != 0) {
-        int i;
-        u8 cnt;
-        cnt = 0;
-        for (i = 0; i < ((Shader*)shader)->layerCount; i++) {
-            ShaderLayer* l = Shader_getLayer(shader, i);
-            if (l->typeBits & 0x80) {
-                cnt++;
+static u8 addShaderLayerStages(GameObject* obj, Shader* shader, ModelRenderOpTextureRefs* textureRefs, int layerMask, int useChannelColor, int lightCount) {
+    u16 alpha;
+    GXColor* channelColor;
+    Texture* texture;
+    ShaderLayer* previousLayer;
+    ShaderLayer* layer;
+    u8 combineLighting;
+    int layerIndex;
+    GXColor color;
+    Mtx texMatrix;
+
+    combineLighting = 1;
+    if (textureRefs->texture0 != 0 || textureRefs->texture1 != 0) {
+        int scanIndex;
+        u8 litLayerCount;
+        litLayerCount = 0;
+        for (scanIndex = 0; scanIndex < shader->layerCount; scanIndex++) {
+            ShaderLayer* scanLayer = Shader_getLayer(shader, scanIndex);
+            if (scanLayer->typeBits & 0x80) {
+                litLayerCount++;
             }
         }
-        if (cnt > 1) {
-            ok = 0;
+        if (litLayerCount > 1) {
+            combineLighting = 0;
         }
     }
-    layerIdx = 0;
-    colp = &gObjCurChanColor.r;
+    layerIndex = 0;
+    channelColor = &gObjCurChanColor;
     {
-        for (; layerIdx < ((Shader*)shader)->layerCount; layerIdx++) {
-            layer = Shader_getLayer(shader, layerIdx);
-            if ((layer[4] & 0x80) == mask) {
-                if ((((Shader*)shader)->flags & SHADER_FLAG_DECAL_LAYER) && layerIdx == 1) {
+        for (; layerIndex < shader->layerCount; layerIndex++) {
+            layer = Shader_getLayer(shader, layerIndex);
+            if ((layer->typeBits & 0x80) == layerMask) {
+                if ((shader->flags & SHADER_FLAG_DECAL_LAYER) && layerIndex == 1) {
                     u8 hasBaseTexture;
-                    if (p3[0] != 0) {
+                    if (textureRefs->texture0 != 0) {
                         hasBaseTexture = 1;
                     } else {
                         hasBaseTexture = 0;
@@ -1365,96 +1372,101 @@ static u8 addShaderLayerStages(GameObject* obj, u8* shader, u32* p3, int mask, i
                     addLitColorStage(hasBaseTexture);
                     return 1;
                 }
-                alpha = ((obj->anim.renderAlpha + 1) * ((Shader*)shader)->alpha) >> 8;
-                if (*(u32*)layer != 0) {
-                    f32(*mtxp)[4];
-                    u8 fl;
-                    tex = textureIdxToPtr(*(u32*)layer);
+                alpha = ((obj->anim.renderAlpha + 1) * shader->alpha) >> 8;
+                if (layer->texture != NULL) {
+                    MtxPtr textureMatrix;
+                    u8 blendMode;
+                    texture = textureIdxToPtr(layer->textureIndex);
                     {
-                        u32 jid = layer[5];
-                        if (jid != 0) {
-                            ObjTextureRuntimeSlot* slots = obj->anim.textureSlots;
-                            ObjDef* modelDef = obj->anim.modelInstance;
-                            ObjTextureSlotDef* q = modelDef->textureSlotDefs;
-                            int n = modelDef->textureSlotCount;
-                            int k;
-                            for (k = 0; k < n; k++) {
-                                if ((int)jid == q->materialIndex) {
-                                    tex = textureGetAnimationFrame(tex, slots[k].textureId);
+                        ObjTextureSlotDef* slotDefs;
+                        ObjTextureRuntimeSlot* textureSlots;
+                        ObjDef* objectDef;
+                        u32 materialId;
+                        int slotCount;
+                        int slotIndex;
+                        materialId = layer->materialId;
+                        if (materialId != 0) {
+                            textureSlots = obj->anim.textureSlots;
+                            objectDef = obj->anim.modelInstance;
+                            slotDefs = objectDef->textureSlotDefs;
+                            slotCount = objectDef->textureSlotCount;
+                            for (slotIndex = 0; slotIndex < slotCount; slotIndex++) {
+                                if ((int)materialId == slotDefs->materialIndex) {
+                                    texture = textureGetAnimationFrame(texture, textureSlots[slotIndex].textureId);
                                     break;
                                 }
-                                q++;
+                                slotDefs++;
                             }
                             {
-                                f32 tx;
-                                f32 ty;
-                                texSlotGetScroll(obj, layer[5], &tx, &ty);
-                                PSMTXTrans((MtxPtr)m, tx, ty, 0.0f);
-                                mtxp = (f32(*)[4])m;
+                                f32 scrollS;
+                                f32 scrollT;
+                                objGetShaderLayerScroll(obj, layer, &scrollS, &scrollT);
+                                PSMTXTrans(texMatrix, scrollS, scrollT, 0.0f);
+                                textureMatrix = texMatrix;
                             }
                         } else {
-                            mtxp = NULL;
+                            textureMatrix = NULL;
                         }
                     }
-                    if (layerIdx == 0) {
-                        if ((p3[0] != 0 || p3[1] != 0 || p6 != 0) && ok) {
-                            fl = 8;
+                    if (layerIndex == 0) {
+                        if ((textureRefs->texture0 != 0 || textureRefs->texture1 != 0 || lightCount != 0) && combineLighting) {
+                            blendMode = 8;
                         } else {
-                            fl = 0;
+                            blendMode = 0;
                         }
-                        color[3] = alpha;
+                        color.a = alpha;
                     } else {
-                        fl = prev[4] & 0x7f;
-                        color[3] = 0xff;
+                        blendMode = previousLayer->typeBits & 0x7f;
+                        color.a = 0xff;
                     }
-                    color[0] = 0xff;
-                    color[1] = 0xff;
-                    color[2] = 0xff;
-                    if (p3[0] != 0 || (shader[0] == 0xff && shader[1] == 0xff && shader[2] == 0xff)) {
-                        addTexLayerStageSwizzled(tex, mtxp, (u8)fl, (GXColor*)color, *((u8*)p3 + 8), 1);
-                    } else if (p5 != 0) {
-                        colp[3] = color[3];
-                        if (((Shader*)shader)->vtxAttrFlags & 0x10) {
-                            addTexLayerStageKColor(tex, mtxp, (u8)fl, &gObjCurChanColor);
+                    color.r = 0xff;
+                    color.g = 0xff;
+                    color.b = 0xff;
+                    if (textureRefs->texture0 != 0 || (shader->pad00[0] == 0xff && shader->pad00[1] == 0xff && shader->pad00[2] == 0xff)) {
+                        addTexLayerStageSwizzled(texture, textureMatrix, (u8)blendMode, &color, textureRefs->swapSelector, 1);
+                    } else if (useChannelColor != 0) {
+                        channelColor->a = color.a;
+                        if (shader->vtxAttrFlags & 0x10) {
+                            addTexLayerStageKColor(texture, textureMatrix, (u8)blendMode, &gObjCurChanColor);
                         } else {
-                            addTexLayerStageSwizzled(tex, mtxp, (u8)fl, &gObjCurChanColor, *((u8*)p3 + 8), 1);
+                            addTexLayerStageSwizzled(texture, textureMatrix, (u8)blendMode, &gObjCurChanColor, textureRefs->swapSelector, 1);
                         }
                     } else {
-                        if (((Shader*)shader)->vtxAttrFlags & 0x10) {
-                            addTexLayerStage(tex, mtxp, (u8)fl);
-                            if (color[3] < 0xff) {
-                                addKColorModulateStage((GXColor*)color);
+                        if (shader->vtxAttrFlags & 0x10) {
+                            addTexLayerStage(texture, textureMatrix, (u8)blendMode);
+                            if (color.a < 0xff) {
+                                addKColorModulateStage(&color);
                             }
                         } else {
-                            addTexLayerStageKAlpha(tex, mtxp, (u8)fl, (GXColor*)color);
+                            addTexLayerStageKAlpha(texture, textureMatrix, (u8)blendMode, &color);
                         }
                     }
                 } else {
-                    color[0] = shader[4];
-                    color[1] = shader[5];
-                    color[2] = shader[6];
-                    color[3] = alpha;
-                    if (p3[0] != 0 || (shader[0] == 0xff && shader[1] == 0xff && shader[2] == 0xff)) {
-                        addKColorModulateStage((GXColor*)color);
-                    } else if (p5 != 0) {
-                        colp[3] = alpha;
+                    color.r = shader->pad00[4];
+                    color.g = shader->pad00[5];
+                    color.b = shader->pad00[6];
+                    color.a = alpha;
+                    if (textureRefs->texture0 != 0 || (shader->pad00[0] == 0xff && shader->pad00[1] == 0xff && shader->pad00[2] == 0xff)) {
+                        addKColorModulateStage(&color);
+                    } else if (useChannelColor != 0) {
+                        channelColor->a = alpha;
                         addKColorModulateStage(&gObjCurChanColor);
                     } else {
-                        if (((Shader*)shader)->vtxAttrFlags & 0x10) {
+                        if (shader->vtxAttrFlags & 0x10) {
                             addVertexColorStage();
-                            if (color[3] < 0xff) {
-                                addKColorModulateStage((GXColor*)color);
+                            if (color.a < 0xff) {
+                                addKColorModulateStage(&color);
                             }
                         } else {
-                            addVertexColorKAlphaStage((GXColor*)color);
+                            addVertexColorKAlphaStage(&color);
                         }
                     }
                 }
             }
-            prev = layer;
+            previousLayer = layer;
         }
     }
-    return ok;
+    return combineLighting;
 }
 static u32 objSetupRenderOpGxState(GameObject* obj, ModelFileHeader* modelFile, ObjModel* activeModel,
                                    ModelRenderInstrsState* stream) {
@@ -1593,7 +1605,7 @@ static u32 objSetupRenderOpGxState(GameObject* obj, ModelFileHeader* modelFile, 
     }
     {
         u8 hl;
-        if (addShaderLayerStages(obj, (u8*)shader, (u32*)textureRefs, 0x80,
+        if (addShaderLayerStages(obj, shader, textureRefs, 0x80,
                                  hl = ((modelFile->shaderFlags & 2) && !(modelFile->flags24 & 2)), nlay) == 0) {
             u8 hasBaseTexture;
             if (textureRefs->texture0 != 0) {
@@ -1608,12 +1620,12 @@ static u32 objSetupRenderOpGxState(GameObject* obj, ModelFileHeader* modelFile, 
             {
                 f32 tx;
                 f32 ty;
-                texSlotGetScroll(obj, l1[5], &tx, &ty);
+                objGetShaderLayerScroll(obj, (ShaderLayer*)l1, &tx, &ty);
                 PSMTXTrans((MtxPtr)m2, tx, ty, 0.0f);
             }
             addWarpedNoiseTevStages(textureIdxToPtr(*(u32*)l1), m2);
         }
-        addShaderLayerStages(obj, (u8*)shader, (u32*)textureRefs, 0, hl, nlay);
+        addShaderLayerStages(obj, shader, textureRefs, 0, hl, nlay);
     }
     if (isHeavyFogEnabled() && !(modelFile->flags & 0x100)) {
         getFogColorRgb(fogc);
