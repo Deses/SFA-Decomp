@@ -131,6 +131,13 @@ with retail, so only the second site inverts.
 - Declaration forms (`static`, `[1]`, scalar), eight no-op expression wrappers, a subtraction temp,
   reversed compare operands (MWCC canonicalizes — `zero > field` also gives 4), and twelve `-opt`
   profiles: all 4.
+- **The code-for-data trade is worthless, verified end to end.** Despite the metric being named
+  `complete_code_percent`, taking the literal (code 8556/8556, data 504/560) through a full
+  build → report → `--write-matching` → report cycle leaves PAL at exactly 92.7016 and does **not** add
+  the unit to `matching_units.txt`. `tools/version_progress.py:report_unit_is_exact` requires
+  `matched_code == total_code` **and** `matched_data == total_data`, with both `fuzzy_match_percent` and
+  `matched_data_percent` at 100. So a unit must be whole; there is no partial credit to harvest anywhere
+  on this frontier.
 
 ### The three rotations, and `GM_MazeWell`
 
