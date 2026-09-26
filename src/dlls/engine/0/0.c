@@ -5183,11 +5183,7 @@ void pauseMenuDraw(int boxDrawParamA, int boxDrawParamB, int boxDrawParamC) {
             sprintf(tokenCountText, lbl_803DBB58, statusTable->tokens[gPauseMenuTokenIndex].thresh);
             gameTextShowStr(tokenCountText, 0x79, 0, tokenTextY + 0x78);
             gameTextMeasureStringBoundsAt(tokenCountText, 0x79, 0, 0, &tokenLeft, &tokenRight, &tokenTop, &tokenBottom);
-            {
-                s32 tokenLineHeight = tokenBottom - tokenTop;
-                tokenTextY = tokenLineHeight + tokenTextY;
-            }
-            tokenTextY += 5;
+            tokenTextY += (tokenBottom - tokenTop) + 5;
             gameTextShowAt(0x441, 0, tokenTextY + 0x78);
             gameTextMeasureById(0x441, 0, 0, &tokenLeft, &tokenRight, &tokenTop, &tokenBottom);
             tokenTextY += tokenBottom - tokenTop;
@@ -5195,11 +5191,7 @@ void pauseMenuDraw(int boxDrawParamA, int boxDrawParamB, int boxDrawParamC) {
             gameTextShowAt(taskTextIds[gPauseMenuTokenIndex * 4], 0, tokenTextY + 0x78);
             gameTextMeasureById(taskTextIds[gPauseMenuTokenIndex * 4], 0, 0, &tokenLeft, &tokenRight, &tokenTop,
                                 &tokenBottom);
-            {
-                s32 tokenLineHeight = tokenBottom - tokenTop;
-                tokenTextY = tokenLineHeight + tokenTextY;
-            }
-            tokenTextY += 0xa;
+            tokenTextY += (tokenBottom - tokenTop) + 0xa;
             gameTextShowAt(0x442, 0, tokenTextY + 0x78);
             gameTextMeasureById(0x442, 0, 0, &tokenLeft, &tokenRight, &tokenTop, &tokenBottom);
             tokenTextY += (tokenBottom - tokenTop) + 0xa;
