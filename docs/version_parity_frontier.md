@@ -272,6 +272,14 @@ produced a match anywhere, so a new idea for this frontier should not start here
   `size:0x11D4` on EN (= 1141 x 4) and `size:0x122C` on PAL, EN v1.1 and PAL v1.1 (= 1163 x 4);
   `wclevelcont_update` is `size:0x1B8` (= 110 x 4) on both lagging configs. The diffs are real, not
   windowing artifacts.
+- **The "make PAL match and version-guard it" strategy is ruled out.** Every sweep above gated on EN at
+  0 and only then measured PAL, which leaves open the idea that some shape makes *PAL* match while
+  breaking EN — that shape would be PAL's source, and the divergence would simply go behind a guard.
+  Measuring PAL for the EN-breaking variants too (typed `statusTable->tokens[i].alt` recovery in either
+  or both arms, dropping the pointer local, inlining `backdropScale`, block-scoped `taskTextIds`, and a
+  function-scope shared `tokenTextY` at all 20 positions) finds **no PAL match**, and more tellingly EN
+  and PAL move *together*: each variant produces the identical diff count on both. The 4-diff gap is
+  invariant to all of them, so there is no per-version shape to split.
 - **The inlined-callee surface does not exist for engine/0.** If a helper were inlined into
   `pauseMenuDraw`, its locals would join that function's IR and its shape would be a live knob. The unit
   is built `-inline noauto,deferred`, so only explicitly `inline` functions are candidates, and of the
