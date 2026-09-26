@@ -158,6 +158,58 @@ pointer that has no named local behind it**, so no ordering knob reaches it: the
 `found`/`itemIndex` swap and all 56 EN-safe single moves of the 8 function-scope declarations are flat
 at 14.
 
+## The v1.1 frontier is a DIFFERENT set — check it separately
+
+`tools/version_progress.py GSAE01_rev1` does not list the same units as `GSAP01`. EN v1.1's gap is
+**+4.393** over 6 real units, and two of them are not on PAL's list at all:
+
+| unit | pts | blocker on EN v1.1 |
+| --- | --- | --- |
+| `dlls/engine/0/0.c` | +2.620 | `pauseMenuDraw`, same 4 diffs as PAL |
+| `main/gametext.c` | +0.791 | `gameTextBuildSystemFontAtlas` — **v1.1 only**, complete on PAL and PAL v1.1 |
+| `dlls/objects/653_WCLevelCont` | +0.295 | `wclevelcont_update`, same 4 diffs |
+| `dlls/engine/2/maketex.c` | +0.236 | `loadMemCardImages`, plus `saveCardBuildComment` SIZE 108/109 on v1.1 only |
+| `dlls/engine/53/53.c` | +0.229 | `SaveSelectScreen_render`, same |
+| `dlls/objects/589_BossDrakor` | +0.222 | `bossdrakor_update`, same rotation |
+
+PAL v1.0 has `main/gameloop.c` and `611_GM_MazeWell` instead, and its `gametext` is complete. So the
+two lagging families need partly different work, and a fix verified only on PAL can leave v1.1 short.
+
+**One of these was a real mis-guard, now fixed.** `bossdrakor_update`'s `" DRAKOR SPEED %f "` trace was
+guarded to the European builds, but EN v1.1 emits it too: its retail `.data` carries the 18-byte string
+right after the jump table, and the call sequence is
+`lfs f1,0(r30); fmr f30,f1; lis/addi r3,<string>; crset 4*cr1+eq; bl logPrintf`, then the unscaled
+`advanceStep` goes straight to `Obj_UpdateRomCurveFollowVelocityIndexed` — v1.1 has **no** 50Hz
+rescaling, so it needs its own arm, not the PAL one. That took the unit's `.text` size from 0x1914 to
+retail's 0x192c, its **data from 144/496 to 496/496**, and made `bossdrakor_init` match. The lesson is
+general: **a size or data mismatch is a mis-guarded version feature and is findable; a same-length
+register permutation is not.** Screen for the former before spending probes on the latter.
+
+**Infrastructure note.** While chasing that, two of rev1's BossDrakor functions
+(`bossdrakor_spawnAttackObjects`, `bossdrakor_handleActionEvent`) showed diffs that are **not** source
+defects: the retail carve at `build/GSAE01_rev1/obj/.../BossDrakor.o` dates from 2026-09-09 while
+`config/GSAE01_rev1/symbols.txt` was updated 2026-09-25, so six `bl`s to `s16toFloat` (present in that
+config at 0x80080404, the exact branch target) were left unrelocated. Nothing in the ninja graph
+produces those objects — they are inputs to `main.elf` — so staleness is invisible to the build. A scan
+of all four versions' objects for the frontier units found this in **GSAE01_rev1's BossDrakor only**
+(6 raw branches; `gametext` has 3 and `gameloop` 1 on every version, which is normal), so it is not a
+systemic understatement. Worth re-carving that version's objects when convenient.
+
+**`gameTextBuildSystemFontAtlas` (v1.1, +0.791)** is a textbook scratch-band signature: 306/306
+instructions, everything identical through instruction 236, then a clean **rotation of `r3..r11` by
+one** (`r3`→`r4`, … `r10`→`r11`, `r11`→`r3`) across the inlined `gameTextCopySystemFontTile` body.
+CLAUDE.md calls that a per-TU flag signature, but no profile reaches it: eight `-opt` profiles and
+seven `-inline` settings all leave EN at 0 and v1.1 at 36, except those that break EN too. Reshaping
+the caller's tile-copy block is a live knob that moves **EN** (hoisting the texture base gives EN 29
+diffs at 275/275 instructions), which only confirms the mechanism — the block is already right for the
+four versions that match. Coalescing aliases in v1.1's own `switch (OSGetFontEncode())` arms are
+completely inert, because MWCC folds them away without allocating anything.
+
+**Measurement hazard found the hard way:** `gameTextSetLanguage` reads as 17 diffs on PAL from a
+stale object and as `MATCH` once rebuilt, and the same unit is reported complete by `report.json`.
+Always rebuild immediately before extracting, and prefer the ninja-built object for any unit listed in
+that version's `matching_units.txt`.
+
 ## Axes that are exhausted across all seven, not just one
 
 These were each run against every unit where they could apply, always with EN gated at 0 diffs. None
