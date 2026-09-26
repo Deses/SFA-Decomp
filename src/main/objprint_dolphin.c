@@ -1332,13 +1332,13 @@ static inline void objGetShaderLayerScroll(GameObject* obj, const ShaderLayer* l
 
 static u8 addShaderLayerStages(GameObject* obj, Shader* shader, ModelRenderOpTextureRefs* textureRefs, int layerMask,
                                int useChannelColor, int lightCount) {
+    int layerIndex;
+    ShaderLayer* layer;
+    ShaderLayer* previousLayer;
     u16 alpha;
     GXColor* channelColor;
     Texture* texture;
-    ShaderLayer* previousLayer;
-    ShaderLayer* layer;
     u8 combineLighting;
-    int layerIndex;
     GXColor color;
     Mtx texMatrix;
 
@@ -1426,24 +1426,24 @@ static u8 addShaderLayerStages(GameObject* obj, Shader* shader, ModelRenderOpTex
                     color.b = 0xff;
                     if (textureRefs->texture0 != 0 ||
                         (shader->pad00[0] == 0xff && shader->pad00[1] == 0xff && shader->pad00[2] == 0xff)) {
-                        addTexLayerStageSwizzled(texture, textureMatrix, (u8)blendMode, &color,
+                        addTexLayerStageSwizzled(texture, textureMatrix, blendMode, &color,
                                                  textureRefs->swapSelector, 1);
                     } else if (useChannelColor != 0) {
                         channelColor->a = color.a;
                         if (shader->vtxAttrFlags & 0x10) {
-                            addTexLayerStageKColor(texture, textureMatrix, (u8)blendMode, &gObjCurChanColor);
+                            addTexLayerStageKColor(texture, textureMatrix, blendMode, &gObjCurChanColor);
                         } else {
-                            addTexLayerStageSwizzled(texture, textureMatrix, (u8)blendMode, &gObjCurChanColor,
+                            addTexLayerStageSwizzled(texture, textureMatrix, blendMode, &gObjCurChanColor,
                                                      textureRefs->swapSelector, 1);
                         }
                     } else {
                         if (shader->vtxAttrFlags & 0x10) {
-                            addTexLayerStage(texture, textureMatrix, (u8)blendMode);
+                            addTexLayerStage(texture, textureMatrix, blendMode);
                             if (color.a < 0xff) {
                                 addKColorModulateStage(&color);
                             }
                         } else {
-                            addTexLayerStageKAlpha(texture, textureMatrix, (u8)blendMode, &color);
+                            addTexLayerStageKAlpha(texture, textureMatrix, blendMode, &color);
                         }
                     }
                 } else {

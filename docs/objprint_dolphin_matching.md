@@ -26,35 +26,43 @@ The complete TU remains `NonMatching`; other functions still have differences.
 
 ## addShaderLayerStages
 
-The 2026-09-26 pass improves `addShaderLayerStages` from 99.184395% to
-99.57447%, and `objSetupRenderOpGxState` from 99.52429% to 99.67612%, in all
-five versions. `objFuzzRenderCb` remains exact. The TU remains `NonMatching`.
+`addShaderLayerStages` matches all 1,128 bytes (282 instructions) under the
+existing GC/1.3 TU profile in EN v1.0, EN rev1, JP, PAL v1.0, and PAL rev1.
+The 2026-09-26 follow-up improves it from 99.57447% to 100%.
 
-The animation lookup now declares its material ID and slot traversal together.
-The scroll helper takes the `ShaderLayer` and reads its material ID locally;
-ordering its locals recovers the second lookup's retail registers. Both lookup
-loops now have exact instruction operands, apart from their containing layer
-pointer. Canonical shader, texture-reference, layer, color, and matrix types
-replace the raw views in the active function, with names describing lighting,
-material lookup, and texture scrolling.
+The final change removes five redundant `(u8)` casts from `blendMode`, which
+already has type `u8`, and declares the layer index, current layer, and previous
+layer before the alpha and texture locals. The rendering operations and control
+flow are unchanged. No compiler settings or TU boundaries change.
 
-There are still 22 instructions with register differences in the 282-instruction
-function. LLDB captures of GC/1.3, checked against the ordinary compiler's raw
-object hash, reproduce both graph simplification and physical register choices.
-The remaining allocation removes the channel-color pointer at degree 31 / cost
-15, then the light-count argument at degree 30 / cost 17. These decisions shift
-the saved registers for the light count, layer index, layer pointers, and alpha.
-Reordering outer declarations, sharing loop indices, extracting larger helpers,
-and changing mode casts did not close this gap. No compiler settings changed.
+The casts were significant to allocation despite being redundant in C. With
+them, the compiler graph contained 137 nodes, including five additional
+coalesced temporaries. Simplification selected the channel-color pointer and
+then the light-count argument as high-degree removals, leaving 22 instructions
+with different register operands. Removing the casts reduces the graph to 132
+nodes and eliminates those forced choices. A replay of this graph predicts the
+retained local declaration order; ordinary compilation confirms the exact match.
+Removing the casts alone does not match.
 
-Reproduce the capture with:
+The final LLDB capture agrees with the ordinary compiler's complete raw object
+hash, aligns all 282 instructions with retail, and replays all 95 physical
+register choices with no high-degree removals. Reproduce it with:
 
 ```sh
 python3 tools/tricky_backend_trace.py --unit main/main/objprint_dolphin \
     --function addShaderLayerStages --graph --output build/add_shader_layers_trace
+python3 tools/unitfuzzy.py objprint_dolphin --symbol addShaderLayerStages
 ```
 
-Validation: all five input DOL hashes checked; only the two functions above
-change instruction bytes, and those changes are exclusively register operands.
-Allocated section layout and non-text bytes are unchanged. The EN
-`ninja all_source` and strict retail checksum targets pass.
+Validation on 2026-09-26:
+
+- Each of the five input DOL hashes verified against its version configuration.
+- Fresh before/after objects report 100% for this function in all five versions.
+  Only its 25 instruction bytes change; all other functions, allocated section
+  layouts, non-text contents, named-symbol layouts, and relocations are unchanged.
+- `objFuzzRenderCb` remains exact; `objSetupRenderOpGxState` remains 99.67612%.
+- The EN `ninja all_source`, strict retail checksum target, and formatter checks
+  pass. Formatting preserves the raw object.
+
+The complete TU remains `NonMatching`; other functions still have differences.
+The exact function does not establish the original local declaration order.
