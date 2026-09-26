@@ -272,6 +272,15 @@ produced a match anywhere, so a new idea for this frontier should not start here
   `size:0x11D4` on EN (= 1141 x 4) and `size:0x122C` on PAL, EN v1.1 and PAL v1.1 (= 1163 x 4);
   `wclevelcont_update` is `size:0x1B8` (= 110 x 4) on both lagging configs. The diffs are real, not
   windowing artifacts.
+- **The inlined-callee surface does not exist for engine/0.** If a helper were inlined into
+  `pauseMenuDraw`, its locals would join that function's IR and its shape would be a live knob. The unit
+  is built `-inline noauto,deferred`, so only explicitly `inline` functions are candidates, and of the
+  14 `static inline` helpers in the file `pauseMenuDraw` calls **none**. Nothing is inlined into it, so
+  there is no callee local set to reshape.
+- **Redundant occurrences in SHARED code are inert too.** Duplicating `tokenTextY`'s initializer (x2 and
+  x3) or the `taskTextIds` assignment, in either token case, leaves EN at 0 and PAL at 4: MWCC removes
+  the redundant store outright, so the IR is unchanged. This was the last mechanism that could have
+  produced a stream-invisible difference in code EN also compiles.
 - **TU `-opt` profiles.** Twelve profiles per unit. Every unit's configured profile is already the one
   that keeps EN byte-identical, and every alternative wrecks EN by thousands of diff words. Probed on
   engine/0 (`pauseMenuDraw` 4 under the configured profile, 4 or 200+ under all others), maketex,
