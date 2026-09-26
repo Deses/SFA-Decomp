@@ -663,6 +663,8 @@ void bossdrakor_update(GameObject* obj) {
 #if defined(VERSION_GSAP01) || defined(VERSION_GSAP01_rev1)
     f32 curveStep;
     f32 advanceStep;
+#elif defined(VERSION_GSAE01_rev1)
+    f32 advanceStep;
 #endif
     BossDrakorState* state;
     int moveResult;
@@ -724,6 +726,11 @@ void bossdrakor_update(GameObject* obj) {
     logPrintf(" DRAKOR SPEED %f ", advanceStep);
     moveResult = Obj_UpdateRomCurveFollowVelocityIndexed(obj, &drakorState->curveWalker, curveStep, 200.0f, 10.0f,
                                                          1, &drakorState->curveFollowState);
+#elif defined(VERSION_GSAE01_rev1)
+    advanceStep = drakorState->curveAdvanceStep;
+    logPrintf(" DRAKOR SPEED %f ", advanceStep);
+    moveResult = Obj_UpdateRomCurveFollowVelocityIndexed(obj, &drakorState->curveWalker, advanceStep, 200.0f,
+                                                         10.0f, 1, &drakorState->curveFollowState);
 #else
     moveResult = Obj_UpdateRomCurveFollowVelocityIndexed(obj, &drakorState->curveWalker, drakorState->curveAdvanceStep,
                                                          200.0f, 10.0f, 1, &drakorState->curveFollowState);
