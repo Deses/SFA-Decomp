@@ -1480,9 +1480,10 @@ static u32 objSetupRenderOpGxState(GameObject* obj, ModelFileHeader* modelFile, 
     ModelRenderOpTextureRefs* textureRefs;
     u32 shaderIndex;
     u8 shad;
-    ModelLightStruct** lp;
-    int envtex;
+    u8 zCompareBeforeTexture;
     int nlay;
+    int envtex;
+    ModelLightStruct** lp;
     u8* sp;
     int i;
     ObjModelRenderCb cb;
@@ -1610,9 +1611,9 @@ static u32 objSetupRenderOpGxState(GameObject* obj, ModelFileHeader* modelFile, 
         }
     }
     {
-        u8 hl;
-        if (addShaderLayerStages(obj, shader, textureRefs, 0x80,
-                                 hl = ((modelFile->shaderFlags & 2) && !(modelFile->flags24 & 2)), nlay) == 0) {
+        u8 useChannelColor;
+        useChannelColor = ((modelFile->shaderFlags & 2) && !(modelFile->flags24 & 2));
+        if (addShaderLayerStages(obj, shader, textureRefs, 0x80, useChannelColor, nlay) == 0) {
             u8 hasBaseTexture;
             if (textureRefs->texture0 != 0) {
                 hasBaseTexture = 1;
@@ -1631,7 +1632,7 @@ static u32 objSetupRenderOpGxState(GameObject* obj, ModelFileHeader* modelFile, 
             }
             addWarpedNoiseTevStages(textureIdxToPtr(*(u32*)l1), m2);
         }
-        addShaderLayerStages(obj, shader, textureRefs, 0, hl, nlay);
+        addShaderLayerStages(obj, shader, textureRefs, 0, useChannelColor, nlay);
     }
     if (isHeavyFogEnabled() && !(modelFile->flags & 0x100)) {
         getFogColorRgb(fogc);
@@ -1667,7 +1668,7 @@ static u32 objSetupRenderOpGxState(GameObject* obj, ModelFileHeader* modelFile, 
         if (pcb != NULL) {
             pcb((int*)obj, (int*)activeModel, shaderIndex);
         } else {
-            u8 zon = 1;
+            zCompareBeforeTexture = 1;
             if (obj->anim.renderAlpha < 0xff || (shader->flags & SHADER_FLAG_FORCE_BLEND) || shad) {
                 u16 flags;
                 GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);
@@ -1676,7 +1677,7 @@ static u32 objSetupRenderOpGxState(GameObject* obj, ModelFileHeader* modelFile, 
                     gxSetZMode_(0, GX_LEQUAL, 0);
                     GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
                 } else if (flags & 0x2000) {
-                    zon = 0;
+                    zCompareBeforeTexture = 0;
                     gxSetZMode_(1, GX_LEQUAL, 1);
                     GXSetAlphaCompare(GX_GREATER, gObjAlphaCompareThreshold, GX_AOP_AND, GX_GREATER,
                                       gObjAlphaCompareThreshold);
@@ -1702,9 +1703,9 @@ static u32 objSetupRenderOpGxState(GameObject* obj, ModelFileHeader* modelFile, 
                 GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
             }
             if (shader->flags & SHADER_FLAG_ALPHA_TEST_OPAQUE) {
-                zon = 0;
+                zCompareBeforeTexture = 0;
             }
-            gxSetPeControl_ZCompLoc_(zon);
+            gxSetPeControl_ZCompLoc_(zCompareBeforeTexture);
         }
     }
     if (shader->flags & SHADER_FLAG_BACKFACE_CULL) {

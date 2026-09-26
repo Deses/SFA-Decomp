@@ -66,3 +66,43 @@ Validation on 2026-09-26:
 
 The complete TU remains `NonMatching`; other functions still have differences.
 The exact function does not establish the original local declaration order.
+
+## objSetupRenderOpGxState
+
+The 2026-09-27 pass improves `objSetupRenderOpGxState` from **99.67612% to
+99.92915%** in all five retail versions under the existing GC/1.3 profile.
+It is **not yet an exact match**. All 494 instructions have the retail operation
+and order; six instructions still use different registers.
+
+The source now assigns `useChannelColor` before the first layer-stage call,
+declares the light count before the environment-map coordinate and light-list
+pointer, and declares `zCompareBeforeTexture` with the other outer locals.
+Its initialization remains in the post-render fallback. These changes correct
+25 of the previous 31 instruction differences without changing rendering logic.
+
+The remaining mismatch exchanges the projected-light loop index (`r20`, retail
+`r19`) and texture pointer (`r19`, retail `r20`). In the verified compiler graph,
+the texture node starts with degree 28 and is removed in the first low-degree
+sweep; the index starts with degree 30 and waits until a later sweep. The
+threshold is strictly below 29. Moving their declarations alone did not resolve
+the swap. Investigate the call/result temporaries and interference around this
+loop before repeating declaration-order searches.
+
+Reproduce the current frontier with:
+
+```sh
+python3 tools/unitfuzzy.py objprint_dolphin --symbol objSetupRenderOpGxState
+python3 tools/tricky_backend_trace.py --unit main/main/objprint_dolphin \
+    --function objSetupRenderOpGxState --graph --output build/setup_gx_trace
+```
+
+Validation:
+
+- All five input DOL hashes verified against their version configurations.
+- Fresh before/after objects change only this function's 30 instruction bytes.
+  Other function scores and bytes, allocated section layouts, non-text contents,
+  and named-symbol layouts are unchanged. Later anonymous literal names advance
+  by one; relocation types, sites, addends, and target section offsets stay fixed.
+- `objFuzzRenderCb` and `addShaderLayerStages` remain 100% in all five versions.
+- EN `ninja all_source` and the strict retail checksum target pass.
+- The TU remains `NonMatching`; no regional completion manifest is promoted.
