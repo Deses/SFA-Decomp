@@ -395,6 +395,32 @@ mechanism that produces such a difference has now been tried, all gated on EN at
 So the invisible difference exists but is not in any construct reachable from these five functions'
 sources. That is where this frontier stands.
 
+## `docs/priced_classes.md` already priced this class — read it FIRST next time
+
+This whole frontier sits inside classes the campaign measured long before this session, and the ledger's
+index states them in one line each. Consulting it first would have saved most of the work above:
+
+- **The colouring frontier is MEASURED EXHAUSTED on both order axes.** §26/§27 built and scored
+  **34 100 orderings** over all 128 attackable colouring rows (25 335 declaration + 8 236 statement + 529
+  by hand) for **8 hits**; §31 then added **7 000** more orderings and rewrites over the 67-row /
+  113 512 B non-bijective population — 5 717 statement, 503 split, 381 operand, 399 declaration — for
+  **0 hits, 0 bytes**. Roughly 41 000 gated builds, and the five rows here are in exactly that
+  population.
+- **§31e covers the float half directly:** a declaration never touches `f0`-`f13`, measured over
+  **8 085 differing FPR operands, 0 volatile**. `wclevelcont_update`'s `f0`/`f1` pair is that row, and
+  `expr_sweep` (above) closes the expression axis on it too.
+- **§29 already proved the parameter-home point** this session re-derived: "the six-permutation proof
+  that a parameter home is not reachable from the declaration list", 8 rows worked off the byte ranking,
+  33 spellings, yield 0.
+- **The pool-order rows are priced, not open.** The ledger's "mover" row says only one construct puts a
+  pool word ahead of its first live loader — a `static const` aggregate of at most 8 bytes — and that is
+  the banned `SINGLE_ELEM_CONST_ARRAY` shape, with the patch deliberately parked and never landed. That
+  is exactly `objhits`/`sal_volume`/`trigf`, and §12b showed the ban is on the shape rather than the
+  bracket, so there is no legal spelling.
+
+This session's independent sweeps agree with all four rows, which is reassuring but was not new
+information. **The lesson: price a row against `docs/priced_classes.md` before sweeping it.**
+
 ## Reference mining — what the projects do and do not give
 
 - `reference_projects/rena-tools/sfadebug` is a decomp of the SFA **PAL debug build** (from
