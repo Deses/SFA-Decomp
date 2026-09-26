@@ -69,6 +69,15 @@ Refuted (EN held at 0 diffs throughout unless noted):
   random moves per step, plateau walking) and the `lineSpan` block spelling, gating EN at 0 every
   step, logged nothing below 4. Single-knob flatness at width 6 is not an artifact of searching one
   knob at a time.
+- **The PAL-only statement knob is live, and its reachable states were enumerated.** `case 4:` carries
+  a PAL-exclusive `lineHeight = gGameTextFontMetrics[sLanguageNameTable[getCurLanguage()].fontId].lineHeight;`
+  whose spelling EN never sees, so it steers PAL's band for free. Introducing a GPR temp there really
+  does re-colour: a `fontId` temp gives **8**, a `language` temp **13**, reusing `textHeight` or `x`
+  **8**, reusing `stringIndex` **23**, reusing `textY` **29**, a result-only temp **4**. Chaining 1, 2,
+  3 or 4 temps all give **13** — it saturates immediately, exactly as the pressure-counter model says.
+  Baseline 4 remains the minimum over every state reachable this way, and none of them is retail's
+  colouring. Merging `lineSpan` into `timer` or `zero`, or declaring it unguarded, is inert at 4 —
+  consistent with the GPR and FP counters being independent.
 
 ### `maketex` / `loadMemCardImages` — root-caused, 2 instructions
 
