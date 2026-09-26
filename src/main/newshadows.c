@@ -351,16 +351,16 @@ void allocLotsOfTextures(void) {
     {
         int i;
         int j;
-        f32 mx = 0.0f;
+        f32 cc, d1, d2, cc2, d3, b;
+        f64 n2, n3;
+        f32 a, n1, mx;
+        f32 fi, fi2;
+        mx = 0.0f;
         for (i = 0; i < 0x40; i++) {
-            f32 fi, fi2;
             j = 0;
             fi = i - 32.0f;
             fi2 = (f32)(i + 1) - 32.0f;
             for (; j < 0x40; j++) {
-                f32 cc, d1, d2, cc2, d3, b;
-                f64 n2, n3;
-                f32 a, n1;
                 rc = fi / 32.0f;
                 rc2 = fi2 / 32.0f;
                 cc = ((f32)j - 32.0f) / 32.0f;
@@ -397,12 +397,13 @@ void allocLotsOfTextures(void) {
                     f32 cc, d1, d2, cc2, d3, n1, n2, n3, a, b, rowCoord;
                     f32 c;
                     int bi, ci, ai;
-                    dst = (u8*)gNewShadowBumpTexture + lowoff;
+                    u8* pixelBase = (u8*)gNewShadowBumpTexture + lowoff;
+                    u8* tileBase;
                     rowCoord = fj / 32.0f;
                     rc2 = fj2 / 32.0f;
-                    dst += bumpRowOff;
-                    dst += (x & 3) * 8;
-                    dst += (x >> 2) * 0x200;
+                    tileBase = pixelBase + bumpRowOff;
+                    tileBase += (x & 3) * 8;
+                    dst = tileBase + (x >> 2) * 0x200;
                     cc = (f32)x - 32.0f;
                     cc /= 32.0f;
                     d1 = sqrtf(rowCoord * rowCoord + cc * cc);
@@ -444,14 +445,14 @@ void allocLotsOfTextures(void) {
 
     gNewShadowRampTexture = textureAlloc(0x100, 4, 1, 0, 0, 0, 0, 0, 0);
     {
+        u8 value;
         int x, y;
         for (x = 0; x < 256; x++) {
             for (y = 0; y < 4; y++) {
-                u8* texel = (u8*)gNewShadowRampTexture + (x & 7);
-                texel += (x >> 3) * 32;
-                texel += (y & 3) * 8;
-                texel += (y >> 2) * 1024;
-                texel[sizeof(Texture)] = x;
+                u8* pixelBase = (u8*)gNewShadowRampTexture + (x & 7);
+                u8* tileBase = pixelBase + (x >> 3) * 32;
+                value = x;
+                tileBase[(y & 3) * 8 + (y >> 2) * 1024 + sizeof(Texture)] = value;
             }
         }
     }
@@ -459,14 +460,14 @@ void allocLotsOfTextures(void) {
 
     gNewShadowInverseRampTexture = textureAlloc(0x100, 4, 1, 0, 0, 0, 0, 1, 1);
     {
+        u8 value;
         int x, y;
         for (x = 0; x < 256; x++) {
             for (y = 0; y < 4; y++) {
-                u8* texel = (u8*)gNewShadowInverseRampTexture + (x & 7);
-                texel += (x >> 3) * 32;
-                texel += (y & 3) * 8;
-                texel += (y >> 2) * 1024;
-                texel[sizeof(Texture)] = 255 - x;
+                u8* pixelBase = (u8*)gNewShadowInverseRampTexture + (x & 7);
+                u8* tileBase = pixelBase + (x >> 3) * 32;
+                value = 255 - x;
+                tileBase[(y & 3) * 8 + (y >> 2) * 1024 + sizeof(Texture)] = value;
             }
         }
     }
