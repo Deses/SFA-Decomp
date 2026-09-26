@@ -259,6 +259,38 @@ of them indexes a base that is re-loaded from a global pointer every iteration
 (`lwz r5,0(0); lbzx r5,r5,r0`), which an explicit pointer local cannot reproduce without hoisting that
 load. So the source shape is already right.
 
+## The gap set is PROVEN closed — there is no alternative route
+
+Worth establishing rather than assuming, because the natural hope is that some *other* unit could close
+the gap instead of the hard ones:
+
+- **No unit is complete on a lagging version but incomplete on EN.** That reverse set is **empty** for
+  GSAP01, so there is no banked gap closure anywhere and none to find.
+- **Every unit incomplete on EN is incomplete by the identical amount on all five versions.** `objhits`
+  (8392/8480), `sal_volume` (592/612), `trigf` (56/60), `objprint_dolphin` (18104/25004) report the same
+  numbers everywhere. Closing any of them raises EN's ceiling by the same points, so the *delta* does not
+  move. Only `model` differs at all (EN 23600/25288, PAL 23276/25308) and it is far from complete on both.
+
+So the parity gap is exactly the seven units in the table above, and the five colouring ties are the
+whole of it. Any future idea has to attack one of those functions.
+
+### `objhits` looks like the biggest prize anywhere (+0.905 on every version) and is rule-bound shut
+
+Its code is **already 100%** (25988/25988) on all five versions and only its `.sdata2` fails, so it
+reads as an 88-byte data fix. It is not:
+
+- All **134** float-pool loads resolve to the **correct value** on both sides — the code is genuinely
+  right, and a wrong-constant bug hiding behind objdiff's `@N`-vs-`lbl_` leniency was the obvious
+  suspect. Ruled out by resolving every referenced atom's bytes.
+- Retail's pool holds **18** atoms to our 17, including one at 0x14 that **no instruction references** —
+  a dead literal in retail's source — and its order differs (`0.0, 2.0, 1.0, 0.1, 1e-6, 0.0(dead), …`
+  against our `0.0, 1.0, 1e-6, …, 0.1, 2.0`).
+
+That is a genuine pool-**order** difference, which CLAUDE.md addresses directly: *"If the pool ORDER
+genuinely differs … that is a TU-boundary artifact — leave the unit NonMatching, do not reconstruct the
+pool."* Reconstructing it would also mean planting a dead literal to reproduce an unreferenced atom.
+Leave it. `sal_volume` (20 B) and `trigf` (4 B) are the same shape at smaller scale.
+
 ## Axes that are exhausted across all seven, not just one
 
 These were each run against every unit where they could apply, always with EN gated at 0 diffs. None
