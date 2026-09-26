@@ -552,9 +552,9 @@ void allocLotsOfTextures(void) {
     {
         int off2;
         int off;
+        u8* base;
         int lowoff;
         int rowoff;
-        u8* base;
         int i;
         int j;
         for (i = 0; i < 0x20; i++) {
