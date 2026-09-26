@@ -1753,12 +1753,18 @@ void updateHeavyFogTexture(int intensity) {
 void blendTextures(Texture* src1, Texture* src2, f32 blend, Texture* dst) {
     u32 tileRow;
     u32 rowInTile;
+    int tileOffset;
     u32 weightA;
     int rowDataOffset;
     int tileColumnOffset;
     int pixelColumnOffset;
+    int pixelOffset;
+    int texelA;
+    int texelB;
     int pixelA;
+    int i;
     int pixelB;
+    int j;
     int x;
     int y;
     u32 weightB;
@@ -1766,9 +1772,7 @@ void blendTextures(Texture* src1, Texture* src2, f32 blend, Texture* dst) {
     int redA;
     int blue;
     int red;
-    int green;
-    u16 outputPixel;
-    int address;
+    int temp;
     u32 rowWidth;
     u8* sourcePixelA;
     u8* sourcePixelB;
@@ -1816,70 +1820,57 @@ void blendTextures(Texture* src1, Texture* src2, f32 blend, Texture* dst) {
             rowInTile = (y & 3) * 8;
             for (; x < (int)(rowWidth = src1->width); x++) {
                 pixelColumnOffset = (x & 3) * 2;
-                address = (int)((u8*)src1 + pixelColumnOffset);
+                temp = (int)((u8*)src1 + pixelColumnOffset);
                 tileColumnOffset = (x >> 2) * 0x20;
-                address = (int)((u8*)address + tileColumnOffset);
-                address = address + rowInTile;
+                temp = (int)((u8*)temp + tileColumnOffset);
+                temp = temp + rowInTile;
                 rowDataOffset = (int)rowWidth * tileRow * 2;
-                sourcePixelA = (u8*)address + rowDataOffset;
+                sourcePixelA = (u8*)temp + rowDataOffset;
                 pixelA = *(u16*)(sourcePixelA + sizeof(Texture));
                 redA = (pixelA & 0xf800) >> 8;
                 redA = (u8)(redA | ((pixelA & 0xe000) >> 13));
-                address = (int)((u8*)src2 + pixelColumnOffset);
-                address = (int)((u8*)address + tileColumnOffset);
-                address = address + rowInTile;
-                sourcePixelB = (u8*)address + rowDataOffset;
+                temp = (int)((u8*)src2 + pixelColumnOffset);
+                temp = (int)((u8*)temp + tileColumnOffset);
+                temp = temp + rowInTile;
+                sourcePixelB = (u8*)temp + rowDataOffset;
                 pixelB = *(u16*)(sourcePixelB + sizeof(Texture));
-                redB = ((pixelB & 0xf800) >> 8) | ((pixelB & 0xe000) >> 13);
+                redB = temp = ((pixelB & 0xf800) >> 8) | ((pixelB & 0xe000) >> 13);
                 blue = ((u8)(((int)(weightA * (u8)(((pixelA & 0x1f) << 3) | ((pixelA & 0x1c) >> 2))) >> 8) +
                              ((int)(weightB * (u8)(((pixelB & 0x1f) << 3) | ((pixelB & 0x1c) >> 2))) >> 8)) &
                         0xf8) >>
                        3;
                 red = ((u8)(((int)(redA * weightA) >> 8) + ((int)(redB * weightB) >> 8)) & 0xf8) << 8;
-                green = ((u8)(((int)(weightA * (u8)(((pixelA & 0x7e0) >> 3) | ((pixelA & 0x600) >> 9))) >> 8) +
-                              ((int)(weightB * (u8)(((pixelB & 0x7e0) >> 3) | ((pixelB & 0x600) >> 9))) >> 8)) &
-                         0xfc)
-                        << 3;
-                outputPixel = blue | (red | green);
-                address = (int)((u8*)dst + pixelColumnOffset);
-                address = (int)((u8*)address + tileColumnOffset);
-                address = address + rowInTile;
-                destinationPixel = (u8*)address + rowDataOffset;
-                *(u16*)(destinationPixel + sizeof(Texture)) = outputPixel;
+                *(u16*)((u8*)(dst + 1) + pixelColumnOffset + tileColumnOffset + rowInTile + rowDataOffset) =
+                    blue |
+                    (red | (((u8)(((int)(weightA * (u8)(((pixelA & 0x7e0) >> 3) | ((pixelA & 0x600) >> 9))) >> 8) +
+                                  ((int)(weightB * (u8)(((pixelB & 0x7e0) >> 3) | ((pixelB & 0x600) >> 9))) >> 8)) &
+                             0xfc)
+                            << 3));
             }
         }
     } else {
-        int tileOffset;
-        int pixelOffset;
-        int texelA, texelB;
-        u8 greenB, greenA, redA8, redB8;
-        int i, j;
+        u8 greenB, greenA, redB8, redA8;
         for (j = 0; j < src1->height; j++) {
             i = 0;
             tileRow = (j >> 2) * 8;
             rowInTile = (j & 3) * 8;
             for (; i < (int)(rowWidth = src1->width); i++) {
                 pixelOffset = (i & 3) * 2;
-                address = (int)((u8*)src1 + pixelOffset);
+                temp = (int)((u8*)src1 + pixelOffset);
                 tileOffset = (i >> 2) * 0x40;
-                address = (int)((u8*)address + tileOffset);
-                address = address + rowInTile;
+                temp = (int)((u8*)temp + tileOffset);
+                temp = temp + rowInTile;
                 rowDataOffset = (int)rowWidth * tileRow * 2;
-                sourcePixelA = (u8*)address + rowDataOffset;
-                address = (int)((u8*)src2 + pixelOffset);
-                address = (int)((u8*)address + tileOffset);
-                address = address + rowInTile;
-                sourcePixelB = (u8*)address + rowDataOffset;
-                redA8 = *(u16*)(sourcePixelA + sizeof(Texture));
-                redB8 = *(u16*)(sourcePixelB + sizeof(Texture));
-                texelA = *(u16*)(sourcePixelA + sizeof(Texture) + 0x20);
-                greenA = (texelA & 0xff00) >> 8;
-                texelB = *(u16*)(sourcePixelB + sizeof(Texture) + 0x20);
-                greenB = (texelB & 0xff00) >> 8;
-                address = (int)((u8*)dst + pixelOffset);
-                address = (int)((u8*)address + tileOffset);
-                address = address + rowInTile;
-                destinationPixel = (u8*)address + sizeof(Texture);
+                sourcePixelA = (u8*)temp + rowDataOffset;
+                temp = (int)((u8*)src2 + pixelOffset);
+                temp = (int)((u8*)temp + tileOffset);
+                temp = temp + rowInTile;
+                sourcePixelB = (u8*)temp + rowDataOffset;
+                redA8 = temp = *(u16*)(sourcePixelA + sizeof(Texture));
+                redB8 = temp = *(u16*)(sourcePixelB + sizeof(Texture));
+                greenA = ((texelA = *(u16*)(sourcePixelA + sizeof(Texture) + 0x20)) & 0xff00) >> 8;
+                greenB = ((texelB = *(u16*)(sourcePixelB + sizeof(Texture) + 0x20)) & 0xff00) >> 8;
+                destinationPixel = (u8*)(dst + 1) + pixelOffset + tileOffset + rowInTile;
                 /* Retail writes the red byte with zero alpha. */
                 *(u16*)(destinationPixel + rowDataOffset) =
                     (u8)(((int)(redA8 * weightA) >> 8) + ((int)(redB8 * weightB) >> 8));
