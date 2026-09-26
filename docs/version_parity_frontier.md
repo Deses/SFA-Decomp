@@ -264,6 +264,14 @@ load. So the source shape is already right.
 These were each run against every unit where they could apply, always with EN gated at 0 diffs. None
 produced a match anywhere, so a new idea for this frontier should not start here.
 
+- **The complete flag space on engine/0, the +2.620 unit.** 33 trials: `-O0` through `-O4,s`, eight
+  `-inline` settings, `-fp_contract`, `-use_lmw_stmw`, three `-str` modes, `-sdata`/`-sdata2` at 0/4/8/64,
+  and `-enum int|min`. Every setting that keeps EN byte-identical leaves PAL at exactly **4**; every
+  other setting breaks EN by 900-1100 diff words. `-O4,p` is the configured level and is correct.
+- **Symbol boundaries verified, so the compared windows are right.** `pauseMenuDraw` is declared
+  `size:0x11D4` on EN (= 1141 x 4) and `size:0x122C` on PAL, EN v1.1 and PAL v1.1 (= 1163 x 4);
+  `wclevelcont_update` is `size:0x1B8` (= 110 x 4) on both lagging configs. The diffs are real, not
+  windowing artifacts.
 - **TU `-opt` profiles.** Twelve profiles per unit. Every unit's configured profile is already the one
   that keeps EN byte-identical, and every alternative wrecks EN by thousands of diff words. Probed on
   engine/0 (`pauseMenuDraw` 4 under the configured profile, 4 or 200+ under all others), maketex,
