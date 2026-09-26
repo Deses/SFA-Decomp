@@ -1,9 +1,10 @@
 # allocLotsOfTextures allocator investigation
 
-This investigation starts at `f6a299c172`. It does **not** finish the function:
-the retained declaration-order change improves objdiff from **99.132484% to
-99.139206%**. The common GC/1.3 compiler, complete TU profile, source boundaries,
-and NonMatching status remain unchanged.
+The current function reaches **99.156020%**, up from **99.132484%** at the
+start of this investigation (`f6a299c172`). It remains incomplete. The initial
+lightning declaration-order change reached **99.139206%**; the gradient follow-up
+below provides the next improvement. The common GC/1.3 compiler, complete TU
+profile, source boundaries, and NonMatching status remain unchanged.
 
 ## Retained change
 
@@ -105,3 +106,47 @@ results are recorded in `build/alloc_texture_match/regional_verification.json`.
 Formatting introduces no additional source change. The strict DOL gate checks
 integration using this NonMatching TU's retail object; objdiff remains the
 evidence for the small source-code gain.
+
+## Gradient follow-up (2026-09-27)
+
+Starting from `76ddcbaff9`, separate the gradient's pixel and tile pointers,
+pack the horizontal component directly into the store expression, and use
+`y * 8` for the row offset. The four-row loop guarantees that this offset equals
+`(y & 3) * 8 + (y >> 2) * 32`. These changes keep the complete inner loop
+unrolled and improve objdiff from **99.139206% to 99.156020%**.
+
+LLDB captures reproduce the ordinary object exactly. Comparing their virtual
+register roles shows that the four unrolled pointer chains now have separate
+identities for the pixel and tile addresses. The cached horizontal component
+moves from r5 to the retail r8 at instruction indices 1288, 1292, 1301, 1310,
+and 1319. There are still 42 gradient operand-difference rows and three moved
+address instructions: some rows now have fewer wrong operands. The ramp and
+lightning regions are unchanged, as are all floating-point register operands.
+
+The frontend trace and the recovered GC/1.3 routines in `../mwcc` explain why
+simple copy chains fail to fix the ramps: expression propagation removes the
+copies, then the shared-expression pass creates fresh mask temporaries. The
+observed mask objects return from the factory at `0x4f4200` to `0x467861`,
+inside the recovered shared-temporary routine. Likewise, propagating the
+gradient's pointer definitions duplicates their expressions before the shared
+pass materializes new address temporaries; splitting the pointers alone does
+not fix the final store's evaluation order. These are compiler addresses and
+observations about the reconstructed source, not retail source provenance.
+
+The retained candidate's graph has 421 GPR nodes and 388 replayed physical
+color decisions, with no forced high-degree removals. Ordinary and traced
+objects have SHA-256
+`abc4556a28d7d1c517758f65a5de761ea374f7d91f203032650bae5a86cbf503`.
+Local captures and comparisons are under `build/newshadows_alloc_round2/`.
+
+Fresh before/after compiles reproduce the same improvement in all five retail
+versions, after verifying each original DOL's configured SHA-1. Only
+`allocLotsOfTextures` changes: 27 bytes in 17 instructions, still 5,948 bytes
+total. All other 43 function bodies, allocated non-text sections, and named
+symbol layouts remain identical. Twenty relocation references acquire new
+anonymous compiler labels; their offsets, types, addends, target sections, and
+target offsets are unchanged. The local evidence is
+`build/newshadows_alloc_round2/regional_verification.json`.
+
+`ninja all_source`, a fresh `ninja build/GSAE01/ok`, and formatter checks pass.
+The formatted source reproduces the traced object byte for byte.

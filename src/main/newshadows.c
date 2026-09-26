@@ -623,14 +623,10 @@ void allocLotsOfTextures(void) {
         for (x = 0; x < 4; x++) {
             f32 horizontal = x / 3.0f - 0.5f;
             for (y = 0; y < 4; y++) {
-                u8* texel = (u8*)gNewShadowReflectionGradientTexture + (x & 3) * 2;
-                int packedHorizontal;
-                texel += (x >> 2) * 0x20;
-                texel += (y & 3) * 8;
-                texel += (y >> 2) * 0x20;
-                packedHorizontal = ((int)(255.0f * horizontal + 128.0f) & 0xff) << 8;
-                *(u16*)(texel + sizeof(Texture)) =
-                    (u16)(packedHorizontal | ((int)(255.0f * (y / 3.0f - 0.5f) + 128.0f) & 0xff));
+                u8* pixelBase = (u8*)gNewShadowReflectionGradientTexture + (x & 3) * 2;
+                u8* texel = pixelBase + (x >> 2) * 0x20;
+                *(u16*)(texel + y * 8 + sizeof(Texture)) = (u16)((((int)(255.0f * horizontal + 128.0f) & 0xff) << 8) |
+                                                                 ((int)(255.0f * (y / 3.0f - 0.5f) + 128.0f) & 0xff));
             }
         }
     }
