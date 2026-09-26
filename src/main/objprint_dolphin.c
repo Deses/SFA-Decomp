@@ -454,6 +454,13 @@ static inline int shaderProjDisabled(ModelLightStruct* light) {
     return flag;
 }
 
+static inline u8 objFuzzHasProjectedLight(void) {
+    if (gObjSelectedLightCount != 0 && shaderProjDisabled(gObjSelectedLights) == 0) {
+        return 1;
+    }
+    return 0;
+}
+
 int objFuzzRenderCb(GameObject* obj, ObjModel* model, int ropIdx) {
     Mtx mtx4;
     Mtx mtx3;
@@ -473,7 +480,7 @@ int objFuzzRenderCb(GameObject* obj, ObjModel* model, int ropIdx) {
     Shader* rop;
     f32 fz;
     int projBlendMode;
-    u8 fancy;
+    u8 hasProjectedLight;
 
     mtxA = sObjFuzzIndMtxA;
     mtxB = sObjFuzzIndMtxB;
@@ -541,12 +548,8 @@ int objFuzzRenderCb(GameObject* obj, ObjModel* model, int ropIdx) {
     GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_A2);
     GXSetTevColorOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVREG1);
     GXSetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_FALSE, GX_TEVPREV);
-    if (gObjSelectedLightCount != 0 && shaderProjDisabled(gObjSelectedLights) == 0) {
-        fancy = 1;
-    } else {
-        fancy = 0;
-    }
-    if (fancy) {
+    hasProjectedLight = objFuzzHasProjectedLight();
+    if (hasProjectedLight) {
         GXSetTevDirect(GX_TEVSTAGE2);
         GXLoadTexMtxImm((MtxPtr)modelLightStruct_getProjectionTexMtx(gObjSelectedLights), GX_PTTEXMTX3, GX_MTX3x4);
         GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX3x4, GX_TG_POS, GX_PNMTX0, GX_FALSE, GX_PTTEXMTX3);
@@ -637,7 +640,7 @@ int objFuzzRenderCb(GameObject* obj, ObjModel* model, int ropIdx) {
     GXSetTevSwapMode(stage + 1, GX_TEV_SWAP0, GX_TEV_SWAP0);
     GXSetTevColorOp(stage + 1, GX_TEV_SUB, GX_TB_ADDHALF, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
     GXSetTevAlphaOp(stage + 1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-    if (fancy) {
+    if (hasProjectedLight) {
         GXSetNumTevStages(5);
         GXSetNumTexGens(6);
     } else {

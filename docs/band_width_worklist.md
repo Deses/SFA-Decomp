@@ -309,7 +309,7 @@ Width >=5 saved band, identical mnemonic stream: the rotation-offset model — e
 | playerBuildLedgeClimbProbe | dlls/objects/195_Player/player | 1296 | 99.691 | 19 | 0 | 15G/3F | 22 | signature: struc 0, band >=5, no recorded lever site |
 | ObjSeq_ExecuteActionCommand | dlls/engine/2/2 | 2012 | 99.742 | 22 | 0 | 7G/0F | 5 | near100-band-census-2026-08-01 (16 dead ends) |
 | ObjHits_CheckTrackContact | main/objhits | 1068 | 99.551 | 23 | 0 | 9G/0F | 9 | objhits GROUND pass 08-03: all 9 T==C recolours, no lever site |
-| objFuzzRenderCb | main/objprint_dolphin | 2780 | 99.827 | 24 | 0 | 5G/1F | 6 | signature: struc 0, band >=5, no recorded lever site |
+| objFuzzRenderCb | main/objprint_dolphin | 2780 | 100 | 0 | 0 | 5G/1F | 6 | Resolved 2026-09-26: inline projected-light predicate preserves the byte result and retail stage/flag allocation in all five versions; see [matching notes](objprint_dolphin_matching.md). |
 | dll_0B_renderEffects | dlls/engine/11/11 | 2512 | 100.000 | 0 | 0 | — | 0 | Resolved 2026-09-07: integer frame masks preserve the texture-walk allocation; see partfx_matching.md |
 | CameraModeNormal_updateWallAvoidance | dlls/engine/66/66 | 1280 | 99.594 | 24 | 0 | 6G/7F | 1 | refreshed-flip-frontier 08-02 (width noted per fn) |
 | ObjHits_DetectObjectPair | main/objhits | 1232 | 99.529 | 24 | 0 | 5G/8F | 9 | objhits GROUND pass 08-03: all 9 T==C recolours, no lever site |
