@@ -291,6 +291,30 @@ genuinely differs … that is a TU-boundary artifact — leave the unit NonMatch
 pool."* Reconstructing it would also mean planting a dead literal to reproduce an unreferenced atom.
 Leave it. `sal_volume` (20 B) and `trigf` (4 B) are the same shape at smaller scale.
 
+## `tools/expr_sweep.py` is the right tool for the two scratch-band rows — and it comes back empty
+
+Two of the blockers put their residual entirely in volatile registers, which declaration order provably
+cannot reach: `wclevelcont_update`'s `f0`/`f1` pair and `gameTextBuildSystemFontAtlas`'s `r3..r11`
+rotation. That is exactly the class `tools/expr_sweep.py` exists for — it enumerates commute / relflip /
+ternflip / assoc rewrites on a real parse tree and refuses any variant `semantic_equivalence.prove()`
+has not certified. Run on both:
+
+| function | version | base fuzzy | variants cleared | best |
+| --- | --- | --- | --- | --- |
+| `wclevelcont_update` | GSAP01 | 99.77273 | 3 | 99.77273 |
+| `gameTextBuildSystemFontAtlas` | GSAE01_rev1 | 98.85621 | 13 | 98.85621 |
+
+No rewrite moves either. So the scratch rows are not expression-shape rows.
+
+**Two gotchas that cost time, both reusable.** `expr_sweep` needs the target version **configured**
+(`configure.py --version <V>`) or `fuzzy_measure` returns `-1.0` and every candidate ties at the base.
+And it parses real C, so it dies on `#if` inside a function body — which is every interesting
+version-divergent function here. The workaround is to resolve the guards for the one version first, then
+**verify the transformation by rebuilding**: the diff count must be unchanged (4 for `wclevelcont_update`
+on PAL, 36 for the atlas on v1.1) before any sweep result can be trusted.
+`scratchpad/prepfn.py` in this session's notes does the guard resolution with a proper nested
+`#if/#elif/#else/#endif` stack.
+
 ## Axes that are exhausted across all seven, not just one
 
 These were each run against every unit where they could apply, always with EN gated at 0 diffs. None
