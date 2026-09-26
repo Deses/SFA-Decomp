@@ -196,13 +196,19 @@ register permutation is not.** Screen for the former before spending probes on t
 
 **Infrastructure note.** While chasing that, two of rev1's BossDrakor functions
 (`bossdrakor_spawnAttackObjects`, `bossdrakor_handleActionEvent`) showed diffs that are **not** source
-defects: the retail carve at `build/GSAE01_rev1/obj/.../BossDrakor.o` dates from 2026-09-09 while
-`config/GSAE01_rev1/symbols.txt` was updated 2026-09-25, so six `bl`s to `s16toFloat` (present in that
-config at 0x80080404, the exact branch target) were left unrelocated. Nothing in the ninja graph
-produces those objects — they are inputs to `main.elf` — so staleness is invisible to the build. A scan
-of all four versions' objects for the frontier units found this in **GSAE01_rev1's BossDrakor only**
-(6 raw branches; `gametext` has 3 and `gameloop` 1 on every version, which is normal), so it is not a
-systemic understatement. Worth re-carving that version's objects when convenient.
+defects. In `build/GSAE01_rev1/obj/.../BossDrakor.o` six `bl`s are left as raw displacements with no
+relocation. The branch at object offset 0x828 resolves to `0x8020A800 + 0x828 - 0x18AC24 = 0x80080404`,
+which `config/GSAE01_rev1/symbols.txt` names `s16toFloat` — and the equivalent site in **every other
+version's** carve does carry `R_PPC_REL24 s16toFloat`. So that object is mis-carved, not mis-written.
+
+Scope it by **content, not timestamps**: counting raw `4b`-prefixed branches across the frontier units
+for all four versions finds this in **GSAE01_rev1's BossDrakor only** (`gametext` has 3 and `gameloop`
+1 on every version, which is normal). It is not a systemic understatement. Nothing in the ninja graph
+produces these objects — they are inputs to `main.elf` — so the build cannot notice.
+
+**Do not use mtime to detect this.** Every retail object of every version, *including GSAE01 where all
+of these units match perfectly*, is older than its own `symbols.txt`; that file is touched far more
+often than the carve needs to re-run. The only sound test is the relocation content itself.
 
 **`gameTextBuildSystemFontAtlas` (v1.1, +0.791)** is a textbook scratch-band signature: 306/306
 instructions, everything identical through instruction 236, then a clean **rotation of `r3..r11` by
@@ -218,6 +224,33 @@ completely inert, because MWCC folds them away without allocating anything.
 stale object and as `MATCH` once rebuilt, and the same unit is reported complete by `report.json`.
 Always rebuild immediately before extracting, and prefer the ninja-built object for any unit listed in
 that version's `matching_units.txt`.
+
+## The bands are IDENTICAL, which is the strongest evidence these are not source defects
+
+For every remaining blocker, retail's saved-register band and ours are the *same set*, not merely the
+same width:
+
+| function | band | width |
+| --- | --- | --- |
+| `pauseMenuDraw` (PAL) | `r26..r31` | 6 |
+| `askProgressiveScanMode` (PAL) | `r26..r31` | 6 |
+| `bossdrakor_update` (PAL) | `r25..r31` | 7 |
+| `SaveSelectScreen_render` (PAL) | `r23..r31` | 9 |
+| `gameTextBuildSystemFontAtlas` (v1.1) | `r20..r31` | 12 |
+
+Identical bands mean **identical register pressure**: there is no extra value in our source to remove
+and none missing to add. Combined with identical instruction streams, that leaves only which colour the
+allocator hands each web — and every one of these widths is past the cliff where the band model has any
+predictive power (97.7% at width 2, 0.1% at width 6+). This is why the ordering sweeps are flat, and it
+is a positive result rather than an absence of one: it rules out the upstream-of-allocation defect that
+lever 16 fixes, which is the only documented escape at these widths.
+
+The corollary for `SaveSelectScreen_render` specifically: retail assigns the slot loop's four values to
+*consecutive* `r23..r26` while we scatter them across `r23, r25, r26, r28`, with `slotIndex` landing on
+`r23` in both. Only `slotIndex` is a named local; the other three are strength-reduced walkers, and one
+of them indexes a base that is re-loaded from a global pointer every iteration
+(`lwz r5,0(0); lbzx r5,r5,r0`), which an explicit pointer local cannot reproduce without hoisting that
+load. So the source shape is already right.
 
 ## Axes that are exhausted across all seven, not just one
 
