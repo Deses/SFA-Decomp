@@ -193,11 +193,23 @@ produced a match anywhere, so a new idea for this frontier should not start here
 ## Reference mining — what the projects do and do not give
 
 - `reference_projects/rena-tools/sfadebug` is a decomp of the SFA **PAL debug build** (from
-  *Interactive Multi-Game Demo Disc - July 2002*, minimally optimized, so its stack layout would
-  reveal original local sets). Its DOL is **not** in the tree: `orig/GSAP01-DEBUG/` holds only
-  `.gitkeep`, and `default.dol.gzf` is a 43 MB Ghidra packed database (Java-serialized header at
-  offset 0, zip from offset 52), not a DOL. `src/main/` has 11 files and covers none of the frontier
-  units.
+  *Interactive Multi-Game Demo Disc - July 2002*, minimally optimized, so its stack slot order would
+  reveal original local sets and declaration order directly — the one input this whole frontier is
+  missing). **Its code bytes are not obtainable from this tree.** `orig/GSAP01-DEBUG/` holds only
+  `.gitkeep`, and `default.dol.gzf` is a 43 MB Ghidra packed database, not a DOL: a Java-serialized
+  header, then one zip entry `FOLDER_ITEM` at offset 52 which raw-inflates (`zlib`, `wbits=-15`) to
+  171 MB of database buffers. Those buffers carry the symbol and source-file analysis — searching them
+  finds `WClevcontrol`, `maketex.c`, `n_pausemenu` — but **no program bytes**: `blr` (`4e800020`),
+  `mflr r0`, `mtlr r0` and `stwu r1,-x(r1)` each occur exactly **once** in 171 MB, where real GC code
+  would have thousands. Do not spend time on this container again; getting the debug build's code
+  needs the disc. `src/main/` has 11 hand-decompiled files and covers none of the frontier units.
+- `sfadebug/notes/srcfiles.csv` is the useful artifact: 11,797 rows of
+  `start,end,function,source-file` recovered from the debug build's `__FILE__` strings. It gives the
+  **original filenames** — `WClevcontrol.c`, `main/maketex.c`, `n_pausemenu.c`, `frontend_control.c`,
+  `savegame.c`, `picmenu.c` — and shows the original object-DLL callback naming: within
+  `WClevcontrol.c` the functions are plain `initialise`, `release`, `init`, `update`, `hitDetect`,
+  `render`, `free`, `getExtraSize`, `setScale`, not our `wclevelcont_*` prefixes. Useful for naming and
+  TU-boundary work; it carries no local-variable information.
 - `reference_projects/dinosaur-planet` carries the **real original DLL names** (`66_pausemenu`,
   `63_gameselect`, `18_objfsa`, ...) and per-DLL `syms.txt` with real global names, recovered from the
   prototype's symbol table. Local variable names there are the decomp authors' reconstructions, not
