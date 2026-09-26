@@ -144,13 +144,51 @@ assignment order give 31/35/37, so the knob is live and only pushes the wrong wa
 most promising of the six remaining walls, because the tell is structural rather than an allocator
 residue.
 
-`SaveSelectScreen_render` is band width **9** — two loop triples each rotated. Not worth an ordering
-sweep.
+`SaveSelectScreen_render` is band width **9** — two loop triples each rotated. In its first loop the
+only named local among the three contested values is the PAL-exclusive `bulletY`; the other two are
+strength-reduced walking pointers over `taskTexts` (stride 4) and `gSaveSelectInfoTextIds` (stride 1),
+and the second loop's three values are *all* compiler temps with no named local behind them. Sweeping
+`bulletY` through every function-scope position and every position inside the `OPEN_FILE` case block
+where it is actually used (a more plausible scope) is flat at 20, or 23 at the last two case positions.
+Dinosaur Planet's `dll_63_draw` — the ancestor — declares `y` before `i` around the same
+`y = start; for (i...) { ... y += step; }` shape, which is what we already have.
 
 `GM_MazeWell_update`'s `r28`/`r29` exchange is between `itemIndex` and a **strength-reduced walking
 pointer that has no named local behind it**, so no ordering knob reaches it: the block-scoped
 `found`/`itemIndex` swap and all 56 EN-safe single moves of the 8 function-scope declarations are flat
 at 14.
+
+## Axes that are exhausted across all seven, not just one
+
+These were each run against every unit where they could apply, always with EN gated at 0 diffs. None
+produced a match anywhere, so a new idea for this frontier should not start here.
+
+- **TU `-opt` profiles.** Twelve profiles per unit. Every unit's configured profile is already the one
+  that keeps EN byte-identical, and every alternative wrecks EN by thousands of diff words. Probed on
+  engine/0 (`pauseMenuDraw` 4 under the configured profile, 4 or 200+ under all others), maketex,
+  WCLevelCont. BossDrakor already carries `nocse,nopropagation`.
+- **Compiler version.** All 13 GC builds (1.0, 1.1, 1.1p1, 1.2.5, 1.2.5n, 1.3, 1.3.2, 1.3.2r, 2.0,
+  2.0p1, 2.5, 2.6, 2.7) produce byte-identical results for maketex. Not a toolchain axis.
+- **Local type.** `int` / `u32` / `s32` / `long` / `short` / `u16` / `s16` / `u8` on the PAL-exclusive
+  locals: `bulletY` in engine/53 is flat at 20 for all eight; `messageY` in gameloop is 25 for the
+  32-bit types and 26 for the narrow ones. Allocator-visible in principle, inert here.
+- **Coalescing copies as a pressure knob.** `b = a;` before the use emits no instruction (verified:
+  the stream stays 242 instructions) and is therefore the one documented way to change the count of
+  values the allocator sees without touching the stream. Added in gameloop's loop 1, loop 2, and both,
+  at two declaration positions: **all flat at 25**. Consistent with the counter saturating, which also
+  means the knob only exists in the decreasing direction, and nothing can be removed from these
+  regions without changing the stream.
+- **Inlined helper boundaries (lever 6).** A `static inline` helper that MWCC fully inlines keeps the
+  instruction count exact and can move homes wholesale — extracting engine/0's `case 2:` body into one
+  held `pauseMenuDraw` at 1141/1141 instructions while moving **127** registers. But the movement comes
+  from the helper's *own locals* (its four measurement temps), not from the boundary: WCLevelCont's
+  PAL-only block extracted into a helper with no new locals, in both a `state` and an `f32*` form, is
+  **exactly inert at 4**. So the boundary is only a knob when it also changes the local set, and in all
+  seven units EN matches without the helper, which means retail has no helper there to restore.
+- **Splitting a web into two source locals.** gameloop's `messageY` has two disjoint webs (loop 1 in
+  `r27`, matching; loop 2 in `r29` retail / `r28` ours), which looks exactly like two variables. Giving
+  loop 2 its own function-scope local costs **one instruction** at every declaration position, so
+  retail's is one variable whose web the allocator splits, and the split is not a source fossil.
 
 ## Reference mining — what the projects do and do not give
 
