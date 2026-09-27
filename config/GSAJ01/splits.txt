@@ -265,7 +265,7 @@ main/shader.c:
 	.rodata     start:0x802C1F58 end:0x802C1FA8
 	.data       start:0x8030E5D0 end:0x8030E984
 	.bss        start:0x8037E1E0 end:0x80387AD0
-	.sdata      start:0x803DB740 end:0x803DB768
+	.sdata      start:0x803DB740 end:0x803DB76C
 	.sbss       start:0x803DCEE8 end:0x803DCFF4
 	.sdata2     start:0x803DECD0 end:0x803DED78
 	.sbss2      start:0x803E8560 end:0x803E856C
@@ -1246,7 +1246,7 @@ dlls/engine/75/75.c:
 	.text       start:0x8010D35C end:0x8010DAF4
 	.data       start:0x80319E68 end:0x80319E98
 	.sbss       start:0x803DD698 end:0x803DD6A0
-	.sdata2     start:0x803E1AB0 end:0x803E1AC0
+	.sdata2     start:0x803E1AB0 end:0x803E1AEC
 
 dlls/engine/76/76.c:
 	.text       start:0x8010DAF4 end:0x8010DB9C
@@ -1903,7 +1903,7 @@ dlls/objects/249/249.c:
 dlls/objects/250_InvisibleHi/InvisibleHi.c:
 	.text       start:0x8017A9AC end:0x8017ACEC
 	.data       start:0x80321170 end:0x803211A8
-	.sdata2     start:0x803E3850 end:0x803E3870
+	.sdata2     start:0x803E3850 end:0x803E3874
 
 dlls/objects/251/251.c:
 	.text       start:0x8017ACEC end:0x8017B688
@@ -1968,7 +1968,7 @@ dlls/objects/254_MagicPlant/MagicPlant.c:
 	.text       start:0x8017F3F4 end:0x8017FFCC
 	.data       start:0x80321688 end:0x803216C0
 	.sdata      start:0x803DBEB8 end:0x803DBEC0
-	.sdata2     start:0x803E3980 end:0x803E3990
+	.sdata2     start:0x803E3978 end:0x803E39BC
 
 dlls/objects/256_TrickyWarp/TrickyWarp.c:
 	.text       start:0x8017FFCC end:0x801802FC
@@ -2037,7 +2037,7 @@ dlls/objects/268_LanternFire/LanternFire.c:
 	.data       start:0x80321950 end:0x80321998
 	.sdata      start:0x803DBEF8 end:0x803DBF00
 	.sbss       start:0x803DDBF8 end:0x803DDC00
-	.sdata2     start:0x803E3BD0 end:0x803E3C04
+	.sdata2     start:0x803E3BB8 end:0x803E3C04
 
 dlls/objects/267_FireFlyLant/FireFlyLant.c:
 	.text       start:0x80187288 end:0x80187700
@@ -2083,7 +2083,7 @@ dlls/objects/284/284.c:
 	.text       start:0x80189A74 end:0x8018A97C
 	.data       start:0x80321D48 end:0x80321D80
 	.sdata      start:0x803DBF00 end:0x803DBF08
-	.sdata2     start:0x803E3CE8 end:0x803E3D40
+	.sdata2     start:0x803E3CD8 end:0x803E3D40
 
 dlls/objects/285/285.c:
 	.text       start:0x8018A97C end:0x8018AE74
@@ -2435,7 +2435,7 @@ dlls/objects/359_SpiritDoorL/SpiritDoorL.c:
 	.rodata     start:0x802C23F8 end:0x802C2408
 	.data       start:0x803231E0 end:0x80323218
 	.sdata      start:0x803DBFF0 end:0x803DC000
-	.sdata2     start:0x803E4558 end:0x803E4560
+	.sdata2     start:0x803E4550 end:0x803E457C
 
 dlls/objects/360_HoloPoint/HoloPoint.c:
 	.sdata      start:0x803DC000 end:0x803DC008
@@ -2998,7 +2998,7 @@ dlls/objects/426_BombPlantSp/BombPlantSp.c:
 	.text       start:0x801D3468 end:0x801D40E4
 	.data       start:0x80326EB8 end:0x80326F00
 	.sdata      start:0x803DC0E0 end:0x803DC0E8
-	.sdata2     start:0x803E54B0 end:0x803E5518
+	.sdata2     start:0x803E54A8 end:0x803E5518
 
 dlls/objects/427_BombPlantin/BombPlantin.c:
 	.text       start:0x801D40E4 end:0x801D4288

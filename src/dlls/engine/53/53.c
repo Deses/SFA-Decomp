@@ -504,9 +504,6 @@ void SaveSelectScreen_render(int param) {
     int progress;
     int alpha;
     u8 fadeAlpha;
-#if !defined(VERSION_GSAE01) && !defined(VERSION_GSAJ01)
-    int bulletY;
-#endif
 
     panel = &gSaveSelectPanels[gSaveSelectPanelIndex];
     gameTextSetDrawFunc(titleScreenTextDrawFunc);
@@ -535,20 +532,14 @@ void SaveSelectScreen_render(int param) {
             taskTextCount++;
         }
         taskTextIndex = 0;
-#if !defined(VERSION_GSAE01) && !defined(VERSION_GSAJ01)
-        bulletY = 52;
-#endif
         firstInfoTextIndex = SAVE_SELECT_VISIBLE_TASK_TEXT_COUNT - taskTextCount;
         while (taskTextIndex < taskTextCount) {
 #if !defined(VERSION_GSAE01) && !defined(VERSION_GSAJ01)
             gameTextSetColor(0xff, 0xff, 0xff, alpha);
-            gameTextShowStr(sSaveSelectTaskBullet, 0x93, 0x41, bulletY);
+            gameTextShowStr(sSaveSelectTaskBullet, 0x93, 0x41, 52 + taskTextIndex * 42);
 #endif
             gameTextAppendStr(saveFileSelect_saveSlots[saveFileSelect_currentSlotIndex].taskTexts[taskTextIndex],
                               gSaveSelectInfoTextIds[firstInfoTextIndex + taskTextIndex]);
-#if !defined(VERSION_GSAE01) && !defined(VERSION_GSAJ01)
-            bulletY += 42;
-#endif
             taskTextIndex++;
         }
         if (gSaveSelectMenuItem != NULL) {

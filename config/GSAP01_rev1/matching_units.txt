@@ -47,6 +47,7 @@ Runtime.PPCEABI.H/fragment.c
 Runtime.PPCEABI.H/global_destructor_chain.c
 Runtime.PPCEABI.H/mem_TRK.c
 Runtime.PPCEABI.H/runtime.c
+dlls/engine/0/0.c
 dlls/engine/10_expgfx/expgfx.c
 dlls/engine/11/11.c
 dlls/engine/12/12.c
@@ -59,6 +60,7 @@ dlls/engine/18/18.c
 dlls/engine/19/19.c
 dlls/engine/1_camcontrol/camcontrol.c
 dlls/engine/2/2.c
+dlls/engine/2/maketex.c
 dlls/engine/20_Hcurves/Hcurves.c
 dlls/engine/20_Hcurves/Hcurves_romcurve.c
 dlls/engine/21/21.c
@@ -96,6 +98,7 @@ dlls/engine/5/5.c
 dlls/engine/50/50.c
 dlls/engine/51/51.c
 dlls/engine/52_n_attractmode/n_attractmode.c
+dlls/engine/53/53.c
 dlls/engine/54/54.c
 dlls/engine/55/55.c
 dlls/engine/56/56.c
@@ -890,13 +893,17 @@ main/fileio.c
 main/gametext.c
 main/gametext_data.c
 main/mm.c
+main/model.c
 main/modelEngine.c
 main/modellight.c
+main/newshadows.c
 main/obj_movelib.c
 main/objanim.c
 main/object.c
+main/objhits.c
 main/objlib.c
 main/objprint.c
+main/objprint_dolphin.c
 main/pad.c
 main/pi_dolphin.c
 main/pi_pathsearch.c

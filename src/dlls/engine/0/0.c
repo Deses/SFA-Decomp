@@ -4855,6 +4855,7 @@ void pauseMenuDraw(int boxDrawParamA, int boxDrawParamB, int boxDrawParamC) {
     s32 x;
     s16 panelAlpha;
     s16* taskTextIds;
+    s32 taskTextY;
     s32 stringIndex;
     s32 textY;
     f32 timer;
@@ -5199,16 +5200,15 @@ void pauseMenuDraw(int boxDrawParamA, int boxDrawParamB, int boxDrawParamC) {
             break;
         }
         case 2: {
-            s32 tokenTextY;
             gameTextShowAt(0x443, 0, 0xa0);
             gameTextMeasureById(0x443, 0, 0, &tokenLeft, &tokenRight, &tokenTop, &tokenBottom);
-            tokenTextY = (tokenBottom - tokenTop) + 5;
+            taskTextY = (tokenBottom - tokenTop) + 5;
             taskTextIds = &statusTable->tokens[0].alt;
-            gameTextShowAt(taskTextIds[gPauseMenuTokenIndex * 4], 0, tokenTextY + 0xa0);
+            gameTextShowAt(taskTextIds[gPauseMenuTokenIndex * 4], 0, taskTextY + 0xa0);
             gameTextMeasureById(taskTextIds[gPauseMenuTokenIndex * 4], 0, 0, &tokenLeft, &tokenRight, &tokenTop,
                                 &tokenBottom);
-            tokenTextY += (tokenBottom - tokenTop) + 0xa;
-            gameTextShowAt(0x444, 0, tokenTextY + 0xa0);
+            taskTextY += (tokenBottom - tokenTop) + 0xa;
+            gameTextShowAt(0x444, 0, taskTextY + 0xa0);
             break;
         }
         }

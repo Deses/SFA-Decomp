@@ -473,7 +473,6 @@ const PlayerFrustumPlaneDirections sPlayerFrustumPlaneDirs = {
 const PlayerFrustumPlaneScales sPlayerFrustumPlaneScales = {{0.0f, -25.0f, -25.0f, -25.0f, -25.0f}};
 extern char sTrackPiLockedFormat[];
 
-extern int gLastRomListPage;
 
 static inline int mapFindLoadedRomList(int id) {
     int index;
@@ -733,6 +732,7 @@ u8 gCloudLayerOverlayColor[4] = {0x20, 0x20, 0x20, 0};
 GXColor gTexShaderAmbColor = {0xFF, 0xFF, 0xFF, 0xFF};
 GXColor gTexLightmapAmbColor = {0xff, 0xff, 0xff, 0xff};
 s8 gTexIndMtxScaleExp = -2;
+int gLastRomListPage = -1;
 
 extern IndTexMtx23 gTexIndMtxTable;
 extern WarpDestination gRcpPendingWarpDest;

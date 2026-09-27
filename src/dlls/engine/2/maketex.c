@@ -290,7 +290,7 @@ int saveGame_prepareAndWrite(int writeImages, int cbA, int cbB, void* cbC, void*
  * loads the banner/icon images from disc, and checksums both halves of the
  * card image buffer. */
 void loadMemCardImages(void) {
-    char* names = sMemoryCardFileNameString;
+    char* names = (char*)sMemoryCardFileNameString;
     DVDFileInfo fi;
     u64* p;
     u16 i[1];
@@ -395,8 +395,9 @@ void loadMemCardImages(void) {
 static void saveCardBuildComment(void)
 {
 #if defined(VERSION_GSAE01_rev1)
-    char* names = sMemoryCardFileNameString;
-    if (getCurLanguage() == OS_LANGUAGE_ITALIAN) {
+    int language = getCurLanguage();
+    char* names = (char*)sMemoryCardFileNameString;
+    if (language == OS_LANGUAGE_ITALIAN) {
         gSaveCardImageBuffer[0x00] = 0x83;
         gSaveCardImageBuffer[0x01] = 0x58;
         gSaveCardImageBuffer[0x02] = 0x83;

@@ -1422,10 +1422,10 @@ void gameTextBuildSystemFontAtlas(void) {
         glyph->font = GAMETEXT_FONT_SYSTEM;
         glyph->page = 0;
         {
-            int firstTileRow;
             int tileColumn;
             int tileRow;
             int firstTileColumn;
+            int firstTileRow;
             u32* glyphPixels;
 
             glyphPixels = (u32*)glyphImage;

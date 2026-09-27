@@ -633,6 +633,160 @@ information. **The lesson: price a row against `docs/priced_classes.md` before s
   `63_gameselect`'s `dll_63_draw` is the ancestor of `SaveSelectScreen_render` and declares `y` before
   `i` around the same `y = start; for (i...) { ... y += step; }` shape.
 
+## CLOSED: pauseMenuDraw, and the colour-selection law that closed it
+
+`pauseMenuDraw` matched on all five versions, which **met the parity goal**: EN v1.0 96.589485,
+JP 96.589775, PAL v1.0 97.852310, EN v1.1 97.331440, PAL v1.1 97.852554 (each lagging version
++5.15, from 92.70/92.18). The unit is 2.622% of all code — two thirds of PAL's entire 3.888 gap —
+because `complete_code` is all-or-nothing per function and this one function is 4652 bytes.
+
+The four residual diffs were one web: case 2's token-prompt accumulator, retail `r29`, ours `r26`.
+`tools/tricky_backend_trace.py --graph` gives the allocator's own decision, and
+`replay_coloring()` in `tools/tricky_backend_graph.py` is the exact rule:
+
+- **A colour is `min(enabled - blockers)`.** `blockers` are the colours of *already coloured*
+  neighbours, so a neighbour coloured later does not constrain a node at all.
+- **`enabled` starts with the scratch band only.** Saved registers are added one at a time by
+  *bank expansion*, in the fixed reserve order `r31, r30, r29, r28, r27, r26, r25 ...`, and only
+  when a node has no free colour left. This is the concrete mechanism behind the "rotation"
+  description in CLAUDE.md: what varies between two builds is *how many* registers have been
+  expanded by the time a given node is coloured.
+- **The colouring order is: nodes of degree >= 32 first, then every remaining node in DESCENDING
+  node index.** Node index runs **reverse to declaration order** (first-declared = highest index),
+  and a **block-scoped local is numbered below every function-scope local**, i.e. it is coloured
+  *last*, after every function-scope local has already forced its expansions.
+
+That last point is the whole defect. Both `tokenTextY`s were block-scoped in their `case` blocks
+(nodes 35 and 36), so case 2's was coloured at position 250 of 254 — after `textY` expanded `r26`
+at position 246 — leaving `min(free) = 26`. On EN the same node is coloured with `enabled` only
+`{r27..r31}` (EN never expands `r26`) and blockers `{27,30}`, giving `min = 28`, which is what EN
+retail has. The two versions want *different registers from the same source*, and both are simply
+`min(free)`; nothing needed to be steered per version.
+
+**The fix:** hoist case 2's accumulator out of the `case` block into the function's declaration
+list, as its own local (`s32 taskTextY;`, beside its sibling `taskTextIds`), leaving case 1's
+`tokenTextY` block-scoped. That raises its node index above `stringIndex`/`textY`, so it is coloured
+while `enabled` is `{r28..r31}`: blockers `{28,31}` -> `r29` on PAL, blockers `{27,30}` -> `r28` on
+EN. Byte-identical on EN and JP, exact on PAL/rev1/PAL_rev1. Positions 0..7 of the declaration list
+all work; position 8 (beside `textY`) does not, because the new node must outrank `stringIndex`.
+
+Corrections this forces to earlier entries in this document:
+- The frontier was **not** allocator-gated. "Needs a 13-interference swing in node degree" was
+  measured on the pre-fix graph and was the wrong lever: degree only decides the >= 32 prefix, and
+  the actual knob was **which population the local belongs to** (block-scoped = coloured last).
+- **Merging** the two accumulators into one shared function-scope variable breaks EN (22 diffs).
+  Splitting the declaration while keeping two webs is what works. This is `source_shape_levers.md`
+  §16 ("change the SET of source locals") with the direction that matters: *scope*, not order.
+- CLAUDE.md's note that hoisting a block-scoped local "reaches orderings no permutation of the
+  top-level list can express -- worth trying at width <=4" understates it. Here the band is width 6
+  and the hoist was the *only* move that works, because block scope is not a position in the
+  ordering, it is a separate lower-numbered population.
+
+## engine/2 maketex: an explicit cast blocks constant-address rematerialization
+
+`loadMemCardImages` was +2 instructions on PAL/rev1/PAL_rev1 at one site: retail reaches the first
+filename as `addi r3,r31,160`, we emitted `lis`/`addi`/`addi`. Derived from the compiler on a minimal
+body: **MWCC rematerializes a link-time-constant address when the def and its first use are in the
+SAME basic block with a call between them.** A branch between def and use (EN's `if (sjis)`, which is
+why EN never showed this) or a def below the call both suppress it; a plain `{}` block, `if (0)`,
+`while (0)`, `p = p;`, the index form `&p[k]`, and every `-opt` token do not (`nopropagation` is a
+demolition, +26 instructions).
+
+**What does suppress it is an explicit cast on the initializer:**
+
+    char* names = (char*)sMemoryCardFileNameString;   /* held in r31 across the call */
+    char* names = sMemoryCardFileNameString;          /* rematerialized after the call */
+
+Measured over eight declaration forms: `(char*)tab`, `(char*)` of a `[][12]` array and `(char*)` of a
+struct array all produce retail's stream; plain `tab`, `&tab[0]`, `tab[0]` and `&tab[0][0]` all
+rematerialize, and the object's declared size and storage class are inert. The cast closed
+`loadMemCardImages` on **all five versions**. Worth trying wherever a `char*`/`u8*` local aliases a
+global array and the diff is a stray `lis`/`addi` pair after a call.
+
+`saveCardBuildComment` (rev1 only) is a second instance with a different residue: names-before-call
+routes through `r0` and copies (`addi r0,r3,0 ; mr r31,r0`, +1), names-after-call has the right length
+but materializes below the `bl`. Best found, and applied, is `int language = getCurLanguage();` before
+the cast declaration: exact length (108/108) with **3** ordering diffs, down from a +1 size mismatch.
+This is the only thing still holding maketex on rev1; PAL and PAL v1.1 are complete.
+
+## main/model: a missing version-guarded cache invalidate
+
+`ObjModel_LoadModelData` was 5 instructions short on PAL/rev1/PAL_rev1 and the size screen found it
+immediately: retail keeps the allocation size in a saved register and calls
+`DCInvalidateRange(model, totalSize)` after `roundUpTo16`, which EN v1.0 and JP do not. Three
+instructions for the call plus the `r29` save/restore pair the extra live value forces = 5. Naming the
+size (`totalSize`) and guarding the call with `#if !defined(VERSION_GSAE01) && !defined(VERSION_GSAJ01)`
+matched the function on all five versions.
+
+PAL then still failed on data (`.sbss` 77.78%) for a naming reason, not a content one: the two
+source-declared globals `lbl_803DCB58`/`lbl_803DCB5C` are named after EN addresses, and **every other
+version's `symbols.txt` keeps those EN-derived names mapped to its own address** (JP `0x803DCC78`,
+rev1 `0x803DD7D8`, PAL v1.1 `0x803DE510`) — only `config/GSAP01/symbols.txt` deviated, naming them
+`lbl_803DE350`/`lbl_803DE354` after PAL addresses, so objdiff could not pair them. Renaming those two
+entries to the shared convention (gated with `tools/pairing_check.py`, 0 retail-only symbols) took the
+unit to 604/604 data. When a mapped unit's code is perfect and only its data is short, check the
+target's symbol NAMES against the other versions before looking for a content defect.
+
+## engine/53: a version-guarded local that retail never had
+
+`SaveSelectScreen_render` had a 20-diff 3-cycle among the task-text loop's three walkers (strides 42,
+1 and 4). Retail colours the bullet-Y walker FIRST, giving it the highest of the three registers — but
+a named local is numbered below every compiler temp and is therefore coloured LAST, so retail's bullet
+Y cannot be a local at all. Writing it as the strength-reduced expression it must be:
+
+    gameTextShowStr(sSaveSelectTaskBullet, 0x93, 0x41, 52 + taskTextIndex * 42);
+
+and deleting the guarded `int bulletY;` plus its `= 52` / `+= 42` statements matched the function on
+all five versions. `(taskTextIndex + 1) * 42 + 10` is NOT equivalent to the allocator (52 diffs), so
+the walker's initial value and stride both have to come out right.
+
+## gametext: an exhaustive permutation, because single moves are a plateau
+
+`gameTextBuildSystemFontAtlas` sat at 36 diffs on EN v1.1 — a permutation of the SCRATCH band in the
+tile-copy block. Every scratch colour is enabled from the start, so `min(enabled - blockers)` makes the
+assignment a pure function of the colouring order, i.e. of that block's five declarations. Of the 120
+permutations exactly **four** keep EN byte-identical, and exactly **one** of those is also rev1-exact:
+
+    int tileColumn; int tileRow; int firstTileColumn; int firstTileRow; u32* glyphPixels;
+
+Every single move from the old order scored 36, so a single-move sweep could not have found this: the
+exchange is a 3-cycle. When five or fewer locals are in play, run the full permutation set.
+
+## Still open, with what each one now needs
+
+EN v1.0 and JP are at 100.000000. PAL v1.0 99.199320, PAL v1.1 99.199420, EN v1.1 99.239685.
+
+| unit | share | versions | residue |
+|---|---|---|---|
+| `653_WCLevelCont` | 0.298 | all three | 4 diffs, one f0/f1 exchange at the message-timer clamp |
+| `main/gameloop` | 0.247 | PAL, PAL v1.1 | 25 diffs, band rotated by one |
+| `dlls/engine/2/maketex` | 0.238 | EN v1.1 | `saveCardBuildComment`, 3 ordering diffs |
+| `589_BossDrakor` | 0.226 | all three | 150/154 diffs, one copy-vs-load exchange |
+| `611_GM_MazeWell` | 0.030 | PAL, PAL v1.1 | 14 diffs, `i` vs `questBitPtr` |
+
+**WCLevelCont** needs a single-`.sdata2`-atom shape whose clamp constant is coloured before the field
+reload. Retail's unit has exactly one `0.0f` atom (offset 0) serving both the clamp and the four
+`x + 0.0f` adds in `traceMoveA`/`traceMoveB` — verified from the relocations — so the clamp cannot use a
+literal: a literal is always a second atom (measured: an extra `00000000` at 0x34, which fails all 56
+bytes and costs the unit its registration), and dropping the const array folds the four adds away.
+Measured flat at 4: block-local and function-scope locals for the constant, for the field, and for both
+with declaration and assignment order split all four ways; `*gWcLevelContZero`; reversed compare; `<=`;
+`!(>=)`; ternary; else-form; and six upstream reorderings of the guard and subtraction. Naming does not
+move it, which is CLAUDE.md's coalescing rule, and the flag space for this unit was measured inert
+earlier. The FPR band is far weaker than GPR for the band model, so this is the expected shape of a
+hard FP row.
+
+**gameloop**, **GM_MazeWell** and **BossDrakor** are measured plateaus on ordering: 30 EN-safe
+declaration orderings x 2 guard positions and 16 PAL-only block permutations for `askProgressiveScanMode`
+(all 25), 38 EN+rev1-safe orderings plus 18 hoist positions for `GM_MazeWell_update` (all 14). Their
+exchanges are rotations, which per CLAUDE.md ordering cannot reach at this band width, so the lever is
+the SET of locals — also probed: merging `i`/`j` in `askProgressiveScanMode` takes PAL 25 -> 23 but costs
+EN 6 diffs, and dropping the `showId` copy makes PAL a size mismatch. `bossdrakor_update` wants the
+parameter copy at the TOP of the band (`obj` = r31, `state` = r30) where ours puts the copy at the
+bottom; the named param-copy lever (`GameObject* self = obj;`) moves PAL 150 -> 136 but costs EN 65, in
+both declaration positions tried. `saveCardBuildComment` is flat at 3 across seven
+declaration/assignment splits.
+
 ## See also
 
 - `docs/source_shape_levers.md` — levers 9, 14 and 16 are the ones this frontier keeps invoking.
