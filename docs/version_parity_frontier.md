@@ -1178,6 +1178,36 @@ So the row is not "one rotation step away and steerable"; it is one rotation ste
 known lever tied to a declaration the versions must share. Closing it needs a mechanism not yet found,
 not another sweep of these axes.
 
+### Measured law: where MWCC puts a parameter copy in a wide saved band
+
+The copy-vs-load placement that both PAL rows turn on is now quantified, from ~120 synthetic probes
+compiled with bossdrakor's own flags (`scratchpad/bandprobe.py`, `grid.py`, `grid2.py`). The probe holds
+one parameter copy, one field load through it (`state = obj->extra`), a second load of the same field,
+`nc` call-return values and `nl` loaded values.
+
+**The copy sits at the BOTTOM of the band until total pressure crosses a threshold, then jumps to the
+TOP** (and the field load takes `r30` beneath it -- retail's shape). The threshold moves with the
+copy-class count: the flip happens at band width 12 for `nc=4`, 11 for `nc=5`, 10 for `nc=6`, i.e. at
+roughly `width + nc >= 16`. Below it, the field load owns `r31` and the copy is pushed to the bottom of
+the band, which is exactly what our `bossdrakor_update` does.
+
+Two corollaries matter for the wide-band problem generally:
+
+- **Pressure is not band width.** Adding *short-lived* values -- defined and consumed immediately, so
+  they all share one register -- flips the copy to `r31` **with the band width unchanged**: at
+  `nc=2, nl=3` the flip happens at three short-lived values and the band stays 7 wide, which is
+  bossdrakor's actual width. So a wide band is not a wall; the rotation has a knob at fixed width.
+- **But no stream-neutral construct reaches it in the probe.** A dead local, a coalesced copy of the
+  loaded value, reversing the declaration list and moving the constant assignment are all
+  byte-identical and all inert; only adding real work flips it. The one construct that flips
+  `bossdrakor_update` without changing its stream -- naming the parameter's copy -- makes the probe
+  drop the saved copy entirely instead, so the probe does not model that case and the underlying rule
+  is still not fully pinned.
+
+This supersedes the project's working assumption that wide bands are simply flat: the placement is a
+threshold function of total pressure, it is reachable at fixed width, and it is worth probing on any
+wide-band near-miss rather than writing the function off.
+
 ## See also
 
 - `docs/source_shape_levers.md` — levers 9, 14 and 16 are the ones this frontier keeps invoking.
