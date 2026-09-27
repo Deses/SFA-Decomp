@@ -63,10 +63,15 @@ and the behaviour is **binary** rather than graded — every position from 2 to 
 (EN 94, PAL 70) and positions 0-1 give (EN 0, PAL 150), with nothing in between. A randomised multi-move
 climb over all 15 declaration items, PAL-only, found 70 in three seconds and never beat it.
 
-The trace says why the row is close but not reachable: `obj` (deg 105), `drakorState` (102) and `state`
-(100) are nearly tied, so their colouring order is decided by a 3-5 point degree margin rather than the
-13-point gap `pauseMenuDraw` needs — which is what makes the movement possible at all — but the residual
-70 diffs involve temps below that trio.
+The trace says why the row is close: `obj` (deg 105), `drakorState` (102) and `state` (100) are nearly
+tied, so their colouring order turns on a 3-5 point degree margin rather than the 13-point gap
+`pauseMenuDraw` needs — which is what makes any movement possible at all.
+
+And the residual 70 is **one exchange, not scattered noise**: the substitution census is
+`r31->r29` x51, `r29->r31` x14, `r29->r30` x2, `r30->r31` x5, so 65 of the 70 are the single
+`obj` <-> `state` swap. Ours gives `obj` 29 and `state` 31; retail gives `obj` 31. `obj` is coloured
+first because it has the highest degree, so this is again a *pick* inside a large free set rather than a
+constraint, and moving it two positions along needs two more nodes coloured before it.
 
 ### The graph is FORCED by the code — so every one of these rows is a selection difference
 
