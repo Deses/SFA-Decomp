@@ -230,8 +230,33 @@ it is a true rotation at band width 7. The named-param-copy lever moves EN by 65
 is declared first and is inert when declared last. Coalescing-copy edits in the PAL-only
 `curveStep`/`advanceStep` block are flat or size-breaking.
 
-`askProgressiveScanMode` looks like a rotation of a 4-wide EN band that is 6 wide on PAL, but lever
-14's diagnostic says it is **not** a relabeling: the per-register definition counts are
+### The colouring order rule, read off the trace — and a correction to "gameloop is decl-inert"
+
+Colouring pops the simplification stack, so nodes are coloured in roughly **descending degree**, and
+**ties are broken by node index — which runs REVERSE to declaration position** (in
+`askProgressiveScanMode` the declarations `showId, counter, sel, textId, i, j, box, savedAlignment` get
+nodes 41, 40, 39, 38, 37, 36, 35, 34, so the last-declared local has the *lowest* index and is coloured
+first among equals).
+
+That makes a whole class of rows predictable instead of blind. In gameloop, `savedAlignment`, `sel` and
+`counter` **all have degree 35** — a three-way tie, and ours colours them in ascending index
+(34, 39, 40) taking 28, 29, 30. Retail's assignment is `sel` 28, `counter` 29, `savedAlignment` 31, so
+retail needs index order `sel < counter < savedAlignment`, i.e. **`sel` declared last, `counter` just
+before it, `savedAlignment` early**.
+
+The prediction holds: moving `savedAlignment` to the front alone takes PAL **25 -> 16**, and orders built
+to satisfy the full index requirement reach **14**, as does an independent randomised climb. **So this row
+is NOT declaration-order inert, and the earlier verdict here was wrong** — it came from a *single-move*
+sweep, which cannot express "move three locals to satisfy a joint index ordering". Count what a sweep
+can express before believing its zero.
+
+It still does not close: 14 is the floor over the orders tried, the residual is in `i`, `j`, `showId` and
+the second `messageY` web whose colours are not decided by that tie, and every order satisfying the
+requirement breaks EN (which wants `savedAlignment` last). A per-version declaration order is available
+in principle — this list already differs per version, since PAL carries `messageY`/`shadeReduction` that
+EN lacks — but it is only worth spending if a PAL order reaching 0 is found first.
+
+`askProgressiveScanMode`'s definition counts also say it is **not** a relabeling: the per-register definition counts are
 `[2,2,3,4,4,5]` in retail against `[1,2,2,4,5,6]` in ours, same total (20 definition points, same
 stream), different grouping. Retail coalesces the 600-frame counter and `messageY` into one register;
 we split them across two. That is a coalescing decision, so the lever is the local set, not the order
