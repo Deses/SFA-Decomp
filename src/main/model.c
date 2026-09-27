@@ -1350,14 +1350,27 @@ void model_multMtxs(ObjModel* model, f32* worldMtx) {
         PSMTXConcat((MtxPtr)worldMtx, jointMtx, jointMtx);
     }
 }
+static inline void* modelJointMtxPtr(ObjModel* model, int joint) {
+    void* mtx = model->jointMatrices[model->bufferFlags & 1] + joint * sizeof(ObjModelJointMatrix);
+    return mtx;
+}
+
 void modelInitBoneMtxs(ObjModel* model, f32* outReordered) {
     ModelFileHeader* file = model->file;
     u32 i;
     Mtx skinMtx;
 
     for (i = 0; i < file->jointCount; i++) {
-        MtxPtr jointMtx = modelGetBoneMtx(model, i);
-        ModelBone* bone = &((ModelBone*)file->jointData)[i];
+        int joint = i;
+        u8 jointCount = model->file->jointCount;
+        MtxPtr jointMtx;
+        ModelBone* bone;
+
+        if (joint >= (jointCount != 0 ? jointCount + model->file->extraJointCount : 1)) {
+            joint = 0;
+        }
+        jointMtx = modelJointMtxPtr(model, joint);
+        bone = &((ModelBone*)file->jointData)[i];
         PSMTXTrans(skinMtx, -bone->tail[0], -bone->tail[1], -bone->tail[2]);
         PSMTXConcat(jointMtx, skinMtx, skinMtx);
         PSMTXReorder(skinMtx, ((ROMtx*)outReordered)[i]);
