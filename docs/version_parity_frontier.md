@@ -1290,6 +1290,27 @@ and the report stale while `ninja` reports success. It briefly showed 21 diffs o
 function. Always delete the object and run `ninja build/<V>/report.json` explicitly before believing a
 per-unit number.
 
+### `saveCardBuildComment`: retail's source shape confirmed, only the order differs
+
+Reading retail's 108 instructions settles the source question: `bl getCurLanguage`, `cmpwi r3,4`,
+`bne` to the else, one `sprintf` on the Italian path and two on the other. That is exactly our
+`if (language == OS_LANGUAGE_ITALIAN)` form -- not a `switch`, not a different call structure. The only
+difference in the whole function is that retail materializes the string address **before** the call
+(`lis r3; addi r31,r3,0; bl`) and we materialize it after (`bl; lis r4; addi r31,r4,0`). Ours has to use
+`r4` precisely because `r3` holds the call's result, which the next instruction compares.
+
+Moving the declaration ahead of the call does not reproduce retail: GC/1.3 then emits the
+three-instruction detour `lis r3; addi r0,r3,LO; mr r31,r0`. Thirty source-order x flag combinations
+were scored whole-unit on EN v1.1 (`-opt schedule`, `-opt peephole` and both, five `-inline` modes,
+`-O4`, `-O4,p`, `-opt nospeculative`/`speculative`/`noptrmerge`/`nolifetimes`): the baseline pair is the
+only one at 3 diffs and every deviation is worse, most breaking 7 to 11 of the unit's 17 functions.
+Also inert: giving the `extern char sMemoryCardFileNameString[]` declaration its real size `[20]`, and
+band pressure (six probes adding one to five long-lived locals never remove the detour).
+
+So this row is one compiler-behaviour difference wide, fully localized, with the source shape proven
+right and every reachable knob measured. It is the closest row at 3 diffs and the least likely to move
+without a different codegen.
+
 ## See also
 
 - `docs/source_shape_levers.md` — levers 9, 14 and 16 are the ones this frontier keeps invoking.
