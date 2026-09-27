@@ -688,6 +688,11 @@ void wclevelcont_syncProgressBits(WcLevelControlState* state) {
     GameBitLatch_Update(&state->gameBitLatch, 0x80, -1, -1, 0xf31, 0xaf);
 }
 
+/* Retail compiled this function with common-subexpression elimination off: with it on, the
+ * message-timer guard and clamp share one value-numbered web for the zero atom, which is
+ * created at the guard and so coloured last, putting the constant in f1 where retail has f0.
+ * The rest of the unit needs CSE on -- traceMoveA and traceMoveB rely on it. */
+#pragma opt_common_subs off
 void wclevelcont_update(GameObject* obj) {
     WcLevelControlState* state = obj->extra;
     f32 sunTime;
@@ -731,6 +736,7 @@ void wclevelcont_update(GameObject* obj) {
         mainSetBits(0x7f1, 1);
     }
 }
+#pragma opt_common_subs reset
 
 void wclevelcont_init(GameObject* obj) {
     WcLevelControlState* state = obj->extra;
