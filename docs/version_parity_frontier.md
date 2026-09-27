@@ -1208,6 +1208,25 @@ This supersedes the project's working assumption that wide bands are simply flat
 threshold function of total pressure, it is reachable at fixed width, and it is worth probing on any
 wide-band near-miss rather than writing the function off.
 
+### Flag axis closed on the remaining units too
+
+The per-unit optimizer profiles differ, and that matters for reading the sweeps above: only
+`dlls/objects/589_BossDrakor` carries `-opt nocse,nopropagation`. `main/gameloop`,
+`dlls/objects/611_GM_MazeWell` and `dlls/engine/2/maketex` do not, so CSE and propagation are live
+there and had never been swept. Sweeping ~28 settings per unit, scoring **every** function against both
+PAL and EN:
+
+- `askProgressiveScanMode` stays at 25 diffs under every setting that keeps EN clean, and every setting
+  that moves it (`-opt nocse`, `-opt nolifetimes`, `-opt peephole`, `-opt schedule`, `-use_lmw_stmw on`)
+  makes it worse and breaks other functions -- `-opt schedule` alone breaks 20 of the unit's 34.
+- `GM_MazeWell_update` stays at 14 under every EN-clean setting, and the settings that move it
+  (`-opt nopropagation`, `-opt nolifetimes`, `-opt nostrength`, `-opt peephole`, `-enum min`,
+  `-opt space`) all turn it into a size mismatch and break siblings.
+
+With BossDrakor and maketex already swept, the flag axis is now closed on all four blocked units: each
+unit's shipped profile is optimal, and no per-version flag change is available that would not cost a
+version that currently matches.
+
 ## See also
 
 - `docs/source_shape_levers.md` — levers 9, 14 and 16 are the ones this frontier keeps invoking.
