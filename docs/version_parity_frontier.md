@@ -887,6 +887,30 @@ hoisting `dvdCheckError()` into a PAL-only local in either or both guarded block
 above or below. A value that is defined and immediately consumed gets no web, which is why the last one
 changes nothing.
 
+## WCLevelCont: the nocse escape hatch is closed too
+
+`-opt nocse` matches `wclevelcont_update` on all five versions but costs `traceMoveA`/`traceMoveB` six
+instructions each. Those six are exactly one recomputed `gWcTileGrid[i][b]`: a `lis`/`addi` for the
+global, `slwi`/`add` for the index and two `extsh` for the s16 conversion, read once for the `!= 0` test
+and again for the `<= 4` test. Retail CSE'd it.
+
+Hoisting it into a local (`u8 cell = gWcTileGridA[i][b];`) is the obvious way to let the TU take
+`nocse` without paying for the recompute. Measured: it takes the unit from 96.349 to 97.561 under
+`nocse` and lets `update` match on PAL -- but `traceMoveA` still fails, and under the CURRENT flags the
+hoist BREAKS `traceMoveA`, which was matching. That is the decisive evidence: retail's source reads the
+grid twice and relies on CSE, so the hoist is not retail's source and `nocse` cannot be adopted for this
+TU without writing code retail did not have.
+
+The sibling level-control DLLs in `reference_projects/dinosaur-planet` (`607_WL_LevelControl`,
+`638_DFPlevcontrol`, and eight more `*levcontrol` objects) confirm the clamp idiom
+`if (timer > 0) { ...; timer -= delta; if (timer < 0) timer = 0; }` with LITERAL zeros, but their timers
+are integers, so they say nothing about the float pool atom. Retail's own relocations confirm our four
+`x + gWcLevelContZero[0]` addends are real: the zero atom at `.sdata2` offset 0 is read twice in
+`traceMoveA` and twice in `traceMoveB`.
+
+So the unit needs the clamp's constant web created late while CSE stays on, and the only instruments
+that do that are a per-function pragma (banned by name) or a `volatile`/pun (banned by name).
+
 ## See also
 
 - `docs/source_shape_levers.md` — levers 9, 14 and 16 are the ones this frontier keeps invoking.
