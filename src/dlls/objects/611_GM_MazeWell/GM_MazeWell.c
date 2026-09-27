@@ -28,9 +28,6 @@
 #include "main/object_render.h"
 #include "dolphin/pad.h"
 #include "main/shader_api.h"
-register int gGmMazeWellReserved14 asm("r14");
-register int gGmMazeWellReserved15 asm("r15");
-register int gGmMazeWellReserved16 asm("r16");
 
 /* Quest-bit table layout (gQuestBitTable, 44 s16 entries):
  *   [0..8]   watched quest/event bits
