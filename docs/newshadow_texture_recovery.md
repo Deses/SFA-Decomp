@@ -14,13 +14,47 @@ proven record consumers. `NewShadowNoiseData` therefore models 50 records and an
 opaque 96-byte tail, not 54 invented placements. The total span is inherited
 from the current TU BSS ownership; the tail's original declaration is still
 unknown. Renaming the BSS symbol and using typed record pointers changes no
-instruction bytes, section sizes, or allocated data. The sampler stays exact;
-the generator retains its pre-existing 98.66216% match.
+instruction bytes, section sizes, or allocated data. Both the sampler and the
+generator are exact.
 
-The generator retains pointers to the candidate record's X/Z/end-radius fields.
-Replacing those with repeated member expressions removes three retail
-instructions. These pointers are meaningful live field references, not raw
-state-offset accessors.
+## Generator register assignment
+
+`newshadows_initProceduralTextures` has an identical instruction stream under
+several spellings; only its 13-register saved band separates them. The band is
+decided by GC/1.3's simplify scan, which visits virtual registers in number
+order: named locals first (reverse declaration order), then IRO-created `@N`
+temporaries (reverse creation order), then lowering temporaries. Retail colours
+the heap flag first, then the frame loop's hoisted invariants, which requires
+the flag to survive into the third simplify round. Four source facts produce
+that graph and numbering:
+
+- Candidate records are indexed as `gNewShadowNoiseData.placements[placedCount]`
+  and `[i]`. MWCC's own strength reduction and code motion then create the
+  record and field addresses as temporaries that scan after the named locals.
+  Named field-pointer locals give the same stream but number those webs too
+  early.
+- The overlap loop's index `i` is reused as the frame counter. The reuse splits
+  the frame web into an `@N` temporary, which must scan after the texel pointer.
+- The texel pointer is written `texel = tileBase; texel += (z >> 2) * 0x200;`.
+  The single-assignment form `texel = tileBase + ...` is copy-propagated into an
+  early `@N` temporary and misorders the frame loop's r20-r22.
+- The tiled offsets and `xPhase` are computed inside the innermost loops and
+  left to loop-invariant code motion. Byte values are packed in one expression
+  instead of through `intensityByte`/`waveByte` locals, whose extra webs
+  remove the simplify slack the heap flag needs.
+
+Declaration order is then constrained as: `placementAttempts` and `overlaps`
+before `i`; the caustic `y` before `texel`, before `placedCount`, before both
+`x` and `savedHeap`. The frame loop keeps its own block-scoped `z`; sharing the
+caustic `y` breaks the assignment. The `u32` placement-count copy is required
+for the retail `mr` before the frame loop.
+
+`tools/tricky_backend_trace.py --graph` captures the graph, and the sibling
+MWCC project's `search_gc13_register_order.py` and
+`solve_gc13_register_order.py` replay it against projected retail colours. That
+pairing scores a spelling by the best colour mismatch any named-local
+declaration order can reach, which separates graph defects from ordering
+defects.
 
 ## Tiled blend
 
