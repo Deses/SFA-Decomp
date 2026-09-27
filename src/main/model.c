@@ -2533,133 +2533,401 @@ void ObjModel_BlendVertexStream(u8* mtxs, ModelVtxAnimJob* job, u8* animData, s3
     }
 }
 
-/* Skinning reads the same live quantization state as retail psq instructions. */
-static inline u32 modelGetGQR7(void) {
-    register u32 config;
-    asm {
-        mfspr config, GQR7
-    }
-    return config;
+/* Register ABI: r3/r4 are 3x4 matrices A and B, r5 walks the u8 weight pairs
+ * through GQR6, r6/r7 walk the source/destination vertices through GQR7 and
+ * r8 is the vertex count, which must be nonzero. The loop is software
+ * pipelined: each pass stores the previous vertex and reads one vertex ahead. */
+asm void ObjModel_TransformVerticesWithTranslation(u8* matrixA, u8* matrixB, u8* weightPairs, u8* source,
+                                                   u8* destination, int count) {
+    // clang-format off
+    nofralloc
+    stwu r1, -0xa0(r1)
+    stfd f14, 0x8(r1)
+    addi r9, r8, -1
+    stfd f15, 0x10(r1)
+    stfd f16, 0x18(r1)
+    stfd f17, 0x20(r1)
+    stfd f18, 0x28(r1)
+    stfd f19, 0x30(r1)
+    stfd f20, 0x38(r1)
+    stfd f21, 0x40(r1)
+    stfd f22, 0x48(r1)
+    stfd f23, 0x50(r1)
+    stfd f24, 0x58(r1)
+    stfd f25, 0x60(r1)
+    stfd f26, 0x68(r1)
+    stfd f27, 0x70(r1)
+    mtctr r9
+    psq_l f0, 0x0(r3), 0, 0
+    addi r6, r6, -2
+    psq_l f1, 0x8(r3), 1, 0
+    addi r7, r7, -2
+    psq_l f6, 0x24(r3), 0, 0
+    addi r5, r5, -2
+    psq_lu f8, 0x2(r6), 0, 7
+    psq_l f7, 0x2c(r3), 1, 0
+    psq_lu f9, 0x4(r6), 1, 7
+    psq_lu f27, 0x2(r5), 0, 6
+    ps_madds0 f15, f0, f8, f6
+    psq_l f2, 0xc(r3), 0, 0
+    ps_madds0 f16, f1, f8, f7
+    psq_l f3, 0x14(r3), 1, 0
+    psq_l f5, 0x20(r3), 1, 0
+    ps_madds1 f15, f2, f8, f15
+    psq_l f19, 0x0(r4), 0, 0
+    ps_madds1 f16, f3, f8, f16
+    psq_l f4, 0x18(r3), 0, 0
+    psq_l f20, 0x8(r4), 1, 0
+    psq_l f21, 0xc(r4), 0, 0
+    ps_madds0 f15, f4, f9, f15
+    psq_l f22, 0x14(r4), 1, 0
+    ps_madds0 f16, f5, f9, f16
+    psq_l f23, 0x18(r4), 0, 0
+    psq_l f24, 0x20(r4), 1, 0
+    psq_l f25, 0x24(r4), 0, 0
+    ps_muls0 f15, f15, f27
+    psq_l f26, 0x2c(r4), 1, 0
+    ps_muls0 f16, f16, f27
+    ps_madds0 f11, f19, f8, f25
+    ps_madds0 f12, f20, f8, f26
+    ps_madds1 f11, f21, f8, f11
+    ps_madds1 f12, f22, f8, f12
+    psq_lu f8, 0x2(r6), 0, 7
+    ps_madds0 f11, f23, f9, f11
+    ps_madds0 f12, f24, f9, f12
+    psq_lu f9, 0x4(r6), 1, 7
+    ps_madds1 f11, f11, f27, f15
+    ps_madds1 f12, f12, f27, f16
+loop:
+    ps_madds0 f15, f0, f8, f6
+    psq_stu f11, 0x2(r7), 0, 7
+    ps_madds0 f16, f1, f8, f7
+    psq_stu f12, 0x4(r7), 1, 7
+    ps_madds1 f15, f2, f8, f15
+    ps_madds1 f16, f3, f8, f16
+    ps_madds0 f15, f4, f9, f15
+    ps_madds0 f16, f5, f9, f16
+    psq_lu f27, 0x2(r5), 0, 6
+    ps_muls0 f15, f15, f27
+    ps_muls0 f16, f16, f27
+    ps_madds0 f11, f19, f8, f25
+    ps_madds0 f12, f20, f8, f26
+    ps_madds1 f11, f21, f8, f11
+    ps_madds1 f12, f22, f8, f12
+    psq_lu f8, 0x2(r6), 0, 7
+    ps_madds0 f11, f23, f9, f11
+    ps_madds0 f12, f24, f9, f12
+    psq_lu f9, 0x4(r6), 1, 7
+    ps_madds1 f11, f11, f27, f15
+    ps_madds1 f12, f12, f27, f16
+    bdnz loop
+    psq_stu f11, 0x2(r7), 0, 7
+    psq_stu f12, 0x4(r7), 1, 7
+    lfd f14, 0x8(r1)
+    lfd f15, 0x10(r1)
+    lfd f16, 0x18(r1)
+    lfd f17, 0x20(r1)
+    lfd f18, 0x28(r1)
+    lfd f19, 0x30(r1)
+    lfd f20, 0x38(r1)
+    lfd f21, 0x40(r1)
+    lfd f22, 0x48(r1)
+    lfd f23, 0x50(r1)
+    lfd f24, 0x58(r1)
+    lfd f25, 0x60(r1)
+    lfd f26, 0x68(r1)
+    lfd f27, 0x70(r1)
+    addi r1, r1, 160
+    blr
+    // clang-format on
 }
 
-/* GQR scale fields encode signed six-bit powers of two. */
-static inline f32 modelQuantizationFactor(u32 encodedScale) {
-    union {
-        u32 bits;
-        f32 value;
-    } factor;
-    int shift = (int)(encodedScale & 0x3f);
-    shift = (shift ^ 0x20) - 0x20;
-    factor.bits = (u32)(127 + shift) << 23;
-    return factor.value;
+/* Register ABI: r3/r4 are 3x4 matrices A and B, r5 walks the u8 weight pairs
+ * through GQR6, r6/r7 walk the source/destination vertices through GQR7 and
+ * r8 is the vertex count, which must be nonzero. The loop is software
+ * pipelined: each pass stores the previous vertex and reads one vertex ahead. */
+asm void ObjModel_TransformVerticesLinear(u8* matrixA, u8* matrixB, u8* weightPairs, u8* source, u8* destination,
+                                          int count) {
+    // clang-format off
+    nofralloc
+    stwu r1, -0xa0(r1)
+    stfd f14, 0x8(r1)
+    addi r9, r8, -1
+    stfd f15, 0x10(r1)
+    stfd f16, 0x18(r1)
+    stfd f17, 0x20(r1)
+    stfd f18, 0x28(r1)
+    stfd f19, 0x30(r1)
+    stfd f20, 0x38(r1)
+    stfd f21, 0x40(r1)
+    stfd f22, 0x48(r1)
+    stfd f23, 0x50(r1)
+    stfd f24, 0x58(r1)
+    stfd f25, 0x60(r1)
+    stfd f26, 0x68(r1)
+    stfd f27, 0x70(r1)
+    mtctr r9
+    psq_l f0, 0x0(r3), 0, 0
+    addi r6, r6, -1
+    psq_l f1, 0x8(r3), 1, 0
+    addi r7, r7, -1
+    addi r5, r5, -2
+    psq_lu f8, 0x1(r6), 0, 7
+    psq_lu f9, 0x2(r6), 1, 7
+    psq_lu f27, 0x2(r5), 0, 6
+    ps_muls0 f15, f0, f8
+    psq_l f2, 0xc(r3), 0, 0
+    ps_muls0 f16, f1, f8
+    psq_l f3, 0x14(r3), 1, 0
+    psq_l f5, 0x20(r3), 1, 0
+    ps_madds1 f15, f2, f8, f15
+    psq_l f19, 0x0(r4), 0, 0
+    ps_madds1 f16, f3, f8, f16
+    psq_l f4, 0x18(r3), 0, 0
+    psq_l f20, 0x8(r4), 1, 0
+    psq_l f21, 0xc(r4), 0, 0
+    ps_madds0 f15, f4, f9, f15
+    psq_l f22, 0x14(r4), 1, 0
+    ps_madds0 f16, f5, f9, f16
+    psq_l f23, 0x18(r4), 0, 0
+    psq_l f24, 0x20(r4), 1, 0
+    ps_muls0 f15, f15, f27
+    ps_muls0 f16, f16, f27
+    ps_muls0 f11, f19, f8
+    ps_muls0 f12, f20, f8
+    ps_madds1 f11, f21, f8, f11
+    ps_madds1 f12, f22, f8, f12
+    psq_lu f8, 0x1(r6), 0, 7
+    ps_madds0 f11, f23, f9, f11
+    ps_madds0 f12, f24, f9, f12
+    psq_lu f9, 0x2(r6), 1, 7
+    ps_madds1 f11, f11, f27, f15
+    ps_madds1 f12, f12, f27, f16
+loop:
+    ps_muls0 f15, f0, f8
+    psq_stu f11, 0x1(r7), 0, 7
+    ps_muls0 f16, f1, f8
+    psq_stu f12, 0x2(r7), 1, 7
+    ps_madds1 f15, f2, f8, f15
+    ps_madds1 f16, f3, f8, f16
+    ps_madds0 f15, f4, f9, f15
+    ps_madds0 f16, f5, f9, f16
+    psq_lu f27, 0x2(r5), 0, 6
+    ps_muls0 f15, f15, f27
+    ps_muls0 f16, f16, f27
+    ps_muls0 f11, f19, f8
+    ps_muls0 f12, f20, f8
+    ps_madds1 f11, f21, f8, f11
+    ps_madds1 f12, f22, f8, f12
+    psq_lu f8, 0x1(r6), 0, 7
+    ps_madds0 f11, f23, f9, f11
+    ps_madds0 f12, f24, f9, f12
+    psq_lu f9, 0x2(r6), 1, 7
+    ps_madds1 f11, f11, f27, f15
+    ps_madds1 f12, f12, f27, f16
+    bdnz loop
+    psq_stu f11, 0x1(r7), 0, 7
+    psq_stu f12, 0x2(r7), 1, 7
+    lfd f14, 0x8(r1)
+    lfd f15, 0x10(r1)
+    lfd f16, 0x18(r1)
+    lfd f17, 0x20(r1)
+    lfd f18, 0x28(r1)
+    lfd f19, 0x30(r1)
+    lfd f20, 0x38(r1)
+    lfd f21, 0x40(r1)
+    lfd f22, 0x48(r1)
+    lfd f23, 0x50(r1)
+    lfd f24, 0x58(r1)
+    lfd f25, 0x60(r1)
+    lfd f26, 0x68(r1)
+    lfd f27, 0x70(r1)
+    addi r1, r1, 160
+    blr
+    // clang-format on
 }
 
-static inline __vec2x32float__ modelLoadFloatPair(const f32* pair) {
-    return *(const __vec2x32float__*)pair;
-}
-
-void ObjModel_TransformVerticesWithTranslation(u8* matrixA, u8* matrixB, u8* weightPairs, u8* source, u8* destination,
-                                               int count) {
-    f32* a = (f32*)matrixA;
-    f32* b = (f32*)matrixB;
-    ModelSkinWeightPair* weights = (ModelSkinWeightPair*)weightPairs;
-    S16Vec* input = (S16Vec*)source;
-    S16Vec* output = (S16Vec*)destination;
-    u32 quantization = modelGetGQR7();
-    f32 storeFactor = modelQuantizationFactor(quantization >> 8);
-    f32 loadFactor = 1.0f / modelQuantizationFactor(quantization >> 24);
-    f32 x, y, z, weightA, weightB, outputZ;
-    union {
-        __vec2x32float__ pair;
-        f32 values[2];
-    } outputXY;
-    int vertex;
-
-    for (vertex = 0; vertex < count; vertex++) {
-        weightA = __OSu8tof32(&weights->matrixA) * (1.0f / 128.0f);
-        weightB = __OSu8tof32(&weights->matrixB) * (1.0f / 128.0f);
-        weights++;
-        x = __OSs16tof32(&input->x) * loadFactor;
-        y = __OSs16tof32(&input->y) * loadFactor;
-        z = __OSs16tof32(&input->z) * loadFactor;
-        input++;
-        outputXY.pair = (modelLoadFloatPair(b) * x + modelLoadFloatPair(b + 9) + modelLoadFloatPair(b + 3) * y +
-                         modelLoadFloatPair(b + 6) * z) *
-                            weightB +
-                        (modelLoadFloatPair(a) * x + modelLoadFloatPair(a + 9) + modelLoadFloatPair(a + 3) * y +
-                         modelLoadFloatPair(a + 6) * z) *
-                            weightA;
-        outputZ =
-            (b[2] * x + b[11] + b[5] * y + b[8] * z) * weightB + (a[2] * x + a[11] + a[5] * y + a[8] * z) * weightA;
-        output->x = __OSf32tos16(outputXY.values[0] * storeFactor);
-        output->y = __OSf32tos16(outputXY.values[1] * storeFactor);
-        output->z = __OSf32tos16(outputZ * storeFactor);
-        output++;
-    }
-}
-
-void ObjModel_TransformVerticesLinear(u8* matrixA, u8* matrixB, u8* weightPairs, u8* source, u8* destination,
-                                      int count) {
-    f32* a = (f32*)matrixA;
-    f32* b = (f32*)matrixB;
-    ModelSkinWeightPair* weights = (ModelSkinWeightPair*)weightPairs;
-    ModelPackedNormal* input = (ModelPackedNormal*)source;
-    ModelPackedNormal* output = (ModelPackedNormal*)destination;
-    u32 quantization = modelGetGQR7();
-    f32 storeFactor = modelQuantizationFactor(quantization >> 8);
-    f32 loadFactor = 1.0f / modelQuantizationFactor(quantization >> 24);
-    f32 x, y, z, weightA, weightB, outputX, outputY, outputZ;
-    int vertex;
-
-    for (vertex = 0; vertex < count; vertex++) {
-        weightA = __OSu8tof32(&weights->matrixA) * (1.0f / 128.0f);
-        weightB = __OSu8tof32(&weights->matrixB) * (1.0f / 128.0f);
-        weights++;
-        x = __OSs8tof32(&input->x) * loadFactor;
-        y = __OSs8tof32(&input->y) * loadFactor;
-        z = __OSs8tof32(&input->z) * loadFactor;
-        input++;
-        outputX = (b[0] * x + b[3] * y + b[6] * z) * weightB + (a[0] * x + a[3] * y + a[6] * z) * weightA;
-        outputY = (b[1] * x + b[4] * y + b[7] * z) * weightB + (a[1] * x + a[4] * y + a[7] * z) * weightA;
-        outputZ = (b[2] * x + b[5] * y + b[8] * z) * weightB + (a[2] * x + a[5] * y + a[8] * z) * weightA;
-        output->x = __OSf32tos8(outputX * storeFactor);
-        output->y = __OSf32tos8(outputY * storeFactor);
-        output->z = __OSf32tos8(outputZ * storeFactor);
-        output++;
-    }
-}
-void ObjModel_TransformNormalTriplets(u8* matrixA, u8* matrixB, u8* weightPairs, u8* source, u8* destination,
-                                      int count) {
-    f32* a = (f32*)matrixA;
-    f32* b = (f32*)matrixB;
-    ModelSkinWeightPair* weights = (ModelSkinWeightPair*)weightPairs;
-    ModelPackedNormal* input = (ModelPackedNormal*)source;
-    ModelPackedNormal* output = (ModelPackedNormal*)destination;
-    u32 quantization = modelGetGQR7();
-    f32 storeFactor = modelQuantizationFactor(quantization >> 8);
-    f32 loadFactor = 1.0f / modelQuantizationFactor(quantization >> 24);
-    f32 x, y, z, weightA, weightB, outputX, outputY, outputZ;
-    int vertex;
-    int vector;
-
-    for (vertex = 0; vertex < count; vertex++) {
-        weightA = __OSu8tof32(&weights->matrixA) * (1.0f / 128.0f);
-        weightB = __OSu8tof32(&weights->matrixB) * (1.0f / 128.0f);
-        weights++;
-        for (vector = 0; vector < 3; vector++) {
-            x = __OSs8tof32(&input->x) * loadFactor;
-            y = __OSs8tof32(&input->y) * loadFactor;
-            z = __OSs8tof32(&input->z) * loadFactor;
-            input++;
-            outputX = (b[0] * x + b[3] * y + b[6] * z) * weightB + (a[0] * x + a[3] * y + a[6] * z) * weightA;
-            outputY = (b[1] * x + b[4] * y + b[7] * z) * weightB + (a[1] * x + a[4] * y + a[7] * z) * weightA;
-            outputZ = (b[2] * x + b[5] * y + b[8] * z) * weightB + (a[2] * x + a[5] * y + a[8] * z) * weightA;
-            output->x = __OSf32tos8(outputX * storeFactor);
-            output->y = __OSf32tos8(outputY * storeFactor);
-            output->z = __OSf32tos8(outputZ * storeFactor);
-            output++;
-        }
-    }
+/* Same register ABI as the vertex loops; each weight pair covers three consecutive
+ * normals, so the weight load is scheduled once per three stores. */
+asm void ObjModel_TransformNormalTriplets(u8* matrixA, u8* matrixB, u8* weightPairs, u8* source, u8* destination,
+                                          int count) {
+    // clang-format off
+    nofralloc
+    stwu r1, -0xa0(r1)
+    stfd f14, 0x8(r1)
+    addi r9, r8, -1
+    stfd f15, 0x10(r1)
+    stfd f16, 0x18(r1)
+    stfd f17, 0x20(r1)
+    stfd f18, 0x28(r1)
+    stfd f19, 0x30(r1)
+    stfd f20, 0x38(r1)
+    stfd f21, 0x40(r1)
+    stfd f22, 0x48(r1)
+    stfd f23, 0x50(r1)
+    stfd f24, 0x58(r1)
+    stfd f25, 0x60(r1)
+    stfd f26, 0x68(r1)
+    stfd f27, 0x70(r1)
+    mtctr r9
+    psq_l f0, 0x0(r3), 0, 0
+    addi r6, r6, -1
+    psq_l f1, 0x8(r3), 1, 0
+    addi r7, r7, -1
+    addi r5, r5, -2
+    psq_lu f8, 0x1(r6), 0, 7
+    psq_lu f9, 0x2(r6), 1, 7
+    psq_lu f27, 0x2(r5), 0, 6
+    ps_muls0 f15, f0, f8
+    psq_l f2, 0xc(r3), 0, 0
+    ps_muls0 f16, f1, f8
+    psq_l f3, 0x14(r3), 1, 0
+    psq_l f5, 0x20(r3), 1, 0
+    ps_madds1 f15, f2, f8, f15
+    psq_l f19, 0x0(r4), 0, 0
+    ps_madds1 f16, f3, f8, f16
+    psq_l f4, 0x18(r3), 0, 0
+    psq_l f20, 0x8(r4), 1, 0
+    psq_l f21, 0xc(r4), 0, 0
+    ps_madds0 f15, f4, f9, f15
+    psq_l f22, 0x14(r4), 1, 0
+    ps_madds0 f16, f5, f9, f16
+    psq_l f23, 0x18(r4), 0, 0
+    psq_l f24, 0x20(r4), 1, 0
+    ps_muls0 f15, f15, f27
+    ps_muls0 f16, f16, f27
+    ps_muls0 f11, f19, f8
+    ps_muls0 f12, f20, f8
+    ps_madds1 f11, f21, f8, f11
+    ps_madds1 f12, f22, f8, f12
+    psq_lu f8, 0x1(r6), 0, 7
+    ps_madds0 f11, f23, f9, f11
+    ps_madds0 f12, f24, f9, f12
+    psq_lu f9, 0x2(r6), 1, 7
+    ps_madds1 f11, f11, f27, f15
+    ps_madds1 f12, f12, f27, f16
+    ps_muls0 f15, f0, f8
+    psq_stu f11, 0x1(r7), 0, 7
+    ps_muls0 f16, f1, f8
+    psq_stu f12, 0x2(r7), 1, 7
+    ps_madds1 f15, f2, f8, f15
+    ps_madds1 f16, f3, f8, f16
+    ps_madds0 f15, f4, f9, f15
+    ps_madds0 f16, f5, f9, f16
+    ps_muls0 f15, f15, f27
+    ps_muls0 f16, f16, f27
+    ps_muls0 f11, f19, f8
+    ps_muls0 f12, f20, f8
+    ps_madds1 f11, f21, f8, f11
+    ps_madds1 f12, f22, f8, f12
+    psq_lu f8, 0x1(r6), 0, 7
+    ps_madds0 f11, f23, f9, f11
+    ps_madds0 f12, f24, f9, f12
+    psq_lu f9, 0x2(r6), 1, 7
+    ps_madds1 f11, f11, f27, f15
+    ps_madds1 f12, f12, f27, f16
+    ps_muls0 f15, f0, f8
+    psq_stu f11, 0x1(r7), 0, 7
+    ps_muls0 f16, f1, f8
+    psq_stu f12, 0x2(r7), 1, 7
+    ps_madds1 f15, f2, f8, f15
+    ps_madds1 f16, f3, f8, f16
+    ps_madds0 f15, f4, f9, f15
+    ps_madds0 f16, f5, f9, f16
+    ps_muls0 f15, f15, f27
+    ps_muls0 f16, f16, f27
+    ps_muls0 f11, f19, f8
+    ps_muls0 f12, f20, f8
+    ps_madds1 f11, f21, f8, f11
+    ps_madds1 f12, f22, f8, f12
+    psq_lu f8, 0x1(r6), 0, 7
+    ps_madds0 f11, f23, f9, f11
+    ps_madds0 f12, f24, f9, f12
+    psq_lu f9, 0x2(r6), 1, 7
+    ps_madds1 f11, f11, f27, f15
+    ps_madds1 f12, f12, f27, f16
+loop:
+    ps_muls0 f15, f0, f8
+    psq_stu f11, 0x1(r7), 0, 7
+    ps_muls0 f16, f1, f8
+    psq_stu f12, 0x2(r7), 1, 7
+    ps_madds1 f15, f2, f8, f15
+    ps_madds1 f16, f3, f8, f16
+    ps_madds0 f15, f4, f9, f15
+    ps_madds0 f16, f5, f9, f16
+    psq_lu f27, 0x2(r5), 0, 6
+    ps_muls0 f15, f15, f27
+    ps_muls0 f16, f16, f27
+    ps_muls0 f11, f19, f8
+    ps_muls0 f12, f20, f8
+    ps_madds1 f11, f21, f8, f11
+    ps_madds1 f12, f22, f8, f12
+    psq_lu f8, 0x1(r6), 0, 7
+    ps_madds0 f11, f23, f9, f11
+    ps_madds0 f12, f24, f9, f12
+    psq_lu f9, 0x2(r6), 1, 7
+    ps_madds1 f11, f11, f27, f15
+    ps_madds1 f12, f12, f27, f16
+    ps_muls0 f15, f0, f8
+    psq_stu f11, 0x1(r7), 0, 7
+    ps_muls0 f16, f1, f8
+    psq_stu f12, 0x2(r7), 1, 7
+    ps_madds1 f15, f2, f8, f15
+    ps_madds1 f16, f3, f8, f16
+    ps_madds0 f15, f4, f9, f15
+    ps_madds0 f16, f5, f9, f16
+    ps_muls0 f15, f15, f27
+    ps_muls0 f16, f16, f27
+    ps_muls0 f11, f19, f8
+    ps_muls0 f12, f20, f8
+    ps_madds1 f11, f21, f8, f11
+    ps_madds1 f12, f22, f8, f12
+    psq_lu f8, 0x1(r6), 0, 7
+    ps_madds0 f11, f23, f9, f11
+    ps_madds0 f12, f24, f9, f12
+    psq_lu f9, 0x2(r6), 1, 7
+    ps_madds1 f11, f11, f27, f15
+    ps_madds1 f12, f12, f27, f16
+    ps_muls0 f15, f0, f8
+    psq_stu f11, 0x1(r7), 0, 7
+    ps_muls0 f16, f1, f8
+    psq_stu f12, 0x2(r7), 1, 7
+    ps_madds1 f15, f2, f8, f15
+    ps_madds1 f16, f3, f8, f16
+    ps_madds0 f15, f4, f9, f15
+    ps_madds0 f16, f5, f9, f16
+    ps_muls0 f15, f15, f27
+    ps_muls0 f16, f16, f27
+    ps_muls0 f11, f19, f8
+    ps_muls0 f12, f20, f8
+    ps_madds1 f11, f21, f8, f11
+    ps_madds1 f12, f22, f8, f12
+    psq_lu f8, 0x1(r6), 0, 7
+    ps_madds0 f11, f23, f9, f11
+    ps_madds0 f12, f24, f9, f12
+    psq_lu f9, 0x2(r6), 1, 7
+    ps_madds1 f11, f11, f27, f15
+    ps_madds1 f12, f12, f27, f16
+    bdnz loop
+    psq_stu f11, 0x1(r7), 0, 7
+    psq_stu f12, 0x2(r7), 1, 7
+    lfd f14, 0x8(r1)
+    lfd f15, 0x10(r1)
+    lfd f16, 0x18(r1)
+    lfd f17, 0x20(r1)
+    lfd f18, 0x28(r1)
+    lfd f19, 0x30(r1)
+    lfd f20, 0x38(r1)
+    lfd f21, 0x40(r1)
+    lfd f22, 0x48(r1)
+    lfd f23, 0x50(r1)
+    lfd f24, 0x58(r1)
+    lfd f25, 0x60(r1)
+    lfd f26, 0x68(r1)
+    lfd f27, 0x70(r1)
+    addi r1, r1, 160
+    blr
+    // clang-format on
 }
 
 void setGQR6(register u32 config) {
