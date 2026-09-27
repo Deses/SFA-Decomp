@@ -787,6 +787,36 @@ bottom; the named param-copy lever (`GameObject* self = obj;`) moves PAL 150 -> 
 both declaration positions tried. `saveCardBuildComment` is flat at 3 across seven
 declaration/assignment splits.
 
+## Why the last two rows are closed on structure, from the allocator's own graph
+
+**`askProgressiveScanMode` (PAL, PAL v1.1).** The trace shows four nodes tied at degree 35 --
+`box`'s temp (node 53), `counter` (40), `sel` (39) and `savedAlignment` (34) -- and they take
+r31/r30/r29/r28 in that order because the colouring order is descending degree with ties broken by
+descending NODE INDEX. Retail wants `savedAlignment` = r31, `box` = r30, `counter` = r29,
+`sel` = r28, i.e. `savedAlignment` coloured FIRST. Node index runs reverse to declaration order, so
+`savedAlignment`, declared last of the four, has the lowest index and can never win an index
+tie-break; and it cannot be given a higher index than node 53 because compiler temps are numbered
+above every named local (`box` is coalesced into such a temp, being a call return). The only route is
+degree: retail's graph must have `savedAlignment` one degree above the other three, where ours has all
+four equal. Every web inside the do-while interferes with all four alike, because
+`savedAlignment`'s range spans the loop exactly as `counter`'s and `box`'s do, so no web can be added
+or removed that separates them. Measured flat: 30 EN-safe single moves x 2 guard positions, 16
+permutations of the two PAL-only blocks, and the set-of-locals probes (merging `i`/`j` takes PAL
+25 -> 23 but costs EN 6 diffs; dropping the `showId` copy makes PAL a size mismatch).
+
+EN is the control that makes this a real obstruction rather than an unfound spelling: EN colours
+`savedAlignment` LAST too and EN is byte-exact, so the same source must produce
+`savedAlignment`-last on EN and `savedAlignment`-first on PAL. The difference has to come from PAL's
+two extra locals changing degrees, not from anything orderable.
+
+**`wclevelcont_update` (all three).** The f0/f1 pair is pinned to the VALUES, not to source order:
+with the clamp written either way round (`field < const` or `const > field`) the field takes f0 and
+the constant f1, because the constant's web outlives the compare -- the clamp's store reuses it --
+while retail gives the constant f0. Forcing two separate loads needs a second `.sdata2` atom and
+retail's unit has exactly one `0.0f` atom serving both the clamp and the four `x + 0.0f` adds
+(verified from the relocations), so the literal route costs the unit its registration. Naming either
+value does not move it, which is CLAUDE.md's coalescing rule.
+
 ## See also
 
 - `docs/source_shape_levers.md` — levers 9, 14 and 16 are the ones this frontier keeps invoking.
