@@ -38,6 +38,79 @@ means the defect is upstream of allocation.**
 
 ## Refutations, per unit
 
+### `wclevelcont_update` has NO FPR colouring graph — that row is not a colouring row at all
+
+```sh
+python3 tools/tricky_backend_trace.py --unit main/dlls/objects/653_WCLevelCont/WCLevelCont         --function wclevelcont_update --graph --register-class fpr
+# ValueError: missing requested register class in the graph capture
+```
+
+MWCC never builds an FPR interference graph for this function. Its `f0`/`f1` pair is therefore assigned
+by the code generator's scratch handling, not by graph colouring — so there is no graph to influence and
+**no source lever can reach it**, which finally explains why all ~40 spellings, the twelve `-opt`
+profiles, the whole non-`-opt` flag space, the declaration forms, the expression sweep and the helper
+boundary were every one of them exactly inert at 4. It also matches `priced_classes.md` §31e: "a
+declaration never touches `f0`-`f13`", measured over 8 085 differing FPR operands with 0 volatile.
+
+Do not spend further probes on this row. The GPR side of the function already matches.
+
+### `bossdrakor_update`: a real gradient, 150 -> 70, then a hard plateau
+
+The alias merge plus a reordered declaration list takes PAL from **150 to 70** positional diffs — the
+largest movement found anywhere on this frontier. The merge half is byte-identical in all five versions
+and is landed. The reorder half is not: it needs `state` declared late, EN wants it early (EN 0 -> 94),
+and the behaviour is **binary** rather than graded — every position from 2 to 14 gives exactly
+(EN 94, PAL 70) and positions 0-1 give (EN 0, PAL 150), with nothing in between. A randomised multi-move
+climb over all 15 declaration items, PAL-only, found 70 in three seconds and never beat it.
+
+The trace says why the row is close: `obj` (deg 105), `drakorState` (102) and `state` (100) are nearly
+tied, so their colouring order turns on a 3-5 point degree margin rather than the 13-point gap
+`pauseMenuDraw` needs — which is what makes any movement possible at all.
+
+And the residual 70 is **one exchange, not scattered noise**: the substitution census is
+`r31->r29` x51, `r29->r31` x14, `r29->r30` x2, `r30->r31` x5, so 65 of the 70 are the single
+`obj` <-> `state` swap. Ours gives `obj` 29 and `state` 31; retail gives `obj` 31. `obj` is coloured
+first because it has the highest degree, so this is again a *pick* inside a large free set rather than a
+constraint, and moving it two positions along needs two more nodes coloured before it.
+
+### And `obj` is a PARAMETER, so its node index cannot be raised — BossDrakor is closed too
+
+After the alias merge the degrees are `obj` **104** and `state` **102** — a two-point margin, the
+tightest anywhere here. But the colouring order is `[164, 40, 39, 32]`: descending node index, so
+`state` (node 40) colours before `obj` (node 32), and retail needs the reverse. Parameters get low node
+indices and every local sits above them, so no declaration position can put `obj` first. That is exactly
+why the position sweep is binary — 150 or 70, never anything between.
+
+The obvious escape is to copy the parameter into a local whose position *is* controllable
+(`GameObject* self = obj;` used throughout). Swept over all 16 positions: **PAL 150 -> 136 at positions
+0-2 only** (EN 0 -> 65), and 150 everywhere else. Binary again, and never 0 — the copy coalesces with the
+parameter and inherits its index constraint rather than getting a fresh one.
+
+**So a parameter's effective node index is not source-controllable**, which closes this row: the single
+`obj` <-> `state` exchange that is 65 of its 70 diffs requires an ordering the front end will not produce.
+
+### Why no node-count lever exists in these functions — the contradiction, stated
+
+Adding a graph node is the one mechanism that reorders colouring (Jack's `modelDoRenderInstrs`: 256 ->
+257). Three measurements pin down what it takes and why it is unavailable here:
+
+1. **A value defined and immediately consumed gets no web.** Confirmed three independent ways — a
+   `fontId` temp (294 nodes before and after, only renumbered), GM_MazeWell's hoisted
+   `isItemBeingUsed` result, and the thrice-used `0xc0 - shadeReduction` subexpression that folds away on
+   EN but not PAL. All inert.
+2. **A node therefore needs a value that genuinely SURVIVES something** — Jack's joint matrix had to
+   survive the second argument's setup.
+3. **But every surviving value in these functions is already a web**, and promoting one that is *not*
+   already a web changes the stream. The cleanest test: `taskTextIds[gPauseMenuTokenIndex * 4]` is the
+   first argument to `gameTextMeasureById(..., 0, 0, &a, &b, &c, &d)`, so it survives four address
+   setups — a perfect candidate. Retail loads it **twice** (two `lhax`), so hoisting it into one local
+   costs 4 instructions on *both* versions (EN and PAL both 10004).
+
+So the requirement "adds a web" and the requirement "leaves the stream identical" are in direct conflict
+in these bodies: anything that survives is already counted, and anything not counted does not survive.
+That is the structural reason the frontier is closed, and it is the thing to re-test first if a future
+change alters one of these functions' streams for an unrelated reason.
+
 ### The graph is FORCED by the code — so every one of these rows is a selection difference
 
 This is the load-bearing result, and it is a theorem the trace then confirms. The interference graph is
@@ -114,7 +187,12 @@ tried at all three advance points and breaks EN (14/11/6 diffs) without reaching
 **Renaming does not add a node — verified twice.** Jack's `modelDoRenderInstrs` fix worked because its
 graph grew 256 -> 257. Re-tracing after adding a `fontId` temp to the PAL-only statement: still **294
 nodes**, only the indices renumbered (`[77, 54, 45, 40, 36, …]`), node 35 still colour 26. Same for
-hoisting GM_MazeWell's `isItemBeingUsed` result into a local: EN and PAL both unchanged. A call result
+hoisting GM_MazeWell's `isItemBeingUsed` result into a local: EN and PAL both unchanged. And a third,
+strongest case: in `askProgressiveScanMode` the subexpression `0xc0 - shadeReduction` appears **three
+times** in one call and CSE already computes it once, and on EN it folds away entirely because
+`shadeReduction` is a `const int = 0` there — so hoisting it into a local looked like a
+version-asymmetric, stream-neutral way to add a node on PAL alone. Swept over all ten declaration
+positions: EN 0 and PAL 25 at every one. It coalesces too. A call result
 that is immediately consumed coalesces straight back; the joint-matrix case added a node because its
 value had to live across the argument setup. **So "hoist it into a local" only moves anything when the
 value genuinely survives something.**

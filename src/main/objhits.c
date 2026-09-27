@@ -74,6 +74,37 @@ ObjHitsSweepEntry* gObjHitsSweepEntryPtrs[OBJHITS_SWEEP_ENTRY_CAPACITY];
 extern ObjHitsSweepEntry gObjHitsSweepEntries[OBJHITS_SWEEP_ENTRY_CAPACITY];
 extern f32 gObjHitsResponseDominanceRatio;
 
+void ObjHits_SumSkeletonHitPush(GameObject* obj, GameObject* other, ObjHitsSkeletonHit* hits, f32 totalWeight,
+                                int keepVertical, Vec* out) {
+    f32 weight;
+
+    out->x = 0.0f;
+    out->y = 0.0f;
+    out->z = 0.0f;
+    totalWeight = 2.0f * (1.0f / totalWeight);
+    while (hits->pointIndexA != OBJHITS_SKELETON_HIT_SENTINEL) {
+        weight = totalWeight * hits->inverseDistance;
+        hits->axisDir[0] *= weight;
+        hits->axisDir[1] *= weight;
+        hits->axisDir[2] *= weight;
+        out->x += hits->axisDir[0];
+        out->y += hits->axisDir[1];
+        out->z += hits->axisDir[2];
+        hits++;
+    }
+    if (keepVertical == 0) {
+        out->y = 0.0f;
+    }
+}
+
+/* Retail body unknown; the E3 build's hit-volume test here gave a zero-distance hit this fallback. */
+void ObjHits_SetFallbackHitDistance(ObjHitsSkeletonHit* hit) {
+    if (0.0f == hit->signedSurfaceDistance) {
+        hit->signedSurfaceDistance = 0.1f;
+    }
+    hit->inverseDistance = 1.0f;
+}
+
 static inline ObjModel* ObjHits_GetActiveModel(GameObject* obj) {
     ObjAnimComponent* objAnim = &obj->anim;
     return (ObjModel*)objAnim->banks[objAnim->bankIndex];

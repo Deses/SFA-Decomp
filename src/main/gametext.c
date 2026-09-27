@@ -1911,6 +1911,10 @@ f32 gameTextGetTimer(void) {
     return gameTextFonts->timer;
 }
 
+int getCurLanguage(void) {
+    return curLanguage;
+}
+
 #if defined(VERSION_GSAP01) || defined(VERSION_GSAP01_rev1)
 void gameTextSetLanguage(int language) {
     GameTextSlot* cmd;
@@ -1969,10 +1973,6 @@ void gameTextSetLanguage(int language) {
     gameTextLoadDir(dirId);
 }
 #endif
-
-int getCurLanguage(void) {
-    return curLanguage;
-}
 
 int getCurGameText(void) {
     return curGameTextDir;

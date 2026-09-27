@@ -207,24 +207,73 @@ extract:
   header: gLoadingScreenTextures.inc
 
 force_active:
+  # shader.c reaches these objects through enclosing storage or keeps them
+  # without a direct relocation; the retail link retains their full extents.
+  - sShaderObjLoadMessages
+  - gLightmapDeferredObjects
+  - gMapCellRenderState
   # Unreferenced zero retail keeps in the title screen init pool.
   - gTitleScreenInitUnusedZero
+  # Retail retains this unreferenced ObjSeq API entry (40 bytes).
+  - ObjSeq_SetCameraTransformOverride
+  # Retain the initialized zero word before the default color.
+  - lbl_803DB744
+  # Unreferenced initialized words retained by retail in gametext_data.c.
+  # Dropping them shifts the following small-data globals despite exact objdiff.
+  - lbl_803DB3E4
+  - lbl_803DB404
   # Retain the version/reset metadata previously used as a diagnostic address base.
   - sGameLoopResetMessages
-  # audio.c: retain the unused initialized word and two small-BSS words.
-  - lbl_803DB1EC
-  - sAudioUnused0
-  - sAudioUnused1
-  # gameloop.c: retain the memory-card dialog and its status-helper references.
-  - cardShowMessage
-  # aram_data.c: retain the same unreferenced 24-byte .bss block as EN.
-  - lbl_803D4868
-  # dlls/engine/5/5.c
-  # Retain the unused sky color table and trailing small-data word.
-  - sSkyUnusedColors
-  - sSkyUnusedD
-  # dlls/objects/429_SH_thorntai/SHthorntail.c
-  # Thorntail reads these state and dialogue tables through the linked-ident base.
+  # GPU error handlers reach these strings through offsets from the boot
+  # texture/FIFO base, so their individual symbols have no direct relocations.
+  - sGpuHangSuspectedMessage
+  - sGpuHangStatusFormat
+  - sGpuHangXfStallMessage
+  - sGpuHangUnterminatedMessage
+  - sGpuHangIllegalInstructionMessage
+  - sGpuHangWaitingMessage
+  - sGpuHangUnknownMessage
+  - sGpuHangXfStallLog
+  - sGpuHangUnterminatedLog
+  - sGpuHangIllegalInstructionLog
+  - sGpuHangWaitingLog
+  - sGpuHangUnknownLog
+  - voicePrioritySortLinks
+  # dlls/objects/599_DR_EarthWar/DR_EarthWar.c: the retail link retained these
+  # two unreferenced .data tables that follow gDREarthWarriorRowIndices;
+  # dropping them would shorten .data and shift every later .data address.
+  - lbl_803352D0
+  - lbl_80335310
+  # dlls/engine/21/21.c: the retail link retained this unreferenced .sdata2
+  # zero atom at the tail of the pool; dropping it would shorten the pool and
+  # shift every later SDA2 reference.
+  # main/objprint_dolphin.c: the retail link retained these two unreferenced
+  # .sbss tail words after gObjSelectedLights; dropping them would shorten the
+  # section and shift every later .sbss address.
+  - lbl_803DCC68
+  - lbl_803DCC6C
+  # dlls/engine/66/66.c: the retail link retained this unreferenced .sbss tail
+  # word; dropping it would shorten the section and shift every later .sbss
+  # address.
+  - lbl_803DD534
+  # dlls/engine/69/69.c: same unreferenced .sbss tail word.
+  - lbl_803DD544
+  # dlls/engine/78/78.c: same unreferenced .sbss tail word.
+  - lbl_803DD58C
+  # SB_Galleon.c: the retail link retained this unreferenced .sbss tail word.
+  - sSbGalleonUnused0
+  # DBstealerwo.c: the retail link retained the worm command-name table even
+  # though nothing references it by name; dropping it would shorten .data and
+  # shift every later .data address.
+  - gDbStealerwormCommandNames
+  # 597.c: the retail link retained the SnowBike race gamebit pairs, which
+  # SnowBike_init reaches through the path setup table base rather than by
+  # name; dropping them would shorten .data and shift every later .data address.
+  - gSnowBikeRaceGameBits
+  # SHthorntail.c: the retail link retained the per-state and talk-sequence
+  # tables that SHthorntail_update reaches through the linked-ident table base
+  # rather than by name; dropping them would shorten .data and shift every
+  # later .data address.
   - gSHthorntailHitReactEntries
   - gSHthorntailAsleepHitReactEntries
   - gSHthorntailStateMoveIds
@@ -238,45 +287,101 @@ force_active:
   - gSHthorntailHerdAct3ClearTalkSeqVariants
   - gSHthorntailHerdAct3SetTalkSeqVariants
   - gSHthorntailHerdAct5ClearTalkSeqVariants
-  # dlls/objects/597/597.c
-  # SnowBike reads these gamebit pairs through the path-setup table base.
-  - gSnowBikeRaceGameBits
-  # main/audio_stream.c
-  # The looped-sound arrays are reached through the flags-array base.
-  - gSfxLoopedObjectSoundIds
-  - gSfxLoopedObjectSoundObjects
-  # main/boot_logo.c
-  # GPU diagnostics address these strings through offsets from the texture base.
-  - sGpuHangSuspectedMessage
-  - sGpuHangStatusFormat
-  - sGpuHangXfStallMessage
-  - sGpuHangUnterminatedMessage
-  - sGpuHangIllegalInstructionMessage
-  - sGpuHangWaitingMessage
-  - sGpuHangUnknownMessage
-  - sGpuHangXfStallLog
-  - sGpuHangUnterminatedLog
-  - sGpuHangIllegalInstructionLog
-  - sGpuHangWaitingLog
-  - sGpuHangUnknownLog
-  # main/objlib.c: retain the zero before the hit-cooldown constant pool.
+  # BossDrakor.c: the retail link retained this unreferenced .sdata tail atom.
+  - lbl_803DC19C
+  # DIMSnowHorn.c: the retail link retained this unreferenced .sdata2 zero atom
+  # at the tail of the pool.
+  - gDIMSnowHorn1ZeroOffset
+  # maketex.c: the retail link retained the memory-card banner asset name
+  # table and the .sdata tail atom even though nothing references them by
+  # name; dropping them would shorten .data and shift every later address.
+  - gMemoryCardBannerAssetNames
+  - lbl_803DB70C
+  # dll_012B_fxemit.c: the retail link retained this unreferenced .sdata2 zero
+  # atom; dropping it would shorten the pool and shift later SDA2 references.
+  # gcrobotpatrol.c: the retail link retained this unreferenced .sdata2 zero
+  # atom; dropping it would shorten the pool and shift the mikaladon SDA2
+  # references that follow it.
+  - gGcRobotPatrolZero
+  # objlib.c: the retail link retained this unreferenced .sdata2 zero atom
+  # between the nearest-object search and the hit-cooldown pool run; dropping
+  # it would shorten the pool and shift every later SDA2 reference.
   - gObjLibZero
-  # main/shader_dolphin.c
-  # These constants are read through offsets from sEnvMapBumpIndMtx.
-  - sWarpedRingRotAxes
-  - sWarpedRingIndMtx
-  # main/thp/THPRead.c
-  # Retain the message arrays addressed through their neighboring queues.
+  # WispBaddie.c: the seq-driver TUs reach these per-family scalar tables
+  # only through the gBaddieMoveProgressTable base (+0x152C/+0x1538), so no
+  # relocation references them by name; dropping them would shorten .data and
+  # shift every later .data address.
+  - gBaddieEventDelayRanges
+  - gBaddieFamilySpeedScales
+  # aram_data.c: the retail link retained this unreferenced .bss block;
+  # dropping it would shorten the section and shift every later .bss address.
+  - lbl_803D4868
+  # picmenu.c: the retail link retained the thread message buffers and the
+  # video-decode stack even though live code reaches them only through the
+  # surrounding thread-area base pointers; dropping them would shorten .bss
+  # and shift every later .bss/.sdata address.
   - gPicMenuReadedBuffer2Messages
   - gPicMenuReadedBufferMessages
   - gPicMenuFreeReadBufferMessages
-  # main/thp/THPVideoDecode.c
-  # Retain the video decoder stack addressed through its containing area.
   - gPicMenuVideoDecodeThreadStack
-  # track/intersect.c
-  # Retain the uncalled surface-sound lookup and unused small-data word.
+  # gameloop.c: the retail link retained this uncalled function (its jumptable
+  # and the .sbss word only it reads come along via its own references);
+  # dropping it would shorten .text and shift every later section.
+  - cardShowMessage
+  # audio_stream.c: the looped-object-sound table is reached through the
+  # gSfxLoopedObjectSoundFlags base, so no relocation names the id or object
+  # halves; dropping them would shorten .bss and shift every later address.
+  - gSfxLoopedObjectSoundIds
+  - gSfxLoopedObjectSoundObjects
+  # intersect_surfacesfx.c: the retail link retained this uncalled function
+  # (its own switch jumptable is the only thing that names it); dropping it
+  # would shorten .text and shift every later section.
   - surfaceSfxGetRecord
+  # intersect.c: the retail link retained this unreferenced .sbss word;
+  # dropping it would shorten the section and shift every later .sbss address.
   - sIntersectUnused0
+  # audio.c: the retail link retained the unreferenced .sdata atom and the two
+  # .sbss words that no relocation names; dropping them would shorten those
+  # sections and shift every later .sdata/.sbss address.
+  - lbl_803DB1EC
+  - sAudioUnused0
+  - sAudioUnused1
+  # dlls/engine/53/53.c: retain the unreferenced .sdata word between the
+  # info-start slot and texture IDs; retail keeps it and the following
+  # texture IDs and format strings depend on its four-byte footprint.
+  - lbl_803DBA00
+  # dlls/engine/5/5.c: retain the unused final .sbss word and the retail
+  # 60-byte .data color table when linking the complete sky TU from source.
+  - sSkyUnusedD
+  - sSkyUnusedColors
+  # Placeholders for retail objects the carve leaves unnamed, in units that are
+  # still NonMatching. Nothing references them, so mwld would dead-strip them
+  # the moment their unit is linked from our object, shortening .sbss/.sdata and
+  # moving _SDA_BASE_ for every TU. Arming them now keeps that flip cheap.
+  # dlls/engine/71/71.c
+  - lbl_803DD564
+  # dlls/engine/68/68.c
+  - lbl_803DD54C
+  # dlls/engine/2/2.c
+  - lbl_803DB74C
+  # main/voxmaps.c
+  - lbl_803DC8E4
+  # main/pi_dolphin.c
+  - sPiUnused0
+  - sPiUnused1
+  - sPiUnused2
+  - sPiUnused3
+  # dlls/objects/609_DR_LaserCan/DR_LaserCan.c
+  - lbl_803DDD6C
+  # dlls/objects/195_Player/player.c
+  - lbl_803DE4BC
+  # dlls/objects/454_DIMCannon/DIMCannon.c
+  - lbl_803DDB54
+  # dlls/objects/213_Kaldachom/Kaldachom.c
+  - lbl_803DDA9C
+  # main/shader_dolphin.c
+  - sWarpedRingRotAxes
+  - sWarpedRingIndMtx
 
 # Retail startup/BSS bounds establish these linker-generated addresses.
 # symbols_known skips signature recovery; keep the linker formulas external.
