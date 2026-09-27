@@ -1474,21 +1474,24 @@ static u32 objSetupRenderOpGxState(GameObject* obj, ModelFileHeader* modelFile, 
                                    ModelRenderInstrsState* stream) {
     Shader* shader;
     ModelRenderOpTextureRefs* textureRefs;
-    u32 shaderIndex;
+    int shaderIndex;
+    u32 renderOpIndex;
     u8 shad;
+    u8* projectionTexture;
+    int lightIndex;
+    s32 shadowColorMode;
     u8 zCompareBeforeTexture;
     int nlay;
     int envtex;
     ModelLightStruct** lp;
     u8* sp;
-    int i;
     ObjModelRenderCb cb;
     f32 m2[12];
     f32 t2[12];
     f32 wm[12];
     f32 t1[12];
-    int a;
-    int b;
+    int colorMode;
+    int alphaMode;
     u8 color[4];
     u8 fogc[4];
 
@@ -1576,19 +1579,20 @@ static u32 objSetupRenderOpGxState(GameObject* obj, ModelFileHeader* modelFile, 
             addWavyCausticTevStage();
             nlay = 0;
         } else if (b4 == 0) {
-            i = 0;
+            lightIndex = 0;
             lp = &gObjSelectedLights;
             sp = &gObjProjectedLightChannel;
-            for (; i < gObjSelectedLightCount; i++) {
-                u8* t = (u8*)modelLightStruct_getProjectionTexture(*lp);
-                if (t != 0) {
-                    modelLightStruct_getProjectionTevModes(*lp, &a, &b);
-                    if (a == 2) {
+            for (; lightIndex < gObjSelectedLightCount; lightIndex++) {
+                projectionTexture = (u8*)modelLightStruct_getProjectionTexture(*lp);
+                if (projectionTexture != 0) {
+                    modelLightStruct_getProjectionTevModes(*lp, &colorMode, &alphaMode);
+                    shadowColorMode = colorMode;
+                    if (shadowColorMode == 2) {
                         shad = 1;
                     }
                     {
                         f32* mtx = modelLightStruct_getProjectionTexMtx(*lp);
-                        addProjectedLightTevStage(t, mtx, a, b, *sp);
+                        addProjectedLightTevStage(projectionTexture, mtx, colorMode, alphaMode, *sp);
                     }
                 }
                 lp++;
@@ -1606,6 +1610,7 @@ static u32 objSetupRenderOpGxState(GameObject* obj, ModelFileHeader* modelFile, 
             addTexModulateReg2Stage();
         }
     }
+    renderOpIndex = shaderIndex;
     {
         u8 useChannelColor;
         useChannelColor = ((modelFile->shaderFlags & 2) && !(modelFile->flags24 & 2));
@@ -1709,7 +1714,7 @@ static u32 objSetupRenderOpGxState(GameObject* obj, ModelFileHeader* modelFile, 
     } else {
         GXSetCullMode(GX_CULL_NONE);
     }
-    return shaderIndex;
+    return renderOpIndex;
 }
 static void shaderSetGxFlags(GameObject* obj, u8* m, u8* shader) {
     u8 blend;
