@@ -93,7 +93,7 @@ void DR_CloudRunner_setupPath(GameObject* obj, CloudRunnerState* state, int mode
         (*gPathControlInterface)->init(pathState, 3, 0x42087, 0);
         (*gPathControlInterface)
             ->setLocalPointCollision(pathState, 2, &base->pathCollisionC, &gDRCloudRunnerMode0LocalRadii, 8);
-        (*gPathControlInterface)->setup(pathState, 1, &base->pathPointsC, &gDRCloudRunnerMode0SegmentRadius, &stk);
+        (*gPathControlInterface)->setup(pathState, 1, &base->pathPointsC, gDRCloudRunnerMode0SegmentRadii, &stk);
     }
     (*gPathControlInterface)->attachObject(obj, pathState);
 }
@@ -1139,7 +1139,7 @@ f32 gDRCloudRunnerMode1SegmentRadius = 40.0f;
 f32 gDRCloudRunnerMode1LocalRadius = 40.0f;
 f32 gDRCloudRunnerMode2SegmentRadius = 20.0f;
 f32 gDRCloudRunnerMode2LocalRadius = 20.0f;
-f32 gDRCloudRunnerMode0SegmentRadius = 0.0f;
+f32 gDRCloudRunnerMode0SegmentRadii[1] = {0.0f};
 f32 gDRCloudRunnerMode0LocalRadii[2] = {15.0f, 15.0f};
 f32 gDRCloudRunnerCameraOffsetY = 16.0f;
 f32 gDRCloudRunnerCameraOffsetZ = -16.0f;

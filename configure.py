@@ -379,19 +379,6 @@ cflags_dll_noopt_nodead = [
     "-opt", "nopeephole,noschedule,nodead",
 ]
 
-cflags_dll_noopt_zerodata_noautoinline = [
-    *cflags_game,
-    "-opt", "nopeephole,noschedule",
-    '-pragma "explicit_zero_data on"',
-    "-inline", "noauto",
-]
-
-cflags_dll_noopt_nocse_noprop_zerodata = [
-    *cflags_game,
-    "-opt", "nopeephole,noschedule,nocse,nopropagation",
-    '-pragma "explicit_zero_data on"',
-]
-
 cflags_msl = [
     *cflags_base,
     "-char signed",
@@ -1518,7 +1505,7 @@ config.libs = [
             Object(MatchingFor("GSAE01"), "dlls/objects/597/597.c", cflags=cflags_dll_noopt),
             Object(MatchingFor("GSAE01"), "dlls/objects/598_DIMSnowHorn/DIMSnowHorn.c", cflags=cflags_dll_noopt_noautoinline),
             Object(MatchingFor("GSAE01"), "dlls/objects/599_DR_EarthWar/DR_EarthWar.c", cflags=cflags_dll_noopt_noautoinline),
-            Object(MatchingFor("GSAE01"), "dlls/objects/600_DR_CloudRun/DR_CloudRun.c", cflags=cflags_dll_noopt_zerodata_noautoinline),
+            Object(MatchingFor("GSAE01"), "dlls/objects/600_DR_CloudRun/DR_CloudRun.c", cflags=cflags_dll_noopt_noautoinline),
             Object(MatchingFor("GSAE01"), "dlls/objects/601_SB_Cloudrun/SB_Cloudrun.c", cflags=cflags_dll_noopt_noautoinline),
             Object(MatchingFor("GSAE01"), "dlls/objects/602_StaticCamer/StaticCamer.c"),
             Object(MatchingFor("GSAE01"), "dlls/objects/603_MSPlantingS/MSPlantingS.c"),
@@ -1652,10 +1639,10 @@ config.libs = [
             Object(MatchingFor("GSAE01"), "main/objhits.c", cflags=cflags_dll_noopt_noautoinline),
             Object(Matching, "main/objlib.c"),
             Object(MatchingFor("GSAE01"), "main/objprint.c", cflags=cflags_dll_noopt_noautoinline),
-            Object(MatchingFor("GSAE01"), "main/objprint_dolphin.c", cflags=cflags_dll_noopt_zerodata_noautoinline),
-            Object(MatchingFor("GSAE01"), "main/pi_dolphin.c", cflags=cflags_dll_noopt_zerodata_noautoinline),
-            Object(MatchingFor("GSAE01"), "main/pi_videoinit.c", cflags=cflags_dll_noopt_nocse_noprop_zerodata),
-            Object(MatchingFor("GSAE01"), "main/pi_pathsearch.c", cflags=cflags_dll_noopt_zerodata_noautoinline),
+            Object(MatchingFor("GSAE01"), "main/objprint_dolphin.c", cflags=cflags_dll_noopt_noautoinline),
+            Object(MatchingFor("GSAE01"), "main/pi_dolphin.c", cflags=cflags_dll_noopt_noautoinline),
+            Object(MatchingFor("GSAE01"), "main/pi_videoinit.c", cflags=cflags_dll_noopt_nocse_noprop),
+            Object(MatchingFor("GSAE01"), "main/pi_pathsearch.c", cflags=cflags_dll_noopt_noautoinline),
             Object(Matching, "main/zlb.s"),
             Object(Matching, "main/shader_dolphin.c"),
             Object(MatchingFor("GSAE01"), "main/boot_logo.c"),

@@ -164,7 +164,6 @@ u16 gGxDrawSyncToken = 1;
 GXColor gEfbCopyClearColor = {0, 0, 0, 0xFF};
 u8 gDispCopyFilterWeights[8] = {7, 7, 0xC, 0xC, 0xC, 7, 7, 0};
 char sProgramCounterFormat[] = "PC: %x";
-int lbl_803DB5E4 = 0;
 
 #define PAD_BUTTON_A 0x100
 #define PAD_BUTTON_B 0x200
