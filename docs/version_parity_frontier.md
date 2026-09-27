@@ -1227,6 +1227,31 @@ With BossDrakor and maketex already swept, the flag axis is now closed on all fo
 unit's shipped profile is optimal, and no per-version flag change is available that would not cost a
 version that currently matches.
 
+### Why the GM_MazeWell loop-pointer lever cannot be retail's source
+
+The lever recorded above -- giving the second loop the explicit pointer the first one has -- does put
+PAL's loop registers exactly right while EN, JP and EN v1.1 stay byte-identical. It still cannot be the
+answer, and the reason is structural rather than a matter of searching harder.
+
+With the pointer in place the function needs a **fifth** saved register, because the anonymous CSE of
+`(GameObject*)(int)obj` (shared between the `INTERACT_FLAG_ACTIVATED` test and the final
+`objUpdateHitVolumeTransforms` call) can no longer coalesce with `obj` under the added pressure. Five
+saved registers make MWCC switch from four `stw`/`lwz` pairs to `_savegpr_27`/`_restgpr_27`, so our
+function comes out **three instructions shorter** than retail's, which uses four saved registers
+(`r28..r31`) and individual stores. Retail has the loop pointer in *both* loops and still only four
+saved registers.
+
+That makes the lever self-defeating: every way of removing the fifth register also removes the pressure
+the register flip depends on. Dropping the alias, passing plain `obj` to the final call, and passing
+`objId` to it all return PAL to 14 diffs, and nine alias spellings are byte-identical. A declaration
+sweep on top of the pointer variant is futile for the same reason -- its baseline is a *size* mismatch
+and declaration order does not change instruction counts (800 orderings confirmed no movement before it
+was stopped).
+
+So the pointer variant is a genuine, EN-safe colouring lever and simultaneously proof that retail
+reached the same registers with less pressure than any source we can write. Recorded so the lever is not
+mistaken for a near-miss that one more sweep would close.
+
 ## See also
 
 - `docs/source_shape_levers.md` — levers 9, 14 and 16 are the ones this frontier keeps invoking.
