@@ -207,6 +207,38 @@ extract:
   header: gLoadingScreenTextures.inc
 
 force_active:
+  # Retain retail data the linker would dead-strip (computed from the link).
+  - sShaderObjLoadMessages
+  - gMemoryCardBannerAssetNames
+  - sFastFloorZeroTail
+  - lbl_803DB744
+  - lbl_803DB74C
+  - lbl_803DB70C
+  - gCurvesUnusedZero
+  - lbl_803DBA00
+  - lbl_803DD534
+  - lbl_803DD54C
+  - lbl_803DD544
+  - lbl_803DD564
+  - lbl_803DD58C
+  - lbl_803DE4BC
+  - gTrickyUnusedSbss
+  - gGcRobotPatrolZero
+  - lbl_803DDA9C
+  - lbl_803DDB54
+  - sSbGalleonUnused0
+  - gDIMSnowHorn1ZeroOffset
+  - lbl_803DDD6C
+  - lbl_803DB3E4
+  - lbl_803DB404
+  - lbl_803DCC68
+  - lbl_803DCC6C
+  - lbl_803DB5E4
+  - sPiUnused0
+  - sPiUnused1
+  - sPiUnused2
+  - sPiUnused3
+  - lbl_803DC8E4
   # Unreferenced zero retail keeps in the title screen init pool.
   - gTitleScreenInitUnusedZero
   # Retain the version/reset metadata previously used as a diagnostic address base.

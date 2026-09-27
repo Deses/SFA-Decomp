@@ -207,6 +207,12 @@ extract:
   header: gLoadingScreenTextures.inc
 
 force_active:
+  # Retain retail data the linker would dead-strip (computed from the link).
+  - sFastFloorZeroTail
+  - gCurvesUnusedZero
+  - gTrickyUnusedSbss
+  - lbl_803E2604
+  - lbl_803DB5E4
   # shader.c reaches these objects through enclosing storage or keeps them
   # without a direct relocation; the retail link retains their full extents.
   - sShaderObjLoadMessages

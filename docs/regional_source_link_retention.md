@@ -92,3 +92,55 @@ Reproduce a manifest check with `tools/verify_source_link.py VERSION`, passing
 each non-comment source unit from that version's `matching_units.txt` after
 configuring the version and building `all_source`. All five versions now also
 support the [native `--matching` checksum build](jp_source_link_retention.md).
+
+## Restoration, 2026-09-26
+
+All five DOLs matched again after four defects. EN v1.0 was the only one still
+byte-exact when this started; JP, PAL v1.0, EN v1.1 and PAL v1.1 had drifted by
+192, 64, 224 and 320 bytes as newer source landed. Each version is back to its
+`build.sha1`.
+
+**The instrument.** Section sizes are a poor screen because a retail carve
+legitimately runs past the object it came from -- the linker's own inter-unit
+padding is inside the carve -- so most size deltas are benign and EN has dozens
+of them. What localises a drift is the linked ELF: compare every retail symbol
+address against `nm build/<V>/main.elf`, per section, and report the first
+divergence. `.text` all-exact with a data section shifted names the section;
+the first shifted symbol names the unit; that unit's carve-versus-object delta
+says whether bytes were lost inside it. Anonymous `@N` pool labels must be
+excluded -- they are per-TU and collide across units, producing false origins.
+
+**Four causes, in the order they were found.**
+
+1. *A carve that runs past the object's natural end.* JP and EN v1.1 ended
+   `pi_dolphin`'s `.data` eight bytes beyond what the source object emits, while
+   EN, PAL and PAL v1.1 ended it exactly there. dtk turns the surplus into a
+   `gap_*` filler inside the retail object, which a source link simply does not
+   have. Cross-version disagreement about the same boundary is the tell.
+2. *Dead-stripping.* A unit can be 100% in objdiff and still lose bytes: an
+   unreferenced data object is dropped by the linker and everything after it in
+   that section moves. Diff each source object's defined data symbols against
+   the linked ELF to get the exact set, then list them in `force_active`. JP and
+   PAL v1.1 were each missing thirty-odd, the largest being `shader.c`'s
+   196-byte `sShaderObjLoadMessages`.
+3. *Two symbols that must NOT be retained.* `GXNtsc480Prog` (60 bytes) is
+   genuinely absent from retail PAL. `__OSFpscrEnableBits` is subtler and was the
+   last defect in all four DOLs: it is dead-stripped on EN too, and the four
+   zero bytes the linker inserts as alignment padding in its place reproduce
+   retail exactly. Retaining it moved the pooled newline literal four bytes and
+   cost two `.text` bytes as well. Over-retention is as damaging as
+   under-retention, and only the DOL distinguishes them.
+4. *Function emission order.* MWCC lays a translation unit's functions out in
+   **reverse source order** -- measured on `dlls/engine/0/0.c`, 117 of 117
+   adjacent pairs inverted. So a function must be declared *after* its neighbour
+   to be emitted *before* it. `gameUiDrawNpcDialogueText`, which only PAL and the
+   v1.1 builds compile, sat 452 bytes out of place and shifted the whole `.text`
+   tail of three DOLs until it was moved below `gameUiUpdateNpcDialogue`.
+
+**Two compiler facts worth keeping.** MWCC always emits `.sdata` with 8-byte
+alignment (`-align` does not change it, and a translation unit holding nothing
+but one `u32` still reports `2**3`), so a source object can never be placed at a
+4-mod-8 `.sdata` address -- if retail wants one there, the bytes belong to the
+preceding unit or to alignment padding. And a pooled two-byte string literal is
+padded to four, so a reconstructed trailing gap should declare only the bytes
+the compiler does not already emit.

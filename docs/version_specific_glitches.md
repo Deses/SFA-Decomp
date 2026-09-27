@@ -1,768 +1,550 @@
-# Version-specific glitches suggested by the source
-
-This is a catalog of bugs and glitch candidates inferred from the current
-version conditionals, with the code taken as written. It is a set of leads for
-testing, not a claim that every predicted symptom has been reproduced.
-
-Audited on 2026-09-26 against staging commit
-`f21cfbc660a7643fa030ae91df9d5ad3513f8aeb`. No game source was changed for this
-audit.
-
-The scan covered **190 `#if` / `#elif` / `#ifdef` / `#ifndef` directives naming
-`VERSION_GSA*` in 59 files under `src/` and `include/`**. The coverage appendix
-accounts for every file, including branches that do not suggest a bug. There
-are **31 behavioral findings and three additional unresolved or latent issues**.
-Several findings are likely fixes or presentation improvements rather than
-exploitable glitches.
-
-As requested, this trusts the reconstruction: EN and JP v1.0 are reported
-complete, and the remaining ports are still in progress at high 99% completion.
-Source intent, exact reproduction conditions, and the meaning of some game bits
-remain less certain than the visible code differences. This audit did not run
-the game, independently compare all retail binaries, or exhaustively compare
-regional assets and scripts. A targeted follow-up traced the map-specific
-branches through retail placement records and text banks; its scope and exact
-record locations are in the location-evidence appendix. Other changes hidden
-in assets, shared bugs with no version branch, and unported differences are
-outside the completeness claim.
-
-## Reading the version labels
-
-| Label | Build macro | Release |
-| --- | --- | --- |
-| E0 | `VERSION_GSAE01` | EN v1.0 |
-| J0 | `VERSION_GSAJ01` | JP v1.0 |
-| P0 | `VERSION_GSAP01` | PAL v1.0 / revision 0 |
-| E1 | `VERSION_GSAE01_rev1` | EN revision 1 |
-| P1 | `VERSION_GSAP01_rev1` | PAL revision 1 |
-
-These are branch memberships, not an assumed chronological ordering across
-regions. In particular, J0 already has two fixes missing from E0; P0 has many
-changes shared with E1 but lacks several revision-1 safeguards.
-
-**High** means the source establishes a concrete failure mechanism or omitted
-behavior. **Medium** means a plausible symptom follows from a targeted change,
-but its practical trigger or intent needs testing. **Low** means the behavioral
-difference is clear but calling it a bug is speculative. Even High does not
-mean a retail gameplay reproduction was performed. “Changed in” means the
-listed source contains the countermeasure, not that all related bugs are gone.
-
-## Best places to start testing
-
-| Finding | Suspect versions | Changed in | Expected issue | Confidence |
-| --- | --- | --- | --- | --- |
-| G01 | E0, J0, P0 | E1, P1 | Navigation patches remain stale after map changes | High |
-| G02 | E0, J0, P0 | E1, P1 | Invalid enemy animation speed when a rate is zero | High |
-| G03 | E0 | J0, P0, E1, P1 | Tricky retains a freed sequence target | High |
-| G04 | E0, J0, P0 | E1, P1 | Tricky commands stay locked after an inconsistent Queen-return state | High |
-| G07 | E0, J0, P0 | E1, P1 | Generic put-down code writes into Tricky ball collision state | High |
-| G10 | E0, J0 | P0, E1, P1 | Volcano Force Point pressure plate remains latched down | High |
-| G12 | E0, J0, P0, E1 | P1 | Krazoa Palace switch-camera flag stops updating when the player moves away | High |
-| G18 | E0, J0 | P0, E1, P1 | Drakor missile launch produces invalid velocity from a zero vector | High |
-| G21 | E0, J0 | P0, E1, P1 | Unloading the shop's Fuel Cell display leaks outstanding lightning allocations | High |
-| G23 | E0, J0 | P0, E1, P1 | Asset table read races an unfinished load | Medium |
-
-The remaining entries matter too, but often have narrower triggers, uncertain
-player-facing effects, or concern UI rather than progression.
-
-## Locations and recognizable encounters
-
-These names come from the retail map-name table, object definitions, placement
-parameters, and the source consumers of those parameters. A placed object
-identifies a test location; it does not prove the problematic state is reachable
-there in every act. Map IDs below are decimal; placement identities are hex.
-
-| Where to look | Map / romlist | Findings and recognizable objects |
-| --- | --- | --- |
-| Thorntail Hollow | 7 / `hollow` | G04: returning Tricky to the Queen; `SH_tricky` controller `0x435F2` |
-| Volcano Force Point Temple | 4 / `temple` | G10: Tricky-enabled `VFP_PuzzleP` pressure plate `0x41996` |
-| DarkIce Mines, upper area | 19 / `snowmines` | G11: Dinosaur Horn interaction `DIMUseObjec` `0x4B13A`; G14: SnowHorn interaction during a hit reaction |
-| Krazoa Palace | 11 / `warlock` | G12: pressure-switch door camera in act 1; the source prefix `WM` refers to this map |
-| SnowHorn Wastes | 10 / `wastes` | G13: `NW_mammoth` family after a sequence; G25: the paid BribeClaw interaction |
-| Ice Mountain | 23 / `newicemount` | G14: additional placements using the same `DIMSnowHorn` controller; reachability of its hit-reaction interaction needs checking |
-| Dragon Rock, upper area | 2 / `dragrock` | G15/G16: HighTop rescue/escort and missile controller; G17: `DR_EarthWar` / EarthWalker riding action |
-| Drakor boss arena | 44 / `finalboss` | G18: Drakor missile launch; the internal name `finalboss` does not mean Andross here |
-| Cape Claw | 29 / `capeclaw` | G25: a second paid `GuardClaw` placement; the Cape Claw HighTop uses a different initial state from the Dragon Rock encounter |
-| ThornTail Store / shop | 51 / `swapstore` | G21: `SPFuelCell` display `0x45B6F`, raw object ID `0x468` |
-| CloudRunner Fortress | 12 / `fortress` | G26: the three `CFSunTemple` timer interactions, raw object ID `0x830` |
-| Walled City | 13 / `wallcity` | G27: the introductory **"Walled City" area-name banner**, not tile-puzzle instructions |
-| Several magic-cave entrances | `capeclaw`, `hollow`, `hollow2`, `moonpass`, `temple`, `wallcity`, `wastes` | G19: shared `MagicCaveTo` approach/glow cleanup; Cape Claw, Thorntail Hollow and its underground area, Moon Mountain Pass, Volcano Force Point, Walled City, SnowHorn Wastes |
-
-## Gameplay, movement, and progression
-
-### G01 — Loaded-map checksum can suppress navigation rebuilding
-
-**Suspect:** E0, J0, P0. **Changed in:** E1, P1. **Confidence:** High.
-
-[`Objfsa_UpdateWalkGroupPatches`](../src/dlls/engine/20_Hcurves/Hcurves.c#L1019)
-multiplies the indices of all nonzero loaded-map flags and returns early if that
-product has not changed. Loading index 0 forces the product to zero; index 1
-does not affect it. Even without those indices, sets `{2, 6}` and `{3, 4}` both
-produce 12. The old check also ignores changes between different nonzero flag
-values. Revision 1 compares every flag byte with the previous array instead.
-
-**Expected symptom:** actors using these walk groups can retain obsolete
-connectivity, refuse a route, or navigate against the preceding map set.
-**Test lead:** log loaded flags and patch rebuilding while crossing streaming
-boundaries. The example sets demonstrate the algorithm's collisions; they are
-not claimed to be reachable neighboring map combinations in normal play.
-
-### G02 — Zero animation-rate inputs produce invalid playback speeds
-
-**Suspect:** E0, J0, P0. **Changed in:** E1, P1. **Confidence:** High.
+# Version-specific glitches
 
-Four paths in [Baddie.c](../src/dlls/objects/201_Baddie/Baddie.c#L148), including
-[`baddieSetMove`](../src/dlls/objects/201_Baddie/Baddie.c#L2027), calculate
-`1.0f / (60.0f * rateScale)` without checking for zero. The additional sites are
-at lines 224 and 1123. E1/P1 substitute `0.1f` when the rate is zero.
-
-**Expected symptom:** non-finite animation speed, abrupt completion, or broken
-animation/event progression when a script or state supplies zero. This does
-not establish an inevitable crash or a specific enemy exploit.
-**Test lead:** instrument zero-rate calls and control-state transitions; inspect
-the resulting animation frame and event state before trying to force a route.
+Likely bugs and fixes found by comparing the game's version-specific code.
+These are leads for testing, not reproduced glitches. The code is taken as
+written; unfinished ports may still contain inaccuracies.
 
-### G03 — Tricky does not recover when his sequence target is freed
+**Patched in** lists the builds containing the relevant fix. Regional releases
+do not form a single revision sequence: JP v1.0 already fixes two EN v1.0 bugs,
+while PAL v1.0 has some, but not all, of the revision-1 fixes.
 
-**Suspect:** E0 only. **Changed in:** J0, P0, E1, P1. **Confidence:** High.
+The entries start with the strongest test leads, followed by less certain
+findings and presentation changes. Finding IDs are unchanged from the original
+audit. Click an ID for its code notes; placement details are in the appendices.
 
-The [sequence-processing code](../src/dlls/objects/196_Tricky/tricky.c#L1912)
-in other versions checks `TRICKY_STATE_FLAG_SEQUENCE_KEEP_STATE` together with
-`followObj->objectFlags & OBJECT_OBJFLAG_FREED`. It resets Tricky's command state,
-sets `TRICKY_MOVE_WALK_WAIT`, and clears current and previous speeds. E0 omits
-this recovery.
-
-**Expected symptom:** Tricky stays in a stale command or movement state after
-the object he was following disappears; later stale-object access is also a
-possibility, not a demonstrated crash.
-**Test lead:** interrupt a target-following sequence by despawning or unloading
-the target while the keep-state flag remains set. JP v1.0 is a useful control.
+## Glitches and fixes
 
-### G04 — Queen-return progress can leave Tricky commands unavailable
+### [G01](#code-g01) — Actors can keep outdated routes when areas load or unload
 
-**Suspect:** E0, J0, P0. **Changed in:** E1, P1. **Confidence:** High.
+**Affected:** EN v1.0, JP v1.0, PAL v1.0. **Patched in:** EN rev1, PAL rev1.
 
-[`shTricky_init`](../src/dlls/objects/422_SH_tricky/SH_tricky.c#L57) previously
-treated `GAMEBIT_SH_ReturnedToQueen` alone as proof that the controller was
-complete. E1/P1 also require `GAMEBIT_Tricky_Unlocked_Sidekick_Commands`.
-If return is recorded but commands are still locked, they clear the return bit
-so the sequence can recover. The update routine restores command and spawn bits
-only in its wait-for-return phase.
-
-**Expected symptom:** an inconsistent save or interrupted sequence leaves
-Tricky's commands locked, with this controller doing nothing to restore them.
-**Test lead:** reload during the interval between the two bits being updated,
-or first test a controlled save with return=1 and commands=0. Whether a natural
-save/reset timing can produce that combination still needs reproduction.
-
-### G05 — Tricky's ball advances collision state while inactive
-
-**Suspect:** E0, J0. **Changed in:** P0, E1, P1. **Confidence:** Medium.
-
-Both [`SidekickBall_update`](../src/dlls/objects/245_SidekickBal/SidekickBal.c#L308)
-and [`trickyBallMove`](../src/dlls/objects/245_SidekickBal/SidekickBal.c#L398)
-unconditionally update, apply, and advance the path/collision state in E0/J0.
-Later versions do so only when `hittableLatch == 1`; otherwise they reattach
-the state to the object's current position.
-
-**Expected symptom:** stale collision history or displacement while the ball is
-inactive or being repositioned, followed by an unexpected bounce or position
-correction. **Test lead:** repeatedly pick up, reposition, and release the ball
-near walls, slopes, and changes in floor height; monitor the latch and trace
-positions. This is distinct from the additional revision-1 change below.
-
-### G06 — Ball throws reuse collision state from before the throw
-
-**Suspect:** E0, J0, P0. **Changed in:** E1, P1. **Confidence:** Medium.
-
-E1/P1 add `attachObject(obj, &state->pathControl)` immediately after setting
-throw velocity and previous position in both
-[`sidekickBall_throw`](../src/dlls/objects/245_SidekickBal/SidekickBal.c#L75)
-and [`sidekickBall_launch`](../src/dlls/objects/245_SidekickBal/SidekickBal.c#L205).
-
-**Expected symptom:** the first movement/collision sweep after a throw uses an
-old origin or contact state, causing a snap, false collision, or odd trajectory.
-**Test lead:** throw after carrying the ball a substantial distance or after
-Tricky has moved it. P0 has G05's guard but lacks this explicit throw-time reset.
-
-### G07 — Generic carryable cleanup can corrupt the ball's state
-
-**Suspect:** E0, J0, P0. **Changed in:** E1, P1. **Confidence:** High for the
-layout conflict; Medium for a naturally reachable crash.
-
-[`Carryable_putDownAndSavePos`](../src/dlls/engine/47/47.c#L21) and the
-[put-down completion path](../src/dlls/engine/47/47.c#L195) gain an exception for
-`romDefNo == 0x112`, which [Tricky's spawn enum](../src/dlls/objects/196_Tricky/tricky.c#L759)
-identifies as the sidekick ball. Without it, they cast `obj->extra` to
-`CarryableState`, clear bytes at offsets 5 and 6, and may save its position.
-The [ball state](../include/dlls/objects/245_SidekickBal.h#L20) actually begins
-with a [collision state](../include/main/dll/curves_collision_state.h#L27),
-whose pointer at offset 4 overlaps those writes.
-
-**Expected symptom:** invalid ball collision data or inappropriate persisted
-position after a generic put-down, potentially causing erratic movement or a
-crash. **Test lead:** trace both carryable paths while putting down the ball,
-and watch the first eight state bytes. The exception does not disable the
-ball's own throw/idle behavior.
-
-### G08 — Barrel ground-contact flicker can repeat the landing sound
-
-**Suspect:** E0 only. **Changed in:** J0, P0, E1, P1. **Confidence:** High.
-
-[Barrel landing detection](../src/dlls/objects/344/344.c#L441) in E0 remembers
-only whether it was grounded on the preceding update. Other versions use a
-three-update `groundGraceFrames` countdown, refreshed while grounded, before
-allowing another landing sound. The corresponding state layout differs too.
-
-**Expected symptom:** repeated put-down/landing noises when tiny bounces or
-uneven contact alternate grounded and airborne states. **Test lead:** rest or
-roll a barrel on a seam or moving surface. The branch directly changes sound
-debouncing; it is not evidence of a changed explosion threshold.
-
-### G09 — Barrel explosion may use stale hit-volume position data
-
-**Suspect:** E0, J0. **Changed in:** P0, E1, P1. **Confidence:** Medium.
-
-[`gunpowderBarrel_triggerExplosion`](../src/dlls/objects/344/344.c#L341) changes
-the collision mask, capsule bounds, and blast slot. Later versions additionally
-call `ObjHits_MarkObjectPositionDirty` when enabling the blast collision.
-
-**Expected symptom:** the visible explosion and its collision effect can
-disagree, or the newly configured blast can fail to refresh promptly.
-**Test lead:** detonate a barrel immediately after carrying, moving, or throwing
-it and compare hit-volume transforms against its position. The exact missed-hit
-scenario depends on the shared collision update order.
-
-### G10 — Volcano Force Point pressure plate becomes permanently latched on reload
-
-**Suspect:** E0, J0. **Changed in:** P0, E1, P1. **Confidence:** High.
-
-[`PressureSwitchFB_init`](../src/dlls/objects/251/251.c#L355) restores an already
-pressed switch and generally sets `latched = 1`. Later versions exempt placement
-identity **`0x41996`**. The update routine's ordinary release/movement paths are
-gated by `latched == 0`.
-
-**Location:** Volcano Force Point Temple (`temple`, map 4). The record is
-`VFP_PuzzleP`, raw object ID `0x546`, at approximately
-`(-318.25, 282.30, 2314.41)` in placement coordinates. Its
-[parameters](../include/dlls/objects/251.h) specify pressed bit `0x4F6`,
-enable bit `0x9FD`, and `drivesTricky = 1`. A nearby `HitAnimator` consumes
-`0x4F6`, and a `VFPSeqObj` consumes `0x9FD`. This identifies a specific
-Tricky-enabled puzzle plate, although the room's descriptive name and the
-complete puzzle consequence remain unproven.
-
-**Expected symptom:** this specific switch cannot release or cycle normally
-after being loaded with its pressed bit set. That might obstruct a puzzle or
-leave something open; the code alone does not establish which.
-**Test lead:** press this plate, unload/reload or save/reload, then remove the
-weight or move Tricky and compare. The placement identity is not a map ID.
-
-### G11 — DarkIce Mines Dinosaur Horn interaction latches through the generic lock path
-
-**Suspect:** E0, J0, P0, E1. **Changed in:** P1 only. **Confidence:** Medium.
-
-[`DoorLock_update`](../src/dlls/objects/273/273.c#L127) in P1 excludes placement
-identity **`0x4B13A`** from the trigger branch. The actual placement resolves to
-**the Dinosaur Horn interaction in upper DarkIce Mines** (`snowmines`, map 19),
-retail object `DIMUseObjec`, raw ID `0x860`, at approximately
-`(788.68, -1042.00, 2254.41)`.
-
-Its trigger and required-item fields both hold `0x1EE`,
-[`GAMEBIT_ITEM_DinoHorn_Got`](../include/main/gamebit_ids.h#L492).
-Crucially, its flags are zero and its unlock sequence is `-1`: this particular
-record does **not** consume the horn or run an unlock sequence through the
-excluded block. It sets its unlocked bit, marks the interaction started, and
-disables the A button for that update. Subsequent updates disable interaction
-while the unlocked bit remains set.
-
-There is also a matching **asset change in P1**: the placement's
-`unlockedGameBit` at `+0x1C` changes from `0x001A` (J0/P0/E1) to `0x03EF`.
-Two nearby `DIMSeqObjec` records already use `0x3EF` as their open/completion
-bit. The code exception and the changed bit therefore need testing together.
-
-**Expected symptom:** the older interaction can become latched/inactive from
-using the horn independently of that shared sequence-completion state.
-**Test lead:** use the Dinosaur Horn at this placement, try interacting again,
-then reload and compare bits `0x1A`/`0x3EF` and the neighboring sequence objects.
-Whether the older behavior actually prevents progression is unconfirmed;
-neither horn consumption nor a particular door softlock follows from this code.
-
-### G12 — Krazoa Palace pressure-switch camera can retain stale state at a distance
-
-**Suspect:** E0, J0, P0, E1. **Changed in:** P1 only. **Confidence:** High.
-
-The [slot-510 pressure switch](../src/dlls/objects/510/510.c#L125) updates
-`GAMEBIT_WM_SwitchCamActive` in map-event slot 11, act 1. Before P1, the entire
-set/clear block requires the player to be within 100 units. Moving farther away skips
-both activation and cleanup. P1 removes only this distance restriction.
-
-**Location:** slot 11 is **Krazoa Palace**, romlist `warlock`. Its `WM_Pressure`
-placements are `0x1F1A` and `0x47293`; the act-1 condition still governs whether
-the changed code executes. A `WM_seqpoint` placement `0x42D45` takes `0x905`
-as its sequence-start bit, independently connecting the source camera flag to
-this map. The prefix should not be expanded as Walled City.
-
-**Expected symptom:** the camera flag remains set after a remote release, or
-does not activate for a switch pressed while the player is farther away.
-**Test lead:** activate the switch camera, move beyond 100 units before the
-hold expires, and compare the game bit and camera. The remaining distance
-checks, including sound behavior, still exist.
-
-### G13 — SnowHorn Wastes mammoth clears its reset request without resetting collision state
-
-**Suspect:** E0, J0. **Changed in:** P0, E1, P1. **Confidence:** Medium.
-
-[`NW_mammoth_processAnimEvents`](../src/dlls/objects/417/417.c#L166) requests a
-path reset during sequence handling. In
-[`NW_mammoth_update`](../src/dlls/objects/417/417.c#L659), E0/J0 simply clear that
-request. Later versions first reattach the path state to the object.
-
-**Location:** the placed DLL-417 actors are all in **SnowHorn Wastes**
-(`wastes`, map 10), with retail names `NW_mammothh`, `NW_mammothw`,
-`NW_mammothg`, and `NW_mammothb`. This is distinct from DLL 598 below.
-
-**Expected symptom:** incorrect first movement or collision after a scripted
-reposition, such as snapping back, getting stuck, or an obsolete contact.
-**Test lead:** compare positions and collision trace origins immediately after
-the mammoth's sequence callback. This is not a claim that every SnowHorn actor
-uses the affected controller.
-
-### G14 — DarkIce Mines SnowHorn remains interactable during hit reactions
-
-**Suspect:** E0, J0, P0. **Changed in:** E1, P1. **Confidence:** High for the
-interaction difference; Medium for an exploit.
-
-[`DIMSnowHorn1_update`](../src/dlls/objects/598_DIMSnowHorn/DIMSnowHorn.c#L1046)
-originally enables interaction before processing a hit reaction, which can
-return early. E1/P1 disable interaction first and re-enable it only after the
-reaction has finished.
-
-**Location:** DLL 598's `DIMSnowHorn` placements occur in **upper DarkIce Mines**
-and **Ice Mountain** (`snowmines` and `newicemount`). Their placement variants
-differ, so Ice Mountain is an additional controller-use lead rather than a
-claim that its actors expose the same mount/damage scenario. The similarly
-named `DIMSnowHorn` lock prop in DLL 273 is a different object.
-
-**Expected symptom:** an interaction or mount request can overlap a damage
-reaction, potentially producing conflicting movement/animation states.
-**Test lead:** press the interaction button while the rideable SnowHorn is
-reacting to a hit. The branch concerns interaction flags, not general immunity
-to damage.
-
-### G15 — Dragon Rock HighTop's scripted transition can fail to reach its alternate state
-
-**Suspect:** E0/J0 for the missing live-state check; E0/J0/P0 for the missing
-creator event. **Changed in:** P0/E1/P1 and E1/P1 respectively. **Confidence:** Medium.
-
-Later [`hightop_stateHandler02`](../src/dlls/objects/626/626.c#L546) immediately
-returns state 8 when game bit `0x631` is set. E0/J0 check it in the initial
-handler but not this active handler, and also retain a different
-[motion event 7](../src/dlls/objects/626/626.c#L493) transition. Separately,
-E1/P1's [`DR_Creator_SeqFn`](../src/dlls/objects/613_DR_Creator/DR_Creator.c#L39)
-sets `0x631` on event 10 when its configured spawn bit is active.
-
-**Location:** **Dragon Rock's HighTop rescue/escort**, `dragrock`, map 2.
-`DR_HighTop` placement `0x3460C` has spawn variant 0. The `CC_HighTop` in
-Cape Claw has variant 1, which instead initially selects state 10 in
-[`hightop_stateHandler00`](../src/dlls/objects/626/626.c#L672).
-Dragon Rock's `DR_Seqobj` `0x4555F` uses `0x631` as its trigger and
-[`GAMEBIT_DR_RescuedHighTop` (`0x632`)](../include/main/gamebit_ids.h#L672)
-as its completion bit, with sequence 11. This ties the formerly anonymous bit
-to the rescue/escort sequence; the full event ordering still needs testing.
-
-**Expected symptom:** HighTop remains in the preceding controlled/movement state
-after a scripted event, or progression depends on receiving a different event.
-**Test lead:** trace event 10, bit `0x631`, and handlers 0/2 around the relevant
-Dragon Rock sequence. P0 has only part of this changed behavior.
-
-### G16 — Dragon Rock HighTop death leaves a missile-sequence enable bit set
-
-**Suspect:** E0, J0, P0. **Changed in:** E1, P1. **Confidence:** Medium.
-
-When HighTop's air meter reaches zero, the
-[death path](../src/dlls/objects/626/626.c#L892) in E1/P1 additionally clears
-**`0xBF7`**, before shutting down the meter, clearing `0x634`, and spawning
-the death object. Earlier versions leave `0xBF7` alone. Here the meter loses a
-point on a hit; its API name does not establish an oxygen/drowning mechanic.
-
-**Location and consumer:** Dragon Rock's `DR_Creator` placement `0x493D3`
-uses **`0xBF7` as `spawnGameBit`**, with behavior mode 9.
-[`DR_Creator_update`](../src/dlls/objects/613_DR_Creator/DR_Creator.c#L123)
-starts sequence 4 while that bit is set, and its callback can spawn
-`DRHomingMis` projectiles. Thus this is a concrete missile-sequence enable flag,
-not merely an unnamed save bit.
-
-**Expected symptom:** the missile sequence remains enabled after HighTop dies,
-potentially interfering with encounter cleanup or retry. **Test lead:** let
-HighTop's meter reach zero in control mode 2 or 8, then compare the creator's
-sequence/spawn activity and subsequent retry. A specific softlock remains
-unconfirmed.
-
-### G17 — EarthWarrior zeroes movement state on every update of one action
-
-**Suspect:** E0, J0. **Changed in:** P0, E1, P1. **Confidence:** Medium.
-
-[`DR_EarthWarrior_stateHandler03`](../src/dlls/objects/599_DR_EarthWar/DR_EarthWar.c#L216)
-clears `animSpeedA/B/C` and XYZ velocity every call in E0/J0. Later versions
-perform those resets only when `moveJustStartedA` is true, alongside starting
-move 7 or 8.
-
-**Location:** `DR_EarthWar` placement `0x4C117` in **Dragon Rock, upper area**
-(`dragrock`, map 2), the EarthWalker riding encounter. The filename's
-"EarthWarrior" spelling is retained for locating the implementation.
-
-**Expected symptom:** movement or accumulated state generated after entry is
-repeatedly erased, making the action stall or behave differently under motion.
-**Test lead:** compare these six fields through the full action, especially
-while mounted. The names alone do not prove that the entire animation freezes;
-the separately assigned `moveSpeed` is not zeroed by this branch.
-
-### G18 — Drakor normalizes a zero missile-launch vector
-
-**Suspect:** E0, J0. **Changed in:** P0, E1, P1. **Confidence:** High.
-
-The [missile launch calculation](../src/dlls/objects/589_BossDrakor/BossDrakor.c#L308)
-subtracts a projection and unconditionally normalizes the remainder in E0/J0.
-Later versions normalize only if at least one component is nonzero. The
-[SDK implementation](../src/dolphin/mtx/vec.c#L53) has no zero-vector guard.
-
-**Location:** the retail map-name table calls map 44 **"BOSS Drakor"**. Its
-romlist is misleadingly named `finalboss`; this finding concerns the Drakor
-fight, not the later Andross fight.
-
-**Expected symptom:** invalid/non-finite missile velocity when the remainder is
-exactly zero, potentially producing a motionless, disappearing, or otherwise
-broken projectile. **Test lead:** log the remainder during aligned launch
-conditions, then compare the resulting velocity. It is not evidence that all
-missiles, or ordinary near-zero vectors, fail.
-
-### G19 — Staff glow can persist after leaving a magic cave's approach radius
-
-**Suspect:** E0, J0. **Changed in:** P0, E1, P1. **Confidence:** High for the
-missing cleanup; Medium for how long the glow survives other updates.
-
-The [magic-cave-top proximity logic](../src/dlls/objects/287_MagicCaveTo/MagicCaveTo.c#L184)
-resets the rumble timer and completion flag when the player moves outside the
-approach radius. Later versions also obtain the staff and disable its glow.
-
-**Expected symptom:** the cave-related staff glow remains after backing away.
-**Test lead:** approach far enough to activate the effect, retreat without
-entering, and watch until another action changes the staff's glow state.
-
-## Loading, resources, and audio
-
-### G20 — Timer sound continues while the timer's effective delta is zero
-
-**Suspect:** E0, J0. **Changed in:** P0, E1, P1. **Confidence:** High.
-
-[`gameTimerRun`](../src/main/modelEngine.c#L899) sets its local delta to zero
-when the timer is paused or the HUD is hidden. E0/J0 still refresh the looped
-timer sound. Later versions [guard that keepalive](../src/main/modelEngine.c#L959)
-with `if (dt)`, while retaining volume and pan updates.
-
-**Expected symptom:** timer beeping continues during a paused or hidden-HUD
-interval. **Test lead:** pause the actual timer or enter a HUD-hidden sequence
-while its loop sound is active. Opening the pause menu alone is not proof that
-this function's pause flag is set. See also
-[the existing timer audit](timer_controls_and_revisions.md).
-
-### G21 — Shop Fuel Cell display destruction leaks live lightning effects
-
-**Suspect:** E0, J0. **Changed in:** P0, E1, P1. **Confidence:** High.
-
-[`shopitem_free`](../src/dlls/objects/644/644.c#L232) gains a loop freeing all
-non-null entries in `lightningHandles[10]` for object type `0x468`. Its
-[render routine](../src/dlls/objects/644/644.c#L127) allocates those effects and
-normally frees them when their individual timers expire. Destroying the item
-before expiry loses that ordinary cleanup opportunity in E0/J0.
-
-**Location:** **ThornTail Store**, `swapstore` (map 51, retail map label
-"Shop"). Raw ID `0x468` resolves to `SPFuelCell`, placed as `0x45B6F`.
-This narrows the effect-bearing "sparkle item" to the Fuel Cell display;
-the other shop items sharing DLL 644 are not all covered by this exception.
-
-**Expected symptom:** memory loss whenever the item is unloaded with effects
-still active; repeated visits could eventually increase allocation pressure.
-**Test lead:** compare heap usage before and after repeated item load/unload
-cycles. A crash threshold or amount leaked per visit has not been measured.
-
-### G22 — Chapter-start save data is loaded and never freed
-
-**Suspect:** E0, J0. **Changed in:** P0, E1, P1. **Confidence:** High for the leak,
-Low for ordinary gameplay exposure.
-
-In the [save-select launch path](../src/dlls/engine/53/53.c#L640), a chapter
-value greater than 1 loads a savegame file and copies `0x6EC` bytes to the work
-buffer. Only later versions free the loaded buffer afterward.
-
-**Expected symptom:** leaked memory when launching through this chapter-start
-path. **Test lead:** use the existing chapter-select flow if accessible and
-compare allocations after repeated launches. This does not imply that loading
-an ordinary player save leaks, or that chapter selection is exposed in every
-retail menu configuration.
-
-### G23 — Model/animation table lookups can race asynchronous loading
-
-**Suspect:** E0, J0. **Changed in:** P0, E1, P1. **Confidence:** Medium.
-
-[`getTableFileEntry`](../src/main/pi_dolphin.c#L1273) gains a wait on in-flight
-load flags before dereferencing two tables: `MODELS.tab` (`0x2A`, mask `0xC`)
-and `ANIMCURV.tab` (`0x0E`, mask `0xA0000000`). The wait services loads, reset
-input, and disc errors. E0/J0 can read those tables immediately.
-
-**Expected symptom:** stale/unready offsets cause the wrong model or animation
-data to be requested, potentially leading to malformed objects or a load
-failure. **Test lead:** log the pending flags at lookup, especially during fast
-map transitions or interrupted disc reads. The table IDs are defined in
-[mldf_fileid.h](../include/main/mldf_fileid.h#L22).
-
-### G24 — Newly allocated model data lacks an explicit cache invalidation
-
-**Suspect:** E0, J0. **Changed in:** P0, E1, P1. **Confidence:** Low to Medium.
-
-[`ObjModel_LoadModelData`](../src/main/model.c#L2246) gains
-`DCInvalidateRange(model, totalSize)` between allocation and loading/decompression.
-
-**Expected symptom:** a possible hardware/cache-dependent stale-data issue when
-memory is reused for model loading. The added cache operation is definite;
-whether another layer already makes a particular transfer coherent is not
-established by this audit. **Test lead:** inspect cache operations throughout
-the actual loading path and test repeated model loads on hardware or with
-appropriate cache emulation. Do not report generic model corruption as confirmed.
-
-## Interaction prompts, text, and saving
-
-### G25 — Missing explicit Hint prompt on a paid guard interaction
-
-**Suspect:** E0, J0. **Changed in:** P0, E1, P1. **Confidence:** High for the
-omitted icon request; Medium for the final visible icon.
-
-The [guardclaw interaction](../src/dlls/objects/202/guardclaw.c#L163) becomes
-enabled when `userData1 == 2` and the placement's game bit is clear. Later
-versions explicitly request `A_BUTTON_ICON_HINT` when the player is in range.
-E0/J0 still permit the paid trigger but omit that icon call.
-
-**Locations:** the retail `GuardClaw` placements are the **SnowHorn Wastes
-BribeClaw** (`wastes`, `0x305D4`, completion bit `0xD83`, named
-[`GAMEBIT_NW_GotPastBribeClaw`](../include/main/gamebit_ids.h#L933)) and a
-**Cape Claw guard** (`capeclaw`, `0x4B939`, completion bit `0xE00`). They
-are registered under the shared Baddie DLL 201, which dispatches to this
-handler, so looking only for object definitions with DLL 202 misses them.
-
-**Expected symptom:** an absent or inappropriate A-button prompt even though
-interaction works. **Test lead:** approach the unpaid/incomplete guard in that
-state and compare the HUD; other UI code may supply a default icon.
-
-### G26 — CloudRunner Fortress timer interactions lack an explicit idle prompt
-
-**Suspect:** E0, J0. **Changed in:** P0, E1, P1. **Confidence:** High for the
-omission; Medium for a visible glitch.
-
-The [Sun Temple interaction](../src/dlls/objects/659/659.c#L157) suppresses the
-prompt while the timer is running in all versions. Later code additionally
-sets `A_BUTTON_ICON_CONTEXT_B` when that variant is in range and the timer is
-not running.
+The game can mistake a changed set of loaded areas for the previous set and
+skip rebuilding actor routes. Actors may then refuse a route or navigate using
+outdated connections. Revision 1 checks each area's loading state directly.
 
-**Location:** the checked raw object ID is **`0x830`**, which resolves to
-`CFSunTemple` in **CloudRunner Fortress**, not a Walled City Sun Temple.
-The three placements are `0x48186`, `0x4817C`, and `0x48188`; they use
-activation bits `0xB1B`, `0xB1C`, and `0xB1D`, each also used by a nearby
-`CNTstopwatc` timer. DLL 659 additionally serves `WCInvUseObj` in Walled
-City, but that object has ID `0x526` and does not satisfy this version guard's
-object-ID condition.
-
-**Expected symptom:** an incorrect or missing prompt for starting the idle
-interaction. **Test lead:** approach the timer-lockout variant before a timer
-starts and after it finishes. This change does not establish broken timer logic.
-
-### G27 — Walled City controller lacks its added area-name banner
-
-**Absent in:** E0, J0. **Added in:** P0, E1, P1. **Confidence:** High for the
-difference, Low that it is a bug rather than a usability addition.
-
-[`wclevelcont_init`](../src/dlls/objects/653_WCLevelCont/WCLevelCont.c#L739)
-sets a new `messageTimer` to 300 nominal frames. The
-[update routine](../src/dlls/objects/653_WCLevelCont/WCLevelCont.c#L695) displays
-text **1401** while the timer is positive, subtracting `timeDelta`. E0/J0 have
-neither the field nor this display path.
-
-**Recovered text:** in E1/P0/P1's `gametext/WallCity/English.bin`, entry 1401
-is a formatting prefix followed by **"Walled City"**. Despite the current
-constant name `WCLEVELCONT_TILE_MESSAGE_TEXT_ID`, this is the area-name banner,
-not explanatory tile-puzzle text.
-
-**Expected difference:** this controller does not request the area banner in
-E0/J0. **Test lead:** enter/reload Walled City and compare text for the first
-300 nominal frames. Other possible title-display paths have not been excluded;
-this is a presentation addition, not evidence of a puzzle softlock.
-
-### G28 — Memory-card messages use fixed spacing despite variable text height
-
-**Suspect:** E0, J0. **Changed in:** P0, E1, P1. **Confidence:** Medium.
-
-[`showMemCardError`](../src/track/intersect_memcard.c#L532) advances each message
-string by a fixed 24 pixels in E0/J0. Later versions measure its height, take at
-least the language's line height, then add 5 pixels.
-
-**Expected symptom:** wrapped or tall strings crowd/overlap subsequent strings.
-**Test lead:** compare multi-string memory-card errors and confirmation dialogs,
-especially ones whose strings wrap. The change may primarily support longer
-localized text; it does not prove stock E0/J0 messages necessarily overflow.
-
-### G29 — Pause-menu hints do not round multi-line heights to full line spacing
-
-**Suspect:** E0, J0. **Changed in:** P0, E1, P1. **Confidence:** Medium.
-
-The [hint-text loop](../src/dlls/engine/0/0.c#L5005) previously advances by the
-greater of measured glyph bounds and one font line height. Later code rounds
-the measured span upward to a whole number of line heights before advancing.
-
-**Expected symptom:** uneven or overly tight spacing between successive
-multi-line hints, potentially overlap at particular glyph heights.
-**Test lead:** compare a hint with multiple wrapped phrases and inspect the next
-phrase's baseline. A short one-line hint may look identical in both versions.
-
-### G30 — Card-image repair can write save blocks before the requested callback
-
-**Suspect:** E0, J0. **Changed in:** P0, E1, P1. **Confidence:** Low for a
-player-facing failure; High for the extra write path.
-
-During image/checksum repair,
-[`saveGame_prepareAndWrite`](../src/dlls/engine/2/maketex.c#L238) in E0/J0 can
-write save blocks immediately, then later run the supplied callback if the
-result permits it. Later versions perform those preliminary writes only when
-`cb == NULL`, allowing a callback-driven operation to handle its own write.
-
-**Expected symptom:** unnecessary writes, extra delay, or an additional failure
-point before the intended callback when the image checksum requires repair.
-The branch alone does **not** establish save corruption or lost progress.
-**Test lead:** instrument write counts and callback entry with deliberately
-mismatched card-image checksums, using disposable test saves.
-
-### G31 — PAL title-screen file creation does not reload newly available options
-
-**Primary comparison:** P0 versus P1. **Changed in:** P1 only. **Confidence:** Low.
-
-[`TitleMenu_CreateSaveFile`](../src/dlls/engine/52_n_attractmode/n_attractmode.c#L338)
-in P1 calls `loadGameOptions()` after successful `cardCreateSaveFile(1)`.
-All other builds omit that step. Its PAL callers include the initial language
-setup/restore flow, which preserves language and subtitle choices around card
-handling.
-
-**Expected symptom:** other option values in memory may remain stale after
-successful creation/recovery of a save file. **Test lead:** on P0/P1, exercise
-first-time language setup and card insertion/retry, then compare in-memory and
-saved options. E0/J0/E1 also lack the reload, but do not expose the same PAL
-language setup, so a universal settings-loss claim would overreach.
-
-## Unresolved, latent, and later-version issues
-
-### U01 — The added timer cancellation check is an ineffective fix
-
-**Added in:** P0, E1, P1. **Underlying synchronization risk:** not shown fixed in
-any version. **Confidence:** High that the check is inert as written.
-
-[`timer_update`](../src/dlls/objects/693_Timer/Timer.c#L117) adds a condition
-intended to set expiry, clear the start bit, and end a global-mode timer when
-`isGameTimerDisabled() == 1`. But the
-[accessor](../src/main/modelEngine.c#L1033) returns the raw mask `state & 2`:
-its possible results are **0 and 2**, never 1.
-
-Thus earlier versions lack the synchronization attempt, and later versions
-still cannot enter that added branch. A globally stopped timer and the object's
-local countdown/progress bits may disagree until another path resolves them.
-This is stronger than a generic porting suspicion: the existing
-[timer audit](timer_controls_and_revisions.md) records the same comparison and
-raw return value in the checked retail binaries. **Test lead:** stop the global
-timer externally while the Timer object remains active; compare its local
-countdown, start/expiry bits, and ended latch. Do not label this “fixed in rev1.”
-
-### U02 — Later audio allocation adds a prefix, but freeing still uses the interior pointer
-
-**Changed in:** P0, E1, P1. **Earlier behavior:** E0/J0 allocate normally.
-**Confidence:** High for the allocation/free mismatch; Low for lasting gameplay impact.
-
-[`_audioAlloc`](../src/main/audio.c#L702) adds `0x100` bytes to a `0x2DC0` request
-and returns allocation base plus `0x100`. That request is the 48-entry DSP voice
-array. The [existing binary-backed audit](audio_voice_allocation_prefix.md)
-leaves the purpose of the prefix unresolved; it cannot establish an earlier
-audio glitch or prove this was an underrun workaround.
-
-There is also a later-version risk visible as written:
-[`salExitDspCtrl`](../src/musyx/runtime/sal_studio.c#L130) frees `dspVoice`
-directly, [`audioFree`](../src/main/audio.c#L698) passes it on unchanged, and
-[`mmFree`](../src/main/mm.c#L594) requires an exact allocation-base match.
-That allocation therefore cannot be freed through this path. An allocation
-failure also becomes an unchecked interior-pointer result in the special case.
-
-**Test lead:** trace `audioReset` / `sndQuit` and heap reclamation in a later
-build. The visible game caller runs during
-[system reset](../src/main/gameloop.c#L775), so the failed free may have no
-lasting player-visible effect on that path.
-Do not turn the unexplained prefix into a claimed E0/J0 sound-corruption bug.
-
-### U03 — The old Japanese system-font lookup omits the ideographic space
-
-**Suspect:** E0/J0 when using the SJIS system-font path. **Changed in:** E1's
-SJIS path. **PAL:** uses a different ANSI/localized setup. **Confidence:** High
-for the lookup omission; Low for a visible spacing difference.
-
-The resident [Japanese glyph list](../src/main/gametext.c#L621) contains U+3000,
-also used by the wrong-disc message's spacer line. The old
-[lookup table](../src/main/gametext_data.c#L378) does not map it;
-[`lookupSjisGlyph`](../src/main/gametext.c#L1659) returns zero. E1's replacement
-[table](../src/main/gametext.c#L767) maps it to SJIS `0x8140`.
-
-The atlas builder passes the resulting empty string to
-[`OSGetFontWidth` / `OSGetFontTexel`](../src/dolphin/os/OSFont.c#L336), both of
-which return without updating the supplied width for a zero first byte.
-Consequently that blank glyph inherits the preceding glyph's width. Its pixels
-remain blank because the scratch image was cleared first.
-
-**Expected symptom:** potentially incorrect blank/spacer metrics on the Japanese
-disc-status screen. If both glyphs have the same width, nothing visible changes.
-**Test lead:** compare U+3000's generated width and the wrong-disc screen under
-SJIS. A normal ANSI-font E0 boot does not use this path. A small source-table
-check found U+3000 was the only changed lookup result among the 85 resident
-Japanese glyphs; the larger table is not evidence of 514 extra missing glyphs.
-
-## Differences reviewed without calling them glitches
-
-| ID | Difference | Why it is not counted as a demonstrated bug |
-| --- | --- | --- |
-| N01 | PAL display modes and viewport heights | PAL selects 50 Hz or EURGB60 instead of NTSC progressive scan. PAL's game-owned mode has EFB height 480 and XFB height 528, so later viewport code uses EFB height. E0/J0's normal modes use equal heights; their XFB-height spelling alone does not establish a retail viewport bug. See [video_viewport.h](../include/main/video_viewport.h#L6), [game UI](../src/dlls/engine/0/0.c#L4089), and [display-mode audit](gameloop_regional_display_mode.md). |
-| N02 | PAL display-choice layout while a DVD error is shown | PAL calls `dvdCheckError` before drawing, moves the question from Y=110 to Y=190, and dims it by 64. Non-PAL draws the error later and ignores the newer return value even in E1. This suggests an overlap/readability test, but compares differently laid-out prompts, not proof of a shared earlier glitch. [gameloop.c](../src/main/gameloop.c#L328), [fileio.c](../src/main/fileio.c#L37). |
-| N03 | PAL language options, defaults, resident messages, title art, and SRAM access | Expected regional functionality: five-language options, language-dependent resources, separate save-options calls, and PAL SRAM mode APIs. Dutch-console initial language setup also suppresses selected early card dialogs. EN/JP not exposing these is not a bug. [Options](../src/dlls/engine/55/55.c#L101), [save defaults](../src/dlls/engine/21/21.c#L1451), [language switching](../src/main/gametext.c#L1918), [card dialogs](../src/track/intersect_memcard.c#L503). |
-| N04 | Dinosaur-language cheat availability | PAL deliberately hides the cheat entry and omits the well's fourth cheat reward. Non-PAL grants that reward only on the non-SJIS path. This looks like a regional feature decision, not a broken token; other reward/follow-up behavior remains. [Maze well](../src/dlls/objects/611_GM_MazeWell/GM_MazeWell.c#L131), [options](../src/dlls/engine/55/55.c#L319). |
-| N05 | PAL50 movement tuning | Drakor, his hoverpad, and HighTop have render-mode-sensitive speed adjustments. These are candidates for timing/balance comparisons, but their absence in NTSC is not a defect. P0 and P1 share these branches. [Drakor](../src/dlls/objects/589_BossDrakor/BossDrakor.c#L718), [hoverpad](../src/dlls/objects/625/625.c#L674), [HighTop](../src/dlls/objects/626/626.c#L938). |
-| N06 | UI layout and decoration | Later code adds task bullets, adjusts WarpStone art and a save-prompt Y coordinate, adds a four-pixel text-box border, and chooses narrow/wide NPC text boxes using an embedded marker. These are observable presentation differences; no particular stock text clipping failure was established. [NPC boxes](../src/dlls/engine/0/0.c#L2086), [text-box definitions](../src/main/gametext_data.c#L166), [border](../src/main/textrender_drawbox.c#L18), [WarpStone](../src/dlls/engine/65/65.c#L19), [menu line height](../src/dlls/engine/60/60.c#L24). |
-| N07 | Diagnostics, storage, and matching-related source shape | Freed-object logging, assert line numbers, a removed unused constant, descriptor tail widths, local-variable aliases, and relocated/reshuffled string tables do not by themselves establish gameplay changes. The shrinking opaque `MldfNames.adjacency` array also has no identified glitch from this audit. [object logging](../src/main/object.c#L1287), [descriptor tail](../include/dlls/objects/358.h#L9), [adjacency](../src/main/pi_dolphin.c#L174). |
-| N08 | Card-comment language constants and font setup refactoring | `OS_LANGUAGE_ITALIAN` in E1's comment builder numerically equals game `LANGUAGE_JAPANESE` (4); `getCurLanguage` returns the game's enum. The misleading constant name is not proof that Italian saves receive Japanese titles. Card-comment asset offsets move together with their backing arrays. The system-font resource-selection refactor has no demonstrated bug beyond U03. [comment builder](../src/dlls/engine/2/maketex.c#L394), [font setup](../src/main/gametext.c#L1271). |
-
-## Location-evidence appendix
-
-The follow-up scanned all **124 romlists in each of J0, E1, P0, and P1**.
-Map labels were read from each extract's `MAPINFO.bin` and joined to the
-romlist-name table in its DOL using
-[map_catalog.py](../tools/orig/map_catalog.py). Object names and DLL numbers
-were resolved through `OBJINDEX.bin`, `OBJECTS.tab`, and `OBJECTS.bin` using
-[romlist_params.py](../tools/orig/romlist_params.py). The map/DLL associations
-in the location index agree across these four extracts.
-
-Each input DOL's SHA-1 was checked against its own `config/<version>/config.yml`
-before using its tables. This validates the DOL input, not every extracted
-asset or a complete regional disc. The local E0 `files/` directory does not
-contain the romlists, `MAPINFO.bin`, or `OBJECTS.bin`; **E0 placement bytes were
-not independently checked**. E0 locations are inferred from the source's same
-identities/controller IDs and the four secondary extracts.
-
-The records below give reproducible anchors without requiring guessed room
-names. Offsets are into the **decompressed** `.romlist.zlb` stream and use E1
-as the reference; identifiers remain the better cross-version key when records
-move. Parameter offsets are relative to the record, after the
-[24-byte common placement header](../include/game/objects/object_setup.h).
-Coordinates elsewhere in this document are stored placement coordinates, not
-a promise of the same numbers in every runtime world/local coordinate space.
+### [G02](#code-g02) — A zero animation rate can break enemy animation
+
+**Affected:** EN v1.0, JP v1.0, PAL v1.0. **Patched in:** EN rev1, PAL rev1.
+
+If a script or action supplies a zero animation rate, several enemy routines
+calculate an invalid playback speed. Animations or their events may then
+advance incorrectly. Revision 1 substitutes a small fallback rate. No specific
+enemy or normal gameplay trigger has been identified.
+
+### [G03](#code-g03) — Tricky fails to recover when his target disappears
+
+**Affected:** EN v1.0. **Patched in:** JP v1.0, PAL v1.0, EN rev1, PAL rev1.
+
+If an object Tricky is following disappears during a scripted sequence, he may
+stay stuck in his previous action. Later versions reset him to waiting.
+
+### [G04](#code-g04) — Tricky's commands can stay locked after returning to the Queen
+
+**Affected:** EN v1.0, JP v1.0, PAL v1.0. **Patched in:** EN rev1, PAL rev1.
+
+In Thorntail Hollow, the game can record that Tricky returned to the Queen
+without having unlocked his commands. Earlier versions treat the return as
+complete and do nothing to recover. Revision 1 checks both flags and lets the
+sequence retry. Whether an ordinary save or interrupted sequence can produce
+this mismatch still needs testing.
+
+### [G07](#code-g07) — Putting down the ball can corrupt its collision data
+
+**Affected:** EN v1.0, JP v1.0, PAL v1.0. **Patched in:** EN rev1, PAL rev1.
+
+The generic put-down code treats Tricky's ball like an ordinary carryable object
+and overwrites part of its collision data. This could cause erratic movement
+or a crash if the ball goes through that path. Revision 1 excludes the ball
+from this cleanup.
+
+### [G10](#code-g10) — Volcano Force Point: pressure plate stays pressed after reloading
+
+**Affected:** EN v1.0, JP v1.0. **Patched in:** PAL v1.0, EN rev1, PAL rev1.
+
+One Tricky-operated pressure plate can become permanently pressed if the area
+loads while its saved press flag is set. Later versions allow it to release
+normally. Try pressing it, reloading the area, then moving Tricky or removing
+the weight. The effect on puzzle progression is still unclear; the appendix
+identifies the exact plate.
+
+### [G12](#code-g12) — Krazoa Palace: switch camera can remain active after walking away
+
+**Affected:** EN v1.0, JP v1.0, PAL v1.0, EN rev1. **Patched in:** PAL rev1.
+
+During act 1, the pressure-switch camera only updates while the player is
+within 100 units of the switch. Walking away can leave its camera flag set
+after the switch releases, or prevent it activating from a distance.
+PAL rev1 removes that distance restriction.
+
+### [G18](#code-g18) — Drakor: missiles can receive an invalid launch velocity
+
+**Affected:** EN v1.0, JP v1.0. **Patched in:** PAL v1.0, EN rev1, PAL rev1.
+
+A particular launch alignment can make the missile's direction calculation
+break down, potentially leaving it motionless or disappearing. Later versions
+guard against a zero-length direction. This concerns the Drakor fight; a
+reliable way to produce that alignment has not been found.
+
+### [G21](#code-g21) — The shop's Fuel Cell display leaks effect memory
+
+**Affected:** EN v1.0, JP v1.0. **Patched in:** PAL v1.0, EN rev1, PAL rev1.
+
+Leaving ThornTail Store while the Fuel Cell display's lightning effects are
+active can leave their memory allocated. Repeated visits could accumulate
+the leak. Later versions free outstanding effects when the display unloads.
+No crash threshold has been measured.
+
+### [G23](#code-g23) — Models and animations can be requested before their tables finish loading
+
+**Affected:** EN v1.0, JP v1.0. **Patched in:** PAL v1.0, EN rev1, PAL rev1.
+
+The loader can consult model or animation tables before their disc read has
+finished. That may request the wrong data or cause a load failure. Later
+versions wait for the read to complete. Fast area transitions or delayed disc
+reads are plausible triggers.
+
+### [G08](#code-g08) — Barrels can repeatedly play their landing sound
+
+**Affected:** EN v1.0. **Patched in:** JP v1.0, PAL v1.0, EN rev1, PAL rev1.
+
+Tiny bounces or uneven ground can repeatedly trigger a barrel's landing sound.
+Later versions allow a short gap in ground contact before treating the next
+contact as another landing.
+
+### [G14](#code-g14) — DarkIce Mines: SnowHorn interaction remains available during damage
+
+**Affected:** EN v1.0, JP v1.0, PAL v1.0. **Patched in:** EN rev1, PAL rev1.
+
+The rideable SnowHorn remains interactable while reacting to a hit. A mount or
+interaction request could overlap the damage reaction. Revision 1 disables
+interaction until the reaction finishes.
+
+Ice Mountain also uses this controller, but its SnowHorns have different
+settings; the same trigger has not been established there.
+
+### [G19](#code-g19) — Staff glow can linger after backing away from a magic cave
+
+**Affected:** EN v1.0, JP v1.0. **Patched in:** PAL v1.0, EN rev1, PAL rev1.
+
+Approaching a magic cave activates a staff effect, but backing away does not
+explicitly turn the glow off. Later versions add that cleanup. How long it
+lingers depends on what else updates the staff. This code is shared by cave
+entrances in Cape Claw, Thorntail Hollow (including its underground area),
+Moon Mountain Pass, Volcano Force Point, Walled City, and SnowHorn Wastes.
+
+### [G20](#code-g20) — Timer beeping can continue while the timer is paused or hidden
+
+**Affected:** EN v1.0, JP v1.0. **Patched in:** PAL v1.0, EN rev1, PAL rev1.
+
+The timer's looping sound keeps playing while the timer is paused or the HUD
+is hidden. Later versions stop refreshing the sound in those conditions.
+Opening the pause menu alone may not trigger this behavior.
+
+### [G05](#code-g05) — Tricky's ball keeps updating collision while inactive
+
+**Affected:** EN v1.0, JP v1.0. **Patched in:** PAL v1.0, EN rev1, PAL rev1.
+
+The ball keeps advancing its collision state while inactive or being
+repositioned. This may cause an unexpected bounce or position correction when
+it becomes active again. Later versions keep collision aligned with its current
+position instead.
+
+### [G06](#code-g06) — Throws can start with old ball collision data
+
+**Affected:** EN v1.0, JP v1.0, PAL v1.0. **Patched in:** EN rev1, PAL rev1.
+
+Throwing the ball does not reset its collision tracking. After carrying it
+some distance, the first movement could snap back, hit something incorrectly,
+or follow an odd trajectory. Revision 1 resets that tracking at launch.
+
+### [G09](#code-g09) — Barrel explosion collision may be out of date
+
+**Affected:** EN v1.0, JP v1.0. **Patched in:** PAL v1.0, EN rev1, PAL rev1.
+
+A barrel explosion may use old collision-position data, causing its hits to
+disagree with the visible blast. Later versions explicitly request a collision
+refresh. Detonating a barrel immediately after moving or throwing it is a
+useful test.
+
+### [G11](#code-g11) — DarkIce Mines: Dinosaur Horn interaction can stop responding
+
+**Affected:** EN v1.0, JP v1.0, PAL v1.0, EN rev1. **Patched in:** PAL rev1.
+
+An interaction in upper DarkIce Mines can mark itself complete when the
+Dinosaur Horn is used, independently of the surrounding sequence's completion
+state. It then stops accepting interaction. PAL rev1 changes both the code
+and the placement's completion flag to address this mismatch.
+
+The horn is not consumed by this code. Whether the older behavior blocks
+progression still needs testing.
+
+### [G13](#code-g13) — SnowHorn Wastes: mammoths may move incorrectly after a sequence
+
+**Affected:** EN v1.0, JP v1.0. **Patched in:** PAL v1.0, EN rev1, PAL rev1.
+
+After a scripted reposition, the mammoth can retain collision data from its
+old position. A reset was requested but never performed. Later versions carry
+out the reset, potentially fixing snapping, sticking, or incorrect first
+movement after the sequence.
+
+### [G15](#code-g15) — Dragon Rock: HighTop can miss a scripted transition
+
+**Affected:** EN v1.0, JP v1.0; PAL v1.0 has part of the fix.
+**Patched in:** EN rev1, PAL rev1; partial patch in PAL v1.0.
+
+HighTop may remain in his previous movement state when the rescue/escort
+sequence advances. Later versions make him respond to the rescue flag while
+already active. Revision 1 also adds a sequence event that sets the flag.
+The exact timing needed to expose the older behavior remains unclear.
+
+### [G16](#code-g16) — Dragon Rock: missile sequence can remain enabled after HighTop dies
+
+**Affected:** EN v1.0, JP v1.0, PAL v1.0. **Patched in:** EN rev1, PAL rev1.
+
+When HighTop loses his last health point, earlier versions leave a nearby
+missile sequence's enable flag set. Revision 1 clears it. The old behavior
+could leave the attack running or interfere with a retry; dying during the
+escort is the useful comparison.
+
+### [G17](#code-g17) — Dragon Rock: EarthWalker movement is repeatedly reset
+
+**Affected:** EN v1.0, JP v1.0. **Patched in:** PAL v1.0, EN rev1, PAL rev1.
+
+One EarthWalker action repeatedly clears movement and animation-speed values,
+which may make the action stall or behave oddly while riding. Later versions
+clear them only when the action begins. The exact visible effect is unresolved.
+
+### [G25](#code-g25) — Paid guards may show the wrong A-button prompt
+
+**Affected:** EN v1.0, JP v1.0. **Patched in:** PAL v1.0, EN rev1, PAL rev1.
+
+The SnowHorn Wastes BribeClaw and a Cape Claw guard accept payment without
+explicitly requesting the Hint icon. Later versions request it when the player
+is in range. Interaction still works; the visible difference depends on whether
+other HUD code supplies an icon.
+
+### [G26](#code-g26) — CloudRunner Fortress timer switches may lack an idle prompt
+
+**Affected:** EN v1.0, JP v1.0. **Patched in:** PAL v1.0, EN rev1, PAL rev1.
+
+Three timer interactions omit an explicit A-button prompt while ready to use.
+Later versions request the prompt when the player approaches and no timer is
+running. This is a prompt fix; the timer behavior itself is unchanged.
+
+### [G28](#code-g28) — Memory-card messages can be too closely spaced
+
+**Affected:** EN v1.0, JP v1.0. **Patched in:** PAL v1.0, EN rev1, PAL rev1.
+
+Earlier versions use fixed spacing between messages even when text wraps.
+Later versions measure the text height before placing the next message.
+The change may mainly accommodate longer translations; no specific EN/JP
+dialog has been shown to overlap.
+
+### [G29](#code-g29) — Wrapped pause-menu hints can have cramped spacing
+
+**Affected:** EN v1.0, JP v1.0. **Patched in:** PAL v1.0, EN rev1, PAL rev1.
+
+Successive multi-line hints may be unevenly spaced or overlap. Later versions
+round each hint's height up to a whole number of lines before placing the next.
+Short, single-line hints may look unchanged.
+
+### [G22](#code-g22) — Chapter selection leaks a loaded save buffer
+
+**Affected:** EN v1.0, JP v1.0. **Patched in:** PAL v1.0, EN rev1, PAL rev1.
+
+The chapter-start path loads save data and never frees the temporary buffer.
+Later versions free it after copying the data. This concerns chapter selection,
+whose retail accessibility is uncertain, rather than ordinary save loading.
+
+### [G24](#code-g24) — Possible model-loading cache problem
+
+**Affected:** EN v1.0, JP v1.0. **Patched in:** PAL v1.0, EN rev1, PAL rev1.
+
+Later versions add a cache operation before loading model data into reused
+memory. It may prevent old data from being read, but the audit did not establish
+whether another part of the loader already prevents that problem. This is a
+weak lead without a known visible symptom.
+
+### [G30](#code-g30) — Save repair can perform unnecessary memory-card writes
+
+**Affected:** EN v1.0, JP v1.0. **Patched in:** PAL v1.0, EN rev1, PAL rev1.
+
+When repairing save-image checksums, earlier versions can write save blocks
+before handing control to an operation that manages its own writing. Later
+versions skip those preliminary writes. Extra delay or another opportunity for
+a write error is plausible; save corruption has not been established.
+
+### [G31](#code-g31) — PAL save-file creation can leave options out of date
+
+**Affected:** PAL v1.0. **Patched in:** PAL rev1.
+
+PAL rev1 reloads game options after successfully creating a save file. Without
+that step, some options may remain out of date during initial language setup
+or a card-retry flow. The affected options and visible consequence are unknown.
+The non-PAL versions do not use the same language-setup flow.
+
+### [G27](#code-g27) — Walled City gains an area-name banner
+
+**Absent in:** EN v1.0, JP v1.0. **Patched in:** PAL v1.0, EN rev1, PAL rev1.
+
+Later versions add a roughly five-second "Walled City" title when the area
+controller starts. The earlier controller omits that display. This appears to
+be a presentation addition; other possible ways of displaying the title were
+not ruled out.
+
+## Unresolved findings
+
+### [U01](#code-u01) — The timer-cancellation patch does nothing
+
+**Attempted patch in:** PAL v1.0, EN rev1, PAL rev1. **Successful patch:** none identified.
+
+Later versions try to keep a timer object's countdown and progress flags in
+sync when the global timer is stopped. The new condition can never be true,
+so the patch does not run. The two timers may still disagree. The existing
+[timer audit](timer_controls_and_revisions.md) confirms the faulty comparison
+in the checked retail binaries.
+
+### [U02](#code-u02) — Later audio allocation cannot be freed through the normal path
+
+**Introduced in:** PAL v1.0, EN rev1, PAL rev1. **Patched in:** none identified.
+
+Later versions reserve extra space before an audio buffer, for an unknown
+reason. The cleanup code then tries to free the wrong address. This looks
+like a leak, but the known caller shuts audio down during system reset, so
+there may be no lasting gameplay effect. It does not explain an earlier-version
+audio glitch. See the [audio allocation audit](audio_voice_allocation_prefix.md).
+
+### [U03](#code-u03) — Japanese disc-status text may use the wrong width for a blank space
+
+**Affected:** EN v1.0 and JP v1.0 on the Japanese system-font path.
+**Patched in:** EN rev1's Japanese system-font path.
+
+A missing character mapping makes a full-width blank inherit the preceding
+character's width. This could affect spacing on the Japanese wrong-disc screen,
+although equal character widths would hide the difference. Normal English-font
+startup and PAL's localized setup use different paths.
+
+## Appendix A: code references
+
+Technical notes for readers checking the implementation. Shorthand here and
+in the remaining appendices: **E0** = EN v1.0, **J0** = JP v1.0, **P0** = PAL
+v1.0, **E1** = EN rev1, **P1** = PAL rev1.
+
+<a id="code-g01"></a>
+
+**G01.** The old check multiplies loaded-map indices. Index 0 forces zero, index 1 has no effect, and different sets can share a product. Revision 1 compares all flag bytes. Reachable map combinations still need checking.
+
+[Hcurves.c:1019](../src/dlls/engine/20_Hcurves/Hcurves.c#L1019).
+
+<a id="code-g02"></a>
+
+**G02.** Four enemy paths divide by `60 * rateScale`. E1/P1 substitute `0.1f` for a zero rate. The relevant sites are at lines 158, 224, 1123, and 2031 in the audited source.
+
+[Baddie.c:148](../src/dlls/objects/201_Baddie/Baddie.c#L148), [Baddie.c:2027](../src/dlls/objects/201_Baddie/Baddie.c#L2027).
+
+<a id="code-g03"></a>
+
+**G03.** Recovery requires `TRICKY_STATE_FLAG_SEQUENCE_KEEP_STATE` and a freed `followObj`. The patch resets command state, selects `TRICKY_MOVE_WALK_WAIT`, and clears movement speeds.
+
+[tricky.c:1912](../src/dlls/objects/196_Tricky/tricky.c#L1912).
+
+<a id="code-g04"></a>
+
+**G04.** `shTricky_init` used to accept `SH_ReturnedToQueen` alone. E1/P1 also require `Tricky_Unlocked_Sidekick_Commands`; otherwise they clear the return bit so the wait-for-return path can recover.
+
+[SH_tricky.c:57](../src/dlls/objects/422_SH_tricky/SH_tricky.c#L57).
+
+<a id="code-g05"></a>
+
+**G05.** Both ball update paths now advance collision only when `hittableLatch == 1`; otherwise they reattach it to the current position.
+
+[SidekickBal.c:308](../src/dlls/objects/245_SidekickBal/SidekickBal.c#L308), [SidekickBal.c:398](../src/dlls/objects/245_SidekickBal/SidekickBal.c#L398).
+
+<a id="code-g06"></a>
+
+**G06.** E1/P1 add `attachObject` after setting launch velocity and previous position in both throw paths. P0 has G05's change but lacks this reset.
+
+[SidekickBal.c:75](../src/dlls/objects/245_SidekickBal/SidekickBal.c#L75), [SidekickBal.c:205](../src/dlls/objects/245_SidekickBal/SidekickBal.c#L205).
+
+<a id="code-g07"></a>
+
+**G07.** The two carryable put-down paths gain an exception for ball ID `0x112`. Their writes to state bytes 5 and 6 overlap the ball collision pointer at offset 4; they may also save an inappropriate position.
+
+[47.c:21](../src/dlls/engine/47/47.c#L21), [47.c:195](../src/dlls/engine/47/47.c#L195), [tricky.c:759](../src/dlls/objects/196_Tricky/tricky.c#L759), [245_SidekickBal.h:20](../include/dlls/objects/245_SidekickBal.h#L20), [curves_collision_state.h:27](../include/main/dll/curves_collision_state.h#L27).
+
+<a id="code-g08"></a>
+
+**G08.** E0 tracks only the previous update's ground contact. Later builds use a three-update `groundGraceFrames` countdown before permitting another landing sound.
+
+[344.c:441](../src/dlls/objects/344/344.c#L441).
+
+<a id="code-g09"></a>
+
+**G09.** Later builds call `ObjHits_MarkObjectPositionDirty` after configuring the blast hit volume. A missed hit depends on collision update order.
+
+[344.c:341](../src/dlls/objects/344/344.c#L341).
+
+<a id="code-g10"></a>
+
+**G10.** The init routine exempts placement `0x41996` from restoring `latched = 1`. Its pressed bit is `0x4F6`, enable bit is `0x9FD`, and `drivesTricky` is set. Stored position: approximately `(-318.25, 282.30, 2314.41)`.
+
+[251.c:355](../src/dlls/objects/251/251.c#L355), [251.h](../include/dlls/objects/251.h).
+
+<a id="code-g11"></a>
+
+**G11.** Placement `0x4B13A` has flags 0, unlock sequence -1, and horn bit `0x1EE` as both trigger and requirement. The old branch sets the unlocked bit and `userData1`, then disables A for that update; it does not clear the horn bit. P1 excludes this placement and changes its unlocked bit from `0x1A` to `0x3EF`. Stored position: approximately `(788.68, -1042.00, 2254.41)`.
+
+[273.c:127](../src/dlls/objects/273/273.c#L127), [gamebit_ids.h:492](../include/main/gamebit_ids.h#L492).
+
+<a id="code-g12"></a>
+
+**G12.** P1 removes the 100-unit proximity condition from the `WM_SwitchCamActive` (`0x905`) update in map slot 11, act 1. The other distance checks remain. Slot 11 / `warlock` is Krazoa Palace.
+
+[510.c:125](../src/dlls/objects/510/510.c#L125).
+
+<a id="code-g13"></a>
+
+**G13.** E0/J0 clear the requested path reset without calling the attach routine. DLL 417's placed actors are the `NW_mammothh/w/g/b` family in `wastes`.
+
+[417.c:166](../src/dlls/objects/417/417.c#L166), [417.c:659](../src/dlls/objects/417/417.c#L659).
+
+<a id="code-g14"></a>
+
+**G14.** E1/P1 disable interaction before `ObjHitReact_Update` can return early, then enable it after the reaction. DLL 598 appears in `snowmines` and `newicemount`; the similarly named DLL-273 lock prop is unrelated.
+
+[DIMSnowHorn.c:1046](../src/dlls/objects/598_DIMSnowHorn/DIMSnowHorn.c#L1046).
+
+<a id="code-g15"></a>
+
+**G15.** P0/E1/P1 add a `0x631` check to active handler 2, selecting state 8, and remove the old motion-event-7 transition. E1/P1 additionally set `0x631` on creator event 10 when its spawn bit is set. The Dragon Rock sequence uses trigger `0x631`, completion bit `0x632` (`DR_RescuedHighTop`), and sequence 11. Cape Claw's HighTop instead starts with variant 1 / state 10.
+
+[626.c:546](../src/dlls/objects/626/626.c#L546), [626.c:493](../src/dlls/objects/626/626.c#L493), [DR_Creator.c:39](../src/dlls/objects/613_DR_Creator/DR_Creator.c#L39), [626.c:672](../src/dlls/objects/626/626.c#L672), [gamebit_ids.h:672](../include/main/gamebit_ids.h#L672).
+
+<a id="code-g16"></a>
+
+**G16.** On death in control mode 2 or 8, E1/P1 clear `0xBF7`. Dragon Rock creator `0x493D3` uses it as `spawnGameBit`, with mode 9 requesting sequence 4 and a callback spawning `DRHomingMis`. The health display uses the air-meter API, but loses points on hits.
+
+[626.c:892](../src/dlls/objects/626/626.c#L892), [DR_Creator.c:123](../src/dlls/objects/613_DR_Creator/DR_Creator.c#L123).
+
+<a id="code-g17"></a>
+
+**G17.** Handler 3 clears `animSpeedA/B/C` and XYZ velocity every update in E0/J0. Later builds restrict that to `moveJustStartedA`, alongside starting move 7 or 8. The separate `moveSpeed` value is not cleared.
+
+[DR_EarthWar.c:216](../src/dlls/objects/599_DR_EarthWar/DR_EarthWar.c#L216).
+
+<a id="code-g18"></a>
+
+**G18.** The launch calculation normalizes a direction after subtracting a projection. The SDK normalization has no zero-vector guard; later game code adds one. Map 44 / `finalboss` is labeled BOSS Drakor.
+
+[BossDrakor.c:308](../src/dlls/objects/589_BossDrakor/BossDrakor.c#L308), [vec.c:53](../src/dolphin/mtx/vec.c#L53).
+
+<a id="code-g19"></a>
+
+**G19.** Later cave-proximity code explicitly disables the staff glow on leaving the approach radius. The rest of the exit cleanup already existed.
+
+[MagicCaveTo.c:184](../src/dlls/objects/287_MagicCaveTo/MagicCaveTo.c#L184).
+
+<a id="code-g20"></a>
+
+**G20.** `gameTimerRun` sets `dt = 0` when paused or HUD-hidden. Later versions guard the loop-sound keepalive with `if (dt)`; volume and pan updates remain.
+
+[modelEngine.c:899](../src/main/modelEngine.c#L899), [modelEngine.c:959](../src/main/modelEngine.c#L959), [timer_controls_and_revisions.md](timer_controls_and_revisions.md).
+
+<a id="code-g21"></a>
+
+**G21.** The new free loop releases non-null `lightningHandles[10]` for raw object ID `0x468` (`SPFuelCell`). Normally the render path frees each effect on expiry; unloading early bypasses that cleanup.
+
+[644.c:232](../src/dlls/objects/644/644.c#L232), [644.c:127](../src/dlls/objects/644/644.c#L127).
+
+<a id="code-g22"></a>
+
+**G22.** The save-select path for chapter values greater than 1 copies `0x6EC` bytes from a loaded save. E0/J0 omit the subsequent buffer free.
+
+[53.c:640](../src/dlls/engine/53/53.c#L640).
+
+<a id="code-g23"></a>
+
+**G23.** `getTableFileEntry` now waits on pending loads for `MODELS.tab` (ID `0x2A`, mask `0xC`) and `ANIMCURV.tab` (ID `0x0E`, mask `0xA0000000`).
+
+[pi_dolphin.c:1273](../src/main/pi_dolphin.c#L1273), [mldf_fileid.h:22](../include/main/mldf_fileid.h#L22).
+
+<a id="code-g24"></a>
+
+**G24.** The added call is `DCInvalidateRange(model, totalSize)`, between allocation and loading/decompression. The full transfer path's cache guarantees were not established.
+
+[model.c:2246](../src/main/model.c#L2246).
+
+<a id="code-g25"></a>
+
+**G25.** The added Hint-icon request runs when `userData1 == 2`, `gameBitD` is clear, and the player is in range. The two `GuardClaw` records use raw ID `0xD8` and DLL 201, which dispatches to the DLL-202 handler. Their completion bits are `0xD83` (SnowHorn Wastes) and `0xE00` (Cape Claw).
+
+[guardclaw.c:163](../src/dlls/objects/202/guardclaw.c#L163), [gamebit_ids.h:933](../include/main/gamebit_ids.h#L933).
+
+<a id="code-g26"></a>
+
+**G26.** The added idle `A_BUTTON_ICON_CONTEXT_B` request applies to raw ID `0x830`, `CFSunTemple`. The same DLL's Walled City object has ID `0x526` and does not enter this branch.
+
+[659.c:157](../src/dlls/objects/659/659.c#L157).
+
+<a id="code-g27"></a>
+
+**G27.** The controller initializes `messageTimer` to 300 nominal frames and displays text 1401 while positive. That text reads Walled City; the constant's TILE_MESSAGE spelling is misleading.
+
+[WCLevelCont.c:739](../src/dlls/objects/653_WCLevelCont/WCLevelCont.c#L739), [WCLevelCont.c:695](../src/dlls/objects/653_WCLevelCont/WCLevelCont.c#L695).
+
+<a id="code-g28"></a>
+
+**G28.** Fixed 24-pixel spacing becomes measured text height, at least one language line-height, plus 5 pixels.
+
+[intersect_memcard.c:532](../src/track/intersect_memcard.c#L532).
+
+<a id="code-g29"></a>
+
+**G29.** The hint loop rounds measured text height up to a full line-height multiple instead of merely taking the greater of glyph bounds and one line-height.
+
+[0.c:5005](../src/dlls/engine/0/0.c#L5005).
+
+<a id="code-g30"></a>
+
+**G30.** During save-image checksum repair, later `saveGame_prepareAndWrite` performs preliminary block writes only when `cb == NULL`. The earlier path can write before invoking a supplied callback.
+
+[maketex.c:238](../src/dlls/engine/2/maketex.c#L238).
+
+<a id="code-g31"></a>
+
+**G31.** P1 adds `loadGameOptions()` after successful `cardCreateSaveFile(1)`. E0/J0/E1 also omit it, but their callers do not expose PAL's language-setup flow.
+
+[n_attractmode.c:338](../src/dlls/engine/52_n_attractmode/n_attractmode.c#L338).
+
+<a id="code-u01"></a>
+
+**U01.** The new condition compares `isGameTimerDisabled() == 1`, but the accessor returns `state & 2`: either 0 or 2. The start/expiry bits and local countdown may therefore remain out of sync with a global stop.
+
+[Timer.c:117](../src/dlls/objects/693_Timer/Timer.c#L117), [modelEngine.c:1033](../src/main/modelEngine.c#L1033), [timer_controls_and_revisions.md](timer_controls_and_revisions.md).
+
+<a id="code-u02"></a>
+
+**U02.** For the 48-voice DSP array, `_audioAlloc` turns a `0x2DC0` request into `0x2EC0` and returns base + `0x100`. `salExitDspCtrl` passes that interior pointer to `mmFree`, which requires an allocation-base match. Allocation failure also yields an unchecked interior-pointer result. The prefix's purpose is unresolved.
+
+[audio.c:702](../src/main/audio.c#L702), [audio_voice_allocation_prefix.md](audio_voice_allocation_prefix.md), [sal_studio.c:130](../src/musyx/runtime/sal_studio.c#L130), [audio.c:698](../src/main/audio.c#L698), [mm.c:594](../src/main/mm.c#L594), [gameloop.c:775](../src/main/gameloop.c#L775).
+
+<a id="code-u03"></a>
+
+**U03.** The old SJIS lookup omits U+3000; E1 maps it to `0x8140`. For an empty input, `OSGetFontWidth` and `OSGetFontTexel` leave the width unchanged, so the blank inherits the previous glyph's width. Its pixels remain blank. This was the only changed mapping among the 85 resident Japanese glyphs.
+
+[gametext.c:621](../src/main/gametext.c#L621), [gametext_data.c:378](../src/main/gametext_data.c#L378), [gametext.c:1659](../src/main/gametext.c#L1659), [gametext.c:767](../src/main/gametext.c#L767), [OSFont.c:336](../src/dolphin/os/OSFont.c#L336).
+
+## Appendix B: placement records
+
+These records identify the objects discussed above. Map labels came from
+`MAPINFO.bin` and the DOL's romlist table; object names came from `OBJINDEX.bin`
+and `OBJECTS.bin`. The tools used were [map_catalog.py](../tools/orig/map_catalog.py)
+and [romlist_params.py](../tools/orig/romlist_params.py).
+
+Offsets below refer to E1's **decompressed** romlists. Use placement identities
+when comparing versions, because offsets can move. Parameter offsets are
+relative to the [placement record](../include/game/objects/object_setup.h).
+Stored coordinates in Appendix A may differ from runtime world coordinates.
 
 | Finding | Romlist | E1 decoded offset | Placement identity / object | Evidence to inspect |
 | --- | --- | --- | --- | --- |
@@ -784,22 +566,11 @@ a promise of the same numbers in every runtime world/local coordinate space.
 | G26 | `fortress` | `0x7970`, `0x7998`, `0x79C0` | `0x48186`, `0x4817C`, `0x48188` / `CFSunTemple` | Raw ID `0x830`; activation bits `0xB1B`/`0xB1C`/`0xB1D` |
 | G26 | `fortress` | `0x7A0C`, `0x79E8`, `0x7A30` | `0x48187`, `0x4817F`, `0x48189` / `CNTstopwatc` | Timer-enable bits `0xB1B`/`0xB1C`/`0xB1D` respectively |
 
-The source layouts that give these bytes meaning include
-[PressureSwitchFB](../include/dlls/objects/251.h),
-[DoorLock](../include/dlls/objects/273.h),
-[SeqObject](../include/dlls/objects/274.h),
-[DR_Creator](../include/main/dll/DR/dll_0265_drcreator.h),
-[GroundBaddie](../include/main/dll/baddie_state.h#L225), and
-[SunTemple](../include/main/dll/dll_0293_suntemple.h).
-In particular, [SeqObject_update](../src/dlls/objects/274/274.c#L125) gives
-the rescue object's `0x08` flag its set-open-bit-on-completion behavior.
+### Asset differences
 
-### Targeted asset differences
-
-The G10 pressure plate, G12 switches/camera sequence point, G16 creator,
-G21 Fuel Cell, G25 guards, and G26 interaction records are byte-identical
-across the four checked extracts, even where their stream offsets differ.
-The following nearby differences should be preserved when testing:
+The G10 plate, G12 switches and camera point, G16 creator, G21 Fuel Cell,
+G25 guards, and G26 interaction records are byte-identical across J0/E1/P0/P1.
+These nearby records differ:
 
 | Record | J0 | E1 / P0 | P1 | Interpretation |
 | --- | --- | --- | --- | --- |
@@ -807,42 +578,65 @@ The following nearby differences should be preserved when testing:
 | G10-associated `VFPSeqObj` `0x4C35F`, `+0x20` | `0x0095` | `0x008C` | `0x008C` | Different preempt-sequence ID; could be regional sequence numbering, so not independently labeled a fix |
 | G15 `DR_Seqobj` `0x4555F`, header `+0x04` / `+0x06` | `0x04` / `0x6C` | `0x01` / `0xD4` | `0x01` / `0xD4` | Loading metadata differs; its rescue/trigger parameters are unchanged. Runtime impact not established |
 
-For G11 the entire record is 40 bytes and only the two-byte unlocked-bit
-field differs among these extracts. Both associated `DIMSeqObjec` records
-are byte-identical across all four; their E1 offsets above shift to
+G11's two associated sequence objects are unchanged. Their stream offsets are
 `0x7804`/`0x785C` in J0/P0 and `0x79B4`/`0x7A0C` in P1.
 
-For G27, parse `files/gametext/WallCity/English.bin` using
-[`gameTextFinalizeLoad`'s table layout](../src/main/gametext.c#L1133):
-a four-byte glyph count, 16 bytes per glyph, a four-byte entry header,
-12 bytes per [GameTextDef](../include/main/gametext_lookup.h), then a counted
-table of string offsets. In E1/P0/P1, definition 1401 is at `0xA4C`; its
-single string is `EF A3 B4 01 B3` followed by `Walled City` and a null byte.
-Those are formatting bytes plus a title, not a recovered puzzle explanation.
+For G27, entry 1401 in E1/P0/P1's `gametext/WallCity/English.bin` contains
+formatting bytes followed by "Walled City". Its definition is at `0xA4C`;
+[gameTextFinalizeLoad](../src/main/gametext.c#L1133) describes the table layout.
 
-Example placement queries, run separately because search terms are combined:
+## Appendix C: other version differences
 
-```sh
-python tools/orig/romlist_params.py --files-root orig/GSAE01_rev1/files --search dll:0x0111
-python tools/orig/romlist_params.py --files-root orig/GSAE01_rev1/files --search dll:0x0272
-python tools/orig/romlist_params.py --files-root orig/GSAE01_rev1/files --search dll:0x0293
-```
+These branches were reviewed but do not establish additional glitches.
 
-The local Rena reference project's game-bit XML helped find candidate
-relationships, especially `0x3EF` and `0x631`. The relationships reported above
-were then checked against the actual placement bytes and current source;
-reference annotations alone were not treated as proof of a map-specific fix.
-Neither this follow-up nor the original audit compares every sequence, trigger,
-collision mesh, map block, or object placement between releases. Untraced
-script-only fixes remain an open area for further work.
+**N01.** **PAL video modes.** PAL50/EURGB60 use different display heights. The viewport differences follow those modes; they do not establish an NTSC viewport bug.
 
-## Coverage appendix
+[video_viewport.h](../include/main/video_viewport.h#L6); [game UI](../src/dlls/engine/0/0.c#L4089); [display-mode audit](gameloop_regional_display_mode.md).
 
-Counts include each version-bearing `#elif`, as well as nested conditions and
-header declarations. Multiple guards implementing one behavior are grouped into
-one finding. Paths link to the audited file; finding references give the useful
-behavioral locations. This is a source-conditional inventory, not a count of
-retail bugs.
+**N02.** **DVD-error screen layout.** PAL repositions and dims its display-mode prompt while an error is shown. An overlap test may be useful, but the regional layouts differ.
+
+[gameloop.c](../src/main/gameloop.c#L328); [fileio.c](../src/main/fileio.c#L37).
+
+**N03.** **Regional options and resources.** PAL language choices, defaults, title art, SRAM access, and selected startup dialogs are expected regional differences.
+
+[Options](../src/dlls/engine/55/55.c#L101); [save defaults](../src/dlls/engine/21/21.c#L1451); [language switching](../src/main/gametext.c#L1918); [card dialogs](../src/track/intersect_memcard.c#L503).
+
+**N04.** **Dinosaur-language cheat.** PAL hides the option and omits the fourth maze-well cheat reward. Non-PAL grants it only outside the Japanese system-font path. This appears intentional.
+
+[Maze well](../src/dlls/objects/611_GM_MazeWell/GM_MazeWell.c#L131); [options](../src/dlls/engine/55/55.c#L319).
+
+**N05.** **PAL50 movement tuning.** Drakor, his hoverpad, and HighTop adjust speeds for the render mode. P0 and P1 share the changes.
+
+[Drakor](../src/dlls/objects/589_BossDrakor/BossDrakor.c#L718); [hoverpad](../src/dlls/objects/625/625.c#L674); [HighTop](../src/dlls/objects/626/626.c#L938).
+
+**N06.** **UI presentation.** Task bullets, WarpStone art, save-prompt placement, text-box borders, and NPC box widths change. No specific clipping bug was established.
+
+[NPC boxes](../src/dlls/engine/0/0.c#L2086); [text-box definitions](../src/main/gametext_data.c#L166); [border](../src/main/textrender_drawbox.c#L18); [WarpStone](../src/dlls/engine/65/65.c#L19); [menu line height](../src/dlls/engine/60/60.c#L24).
+
+**N07.** **Diagnostics and source layout.** Logging, assert lines, unused constants, storage layouts, and renamed or moved data do not establish gameplay changes.
+
+[object logging](../src/main/object.c#L1287); [descriptor tail](../include/dlls/objects/358.h#L9); [adjacency](../src/main/pi_dolphin.c#L174).
+
+**N08.** **Misleading language constant.** The Italian SDK constant used by E1's card-comment code has the same numeric value as the game's Japanese enum. It does not imply Japanese titles on Italian saves. Font changes are covered by U03.
+
+[comment builder](../src/dlls/engine/2/maketex.c#L394); [font setup](../src/main/gametext.c#L1271).
+
+## Appendix D: audit scope and coverage
+
+The original source audit was performed on 2026-09-26 against
+`f21cfbc660a7643fa030ae91df9d5ad3513f8aeb`. It found 190 version conditionals in
+59 files, grouped here into 31 findings and three unresolved issues. Counts
+include nested guards and `#elif` branches, so they are not bug counts.
+
+The location follow-up scanned 124 romlists in each of J0, E1, P0, and P1 and
+checked their DOL hashes against the configured originals. E0's placement
+assets were unavailable locally; its locations are inferred from matching
+source IDs and the other releases. Rena's game-bit annotations supplied leads
+that were then checked against placement bytes and source.
+
+This was a code and targeted asset review, without gameplay reproduction.
+It does not cover every script or asset difference, bugs shared by all versions,
+or differences still missing from the unfinished ports.
 
 | File | Directives | Disposition |
 | --- | ---: | --- |
@@ -907,23 +701,10 @@ retail bugs.
 | [include/track/intersect_card_api.h](../include/track/intersect_card_api.h) | 1 | N03 declaration |
 | **Total** | **190** | **59 files** |
 
-The broader directive scan also found inherited SDK/compiler switches such as
-`SDK_REVISION`, `VERSION_GCCP01`, and `__MWERKS__`, plus generic legacy `VERSION`
-macros in `global.h`. These are not automatically retail SFA release differences.
-The current configuration supplies `VERSION_<target>` and applies the PAD donor
-switch independently of the SFA target, so those switches were not counted as
-additional game glitches.
-
-To find newly added version branches for a future refresh:
+SDK/compiler switches such as `SDK_REVISION`, `VERSION_GCCP01`, and `__MWERKS__`
+were excluded unless they described an actual SFA release difference.
+To refresh the source inventory:
 
 ```sh
 rg -n '^\s*#\s*(if|ifdef|ifndef|elif)\b.*VERSION_GSA' src include
 ```
-
-Validation for this document consisted of reviewing both sides of the guards
-and relevant callers/types, checking the coverage counts and local links, and
-small source-derived checks for G01's checksum collisions, U01's impossible
-comparison, and U03's glyph mappings. The location follow-up additionally
-checked four configured DOL hashes, scanned their romlists, compared the
-targeted records, and decoded the Walled City text entry. No gameplay
-reproduction or new full build is claimed by this documentation-only audit.
