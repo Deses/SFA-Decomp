@@ -38,6 +38,38 @@ means the defect is upstream of allocation.**
 
 ## Refutations, per unit
 
+### The graph is FORCED by the code — so every one of these rows is a selection difference
+
+This is the load-bearing result, and it is a theorem the trace then confirms. The interference graph is
+*derived* from liveness, and liveness is derived from the instruction stream. All five blockers have
+**byte-identical streams**, so our interference graph and retail's are the same graph. Retail's register
+assignment is therefore *necessarily* a valid colouring of our graph, and no amount of live-range work
+can be the fix.
+
+Measured confirmation on `askProgressiveScanMode`, reading retail's colours off the asm
+(`counter` 29, `sel` 28, `savedAlignment` 31, `i` 30, `j` 31, `showId` 30, `messageY` 27) and checking
+every edge among those nodes in our own graph: **0 conflicts**. The edges are real
+(`messageY`-`savedAlignment`-`sel`-`counter` form a clique, `j`-`showId` an edge) and retail's colours
+respect all of them. Same story on `pauseMenuDraw`: colour 29 is free for the case-2 node.
+
+**Beware the naive per-node test.** Asking "is retail's colour for node X free, given OUR colours for
+everything else" reports FALSE for `messageY` (blocked by `sel`) and `showId` (blocked by `j`) and looks
+like a live-range defect. It is not — those neighbours also move under retail's assignment. Always test
+retail's assignment as a whole.
+
+So the lever is the **colour-selection order** and nothing else. That order is set by the node count,
+the degrees, and the simplification worklist — i.e. by how many webs the FRONT END created, which can
+differ between two sources that emit identical code (a coalesced copy is a web the allocator counted and
+the code never shows). That is exactly why Jack's `modelDoRenderInstrs` fix is described as the graph
+growing 256 -> 257, and it is why liveness-shaped reasoning has been barren here.
+
+The practical corollary, measured twice: **naming a value does not create a web.** Adding a `fontId`
+temp left the graph at 294 nodes; hoisting GM_MazeWell's `isItemBeingUsed` result changed nothing. A
+value that is defined and immediately consumed coalesces straight back. The joint-matrix case added a
+node because its value had to survive the second argument's setup. So a node-count lever needs a value
+that genuinely *survives* something, and finding one that also leaves the stream intact is the open
+problem on this frontier.
+
 ### The allocator graph is directly observable — use `tools/tricky_backend_trace.py` FIRST
 
 This is the tool for this whole class and it turns blind sweeping into a measurement. It intercepts a
