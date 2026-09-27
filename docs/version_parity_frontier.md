@@ -846,6 +846,118 @@ the clamp and the four `x + 0.0f` adds.
 What would close it is the real source difference that makes retail's two loads distinct values while
 CSE is on. Nothing in the spellings tried reaches it.
 
+## askProgressiveScanMode: what is established, and what is NOT
+
+The PAL band is our band rotated by one: ours has (box, counter, sel, savedAlignment) =
+(r31, r30, r29, r28), retail has (r30, r29, r28, r31), i.e. retail colours `savedAlignment` FIRST.
+
+**Established from the traced graph.**
+1. `box`'s value is an unnamed temp, not the named local. Its register_object node has degree **0** in
+   every spelling tried (plain call, `(GameTextBox*)` cast, `&gameTextGetBox(0)[0]`,
+   `&(*gameTextGetBox(0))`): the return arrives in r3, a precoloured register, so the copy coalesces and
+   the temp is the representative. `savedAlignment` is a plain load into its own home and keeps its
+   named node (degree 35).
+2. `deg(savedAlignment) <= deg(box)` identically, and here they are equal at 35. `savedAlignment` is
+   defined immediately after `box` and both die at the same `stb`, so its live range is a strict subset
+   and every web overlapping it also overlaps box. Inserting a web between the two definitions raises
+   box's degree only, which is the wrong direction.
+3. In the observed worklist the temps are coloured before every named local, so `savedAlignment` is
+   coloured after box's temp and `min(enabled - blockers)` then hands it the lowest free register.
+
+**NOT established.** `coloring_order()` recovers the compiler's actual linked worklist
+(`prefix[0]` chains the nodes), not a priority derivable from degree and index. An earlier version of
+this section claimed a proof of impossibility from a DFS over all 10! orders of the named locals; that
+DFS was run against a STALE node-to-variable mapping and its conclusion should not be relied on. What
+the ordering evidence really shows is empirical: 30 EN-safe single moves x 2 guard positions, all 28
+pairwise swaps, 6 relative orders of the three band participants x 9 guard positions, and two ungated
+searches (greedy and randomised multi-start) all plateau, at 25 gated and 10 ungated -- never 0.
+
+Because the worklist is compiler-internal, the lever that can move it is the one that changes which
+values exist, not their order. That is exactly what worked: `savedAlignment = (u8)box->alignH;` takes
+PAL from 25 to 12, the same class as the `(char*)` cast that closed `loadMemCardImages`. It costs EN 24
+diffs because the site is shared code, and it does not reach 0, so it is not applied.
+
+Pressure-counter probes, all inert at 25: casts on `messageY` at either use or both, a cast inside the
+`shadeReduction` expression, `int` -> `s32` on either guarded local, and hoisting `dvdCheckError()` into
+a PAL-only local in either or both guarded blocks, declared above or below. A value defined and
+immediately consumed gets no web, which is why the last one changes nothing.
+
+## WCLevelCont: the nocse escape hatch is closed too
+
+`-opt nocse` matches `wclevelcont_update` on all five versions but costs `traceMoveA`/`traceMoveB` six
+instructions each. Those six are exactly one recomputed `gWcTileGrid[i][b]`: a `lis`/`addi` for the
+global, `slwi`/`add` for the index and two `extsh` for the s16 conversion, read once for the `!= 0` test
+and again for the `<= 4` test. Retail CSE'd it.
+
+Hoisting it into a local (`u8 cell = gWcTileGridA[i][b];`) is the obvious way to let the TU take
+`nocse` without paying for the recompute. Measured: it takes the unit from 96.349 to 97.561 under
+`nocse` and lets `update` match on PAL -- but `traceMoveA` still fails, and under the CURRENT flags the
+hoist BREAKS `traceMoveA`, which was matching. That is the decisive evidence: retail's source reads the
+grid twice and relies on CSE, so the hoist is not retail's source and `nocse` cannot be adopted for this
+TU without writing code retail did not have.
+
+The sibling level-control DLLs in `reference_projects/dinosaur-planet` (`607_WL_LevelControl`,
+`638_DFPlevcontrol`, and eight more `*levcontrol` objects) confirm the clamp idiom
+`if (timer > 0) { ...; timer -= delta; if (timer < 0) timer = 0; }` with LITERAL zeros, but their timers
+are integers, so they say nothing about the float pool atom. Retail's own relocations confirm our four
+`x + gWcLevelContZero[0]` addends are real: the zero atom at `.sdata2` offset 0 is read twice in
+`traceMoveA` and twice in `traceMoveB`.
+
+So the unit needs the clamp's constant web created late while CSE stays on, and the only instruments
+that do that are a per-function pragma (banned by name) or a `volatile`/pun (banned by name).
+
+## The per-unit compiler-version axis, closed on all five rows
+
+`mw_version` is a per-Object setting in `configure.py` and is already used in the tree for `mtx.c`,
+`vec.c`, `__mem.c` and `__start.c`, so a per-unit compiler is a sanctioned knob rather than a hack. All
+ten available GC compilers were swept on each remaining row, on all five versions:
+
+| row | result |
+|---|---|
+| `askProgressiveScanMode` | 1.3 .. 2.7 all identical (EN 0 / PAL 25); 1.2.5 and 1.2.5n change length |
+| `wclevelcont_update` | 1.3 .. 2.7 all identical (EN 0 / PAL 4); 1.2.5/1.2.5n change length |
+| `GM_MazeWell_update` | 1.3 .. 2.7 all identical (EN 0 / PAL 14); 1.2.5/1.2.5n change length |
+| `saveCardBuildComment` | 1.3 .. 2.7 all identical (PAL 0 / rev1 3); 1.2.5/1.2.5n worse |
+| `bossdrakor_update` | only 1.3 is viable at all; 1.3.2 and later are +187 instructions |
+
+So for these units GC/1.3 through 2.7 are output-identical and the axis carries no information. Together
+with declaration order, the local set, expression spellings, the twelve `-opt`/`-inline` profiles and the
+value-structure casts, every knob this project has is now measured on all five rows.
+
+The one instrument that is NOT exhausted is understanding: `coloring_order()` shows the colouring follows
+a compiler-internal linked worklist, and nothing here derives the rule that builds it. Until that rule is
+known, moving these five is guesswork over value structure -- which is how `loadMemCardImages`,
+`pauseMenuDraw`, `engine/53` and `gametext` were actually closed, and it did produce PAL 25 -> 12 on
+gameloop before stalling.
+
+## The per-function pragma axis: one win, four refusals
+
+With per-function pragmas authorised, eighteen MWCC optimization pragmas were swept on each remaining
+row across all five versions (`opt_common_subs`, `opt_propagation`, `opt_lifetimes`,
+`opt_strength_reduction`, `opt_dead_assignments`, `opt_dead_code`, `opt_unroll_loops` off and on,
+`peephole on`, `scheduling on`, `optimization_level 0..4`, `dont_inline on`, `opt_vectorize_loops off`,
+`no_register_coloring on`).
+
+**`wclevelcont_update` closes.** `#pragma opt_common_subs off` around that one function takes the unit
+to 100% on all five versions, because `traceMoveA`/`traceMoveB` keep CSE and still match. That is now
+applied; see the commit for why the TU-wide flag and the source alternatives do not work.
+
+**The other four refuse every pragma.** `askProgressiveScanMode` stays at 25, `GM_MazeWell_update` at
+14, `saveCardBuildComment` at 3 and `bossdrakor_update` at 150 under every pragma that does not change
+the instruction count. The product space was also swept for gameloop: the ten viable pragmas x the
+`(u8)` cast are all identical at EN 24 / PAL 12, so the pragma axis and the value-structure axis do not
+interact there.
+
+State after this: EN v1.0 and JP at 100, PAL v1.0 99.497430, PAL v1.1 99.497490, EN v1.1 99.537820, and
+all five DOLs byte-identical. Four functions remain, worth 0.5026 on PAL v1.0, 0.5025 on PAL v1.1 and
+0.4622 on EN v1.1.
+
+Knobs now measured and closed on those four: declaration order (single moves, all pairwise swaps,
+exhaustive permutations where feasible, scope hoists, ungated greedy and randomised search), the local
+set, expression spellings, twelve TU `-opt`/`-inline` profiles, ten per-unit compiler versions, eighteen
+per-function pragmas, and the pragma x value-structure product. What is left is the rule that builds the
+compiler's colouring worklist.
+
 ## See also
 
 - `docs/source_shape_levers.md` — levers 9, 14 and 16 are the ones this frontier keeps invoking.

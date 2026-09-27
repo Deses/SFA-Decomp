@@ -693,6 +693,7 @@ dlls/objects/649_SPitembeam/SPitembeam.c
 dlls/objects/650/650.c
 dlls/objects/651/651.c
 dlls/objects/652_WCBouncyCra/WCBouncyCra.c
+dlls/objects/653_WCLevelCont/WCLevelCont.c
 dlls/objects/654_WCBeacon/WCBeacon.c
 dlls/objects/655_WCPressureS/WCPressureS.c
 dlls/objects/656_WCPushBlock/WCPushBlock.c
