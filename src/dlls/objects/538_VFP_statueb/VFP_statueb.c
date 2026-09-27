@@ -39,7 +39,7 @@ int VFP_statueball_getObjectTypeId(void)
 
 void VFP_statueball_free(GameObject* obj)
 {
-    (*gExpgfxInterface)->freeSource((u32)obj);
+    (*gExpgfxInterface)->freeSource(obj);
 }
 
 void VFP_statueball_render(void)
@@ -139,7 +139,7 @@ void VFP_statueball_update(GameObject* obj)
         else
         {
             Sfx_StopObjectChannel(obj, 0x40);
-            (*gExpgfxInterface)->freeSource((u32)obj);
+            (*gExpgfxInterface)->freeSource(obj);
             if (state->activationGameBit != -1)
             {
                 if (mainGetBit(state->activationGameBit) != 0)

@@ -9,7 +9,7 @@ typedef int (*ExpgfxSpawnEffectFn)(void* config, int preferredPoolIndex, int slo
 typedef void (*ExpgfxUpdateFrameStateFn)(int sourceMode, int sourceId, int unused0,
                                          int unused1);
 typedef void (*ExpgfxResetAllPoolsFn)(void);
-typedef void (*ExpgfxFreeSourceFn)(u32 sourceId);
+typedef void (*ExpgfxFreeSourceFn)(void* sourceId);
 typedef int (*ExpgfxFunc09Fn)(void);
 typedef void (*ExpgfxNopFn)(void);
 typedef void (*ExpgfxUpdateSourceFrameFlagsFn)(void* sourceObject);

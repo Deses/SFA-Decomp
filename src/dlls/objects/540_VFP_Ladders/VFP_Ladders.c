@@ -44,7 +44,7 @@ int VFP_Ladders_getObjectTypeId(void)
 
 void VFP_Ladders_free(GameObject* obj)
 {
-    (*gExpgfxInterface)->freeSource2((u32)obj);
+    (*gExpgfxInterface)->freeSource2(obj);
 }
 
 void VFP_Ladders_render(GameObject* obj, int p2, int p3, int p4, int p5, s8 visible)

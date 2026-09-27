@@ -103,7 +103,7 @@ void pollenfragment_free(GameObject* obj)
         ModelLightStruct_free(state->modelLight);
         state->modelLight = NULL;
     }
-    (*gExpgfxInterface)->freeSource2((u32)obj);
+    (*gExpgfxInterface)->freeSource2(obj);
 }
 
 void pollenfragment_render(GameObject* obj, int p2, int p3, int p4, int p5)

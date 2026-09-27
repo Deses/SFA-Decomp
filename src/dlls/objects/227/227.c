@@ -185,7 +185,7 @@ void Fireball_free(GameObject* obj) {
     if (light != NULL) {
         ModelLightStruct_free(light);
     }
-    (*gExpgfxInterface)->freeSource2((u32)obj);
+    (*gExpgfxInterface)->freeSource2(obj);
     objFreeObjectType(obj, FIREBALL_OBJECT_GROUP);
 }
 

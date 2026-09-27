@@ -518,7 +518,7 @@ int SB_CloudRunner_getObjectTypeId(void) {
 
 void SB_CloudRunner_free(GameObject* obj) {
     SBCloudRunnerState* state = obj->extra;
-    (*gExpgfxInterface)->freeSource2((u32)obj);
+    (*gExpgfxInterface)->freeSource2(obj);
     if (state->texture0 != NULL) {
         textureFree((Texture*)(state->texture0));
         state->texture0 = NULL;

@@ -273,7 +273,7 @@ void firefly_free(GameObject* obj) {
     FireFlyState* state = obj->extra;
 
     modelLightStruct_freeSlot((ModelLightStruct**)&state->flight.ownerData.pointLight);
-    (*gExpgfxInterface)->freeSource2((u32)obj);
+    (*gExpgfxInterface)->freeSource2(obj);
 }
 
 void firefly_render(void) {

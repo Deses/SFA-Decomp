@@ -46,7 +46,7 @@ void dll413_free(GameObject* obj) {
         getLActions(obj, obj, DLL19D_STOP_ACTION_ID, 0, 0, 0);
         state->flags |= DLL19D_FLAG_STOP_ACTION_INITIALIZED;
     }
-    (*gExpgfxInterface)->freeSource2((u32)obj);
+    (*gExpgfxInterface)->freeSource2(obj);
 }
 
 void dll413_render(void) {

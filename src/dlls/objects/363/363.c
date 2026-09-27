@@ -53,7 +53,7 @@ void MagicLight_free(GameObject* obj) {
         if (state->inRange != 0) {
             getLActions(obj, obj, (u16)state->leaveAction, 0, 0, 0);
         }
-        (*gExpgfxInterface)->freeSource2((u32)obj);
+        (*gExpgfxInterface)->freeSource2(obj);
     }
 }
 

@@ -28,7 +28,7 @@ STATIC_ASSERT(offsetof(VfpCorePlatformPlacement, gameBitId) == 0x20);
 int VFP_coreplat_sequenceCallback(void);
 int VFP_coreplat_getExtraSize(void);
 int VFP_coreplat_getObjectTypeId(void);
-void VFP_coreplat_free(int obj);
+void VFP_coreplat_free(GameObject* obj);
 void VFP_coreplat_render(GameObject* obj, int p2, int p3, int p4, int p5, s8 visible);
 void VFP_coreplat_hitDetect(void);
 void VFP_coreplat_update(void);

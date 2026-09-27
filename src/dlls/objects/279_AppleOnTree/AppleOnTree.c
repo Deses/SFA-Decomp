@@ -231,7 +231,7 @@ int AppleOnTree_getExtraSize(void) {
 }
 
 void AppleOnTree_free(GameObject* obj) {
-    (*gExpgfxInterface)->freeSource((u32)obj);
+    (*gExpgfxInterface)->freeSource(obj);
 }
 
 void AppleOnTree_render(GameObject* obj, int renderArg2, int renderArg3, int renderArg4, int renderArg5, s8 visible) {

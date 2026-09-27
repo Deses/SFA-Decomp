@@ -139,7 +139,7 @@ void MagicDust_free(GameObject* obj) {
     if (obj->ownerObj != NULL) {
         ObjLink_DetachChild((GameObject*)obj->ownerObj, obj);
     }
-    (*gExpgfxInterface)->freeSource2((u32)obj);
+    (*gExpgfxInterface)->freeSource2(obj);
 }
 
 void MagicDust_render(GameObject* obj, int fwdArg2, int fwdArg3, int fwdArg4, int fwdArg5, s8 unusedVisible) {
@@ -148,7 +148,7 @@ void MagicDust_render(GameObject* obj, int fwdArg2, int fwdArg3, int fwdArg4, in
 
 static inline void MagicDust_collect(GameObject* obj, MagicGemState* state, GameObject* player) {
     MagicGemObjectDef* objectDef = (MagicGemObjectDef*)obj->anim.modelInstance->extraSetupData;
-    (*gExpgfxInterface)->freeSource2((u32)obj);
+    (*gExpgfxInterface)->freeSource2(obj);
     itemPickupDoParticleFx(obj, MAGICGEM_RENDER_SCALE, state->mode, MAGICGEM_PICKUP_PARTICLE_COUNT);
     ObjHits_DisableObject(obj);
     Sfx_PlayFromObject(obj, (u16)state->sfxId);
@@ -202,7 +202,7 @@ void MagicDust_update(GameObject* obj) {
         }
     } else if (getXZDistanceSquared(&obj->anim.worldPosX, &player->anim.worldPosX) >= MAGICGEM_ACTIVATE_DIST_SQ) {
         state->flags &= ~MAGICGEM_FLAG_AMBIENT_FX;
-        (*gExpgfxInterface)->freeSource2((u32)obj);
+        (*gExpgfxInterface)->freeSource2(obj);
     }
     if ((obj->anim.flags & OBJANIM_FLAG_OWNS_PLACEMENT_DATA) != 0) {
         if ((state->flags & MAGICGEM_FLAG_SETTLED) != 0) {
@@ -251,7 +251,7 @@ void MagicDust_update(GameObject* obj) {
                 state->flags = flags & ~MAGICGEM_FLAG_BURST2;
                 state->flags |= MAGICGEM_FLAG_COLLECTED;
                 state->burstTimer = MAGICGEM_BURST_TIMER;
-                (*gExpgfxInterface)->freeSource2((u32)obj);
+                (*gExpgfxInterface)->freeSource2(obj);
                 if (obj->anim.parent == NULL) {
                     for (burstCount = MAGICGEM_BURST_PARTICLE_COUNT; burstCount != '\0'; burstCount--) {
                         (*gPartfxInterface)

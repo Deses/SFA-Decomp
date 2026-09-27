@@ -32,7 +32,7 @@ STATIC_ASSERT(offsetof(VfpDoorSwitchPlacement, gameBitId) == 0x1E);
 void vfpdoorswitch_updateExplodingVariant(GameObject* obj);
 int VFP_DoorSwitch_getExtraSize(void);
 int VFP_DoorSwitch_getObjectTypeId(void);
-void VFP_DoorSwitch_free(int obj);
+void VFP_DoorSwitch_free(GameObject* obj);
 void VFP_DoorSwitch_render(GameObject* obj, int p2, int p3, int p4, int p5, s8 visible);
 void VFP_DoorSwitch_hitDetect(void);
 void VFP_DoorSwitch_update(GameObject* obj);

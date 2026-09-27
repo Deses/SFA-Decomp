@@ -22,7 +22,7 @@ int chuka_getObjectTypeId(void) {
 }
 
 void chuka_free(GameObject* obj) {
-    (*gExpgfxInterface)->freeSource2((int)obj);
+    (*gExpgfxInterface)->freeSource2(obj);
 }
 
 void chuka_render(void) {

@@ -39,7 +39,7 @@ int lightsource_getObjectTypeId(void) {
 void lightsource_free(GameObject* obj) {
     LightSourceState* state = obj->extra;
 
-    (*gExpgfxInterface)->freeSource2((u32)obj);
+    (*gExpgfxInterface)->freeSource2(obj);
     if (state->light != NULL) {
         ModelLightStruct_free(state->light);
     }
@@ -83,7 +83,7 @@ void lightsource_update(GameObject* obj) {
                 }
                 Sfx_PlayFromObject(obj, SFXTRIG_cvdrip1c);
             } else {
-                (*gExpgfxInterface)->freeSource((u32)obj);
+                (*gExpgfxInterface)->freeSource(obj);
                 if (state->gameBit != -1 && mainGetBit(state->gameBit) != 0) {
                     mainSetBits(state->gameBit, 0);
                 }

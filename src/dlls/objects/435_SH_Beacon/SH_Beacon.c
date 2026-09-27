@@ -55,7 +55,7 @@ int sh_beacon_getExtraSize(void) {
 
 void sh_beacon_free(GameObject* obj, int keepChild) {
     ShBeaconState* state = obj->extra;
-    (*gExpgfxInterface)->freeSource2((u32)obj);
+    (*gExpgfxInterface)->freeSource2(obj);
     if (keepChild == 0) {
         GameObject* twinkleObject = state->twinkleObject;
         if (twinkleObject != NULL && (twinkleObject->objectFlags & OBJECT_OBJFLAG_FREED) == 0) {

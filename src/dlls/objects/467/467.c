@@ -155,7 +155,7 @@ void worldobj_free(GameObject* obj) {
         ModelLightStruct_free(state->light);
         state->light = NULL;
     }
-    (*gExpgfxInterface)->freeSource((int)obj);
+    (*gExpgfxInterface)->freeSource(obj);
 }
 
 void worldobj_render(GameObject* obj, int renderArg2, int renderArg3, int renderArg4, int renderArg5, s8 visible) {

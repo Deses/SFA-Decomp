@@ -266,7 +266,7 @@ void EdibleMushroom_updateBehavior(GameObject* obj, EdibleMushroomState* state, 
         state->burrowAttackTimer = timer;
         if (timer <= 0.0f) {
             ObjHits_SetSourceMask((ObjAnimComponent*)obj, 1);
-            (*gExpgfxInterface)->freeSource((int)obj);
+            (*gExpgfxInterface)->freeSource(obj);
             state->animState = 0;
             state->flags &= ~EDIBLE_MUSHROOM_FLAG_STRUCK;
         } else {
@@ -283,7 +283,7 @@ void EdibleMushroom_updateBehavior(GameObject* obj, EdibleMushroomState* state, 
             if (mainGetBit(GAMEBIT_ITEM_TrickyFood_GrabInProgress) == 0) {
                 if (!(player->objectFlags & OBJECT_OBJFLAG_PARENT_SLACK)) {
                     if (Vec_xzDistance(&player->anim.worldPosX, &obj->anim.worldPosX) < 25.0f) {
-                        (*gExpgfxInterface)->freeSource((int)obj);
+                        (*gExpgfxInterface)->freeSource(obj);
                         if (obj->anim.romDefNo == EDIBLE_MUSHROOM_WHITE_ALIAS_ID) {
                             state->pickupMsgBitId = 0x18A;
                             itemPickupDoParticleFx(obj, 1.0f, 0xFF, 0x28);

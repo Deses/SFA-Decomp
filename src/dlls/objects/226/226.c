@@ -848,7 +848,7 @@ void staff_free(GameObject* obj) {
     for (; i < STAFF_SWIPE_SLOT_COUNT; i++) {
         mm_free(state->slots[i].vertexData);
     }
-    (*gExpgfxInterface)->freeSource2((u32)obj);
+    (*gExpgfxInterface)->freeSource2(obj);
 }
 
 void staff_render(void) {

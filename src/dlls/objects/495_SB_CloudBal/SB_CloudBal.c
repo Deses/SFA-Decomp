@@ -72,7 +72,7 @@ int SB_CloudBall_getObjectTypeId(void) {
 void SB_CloudBall_free(GameObject* obj) {
     SBCloudBallState* state = obj->extra;
 
-    (*gExpgfxInterface)->freeSource2((u32)obj);
+    (*gExpgfxInterface)->freeSource2(obj);
     if (state->light != NULL) {
         ModelLightStruct_free(state->light);
         state->light = NULL;

@@ -235,7 +235,7 @@ void shopitem_free(GameObject* obj) {
     u8 i;
 
 #endif
-    (*gExpgfxInterface)->freeSource((int)obj);
+    (*gExpgfxInterface)->freeSource(obj);
     switch (obj->anim.romDefNo) {
     case SHOPITEM_SEQ_SPARKLE:
 #if !defined(VERSION_GSAE01) && !defined(VERSION_GSAJ01)

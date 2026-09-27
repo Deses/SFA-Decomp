@@ -24,7 +24,7 @@ int dustmotesou_getObjectTypeId(void) {
 }
 
 void dustmotesou_free(GameObject* obj) {
-    (*gExpgfxInterface)->freeSource2((u32)obj);
+    (*gExpgfxInterface)->freeSource2(obj);
 }
 
 void dustmotesou_render(GameObject* obj, int p2, int p3, int p4, int p5, s8 visible) {

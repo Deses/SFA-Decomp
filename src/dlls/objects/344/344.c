@@ -521,7 +521,7 @@ void gunpowderBarrel_free(GameObject* obj, int keepLinkedTimer) {
     objFreeObjectType(obj, GUNPOWDER_BARREL_OBJECT_GROUP);
     objFreeObjectType(obj, GUNPOWDER_BARREL_LOOSE_OBJECT_GROUP);
     if (state->fuseFrames != 0) {
-        (*gExpgfxInterface)->freeSource2((u32)obj);
+        (*gExpgfxInterface)->freeSource2(obj);
     }
 }
 
