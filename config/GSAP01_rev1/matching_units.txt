@@ -652,6 +652,7 @@ dlls/objects/607_CRFuelTank/CRFuelTank.c
 dlls/objects/608/608.c
 dlls/objects/609_DR_LaserCan/DR_LaserCan.c
 dlls/objects/610/610.c
+dlls/objects/611_GM_MazeWell/GM_MazeWell.c
 dlls/objects/612/612.c
 dlls/objects/613_DR_Creator/DR_Creator.c
 dlls/objects/614_KytesMum/KytesMum.c

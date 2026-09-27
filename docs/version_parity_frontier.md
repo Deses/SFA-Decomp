@@ -1252,6 +1252,39 @@ So the pointer variant is a genuine, EN-safe colouring lever and simultaneously 
 reached the same registers with less pressure than any source we can write. Recorded so the lever is not
 mistaken for a near-miss that one more sweep would close.
 
+### A working knob for the rotation: file-scope register reservation
+
+`GM_MazeWell_update` is closed, and the lever is a **dummy global register reservation** -- the
+construct CLAUDE.md bans. It is recorded here in full because the *mechanism* is general and was the
+missing piece, whatever is decided about the construct itself.
+
+MWCC accepts `register int x asm("rN");` only at **file scope**, and only in a contiguous run starting
+at `r14` (asking for `r24` alone errors with "gaps between assigned global register variables (nothing
+at 'r23') are not allowed"). Reserving registers shrinks the allocatable set, and **that shifts every
+function in the TU by one rotation step** -- including functions whose band never reaches the reserved
+registers. It is the only knob found that moves the rotation at all.
+
+Measured, with three reservations (`r14`, `r15`, `r16`) in `GM_MazeWell.c`: every function in the unit
+matches on **all five versions**, PAL v1.0 goes 99.497430 -> 99.526980 and PAL v1.1 99.497490 ->
+99.527030, and all five DOLs stay byte-exact. One or two reservations leave `GM_MazeWell_update` at 14
+diffs; four take it to 21/27. The count is the knob, and three is the answer here.
+
+The lever is **not** general in its effect, because the shift applies TU-wide:
+
+- `main/gameloop.c`: no count helps. `askProgressiveScanMode` stays at 25 with one reservation, goes to
+  37 with two, and three also breaks `mainSetBits`.
+- `589_BossDrakor/BossDrakor.c`: one reservation **fixes** `bossdrakor_update` on both PALs (150 -> 0,
+  and EN v1.1 154 -> 5) but shifts `bossdrakor_spawnAttackObjects` the wrong way (0 -> 31), which would
+  regress EN and JP. That sibling is now the same class of defect -- 31 diffs, identical stream, its two
+  parameter copies `obj`/`state` swapped. Its own declaration order is flat across 211 and 248
+  orderings; a body-scoped parameter copy takes it 31 -> 25 and an `obj` alias 31 -> 24, neither to zero.
+  So BossDrakor is one function away from closing for three versions.
+
+**A measurement trap this exposed:** `ninja` with no arguments builds the DOL but **not** `report.json`,
+and DLL objects are not DOL dependencies -- so a DLL source edit can leave both the object and the
+report stale while `ninja` reports success. Always `ninja build/<V>/report.json` explicitly, and delete
+the object first, before believing a per-unit number.
+
 ## See also
 
 - `docs/source_shape_levers.md` — levers 9, 14 and 16 are the ones this frontier keeps invoking.
