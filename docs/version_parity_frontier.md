@@ -38,6 +38,55 @@ means the defect is upstream of allocation.**
 
 ## Refutations, per unit
 
+### The allocator graph is directly observable — use `tools/tricky_backend_trace.py` FIRST
+
+This is the tool for this whole class and it turns blind sweeping into a measurement. It intercepts a
+private GC/1.3 process's dump hook, verifies the instrumented object is byte-identical to an ordinary
+compile, and replays simplification and physical colouring:
+
+```sh
+python3 configure.py --version GSAP01          # it traces the CONFIGURED version
+python3 tools/tricky_backend_trace.py --unit main/dlls/engine/0/0         --function pauseMenuDraw --graph --output build/pmd_trace
+```
+
+`snapshots[15]` carries `register_objects`, which maps **source variable names to graph node indices**,
+plus `coloring_graph` with each node's `neighbors`; `snapshots[16]` carries the same graph after
+colouring. Each node's `prefix` decodes as `[…, node_index, order, colour, flags, degree]`, and the
+colour **is** the physical register number.
+
+### `pauseMenuDraw`'s 4 diffs, diagnosed at the graph
+
+| node | source local | degree | interference (>=r14) | our colour | retail wants |
+| --- | --- | --- | --- | --- | --- |
+| 36 | `tokenTextY` (case 1) | 33 | `{28, 31}` | 30 | 30 (already right) |
+| 35 | `tokenTextY` (case 2) | 21 | `{28, 31}` | **26** | **29** |
+
+Three facts fall straight out, and together they replace the guesswork above:
+
+1. **Retail's assignment is legal in our graph.** Node 35 interferes with *nothing* in the saved band
+   except colours 28 and 31 — not with `boxDrawParamA/B/C` (nodes 32/33/34), `player`, `statusTable`,
+   `taskTextIds` or node 36. Colour 29 is free for it. So this is a colour *preference*, not a
+   constraint, and no amount of live-range work is needed to "make room".
+2. **The two nodes have IDENTICAL constraint sets** — same neighbours-in-band, same free set — so the
+   colour is decided purely by their position in the colouring sequence. The tool prints that sequence:
+   `[76, 53, 44, 39, 36, 293, 292, 291, …]`, node 36 fifth. Ours colours 36 first (takes 30) then 35
+   (which wraps past the taken 31 to **26**). Retail colours **35 first** (takes 29) then 36 (30).
+3. **So the target is exact: reverse the colouring order of nodes 35 and 36.** Simplification removed
+   every node as low-degree ("0 high-degree removals"), so the stack order is the removal order and the
+   lower-degree node is coloured last. Reversing it needs **deg(35) > deg(36)**, i.e. 21 must exceed 33.
+
+That is a 13-interference swing, which is why every spelling-level perturbation is flat: none of them
+changes a degree by anything like that. Splitting case 1's accumulator to lower node 36's degree was
+tried at all three advance points and breaks EN (14/11/6 diffs) without reaching it.
+
+**Renaming does not add a node — verified twice.** Jack's `modelDoRenderInstrs` fix worked because its
+graph grew 256 -> 257. Re-tracing after adding a `fontId` temp to the PAL-only statement: still **294
+nodes**, only the indices renumbered (`[77, 54, 45, 40, 36, …]`), node 35 still colour 26. Same for
+hoisting GM_MazeWell's `isItemBeingUsed` result into a local: EN and PAL both unchanged. A call result
+that is immediately consumed coalesces straight back; the joint-matrix case added a node because its
+value had to live across the argument setup. **So "hoist it into a local" only moves anything when the
+value genuinely survives something.**
+
 ### `pauseMenuDraw` — the remaining 4 diffs
 
 The whole 1163-instruction stream matches; one web is on the wrong home. PAL copies the three `int`
