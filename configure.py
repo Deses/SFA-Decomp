@@ -367,12 +367,6 @@ cflags_dll_noopt_noprop_noautoinline = [
     "-inline", "noauto",
 ]
 
-cflags_dll_noopt_nolifetimes_noautoinline = [
-    *cflags_game,
-    "-opt", "nopeephole,noschedule,nolifetimes",
-    "-inline", "noauto",
-]
-
 cflags_dll_noopt_nocse_noprop = [
     *cflags_game,
     "-opt", "nopeephole,noschedule,nocse,nopropagation",
@@ -396,15 +390,9 @@ cflags_dll_noopt_nostrength_noinline = [
     "-inline", "off",
 ]
 
-cflags_dll_noopt_nolifetimes_nodead = [
+cflags_dll_noopt_nodead = [
     *cflags_game,
-    "-opt", "nopeephole,noschedule,nolifetimes,nodead",
-]
-
-cflags_dll_noopt_nolifetimes_zerodata = [
-    *cflags_game,
-    "-opt", "nopeephole,noschedule,nolifetimes",
-    '-pragma "explicit_zero_data on"',
+    "-opt", "nopeephole,noschedule,nodead",
 ]
 
 cflags_dll_noopt_zerodata_noautoinline = [
@@ -414,9 +402,9 @@ cflags_dll_noopt_zerodata_noautoinline = [
     "-inline", "noauto",
 ]
 
-cflags_dll_noopt_nocse_nolifetimes_noprop_zerodata = [
+cflags_dll_noopt_nocse_noprop_zerodata = [
     *cflags_game,
-    "-opt", "nopeephole,noschedule,nocse,nolifetimes,nopropagation",
+    "-opt", "nopeephole,noschedule,nocse,nopropagation",
     '-pragma "explicit_zero_data on"',
 ]
 
@@ -1342,7 +1330,7 @@ config.libs = [
             Object(MatchingFor("GSAE01"), "dlls/objects/393_CCSharpclaw/CCSharpclaw.c"),
             Object(MatchingFor("GSAE01"), "dlls/objects/394_CCpedstal/CCpedstal.c"),
             Object(MatchingFor("GSAE01"), "dlls/objects/395_CClevcontro/CClevcontro.c"),
-            Object(MatchingFor("GSAE01"), "dlls/objects/396_MMSH_Shrine/MMSH_Shrine.c", cflags=cflags_dll_noopt_nolifetimes_noautoinline),
+            Object(MatchingFor("GSAE01"), "dlls/objects/396_MMSH_Shrine/MMSH_Shrine.c", cflags=cflags_dll_noopt_noautoinline),
             Object(MatchingFor("GSAE01"), "dlls/objects/397_MMSH_Scales/MMSH_Scales.c"),
             Object(MatchingFor("GSAE01"), "dlls/objects/398_MMSH_WaterS/MMSH_WaterS.c"),
             Object(MatchingFor("GSAE01"), "dlls/objects/399_ECSH_Shrine/ECSH_Shrine.c", cflags=cflags_dll_noopt_nostrength),
@@ -1369,7 +1357,7 @@ config.libs = [
             Object(MatchingFor("GSAE01"), "dlls/objects/420/420.c"),
             Object(MatchingFor("GSAE01"), "dlls/objects/421_NW_levcontr/NW_levcontr.c", cflags=cflags_dll_noopt_noinline),
             Object(MatchingFor("GSAE01"), "dlls/objects/422_SH_tricky/SH_tricky.c"),
-            Object(MatchingFor("GSAE01"), "dlls/objects/423/423.c", cflags=cflags_dll_noopt_nolifetimes_nodead),
+            Object(MatchingFor("GSAE01"), "dlls/objects/423/423.c", cflags=cflags_dll_noopt_nodead),
             Object(MatchingFor("GSAE01"), "dlls/objects/424_SH_killermu/SH_killermu.c", cflags=cflags_dll_noopt_nocse_noinline),
             Object(MatchingFor("GSAE01"), "dlls/objects/425_BombPlant/BombPlant.c", cflags=cflags_dll_noopt_noautoinline),
             Object(Matching, "dlls/objects/426_BombPlantSp/BombPlantSp.c", cflags=cflags_dll_noopt_noautoinline, extra_cflags=["-inline", "noauto,deferred"]),
@@ -1680,9 +1668,9 @@ config.libs = [
             Object(MatchingFor("GSAE01"), "main/objhits.c", cflags=cflags_dll_noopt_noautoinline),
             Object(Matching, "main/objlib.c"),
             Object(MatchingFor("GSAE01"), "main/objprint.c", cflags=cflags_dll_noopt_noautoinline),
-            Object(MatchingFor("GSAE01"), "main/objprint_dolphin.c", cflags=[*cflags_dll_noopt_nolifetimes_zerodata, "-inline", "noauto"]),
+            Object(MatchingFor("GSAE01"), "main/objprint_dolphin.c", cflags=cflags_dll_noopt_zerodata_noautoinline),
             Object(MatchingFor("GSAE01"), "main/pi_dolphin.c", cflags=cflags_dll_noopt_zerodata_noautoinline),
-            Object(MatchingFor("GSAE01"), "main/pi_videoinit.c", cflags=cflags_dll_noopt_nocse_nolifetimes_noprop_zerodata),
+            Object(MatchingFor("GSAE01"), "main/pi_videoinit.c", cflags=cflags_dll_noopt_nocse_noprop_zerodata),
             Object(MatchingFor("GSAE01"), "main/pi_pathsearch.c", cflags=cflags_dll_noopt_zerodata_noautoinline),
             Object(Matching, "main/zlb.s"),
             Object(Matching, "main/shader_dolphin.c"),

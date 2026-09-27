@@ -81,10 +81,7 @@ void EdibleMushroom_updateBehavior(GameObject* obj, EdibleMushroomState* state, 
     int curMove;
     int moveId;
     int bit;
-    f32 dz;
-    f32 dx;
     f32 speed;
-    f32 rangeSq;
     f32 timer;
     s16 ang;
     ObjAnimEventList animEvents;
@@ -107,6 +104,10 @@ void EdibleMushroom_updateBehavior(GameObject* obj, EdibleMushroomState* state, 
         } else if ((*gSkyInterface)->getSunPosition(&sunTime) == 0) {
             if (state->currentTargetDistance < placement->lungeTriggerDistance) {
                 if (state->flags & EDIBLE_MUSHROOM_FLAG_ON_CURVE) {
+                    f32 dz;
+                    f32 dx;
+                    f32 rangeSq;
+
                     rangeSq = state->lungeRange * state->lungeRange;
                     while (1) {
                         dx = state->curve.posX - obj->anim.localPosX;
@@ -179,6 +180,10 @@ void EdibleMushroom_updateBehavior(GameObject* obj, EdibleMushroomState* state, 
                 Sfx_PlayFromObject(obj, SFXTRIG_mushrele16);
                 if (speed >= 0.54f) {
                     if (state->flags & EDIBLE_MUSHROOM_FLAG_ON_CURVE) {
+                        f32 dz;
+                        f32 dx;
+                        f32 rangeSq;
+
                         rangeSq = state->lungeRange * state->lungeRange;
                         while (1) {
                             dx = state->curve.posX - obj->anim.localPosX;
@@ -200,6 +205,10 @@ void EdibleMushroom_updateBehavior(GameObject* obj, EdibleMushroomState* state, 
                     obj->anim.rotX = (s16)(state->moveAngle - 0x4000);
                 } else {
                     if (state->flags & EDIBLE_MUSHROOM_FLAG_ON_CURVE) {
+                        f32 dz;
+                        f32 dx;
+                        f32 rangeSq;
+
                         rangeSq = state->retreatRange * state->retreatRange;
                         while (1) {
                             dx = state->curve.posX - obj->anim.localPosX;
@@ -234,6 +243,10 @@ void EdibleMushroom_updateBehavior(GameObject* obj, EdibleMushroomState* state, 
             state->animState = 4;
         } else if (speed >= 0.54f) {
             if (state->flags & EDIBLE_MUSHROOM_FLAG_ON_CURVE) {
+                f32 dz;
+                f32 dx;
+                f32 rangeSq;
+
                 rangeSq = state->lungeRange * state->lungeRange;
                 while (1) {
                     dx = state->curve.posX - obj->anim.localPosX;
