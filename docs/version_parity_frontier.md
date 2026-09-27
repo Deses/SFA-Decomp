@@ -73,6 +73,22 @@ And the residual 70 is **one exchange, not scattered noise**: the substitution c
 first because it has the highest degree, so this is again a *pick* inside a large free set rather than a
 constraint, and moving it two positions along needs two more nodes coloured before it.
 
+### And `obj` is a PARAMETER, so its node index cannot be raised — BossDrakor is closed too
+
+After the alias merge the degrees are `obj` **104** and `state` **102** — a two-point margin, the
+tightest anywhere here. But the colouring order is `[164, 40, 39, 32]`: descending node index, so
+`state` (node 40) colours before `obj` (node 32), and retail needs the reverse. Parameters get low node
+indices and every local sits above them, so no declaration position can put `obj` first. That is exactly
+why the position sweep is binary — 150 or 70, never anything between.
+
+The obvious escape is to copy the parameter into a local whose position *is* controllable
+(`GameObject* self = obj;` used throughout). Swept over all 16 positions: **PAL 150 -> 136 at positions
+0-2 only** (EN 0 -> 65), and 150 everywhere else. Binary again, and never 0 — the copy coalesces with the
+parameter and inherits its index constraint rather than getting a fresh one.
+
+**So a parameter's effective node index is not source-controllable**, which closes this row: the single
+`obj` <-> `state` exchange that is 65 of its 70 diffs requires an ordering the front end will not produce.
+
 ### The graph is FORCED by the code — so every one of these rows is a selection difference
 
 This is the load-bearing result, and it is a theorem the trace then confirms. The interference graph is
