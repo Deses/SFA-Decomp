@@ -1013,6 +1013,79 @@ This supersedes the earlier row-by-row "closed" verdicts: the rows are not indiv
 share one cause, and the target is now specific -- make the allocator see enough pressure to order by
 degree. That is the first statement of this frontier that predicts all four rows at once.
 
+## What the four rows are made of, measured axis by axis (2026-09-27)
+
+The degree-vs-index worklist finding above says *what* differs. This section records the
+measurements that follow from it, so none of these axes gets re-ground.
+
+### The allocator worklist, read directly out of the compiler
+
+`tools/tricky_backend_trace.py --graph` recovers the real linked worklist, and it is not a
+single rule but two concatenated ones:
+
+    worklist = [ nodes with degree >= ~31, first ] ++ [ everything else, descending node index ]
+
+and the node index is **reverse declaration order**, with block-scoped locals taking the lowest
+indices. For `GM_MazeWell_update` (our PAL compile) the prefix is `[temp164, questBits, obj]` at
+degrees 43/46/49; for `bossdrakor_update` it is `[temp164, state, moveResult, obj]` at degrees
+35/102/31/104. `moveResult` sits at exactly the threshold. Retail's colours are what the *same*
+graph yields when that prefix is ordered by descending degree instead.
+
+### Axes measured inert (byte-identical output, not merely "no better")
+
+| axis | extent | result |
+|---|---|---|
+| declaration order, `GM_MazeWell_update` | 71 orderings (all swaps + all single moves) | no ordering beats baseline |
+| declaration scope, `GM_MazeWell_update` | 36 hoists of `found`/`itemIndex` to every function-scope position | **all 36 byte-identical in all five versions** |
+| local set, `bossdrakor_update` | 7 merges/splits of `moveResult`/`adv`/`moveId`/`step` | **all 7 byte-identical** |
+| inlined-helper declarations, `bossdrakor_update` | 165 orderings of `bossdrakor_updateEffects`'s 11 locals | flat |
+| `#if`-gated FP declarations, `bossdrakor_update` | 16 positions + order swaps | **all byte-identical** |
+| PAL-gated declarations, `askProgressiveScanMode` | 18 positions + 6 loop-body scopings | never below 25 |
+| PAL-only compiler flags, `bossdrakor_update` | 43 flag settings incl. every `-opt no*`, `-inline`, `-O` level | 150 is a hard floor |
+| whole-unit flags, `engine/2` on EN v1.1 | 23 settings | `saveCardBuildComment` stays at 3 |
+
+The byte-identical rows matter more than the "no better" ones: MWCC coalesces renamed and
+re-ordered locals straight back into the same webs, so these colours are **graph-forced**, not
+order-forced. Only changing where a value is materialized can move them.
+
+### The one EN-safe colouring lever found
+
+`GM_MazeWell_update`'s second loop walks `questBits` by index while the first walks it by an
+explicit pointer. Giving the second loop the same explicit pointer -- either a second local or, better,
+reusing `questBitPtr` -- keeps EN, JP and EN v1.1 **byte-identical** and flips PAL's first loop to
+retail's exact registers (`li r29,0; mr r28,r31; lha r3,0(r28)`). It is the only source change found
+that moves a PAL colouring without touching EN. It does not close the row: `objId` then stops
+coalescing with `obj`, which costs a fifth saved register and pushes `itemIndex` to `r27`. Nine
+`objId` spellings were swept against it; every spelling that keeps EN matching also reverts the flip,
+and every spelling that frees the register costs EN 36 diffs.
+
+### `bossdrakor_update`: our PAL allocation is EN's allocation
+
+Retail EN opens `mr r29,r3; lwz r31,184(r29)`; retail PAL opens `mr r31,r3; lwz r30,184(r31)`. Our
+PAL emits EN's form exactly. So retail's PAL-gated code perturbed the GPR allocator and ours does
+not -- our arm adds only FP locals and a scratch-only global compare, and the FP band has its own
+counter. Injecting genuinely call-spanning GPR values into the PAL arm does shift the rotation
+**without changing the instruction count**, and two of them reach retail's `obj = r31`; but no
+placement of one or two (16 site pairs) reaches `obj = r31` *and* `state = r30` together.
+
+### `saveCardBuildComment`: an emission-order rule, now pinned exactly
+
+The three diffs are not colouring. Retail emits
+
+    lis r3,HA(sMemoryCardFileNameString) ; addi r31,r3,LO ; bl getCurLanguage
+
+and we emit the same three instructions in the other order. Moving the declaration ahead of the
+call in the source does not reproduce retail: an eleven-probe matrix compiled with engine/2's own
+flags (`scratchpad/p1.c`, `p2.c`) shows GC/1.3 emits a **three-instruction detour**
+`lis rX; addi r0,rX,LO; mr r31,r0` whenever a call separates the value's definition from its first
+use, and the two-instruction direct form only when a use precedes the call (probes `u2`, `u7`) or the
+value feeds a loop (probe `t8`). Retail's form -- direct materialization immediately *followed* by the
+call -- was not produced by any of the 20 source spellings tried, nor by any of 15 compilers at
+GC/1.3's flags, with one exception: **GC/3.0a3 and 3.0a5 match the function exactly**, under every
+flag setting. That is not usable, because 3.0a3 breaks 9 of the unit's other 16 functions, and
+carving the unit to isolate a compiler profile is banned. Recorded because it localizes the
+remaining gap to one documented codegen difference rather than an unknown.
+
 ## See also
 
 - `docs/source_shape_levers.md` — levers 9, 14 and 16 are the ones this frontier keeps invoking.
