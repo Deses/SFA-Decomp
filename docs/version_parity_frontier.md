@@ -1086,6 +1086,30 @@ flag setting. That is not usable, because 3.0a3 breaks 9 of the unit's other 16 
 carving the unit to isolate a compiler profile is banned. Recorded because it localizes the
 remaining gap to one documented codegen difference rather than an unknown.
 
+### `bossdrakor_update` is one rotation step, and half of it is now reachable
+
+Classifying all 150 differing instructions: **every one is saved-GPR naming only** -- the streams are
+byte-identical modulo `r24..r31`, and the earlier `cmplwi`/`cmpwi` sighting was ndiff alignment noise
+(both objects use `cmplwi`). The permutation is a clean 3-cycle over the top three registers:
+ours `r29 -> r31`, `r30 -> r29`, `r31 -> r30` in retail, with `r25..r28` fixed. That is a rotation of
+the cyclic band order by one, i.e. exactly the rotation-offset knob.
+
+Half of it is reachable. Copying the incoming parameter into a named local
+(`GameObject* obj = objArg;`, declared at position 0 or 1 of the list) takes PAL from 150 diffs to
+**136**, and collapses the residue from a 3-cycle to a bare **2-cycle**: only `obj` and `state`
+(`r31`/`r30`) remain swapped. It is the copy-vs-load direction flip, with `obj` copy-class and `state`
+load-class; retail puts the copy on top, we put the load on top. What does *not* close it, on top of
+the copy: six orderings of the copy's declaration and assignment against `state`'s, a second
+copy-class value in the PAL arm, loading `state` through the parameter, and 34 further PAL-only flag
+settings (136 is the new floor).
+
+The copy is recorded, not committed: it only helps when the parameter is renamed under
+`#if VERSION_GSAP01`, since applying it to every version costs EN 65 diffs. A version-gated parameter
+name whose only purpose is to shift registers is a match-hack, not recovered source. What it
+establishes is that this row is one rotation step wide and that the step is a real, measurable knob --
+so the remaining work is finding a plausible PAL-only construct with the same effect, not proving the
+row movable.
+
 ## See also
 
 - `docs/source_shape_levers.md` — levers 9, 14 and 16 are the ones this frontier keeps invoking.
