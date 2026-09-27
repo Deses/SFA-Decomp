@@ -165,7 +165,12 @@ tried at all three advance points and breaks EN (14/11/6 diffs) without reaching
 **Renaming does not add a node — verified twice.** Jack's `modelDoRenderInstrs` fix worked because its
 graph grew 256 -> 257. Re-tracing after adding a `fontId` temp to the PAL-only statement: still **294
 nodes**, only the indices renumbered (`[77, 54, 45, 40, 36, …]`), node 35 still colour 26. Same for
-hoisting GM_MazeWell's `isItemBeingUsed` result into a local: EN and PAL both unchanged. A call result
+hoisting GM_MazeWell's `isItemBeingUsed` result into a local: EN and PAL both unchanged. And a third,
+strongest case: in `askProgressiveScanMode` the subexpression `0xc0 - shadeReduction` appears **three
+times** in one call and CSE already computes it once, and on EN it folds away entirely because
+`shadeReduction` is a `const int = 0` there — so hoisting it into a local looked like a
+version-asymmetric, stream-neutral way to add a node on PAL alone. Swept over all ten declaration
+positions: EN 0 and PAL 25 at every one. It coalesces too. A call result
 that is immediately consumed coalesces straight back; the joint-matrix case added a node because its
 value had to live across the argument setup. **So "hoist it into a local" only moves anything when the
 value genuinely survives something.**
