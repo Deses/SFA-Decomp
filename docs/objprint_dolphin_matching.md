@@ -204,16 +204,14 @@ Validation:
 - Formatting preserves the raw object; the TU and its internal header pass
   `clang-format --dry-run --Werror`.
 
-After integrating the other two function matches from staging, the complete
-TU reports 100% for all 32 functions (25,004 code bytes) and all 12,768 assigned
-data bytes in each version. It still remains `NonMatching`: the EN
-`verify_source_link.py` retail baseline passes, but substituting this source
-object discards the unreferenced `lbl_803DCC68` and `lbl_803DCC6C` definitions.
-The extracted retail object retains the eight-byte `gap_10_803DCC68_sbss` tail;
-without it, `gForceLoadImmediately` and later small-data symbols move eight
-bytes earlier. The selected-light storage contract and this tail's ownership
-need recovery before promotion. No forced retention, padding, symbol-size, or
-checksum changes were made, and no regional completion manifest is promoted.
+The complete TU reports 100% for all 32 functions (25,004 code bytes) and all
+12,768 assigned data bytes in each version, and is `MatchingFor("GSAE01")`.
+Nothing references `lbl_803DCC68` and `lbl_803DCC6C`, so `mwldeppc` strips them
+unless retained; without them `gForceLoadImmediately` and later small-data
+symbols move eight bytes earlier. Both are listed under `force_active` in
+`config/GSAE01/config.yml`, as for other unreferenced retail `.sbss` tail words.
+A single 12-byte `gObjSelectedLights[3]` is not an alternative: no retail
+small-data object exceeds eight bytes, and MWCC places the array in `.bss`.
 Compiler settings and TU boundaries are unchanged.
 
 Reproduce the additional link check with:
