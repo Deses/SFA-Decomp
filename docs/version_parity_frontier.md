@@ -958,6 +958,29 @@ set, expression spellings, twelve TU `-opt`/`-inline` profiles, ten per-unit com
 per-function pragmas, and the pragma x value-structure product. What is left is the rule that builds the
 compiler's colouring worklist.
 
+## Mining the reference corpus for gameloop's shape: the construct does not exist
+
+Retail's shape is a call whose return is copied into a saved register, followed by a byte load through
+that pointer into a HIGHER saved register (`bl gameTextGetBox` / `mr r30,r3` / `lbz r31,16(r30)`). Our
+compiler gives the call-return copy the higher register instead. `tools/refcorpus` was scanned for any C
+that our compiler turns into retail's shape: **1757 files, ~30k functions, zero hits.**
+
+Widening the query to "a call-return copy into a saved register followed by ANY higher saved-register
+definition" returns 7 sites and 4 apparent counterexamples, and all 4 are false positives: the `bl`
+immediately before the copy is `_savegpr_25`, the register-save helper, so those are PARAMETER copies at
+function entry, not call returns. **Worth remembering when scanning corpus asm: `bl _savegpr_N` /
+`_restgpr_N` look like calls and will fool a "call return" pattern.**
+
+Two corpus cases do show the ordering retail needs -- `mp4 MoveShopItemChoice` and `melee it_8026C65C`
+both put a byte loaded through a pointer in r31 while the pointer sits in r30 -- but in both the pointer
+is a FUNCTION PARAMETER, whose web is the parameter's own node rather than a mid-function temp. That is
+the structural difference from `askProgressiveScanMode`, where the pointer comes from a call and so gets
+a high-index temp that outranks every named local.
+
+So the corpus corroborates the obstruction rather than solving it: with our flags, a parameter pointer
+yields retail's ordering and a call-return pointer does not, and there is no sample of the latter
+behaving like the former.
+
 ## See also
 
 - `docs/source_shape_levers.md` — levers 9, 14 and 16 are the ones this frontier keeps invoking.
