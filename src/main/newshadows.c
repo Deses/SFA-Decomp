@@ -550,20 +550,20 @@ void allocLotsOfTextures(void) {
 
     gNewShadowLightningTexture = textureAlloc(0x20, 4, 1, 0, 0, 0, 0, 1, 1);
     {
+        int lowoff;
+        u8* base;
         int off2;
         int off;
-        u8* base;
-        int lowoff;
         int rowoff;
         int i;
         int j;
         for (i = 0; i < 0x20; i++) {
             j = 0;
             rowoff = (i >> 3) * 0x20;
-            lowoff = i & 7;
-            cy = i - 16.0f;
-            lowoff += rowoff;
             for (; j < 4; j++) {
+                lowoff = i & 7;
+                cy = i - 16.0f;
+                lowoff += rowoff;
                 base = (u8*)gNewShadowLightningTexture;
                 off = lowoff + (j & 3) * 8;
                 off += (j >> 2) * 0x80;

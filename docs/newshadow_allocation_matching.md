@@ -1,6 +1,6 @@
 # allocLotsOfTextures allocator investigation
 
-The current function reaches **99.156020%**, up from **99.132484%** at the
+The current function reaches **99.169470%**, up from **99.132484%** at the
 start of this investigation (`f6a299c172`). It remains incomplete. The initial
 lightning declaration-order change reached **99.139206%**; the gradient follow-up
 below provides the next improvement. The common GC/1.3 compiler, complete TU
@@ -150,3 +150,37 @@ target offsets are unchanged. The local evidence is
 
 `ninja all_source`, a fresh `ninja build/GSAE01/ok`, and formatter checks pass.
 The formatted source reproduces the traced object byte for byte.
+
+## Lightning lifetime follow-up (2026-09-27)
+
+Compute the lightning column mask and centered coordinate inside the pixel
+loop, leaving the tile-column offset outside it. Both expressions depend only
+on the outer coordinate; GC/1.3 moves their calculations back out of the loop
+and preserves the complete instruction sequence. The different source
+lifetimes separate the initial column mask from the combined column offset.
+Declare `lowoff`, `base`, `off2`, `off`, `rowoff`, `i`, and `j` in that order.
+
+A verified LLDB capture and exhaustive replay of the seven existing local
+identities predict this declaration order. Ordinary compilation confirms
+**99.169470%**, versus **99.156020%** before this change. Only eight instruction
+bytes change, across seven instructions in the lightning fill. All 1,487
+instructions remain; the rest of the function and all 43 other functions are
+unchanged. The complete unit reaches **99.770580%**, with 43/44 functions exact.
+
+The remaining differences are 40 operand rows in the ramps, eight in lightning,
+and 42 in the gradient, plus the gradient's three displaced address
+instructions. Named-local ordering alone does not finish the captured lightning
+graph. Further pointer, scalar-field, inline-helper, conversion, and loop-shape
+experiments did not produce a complete source match. The Dinosaur Planet
+reference has no counterpart for these GameCube procedural texture fills.
+Compiler profiles and `NonMatching` status remain unchanged.
+
+Fresh baseline/candidate compiles reproduce the same eight changed bytes and
+score improvement in all five versions, after checking each original DOL's
+configured SHA-1. Allocated non-text sections and named symbol layouts are
+identical. Twenty relocation references acquire new anonymous labels; their
+offsets, types, addends, target sections, and target offsets are unchanged.
+`ninja all_source` and a fresh strict EN checksum pass. Local verification and
+compiler captures are under
+`build/newshadows_finish/`; the retained ordinary/traced object SHA-256 is
+`c33b9e8303bcfc025a3ce33be37d58607f56484c339a84d5c403550519ae7916`.
