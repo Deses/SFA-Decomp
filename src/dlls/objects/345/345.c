@@ -74,7 +74,7 @@ void blasted_update(GameObject* obj) {
     int hitIndex;
     BlastedTargetPlacement* placement = (BlastedTargetPlacement*)obj->anim.placement;
     BlastedTargetState* state = obj->extra;
-    s16 pieceCount = placement->pieceCount;
+    int pieceCount = placement->pieceCount;
 
     if (state->mapLayerActivated != 0) {
         return;

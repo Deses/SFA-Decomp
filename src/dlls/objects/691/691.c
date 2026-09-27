@@ -55,7 +55,7 @@ int Vortex_getObjectTypeId(void) {
 }
 
 void Vortex_free(GameObject* obj) {
-    (*gExpgfxInterface)->freeSource2((u32)obj);
+    (*gExpgfxInterface)->freeSource2(obj);
 }
 
 void Vortex_render(GameObject* obj, int p2, int p3, int p4, int p5, s8 visible) {

@@ -16,7 +16,7 @@ int VFP_coreplat_getObjectTypeId(void) {
     return 0x0;
 }
 
-void VFP_coreplat_free(int obj) {
+void VFP_coreplat_free(GameObject* obj) {
     (*gExpgfxInterface)->freeSource2(obj);
 }
 

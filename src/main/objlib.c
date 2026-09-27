@@ -453,7 +453,7 @@ int ObjMsg_Pop(GameObject* obj, u32* outMessage, u32* outSender, u32* outParam) 
 
 char sObjMsgOverflowInObjectWarning[64] = "objmsg (%x): overflow in object %d defno=%d FROM: defno %d\n";
 
-void ObjMsg_SendToNearbyObjects(int targetId, float radius, u32 flags, void* sender, u32 message, u32 param) {
+void ObjMsg_SendToNearbyObjects(int targetId, float radius, u32 flags, void* sender, u32 message, void* param) {
     GameObject** objects;
     u32 count;
     int maskedFlags;
@@ -481,7 +481,7 @@ void ObjMsg_SendToNearbyObjects(int targetId, float radius, u32 flags, void* sen
                 slot = (ObjMsgQueueCursor*)((u8*)queue + ((count + count + count) << 2));
                 slot->entry.message = message;
                 slot->entry.sender = (u32)sender;
-                slot->entry.param = param;
+                slot->entry.param = (u32)param;
                 queue->count += 1;
             } else {
                 debugPrintf(sObjMsgOverflowInObjectWarning, message, (int)obj->anim.classId, (int)obj->anim.romDefNo,
@@ -492,7 +492,7 @@ void ObjMsg_SendToNearbyObjects(int targetId, float radius, u32 flags, void* sen
     return;
 }
 
-void ObjMsg_SendToObjects(int targetId, u32 flags, void* sender, u32 message, u32 param) {
+void ObjMsg_SendToObjects(int targetId, u32 flags, void* sender, u32 message, void* param) {
     GameObject** objects;
     u32 count;
     int maskedFlags;
@@ -515,7 +515,7 @@ void ObjMsg_SendToObjects(int targetId, u32 flags, void* sender, u32 message, u3
                     slot = (ObjMsgQueueCursor*)((u8*)queue + ((count + count + count) << 2));
                     slot->entry.message = message;
                     slot->entry.sender = (u32)sender;
-                    slot->entry.param = param;
+                    slot->entry.param = (u32)param;
                     queue->count += 1;
                 } else {
                     debugPrintf(sObjMsgOverflowInObjectWarning, message, (int)obj->anim.classId,
@@ -534,7 +534,7 @@ void ObjMsg_SendToObjects(int targetId, u32 flags, void* sender, u32 message, u3
                     slot = (ObjMsgQueueCursor*)((u8*)queue + ((count + count + count) << 2));
                     slot->entry.message = message;
                     slot->entry.sender = (u32)sender;
-                    slot->entry.param = param;
+                    slot->entry.param = (u32)param;
                     queue->count += 1;
                 } else {
                     debugPrintf(sObjMsgOverflowInObjectWarning, message, (int)obj->anim.classId,

@@ -34,7 +34,7 @@ int VFP_Block1_getObjectTypeId(void)
     return 0x0;
 }
 
-void VFP_Block1_free(int obj)
+void VFP_Block1_free(GameObject* obj)
 {
     (*gExpgfxInterface)->freeSource2(obj);
 }

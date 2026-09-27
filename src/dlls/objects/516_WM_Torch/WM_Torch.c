@@ -45,7 +45,7 @@ void wmtorch_free(GameObject* obj, int mode) {
         Obj_FreeObject(state->linkedObject);
     }
     (*gModgfxInterface)->detachSource(obj);
-    (*gExpgfxInterface)->freeSource((u32)obj);
+    (*gExpgfxInterface)->freeSource(obj);
 }
 
 void wmtorch_render(GameObject* obj, int renderArg2, int renderArg3, int renderArg4, int renderArg5, s8 visible) {

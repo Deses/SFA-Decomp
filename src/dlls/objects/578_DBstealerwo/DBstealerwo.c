@@ -1763,12 +1763,11 @@ void dbstealerworm_update(GameObject* obj) {
     int n;
     DbStealerwormControl* sub2;
     GameObject* t;
-    struct {
-        u32 msg;
-        int argA;
-        int argB;
-        f32 v[3];
-    } stk;
+    f32 targetDelta[3];
+    f32* delta = targetDelta;
+    u32 sender;
+    u32 param;
+    u32 msg;
 
     st[0] = &gDbWormEffectSpawnWork;
     tbl = (char*)gDbStealerwormScriptStealEggThrowToWorm;
@@ -1809,17 +1808,17 @@ void dbstealerworm_update(GameObject* obj) {
             } else {
                 t = blob->baddie.targetObj;
                 if (blob->baddie.targetObj != NULL) {
-                    stk.v[0] = t->anim.worldPosX - obj->anim.worldPosX;
-                    stk.v[1] = t->anim.worldPosY - obj->anim.worldPosY;
-                    stk.v[2] = t->anim.worldPosZ - obj->anim.worldPosZ;
+                    delta[0] = t->anim.worldPosX - obj->anim.worldPosX;
+                    delta[1] = t->anim.worldPosY - obj->anim.worldPosY;
+                    delta[2] = t->anim.worldPosZ - obj->anim.worldPosZ;
                     blob->baddie.targetDistance =
-                        sqrtf(stk.v[2] * stk.v[2] + (stk.v[0] * stk.v[0] + stk.v[1] * stk.v[1]));
+                        sqrtf(delta[2] * delta[2] + (delta[0] * delta[0] + delta[1] * delta[1]));
                 }
-                stk.msg = 0;
-                stk.argA = 0;
+                msg = 0;
+                param = 0;
                 sub2 = ((GroundBaddieState*)obj->extra)->control;
-                while (ObjMsg_Pop(obj, &stk.msg, (u32*)&stk.argB, &stk.msg + 1) != 0) {
-                    if (stk.msg == 0x11 && sub2->heldScriptSlot != -1) {
+                while (ObjMsg_Pop(obj, &msg, &sender, &param) != 0) {
+                    if (msg == 0x11 && sub2->heldScriptSlot != -1) {
                         ObjMsg_SendToObject((void*)sub2->linkedObj, 0x11, (void*)obj, 0x14);
                         sub2->linkedObj = 0;
                         sub2->heldScriptSlot = -1;

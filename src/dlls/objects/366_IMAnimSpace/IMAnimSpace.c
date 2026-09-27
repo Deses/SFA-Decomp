@@ -124,7 +124,7 @@ int imAnimSpace_getObjectTypeId(void) {
 }
 
 void imAnimSpace_free(GameObject* obj) {
-    (*gExpgfxInterface)->freeSource2((u32)obj);
+    (*gExpgfxInterface)->freeSource2(obj);
 }
 
 void imAnimSpace_render(GameObject* obj, int renderArg2, int renderArg3, int renderArg4, int renderArg5, s8 visible) {

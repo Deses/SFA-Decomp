@@ -108,7 +108,7 @@ void BombPlantSpore_update(GameObject* obj) {
             case BOMB_PLANT_SPORE_MESSAGE_DETONATE:
                 gameBitIncrement(GAMEBIT_ITEM_BombSpore_Count);
                 Sfx_PlayFromObject(obj, SFXTRIG_sc_gemrun0122);
-                (*gExpgfxInterface)->freeSource((u32)obj);
+                (*gExpgfxInterface)->freeSource(obj);
                 for (i = 0; i < BOMB_PLANT_SPORE_EXPLOSION_PARTICLE_COUNT; i++) {
                     objfx_spawnDirectionalBurst(obj, 5, 1.0f, 7, 1, 0x3C,
                                                 1.5f, NULL, 0);
@@ -221,7 +221,7 @@ void BombPlantSpore_update(GameObject* obj) {
         state->fuseTimer = fuse;
         if (fuse <= 0.0f) {
             Sfx_PlayFromObject(obj, SFXTRIG_en_majring2);
-            (*gExpgfxInterface)->freeSource((u32)obj);
+            (*gExpgfxInterface)->freeSource(obj);
             for (j = 0; j < BOMB_PLANT_SPORE_EXPLOSION_PARTICLE_COUNT; j++) {
                 objfx_spawnDirectionalBurst(obj, 5, 1.0f, 7, 1, 0x3C,
                                             1.5f, NULL, 0);
@@ -335,7 +335,7 @@ void BombPlantSpore_free(GameObject* obj) {
     ModelLightStruct* light;
 
     state = obj->extra;
-    (*gExpgfxInterface)->freeSource((u32)obj);
+    (*gExpgfxInterface)->freeSource(obj);
     light = state->light;
     if (light != NULL) {
         ModelLightStruct_free(light);

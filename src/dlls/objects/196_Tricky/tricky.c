@@ -1613,7 +1613,6 @@ void Tricky_render(GameObject* obj, int renderArg2, int renderArg3, int renderAr
 
 void Tricky_free(GameObject* obj, int shouldKeepFlameChildren) {
     TrickyState* state;
-    u32 objId = (u32)obj;
 
     state = obj->extra;
     freeAndNull((void**)&state->candidateSearches[0].nodes);
@@ -1626,7 +1625,7 @@ void Tricky_free(GameObject* obj, int shouldKeepFlameChildren) {
     freeAndNull((void**)&state->candidateSearches[7].nodes);
     freeAndNull((void**)&state->cachedPathSearch.nodes);
     objFreeObjectType(obj, TRICKY_OBJGROUP);
-    (*gExpgfxInterface)->freeSource(objId);
+    (*gExpgfxInterface)->freeSource(obj);
     if ((shouldKeepFlameChildren == 0) && ((state->stateFlags & TRICKY_STATE_FLAG_CHILDREN_ACTIVE) != 0)) {
         trickyStopFlameChildren(obj, state);
     }

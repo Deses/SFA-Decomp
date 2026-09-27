@@ -86,7 +86,7 @@ int dll414_getObjectTypeId(void) {
 
 void dll414_free(GameObject* obj) {
     (*gModgfxInterface)->detachSource(obj);
-    (*gExpgfxInterface)->freeSource2((u32)obj);
+    (*gExpgfxInterface)->freeSource2(obj);
 }
 
 void dll414_render(GameObject* obj, int renderArg2, int renderArg3, int renderArg4, int renderArg5, s8 visible) {
@@ -153,7 +153,7 @@ void dll414_render(GameObject* obj, int renderArg2, int renderArg3, int renderAr
             if (voxmaps_traceLine((VoxPos*)objectGridStorage, (VoxPos*)cameraGridStorage, (VoxPos*)traceResultStorage,
                                   NULL, 0) == 0) {
                 state->lineOfSightVisible = 0;
-                (*gExpgfxInterface)->freeSource((int)obj);
+                (*gExpgfxInterface)->freeSource(obj);
             }
         }
         if (state->delayTimer > 0) {
@@ -259,7 +259,7 @@ void dll414_update(GameObject* obj) {
             } else {
                 Sfx_StopObjectChannel(obj, DLL19E_EFFECT_SFX_CHANNEL);
                 (*gModgfxInterface)->detachSource(obj);
-                (*gExpgfxInterface)->freeSource((u32)obj);
+                (*gExpgfxInterface)->freeSource(obj);
                 if ((state->gameBitId != -1) && (mainGetBit(state->gameBitId) != 0)) {
                     mainSetBits(state->gameBitId, 0);
                 }

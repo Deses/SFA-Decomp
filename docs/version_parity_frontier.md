@@ -958,6 +958,300 @@ set, expression spellings, twelve TU `-opt`/`-inline` profiles, ten per-unit com
 per-function pragmas, and the pragma x value-structure product. What is left is the rule that builds the
 compiler's colouring worklist.
 
+## Mining the reference corpus for gameloop's shape: the construct does not exist
+
+Retail's shape is a call whose return is copied into a saved register, followed by a byte load through
+that pointer into a HIGHER saved register (`bl gameTextGetBox` / `mr r30,r3` / `lbz r31,16(r30)`). Our
+compiler gives the call-return copy the higher register instead. `tools/refcorpus` was scanned for any C
+that our compiler turns into retail's shape: **1757 files, ~30k functions, zero hits.**
+
+Widening the query to "a call-return copy into a saved register followed by ANY higher saved-register
+definition" returns 7 sites and 4 apparent counterexamples, and all 4 are false positives: the `bl`
+immediately before the copy is `_savegpr_25`, the register-save helper, so those are PARAMETER copies at
+function entry, not call returns. **Worth remembering when scanning corpus asm: `bl _savegpr_N` /
+`_restgpr_N` look like calls and will fool a "call return" pattern.**
+
+Two corpus cases do show the ordering retail needs -- `mp4 MoveShopItemChoice` and `melee it_8026C65C`
+both put a byte loaded through a pointer in r31 while the pointer sits in r30 -- but in both the pointer
+is a FUNCTION PARAMETER, whose web is the parameter's own node rather than a mid-function temp. That is
+the structural difference from `askProgressiveScanMode`, where the pointer comes from a call and so gets
+a high-index temp that outranks every named local.
+
+So the corpus corroborates the obstruction rather than solving it: with our flags, a parameter pointer
+yields retail's ordering and a call-return pointer does not, and there is no sample of the latter
+behaving like the former.
+
+## The unified cause: retail's colouring worklist is DEGREE-ordered, ours is INDEX-ordered
+
+`coloring_order()` recovers the compiler's linked worklist. Replaying the traced graph under candidate
+orders and comparing against retail's actual registers gives one answer for every remaining row:
+
+| row | our actual worklist | descending degree, ties by ascending index | retail wants |
+|---|---|---|---|
+| `bossdrakor_update` | state=r31 moveResult=r30 obj=r29 | **obj=r31 state=r30** | obj=r31 state=r30 |
+| `askProgressiveScanMode` | savedAlignment=r28 counter=r30 sel=r29 | **savedAlignment=r31 counter=r29** | savedAlignment=r31 counter=r29 sel=r28 |
+| `GM_MazeWell_update` | i=r29 questBitPtr=r28 | **i=r28 questBitPtr=r29** | the r28/r29 pair swapped |
+
+So these are not four unrelated allocator accidents. In every case retail's assignment is what a
+**degree-ordered** worklist produces and ours is what a **descending-node-index** worklist produces.
+That also explains why every source-level knob failed: declaration order, scope and the local set move
+node INDICES, which only matters while the worklist is index-ordered, and none of them changes the
+ordering discipline itself.
+
+**Why ours is index-ordered.** The trace reports "0 high-degree removals": our graphs simplify without
+ever invoking the spill heuristic, so the worklist comes out in the order the nodes were scanned, which
+is node index. A graph with genuine pressure -- nodes that cannot be simplified -- would be ordered by
+degree instead. Retail's graphs evidently had that pressure and ours do not.
+
+**What this does NOT yet give.** The knob that adds that pressure is more simultaneously-live values,
+which is a code change, not a spelling. The compiler axis is ruled out: GC/1.3 is retail's compiler for
+these units (EN matches byte-for-byte across the tree under it), 1.3.2 through 2.7 are +187 instructions
+on BossDrakor, and the GC/3.0 alphas are -8 and break EN. Eighteen per-function pragmas and twelve TU
+cflag profiles do not change the discipline either.
+
+This supersedes the earlier row-by-row "closed" verdicts: the rows are not individually capped, they
+share one cause, and the target is now specific -- make the allocator see enough pressure to order by
+degree. That is the first statement of this frontier that predicts all four rows at once.
+
+## What the four rows are made of, measured axis by axis (2026-09-27)
+
+The degree-vs-index worklist finding above says *what* differs. This section records the
+measurements that follow from it, so none of these axes gets re-ground.
+
+### The allocator worklist, read directly out of the compiler
+
+`tools/tricky_backend_trace.py --graph` recovers the real linked worklist, and it is not a
+single rule but two concatenated ones:
+
+    worklist = [ nodes with degree >= ~31, first ] ++ [ everything else, descending node index ]
+
+and the node index is **reverse declaration order**, with block-scoped locals taking the lowest
+indices. For `GM_MazeWell_update` (our PAL compile) the prefix is `[temp164, questBits, obj]` at
+degrees 43/46/49; for `bossdrakor_update` it is `[temp164, state, moveResult, obj]` at degrees
+35/102/31/104. `moveResult` sits at exactly the threshold. Retail's colours are what the *same*
+graph yields when that prefix is ordered by descending degree instead.
+
+### Axes measured inert (byte-identical output, not merely "no better")
+
+| axis | extent | result |
+|---|---|---|
+| declaration order, `GM_MazeWell_update` | 71 orderings (all swaps + all single moves) | no ordering beats baseline |
+| declaration scope, `GM_MazeWell_update` | 36 hoists of `found`/`itemIndex` to every function-scope position | **all 36 byte-identical in all five versions** |
+| local set, `bossdrakor_update` | 7 merges/splits of `moveResult`/`adv`/`moveId`/`step` | **all 7 byte-identical** |
+| inlined-helper declarations, `bossdrakor_update` | 165 orderings of `bossdrakor_updateEffects`'s 11 locals | flat |
+| `#if`-gated FP declarations, `bossdrakor_update` | 16 positions + order swaps | **all byte-identical** |
+| PAL-gated declarations, `askProgressiveScanMode` | 18 positions + 6 loop-body scopings | never below 25 |
+| PAL-only compiler flags, `bossdrakor_update` | 43 flag settings incl. every `-opt no*`, `-inline`, `-O` level | 150 is a hard floor |
+| whole-unit flags, `engine/2` on EN v1.1 | 23 settings | `saveCardBuildComment` stays at 3 |
+
+The byte-identical rows matter more than the "no better" ones: MWCC coalesces renamed and
+re-ordered locals straight back into the same webs, so these colours are **graph-forced**, not
+order-forced. Only changing where a value is materialized can move them.
+
+### The one EN-safe colouring lever found
+
+`GM_MazeWell_update`'s second loop walks `questBits` by index while the first walks it by an
+explicit pointer. Giving the second loop the same explicit pointer -- either a second local or, better,
+reusing `questBitPtr` -- keeps EN, JP and EN v1.1 **byte-identical** and flips PAL's first loop to
+retail's exact registers (`li r29,0; mr r28,r31; lha r3,0(r28)`). It is the only source change found
+that moves a PAL colouring without touching EN. It does not close the row: `objId` then stops
+coalescing with `obj`, which costs a fifth saved register and pushes `itemIndex` to `r27`. Nine
+`objId` spellings were swept against it; every spelling that keeps EN matching also reverts the flip,
+and every spelling that frees the register costs EN 36 diffs.
+
+### `bossdrakor_update`: our PAL allocation is EN's allocation
+
+Retail EN opens `mr r29,r3; lwz r31,184(r29)`; retail PAL opens `mr r31,r3; lwz r30,184(r31)`. Our
+PAL emits EN's form exactly. So retail's PAL-gated code perturbed the GPR allocator and ours does
+not -- our arm adds only FP locals and a scratch-only global compare, and the FP band has its own
+counter. Injecting genuinely call-spanning GPR values into the PAL arm does shift the rotation
+**without changing the instruction count**, and two of them reach retail's `obj = r31`; but no
+placement of one or two (16 site pairs) reaches `obj = r31` *and* `state = r30` together.
+
+### `saveCardBuildComment`: an emission-order rule, now pinned exactly
+
+The three diffs are not colouring. Retail emits
+
+    lis r3,HA(sMemoryCardFileNameString) ; addi r31,r3,LO ; bl getCurLanguage
+
+and we emit the same three instructions in the other order. Moving the declaration ahead of the
+call in the source does not reproduce retail: an eleven-probe matrix compiled with engine/2's own
+flags (`scratchpad/p1.c`, `p2.c`) shows GC/1.3 emits a **three-instruction detour**
+`lis rX; addi r0,rX,LO; mr r31,r0` whenever a call separates the value's definition from its first
+use, and the two-instruction direct form only when a use precedes the call (probes `u2`, `u7`) or the
+value feeds a loop (probe `t8`). Retail's form -- direct materialization immediately *followed* by the
+call -- was not produced by any of the 20 source spellings tried, nor by any of 15 compilers at
+GC/1.3's flags, with one exception: **GC/3.0a3 and 3.0a5 match the function exactly**, under every
+flag setting. That is not usable, because 3.0a3 breaks 9 of the unit's other 16 functions, and
+carving the unit to isolate a compiler profile is banned. Recorded because it localizes the
+remaining gap to one documented codegen difference rather than an unknown.
+
+### `bossdrakor_update` is one rotation step, and half of it is now reachable
+
+Classifying all 150 differing instructions: **every one is saved-GPR naming only** -- the streams are
+byte-identical modulo `r24..r31`, and the earlier `cmplwi`/`cmpwi` sighting was ndiff alignment noise
+(both objects use `cmplwi`). The permutation is a clean 3-cycle over the top three registers:
+ours `r29 -> r31`, `r30 -> r29`, `r31 -> r30` in retail, with `r25..r28` fixed. That is a rotation of
+the cyclic band order by one, i.e. exactly the rotation-offset knob.
+
+Half of it is reachable. Copying the incoming parameter into a named local
+(`GameObject* obj = objArg;`, declared at position 0 or 1 of the list) takes PAL from 150 diffs to
+**136**, and collapses the residue from a 3-cycle to a bare **2-cycle**: only `obj` and `state`
+(`r31`/`r30`) remain swapped. It is the copy-vs-load direction flip, with `obj` copy-class and `state`
+load-class; retail puts the copy on top, we put the load on top. What does *not* close it, on top of
+the copy: six orderings of the copy's declaration and assignment against `state`'s, a second
+copy-class value in the PAL arm, loading `state` through the parameter, and 34 further PAL-only flag
+settings (136 is the new floor).
+
+The copy is recorded, not committed: it only helps when the parameter is renamed under
+`#if VERSION_GSAP01`, since applying it to every version costs EN 65 diffs. A version-gated parameter
+name whose only purpose is to shift registers is a match-hack, not recovered source. What it
+establishes is that this row is one rotation step wide and that the step is a real, measurable knob --
+so the remaining work is finding a plausible PAL-only construct with the same effect, not proving the
+row movable.
+
+### Two exhaustion proofs, and why one shared declaration list cannot serve both versions
+
+`GM_MazeWell_update`: **all 2520 declaration orderings** of the list were built and scored (every
+permutation of the seven movable declarations, `questBits` before `questBits32`; `i` is pinned because
+moving it costs EN 7 diffs). Every one gives PAL 14 diffs. Bucketing the 71 single swaps and moves by
+`(EN, PAL)` shows the shape of the space: 34 orderings leave both untouched, nine are **EN-neutral and
+change PAL** -- to 21, never lower -- and the rest cost EN. So an EN-safe knob exists and provably does
+not reach retail.
+
+`bossdrakor_update`: all 247 single swaps and moves, bucketed the same way, contain **no EN-neutral
+ordering that changes PAL at all**. Every ordering that improves PAL does it by moving `state` off
+position 0, and all 22 of those give PAL 70 (down from 150) at a cost of EN 94. EN wants `state`
+declared first and PAL wants it later, and one list cannot do both. Splitting the reused locals -- the
+`set` lever that closed `pauseMenuDraw` -- is inert here: seven splits of `step` into its four distinct
+roles (yaw delta, rotY clamp, rotZ clamp, joint step) are all byte-identical in both versions.
+
+That is the same structure as `pauseMenuDraw` before it closed: two versions whose colourings cannot be
+satisfied simultaneously from the shared list. `pauseMenuDraw` was closed by changing the local *set*,
+not the order, so the set lever is the right one to keep pushing -- it is simply exhausted on `step`,
+and `state`/`obj` is where the remaining gap lives.
+
+### The band contents, and the mirror-image shape retail produces
+
+Listing which value owns each saved register makes both remaining PAL rows small and precise.
+
+`bossdrakor_update` (7-wide band, `r25..r28` identical in both): only **three** values are permuted --
+the parameter copy `obj`, `state` from `obj->extra`, and a *second* load of `obj->extra` that comes from
+the inlined `bossdrakor_initAirMeter`.
+
+| | r31 | r30 | r29 |
+|---|---|---|---|
+| retail | `mr r31,r3` (obj) | `lwz r30,184(r31)` (state) | second load (air-meter) |
+| ours | state | second load | obj |
+
+`askProgressiveScanMode`: retail is `savedAlignment`, `box`, `counter`, `sel`, `messageY`,
+`shadeReduction` from `r31` down; ours is `box`, `counter`, `sel`, `savedAlignment`, `messageY`,
+`shadeReduction`. `r27`/`r26` already agree.
+
+Both rows are the same defect: **retail keeps the copy and the value loaded through it adjacent at the
+top of the band, and our compile separates them** -- and it does so in opposite directions in the two
+functions, which rules out a global cause. A census of all five retail builds shows the copy-on-top
+shape is not exotic: 103 functions in EN, 95 in PAL, and several of them (`Pollen_update`,
+`iceBaddie_update`, `WispBaddie_init`) are in *matched* units. `Pollen_update` even has
+bossdrakor's exact opening -- parameter, `State* state;` declared first, `state = obj->extra;` first
+statement -- and gets the copy on top. The difference is band width: Pollen's band is narrow, and per
+the cliff a narrow band is predictable while a 7-wide one is a rotation.
+
+### What is left after this session, stated precisely
+
+The flag sweeps earlier in this document were partly void: the unit already compiles with
+`-opt nopeephole,noschedule,nocse,nopropagation`, so appending `-opt nocse` or `-opt nopropagation`
+was a no-op. Sweeping the **positive** forms whole-unit (`-opt propagation`, `-opt cse`,
+`-opt cse,propagation`, and their combinations with peephole/schedule, plus `-opt all`/`-opt on`)
+makes things strictly worse in every case: the baseline profile is optimal.
+
+One source form does move `bossdrakor_update`, and it is plausible rather than a gated hack:
+`void bossdrakor_update(void* self) { GameObject* obj = self; ... }`, the `void*` callback signature
+this codebase already uses elsewhere (`GM_MazeWell_render(void* obj, ...)`). It gives PAL 136 and a
+bare 2-cycle residue -- but costs EN 65, and it only has any effect with the copy declared at position
+0 or 1. All 287 second single edits of the resulting 15-element declaration list were searched for one
+that restores EN to 0: none does. PAL-gated coalesced copies inside the existing `#if` arm
+(`curveState = state;`) are stream-identical and do **not** move the rotation, so it is specifically the
+parameter's own copy-class membership that matters, and that is shared by every version.
+
+So the row is not "one rotation step away and steerable"; it is one rotation step away with the only
+known lever tied to a declaration the versions must share. Closing it needs a mechanism not yet found,
+not another sweep of these axes.
+
+### Measured law: where MWCC puts a parameter copy in a wide saved band
+
+The copy-vs-load placement that both PAL rows turn on is now quantified, from ~120 synthetic probes
+compiled with bossdrakor's own flags (`scratchpad/bandprobe.py`, `grid.py`, `grid2.py`). The probe holds
+one parameter copy, one field load through it (`state = obj->extra`), a second load of the same field,
+`nc` call-return values and `nl` loaded values.
+
+**The copy sits at the BOTTOM of the band until total pressure crosses a threshold, then jumps to the
+TOP** (and the field load takes `r30` beneath it -- retail's shape). The threshold moves with the
+copy-class count: the flip happens at band width 12 for `nc=4`, 11 for `nc=5`, 10 for `nc=6`, i.e. at
+roughly `width + nc >= 16`. Below it, the field load owns `r31` and the copy is pushed to the bottom of
+the band, which is exactly what our `bossdrakor_update` does.
+
+Two corollaries matter for the wide-band problem generally:
+
+- **Pressure is not band width.** Adding *short-lived* values -- defined and consumed immediately, so
+  they all share one register -- flips the copy to `r31` **with the band width unchanged**: at
+  `nc=2, nl=3` the flip happens at three short-lived values and the band stays 7 wide, which is
+  bossdrakor's actual width. So a wide band is not a wall; the rotation has a knob at fixed width.
+- **But no stream-neutral construct reaches it in the probe.** A dead local, a coalesced copy of the
+  loaded value, reversing the declaration list and moving the constant assignment are all
+  byte-identical and all inert; only adding real work flips it. The one construct that flips
+  `bossdrakor_update` without changing its stream -- naming the parameter's copy -- makes the probe
+  drop the saved copy entirely instead, so the probe does not model that case and the underlying rule
+  is still not fully pinned.
+
+This supersedes the project's working assumption that wide bands are simply flat: the placement is a
+threshold function of total pressure, it is reachable at fixed width, and it is worth probing on any
+wide-band near-miss rather than writing the function off.
+
+### Flag axis closed on the remaining units too
+
+The per-unit optimizer profiles differ, and that matters for reading the sweeps above: only
+`dlls/objects/589_BossDrakor` carries `-opt nocse,nopropagation`. `main/gameloop`,
+`dlls/objects/611_GM_MazeWell` and `dlls/engine/2/maketex` do not, so CSE and propagation are live
+there and had never been swept. Sweeping ~28 settings per unit, scoring **every** function against both
+PAL and EN:
+
+- `askProgressiveScanMode` stays at 25 diffs under every setting that keeps EN clean, and every setting
+  that moves it (`-opt nocse`, `-opt nolifetimes`, `-opt peephole`, `-opt schedule`, `-use_lmw_stmw on`)
+  makes it worse and breaks other functions -- `-opt schedule` alone breaks 20 of the unit's 34.
+- `GM_MazeWell_update` stays at 14 under every EN-clean setting, and the settings that move it
+  (`-opt nopropagation`, `-opt nolifetimes`, `-opt nostrength`, `-opt peephole`, `-enum min`,
+  `-opt space`) all turn it into a size mismatch and break siblings.
+
+With BossDrakor and maketex already swept, the flag axis is now closed on all four blocked units: each
+unit's shipped profile is optimal, and no per-version flag change is available that would not cost a
+version that currently matches.
+
+### Why the GM_MazeWell loop-pointer lever cannot be retail's source
+
+The lever recorded above -- giving the second loop the explicit pointer the first one has -- does put
+PAL's loop registers exactly right while EN, JP and EN v1.1 stay byte-identical. It still cannot be the
+answer, and the reason is structural rather than a matter of searching harder.
+
+With the pointer in place the function needs a **fifth** saved register, because the anonymous CSE of
+`(GameObject*)(int)obj` (shared between the `INTERACT_FLAG_ACTIVATED` test and the final
+`objUpdateHitVolumeTransforms` call) can no longer coalesce with `obj` under the added pressure. Five
+saved registers make MWCC switch from four `stw`/`lwz` pairs to `_savegpr_27`/`_restgpr_27`, so our
+function comes out **three instructions shorter** than retail's, which uses four saved registers
+(`r28..r31`) and individual stores. Retail has the loop pointer in *both* loops and still only four
+saved registers.
+
+That makes the lever self-defeating: every way of removing the fifth register also removes the pressure
+the register flip depends on. Dropping the alias, passing plain `obj` to the final call, and passing
+`objId` to it all return PAL to 14 diffs, and nine alias spellings are byte-identical. A declaration
+sweep on top of the pointer variant is futile for the same reason -- its baseline is a *size* mismatch
+and declaration order does not change instruction counts (800 orderings confirmed no movement before it
+was stopped).
+
+So the pointer variant is a genuine, EN-safe colouring lever and simultaneously proof that retail
+reached the same registers with less pressure than any source we can write. Recorded so the lever is not
+mistaken for a near-miss that one more sweep would close.
+
 ## See also
 
 - `docs/source_shape_levers.md` — levers 9, 14 and 16 are the ones this frontier keeps invoking.

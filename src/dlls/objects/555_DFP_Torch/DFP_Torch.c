@@ -45,7 +45,7 @@ int DFP_Torch_getObjectTypeId(void) {
 
 void DFP_Torch_free(GameObject* obj) {
     (*gModgfxInterface)->detachSource((void*)obj);
-    (*gExpgfxInterface)->freeSource2((u32)obj);
+    (*gExpgfxInterface)->freeSource2(obj);
 }
 
 void DFP_Torch_render(GameObject* obj, int p2, int p3, int p4, int p5, s8 visible) {
@@ -97,7 +97,7 @@ void DFP_Torch_render(GameObject* obj, int p2, int p3, int p4, int p5, s8 visibl
                 voxmaps_worldToGrid(renderWork.traceEnd, &gridEnd.x);
                 if (voxmaps_traceLine(&gridStart, &gridEnd, &gridHit, NULL, 0) == 0) {
                     state->visibleLatch = 0;
-                    (*gExpgfxInterface)->freeSource((u32)obj);
+                    (*gExpgfxInterface)->freeSource(obj);
                 }
             }
             if (state->flickerTimer > 0) {
@@ -181,7 +181,7 @@ void DFP_Torch_update(GameObject* obj) {
             } else {
                 Sfx_StopObjectChannel(obj, 0x40);
                 (*gModgfxInterface)->detachSource((void*)obj);
-                (*gExpgfxInterface)->freeSource((u32)obj);
+                (*gExpgfxInterface)->freeSource(obj);
                 if (state->gameBit != -1) {
                     if (mainGetBit(state->gameBit) != 0) {
                         mainSetBits(state->gameBit, 0);

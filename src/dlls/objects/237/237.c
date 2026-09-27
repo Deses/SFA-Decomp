@@ -471,7 +471,7 @@ int collectible_getObjectTypeId(void) {
 }
 
 void collectible_free(GameObject* obj) {
-    (*gExpgfxInterface)->freeSource2((u32)obj);
+    (*gExpgfxInterface)->freeSource2(obj);
     objFreeObjectType(obj, COLLECTIBLE_OBJECT_GROUP);
 }
 

@@ -59,7 +59,7 @@ int Pollen_getObjectTypeId(void) {
 }
 
 void Pollen_free(GameObject* obj) {
-    (*gExpgfxInterface)->freeSource2((u32)obj);
+    (*gExpgfxInterface)->freeSource2(obj);
 }
 
 void Pollen_render(GameObject* obj, int fwdArg2, int fwdArg3, int fwdArg4, int fwdArg5, s8 visible) {

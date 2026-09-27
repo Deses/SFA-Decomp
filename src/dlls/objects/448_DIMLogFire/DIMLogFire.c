@@ -87,7 +87,7 @@ int DIMLogFire_getObjectTypeId(void) {
 void DIMLogFire_free(GameObject* obj, int freeMode) {
     DimLogFireState* state = obj->extra;
 
-    (*gExpgfxInterface)->freeSource2((u32)obj);
+    (*gExpgfxInterface)->freeSource2(obj);
     if ((void*)state->subObject != NULL && freeMode == 0) {
         Obj_FreeObject((GameObject*)state->subObject);
     }

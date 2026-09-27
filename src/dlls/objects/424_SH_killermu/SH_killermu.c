@@ -109,7 +109,7 @@ int EnemyMushroom_getObjectTypeId(GameObject* obj) {
 }
 
 void EnemyMushroom_free(GameObject* obj) {
-    (*gExpgfxInterface)->freeSource((u32)obj);
+    (*gExpgfxInterface)->freeSource(obj);
     objFreeObjectType(obj, ENEMY_MUSHROOM_OBJECT_GROUP);
 }
 
@@ -307,7 +307,7 @@ void EnemyMushroom_update(GameObject* obj) {
             f32 timer = state->timer - timeDelta;
             state->timer = timer;
             if (timer <= 0.0f) {
-                (*gExpgfxInterface)->freeSource((u32)obj);
+                (*gExpgfxInterface)->freeSource(obj);
                 state->stateId = ENEMY_MUSHROOM_STATE_IDLE;
                 Obj_ResetActiveHitVolumeBounds(obj);
             } else {

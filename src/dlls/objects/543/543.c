@@ -34,7 +34,7 @@ STATIC_ASSERT(sizeof(VfpPlatformState) == 0x6);
 void VFP_Platform_updateLavaBlock(GameObject* obj);
 int VFP_Platform_getExtraSize(void);
 int VFP_Platform_getObjectTypeId(void);
-void VFP_Platform_free(int obj);
+void VFP_Platform_free(GameObject* obj);
 void VFP_Platform_render(GameObject* obj, int p2, int p3, int p4, int p5, s8 visible);
 void VFP_Platform_hitDetect(void);
 void VFP_Platform_update(GameObject* obj);
@@ -162,7 +162,7 @@ int VFP_Platform_getObjectTypeId(void)
     return 0x0;
 }
 
-void VFP_Platform_free(int obj)
+void VFP_Platform_free(GameObject* obj)
 {
     (*gExpgfxInterface)->freeSource2(obj);
 }

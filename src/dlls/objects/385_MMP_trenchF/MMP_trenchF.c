@@ -29,7 +29,7 @@ int mmpTrenchFx_getObjectTypeId(void) {
 }
 
 void mmpTrenchFx_free(GameObject* obj) {
-    (*gExpgfxInterface)->freeSource2((u32)obj);
+    (*gExpgfxInterface)->freeSource2(obj);
 }
 
 void mmpTrenchFx_render(GameObject* obj, int renderArg2, int renderArg3, int renderArg4, int renderArg5, s8 visible) {

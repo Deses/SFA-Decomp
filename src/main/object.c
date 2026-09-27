@@ -799,7 +799,7 @@ static void objFreeObjdef(u8* obj, int flag) {
         break;
     }
     gTitleMenuControlInterface->vtable->func15(obj);
-    (*gExpgfxInterface)->freeOwner3((u32)(GameObject*)obj);
+    (*gExpgfxInterface)->freeOwner3(obj);
     if (((ObjAnimComponent*)obj)->modelInstance->flags & OBJDEF_FLAG_HITBOX_GROUP) {
         objFreeObjectType((GameObject*)obj, OBJECT_OBJGROUP_HITBOX);
         if (flag == 0) {

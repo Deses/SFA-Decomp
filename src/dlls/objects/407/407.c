@@ -55,7 +55,7 @@ int dll407_getObjectTypeId(void) {
 
 void dll407_free(GameObject* obj) {
     (*gModgfxInterface)->detachSource(obj);
-    (*gExpgfxInterface)->freeSource2((u32)obj);
+    (*gExpgfxInterface)->freeSource2(obj);
 }
 
 void dll407_render(GameObject* obj, int renderArg2, int renderArg3, int renderArg4, int renderArg5, s8 visible) {
@@ -114,7 +114,7 @@ void dll407_render(GameObject* obj, int renderArg2, int renderArg3, int renderAr
         voxmaps_worldToGrid(cameraTrace, endGrid);
         if (voxmaps_traceLine((VoxPos*)startGrid, (VoxPos*)endGrid, (VoxPos*)traceOut, NULL, 0) == 0) {
             state->visibleToCamera = 0;
-            (*gExpgfxInterface)->freeSource((u32)obj);
+            (*gExpgfxInterface)->freeSource(obj);
         }
     }
 
@@ -238,7 +238,7 @@ void dll407_update(GameObject* objectAddress) {
     } else {
         Sfx_StopObjectChannel(objectAddress, DLL197_SHUTDOWN_SFX_CHANNEL);
         (*gModgfxInterface)->detachSource((void*)objectAddress);
-        (*gExpgfxInterface)->freeSource((u32)objectAddress);
+        (*gExpgfxInterface)->freeSource(objectAddress);
         if (state->gameBit != -1 && mainGetBit(state->gameBit) != 0) {
             mainSetBits(state->gameBit, 0);
         }

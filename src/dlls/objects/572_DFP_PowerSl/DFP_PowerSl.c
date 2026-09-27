@@ -46,7 +46,7 @@ int dfppowersl_getExtraSize(void) {
 
 void dfppowersl_free(GameObject* obj) {
     if (obj != 0) {
-        (*gExpgfxInterface)->freeSource2((u32)obj);
+        (*gExpgfxInterface)->freeSource2(obj);
     }
     return;
 }

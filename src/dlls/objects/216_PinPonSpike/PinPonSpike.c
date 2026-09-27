@@ -92,7 +92,7 @@ int pinponspike_getObjectTypeId(void) {
 }
 
 void pinponspike_free(GameObject* obj) {
-    (*gExpgfxInterface)->freeSource2((u32)obj);
+    (*gExpgfxInterface)->freeSource2(obj);
 }
 
 void pinponspike_render(GameObject* obj, int fwdArg2, int fwdArg3, int fwdArg4, int fwdArg5, s8 visible) {

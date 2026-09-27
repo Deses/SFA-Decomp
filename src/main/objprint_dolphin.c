@@ -1306,7 +1306,7 @@ static void modelRenderFn_setVtxDescr(ModelFileHeader* modelHeader, Shader* shad
 static inline void objGetShaderLayerScroll(GameObject* obj, const ShaderLayer* layer, f32* offsetS, f32* offsetT) {
     ObjDef* objectDef;
     ObjTextureSlotDef* slotDefs;
-    u32 materialId;
+    int materialId;
     int slotCount;
     int slotIndex;
     ObjTextureRuntimeSlot* textureSlots;
@@ -1316,7 +1316,7 @@ static inline void objGetShaderLayerScroll(GameObject* obj, const ShaderLayer* l
     slotDefs = objectDef->textureSlotDefs;
     slotCount = objectDef->textureSlotCount;
     for (slotIndex = 0; slotIndex < slotCount; slotIndex++) {
-        if ((int)materialId == slotDefs->materialIndex) {
+        if (materialId == slotDefs->materialIndex) {
             *offsetS = 0.0001f * textureSlots[slotIndex].offsetS;
             *offsetT = 0.0001f * textureSlots[slotIndex].offsetT;
             return;

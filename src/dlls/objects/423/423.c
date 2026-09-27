@@ -81,10 +81,7 @@ void EdibleMushroom_updateBehavior(GameObject* obj, EdibleMushroomState* state, 
     int curMove;
     int moveId;
     int bit;
-    f32 dz;
-    f32 dx;
     f32 speed;
-    f32 rangeSq;
     f32 timer;
     s16 ang;
     ObjAnimEventList animEvents;
@@ -107,6 +104,10 @@ void EdibleMushroom_updateBehavior(GameObject* obj, EdibleMushroomState* state, 
         } else if ((*gSkyInterface)->getSunPosition(&sunTime) == 0) {
             if (state->currentTargetDistance < placement->lungeTriggerDistance) {
                 if (state->flags & EDIBLE_MUSHROOM_FLAG_ON_CURVE) {
+                    f32 dz;
+                    f32 dx;
+                    f32 rangeSq;
+
                     rangeSq = state->lungeRange * state->lungeRange;
                     while (1) {
                         dx = state->curve.posX - obj->anim.localPosX;
@@ -179,6 +180,10 @@ void EdibleMushroom_updateBehavior(GameObject* obj, EdibleMushroomState* state, 
                 Sfx_PlayFromObject(obj, SFXTRIG_mushrele16);
                 if (speed >= 0.54f) {
                     if (state->flags & EDIBLE_MUSHROOM_FLAG_ON_CURVE) {
+                        f32 dz;
+                        f32 dx;
+                        f32 rangeSq;
+
                         rangeSq = state->lungeRange * state->lungeRange;
                         while (1) {
                             dx = state->curve.posX - obj->anim.localPosX;
@@ -200,6 +205,10 @@ void EdibleMushroom_updateBehavior(GameObject* obj, EdibleMushroomState* state, 
                     obj->anim.rotX = (s16)(state->moveAngle - 0x4000);
                 } else {
                     if (state->flags & EDIBLE_MUSHROOM_FLAG_ON_CURVE) {
+                        f32 dz;
+                        f32 dx;
+                        f32 rangeSq;
+
                         rangeSq = state->retreatRange * state->retreatRange;
                         while (1) {
                             dx = state->curve.posX - obj->anim.localPosX;
@@ -234,6 +243,10 @@ void EdibleMushroom_updateBehavior(GameObject* obj, EdibleMushroomState* state, 
             state->animState = 4;
         } else if (speed >= 0.54f) {
             if (state->flags & EDIBLE_MUSHROOM_FLAG_ON_CURVE) {
+                f32 dz;
+                f32 dx;
+                f32 rangeSq;
+
                 rangeSq = state->lungeRange * state->lungeRange;
                 while (1) {
                     dx = state->curve.posX - obj->anim.localPosX;
@@ -266,7 +279,7 @@ void EdibleMushroom_updateBehavior(GameObject* obj, EdibleMushroomState* state, 
         state->burrowAttackTimer = timer;
         if (timer <= 0.0f) {
             ObjHits_SetSourceMask((ObjAnimComponent*)obj, 1);
-            (*gExpgfxInterface)->freeSource((int)obj);
+            (*gExpgfxInterface)->freeSource(obj);
             state->animState = 0;
             state->flags &= ~EDIBLE_MUSHROOM_FLAG_STRUCK;
         } else {
@@ -283,7 +296,7 @@ void EdibleMushroom_updateBehavior(GameObject* obj, EdibleMushroomState* state, 
             if (mainGetBit(GAMEBIT_ITEM_TrickyFood_GrabInProgress) == 0) {
                 if (!(player->objectFlags & OBJECT_OBJFLAG_PARENT_SLACK)) {
                     if (Vec_xzDistance(&player->anim.worldPosX, &obj->anim.worldPosX) < 25.0f) {
-                        (*gExpgfxInterface)->freeSource((int)obj);
+                        (*gExpgfxInterface)->freeSource(obj);
                         if (obj->anim.romDefNo == EDIBLE_MUSHROOM_WHITE_ALIAS_ID) {
                             state->pickupMsgBitId = 0x18A;
                             itemPickupDoParticleFx(obj, 1.0f, 0xFF, 0x28);
@@ -322,8 +335,8 @@ void EdibleMushroom_updateBehavior(GameObject* obj, EdibleMushroomState* state, 
         ObjAnim_SetCurrentMove(obj, moveId, 0.25f, 0);
     }
 
-    if (ObjAnim_AdvanceCurrentMove(obj, gEdibleMushroomAnimStepScaleTable[state->animState], timeDelta,
-                                   &animEvents) != 0) {
+    if (ObjAnim_AdvanceCurrentMove(obj, gEdibleMushroomAnimStepScaleTable[state->animState], timeDelta, &animEvents) !=
+        0) {
         state->flags |= EDIBLE_MUSHROOM_FLAG_ANIM_DONE;
     } else {
         state->flags &= ~EDIBLE_MUSHROOM_FLAG_ANIM_DONE;
@@ -436,8 +449,7 @@ void EdibleMushroom_hitDetect(GameObject* obj) {
         (((state->flags & EDIBLE_MUSHROOM_FLAG_MOVING) != 0) ||
          ((((ObjHitsPriorityState*)obj->anim.hitReactState)->flags & OBJHITS_PRIORITY_STATE_PAIR_RESPONSE_APPLIED) !=
           0))) {
-        hitCount =
-            trackGetHeight(obj, obj->anim.localPosX, obj->anim.localPosY, obj->anim.localPosZ, &hits, 0, 0);
+        hitCount = trackGetHeight(obj, obj->anim.localPosX, obj->anim.localPosY, obj->anim.localPosZ, &hits, 0, 0);
         for (i = 0; i < hitCount; i++) {
             if (hits[i]->height < 10.0f + obj->anim.localPosY) {
                 obj->anim.localPosY = hits[i]->height;
@@ -445,8 +457,8 @@ void EdibleMushroom_hitDetect(GameObject* obj) {
             }
         }
 
-        hitCount = trackGetLineIntersect(&obj->anim.previousLocalPosX, &obj->anim.localPosX, 6.0f, 2, &bboxHit, obj, 8, -1,
-                                      0xFF, 0x14);
+        hitCount = trackGetLineIntersect(&obj->anim.previousLocalPosX, &obj->anim.localPosX, 6.0f, 2, &bboxHit, obj, 8,
+                                         -1, 0xFF, 0x14);
         if ((placement->objectType == 4) && (hitCount != 0) && (bboxHit.surfaceType == 13)) {
             state->flags |= EDIBLE_MUSHROOM_FLAG_GROUNDED;
         }

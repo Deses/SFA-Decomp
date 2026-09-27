@@ -55,7 +55,7 @@ int VFP_DoorSwitch_getObjectTypeId(void) {
     return 0x0;
 }
 
-void VFP_DoorSwitch_free(int obj) {
+void VFP_DoorSwitch_free(GameObject* obj) {
     (*gExpgfxInterface)->freeSource2(obj);
 }
 

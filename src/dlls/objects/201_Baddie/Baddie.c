@@ -2104,7 +2104,7 @@ void enemy_free(GameObject* obj, int flag) {
             }
         }
     }
-    (*gExpgfxInterface)->freeSource((int)obj);
+    (*gExpgfxInterface)->freeSource(obj);
     objFreeObjectType(obj, ENEMY_OBJGROUP);
 }
 
