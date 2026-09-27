@@ -89,6 +89,28 @@ parameter and inherits its index constraint rather than getting a fresh one.
 **So a parameter's effective node index is not source-controllable**, which closes this row: the single
 `obj` <-> `state` exchange that is 65 of its 70 diffs requires an ordering the front end will not produce.
 
+### Why no node-count lever exists in these functions — the contradiction, stated
+
+Adding a graph node is the one mechanism that reorders colouring (Jack's `modelDoRenderInstrs`: 256 ->
+257). Three measurements pin down what it takes and why it is unavailable here:
+
+1. **A value defined and immediately consumed gets no web.** Confirmed three independent ways — a
+   `fontId` temp (294 nodes before and after, only renumbered), GM_MazeWell's hoisted
+   `isItemBeingUsed` result, and the thrice-used `0xc0 - shadeReduction` subexpression that folds away on
+   EN but not PAL. All inert.
+2. **A node therefore needs a value that genuinely SURVIVES something** — Jack's joint matrix had to
+   survive the second argument's setup.
+3. **But every surviving value in these functions is already a web**, and promoting one that is *not*
+   already a web changes the stream. The cleanest test: `taskTextIds[gPauseMenuTokenIndex * 4]` is the
+   first argument to `gameTextMeasureById(..., 0, 0, &a, &b, &c, &d)`, so it survives four address
+   setups — a perfect candidate. Retail loads it **twice** (two `lhax`), so hoisting it into one local
+   costs 4 instructions on *both* versions (EN and PAL both 10004).
+
+So the requirement "adds a web" and the requirement "leaves the stream identical" are in direct conflict
+in these bodies: anything that survives is already counted, and anything not counted does not survive.
+That is the structural reason the frontier is closed, and it is the thing to re-test first if a future
+change alters one of these functions' streams for an unrelated reason.
+
 ### The graph is FORCED by the code — so every one of these rows is a selection difference
 
 This is the load-bearing result, and it is a theorem the trace then confirms. The interference graph is
