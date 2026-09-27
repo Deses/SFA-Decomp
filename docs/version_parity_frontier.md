@@ -981,6 +981,38 @@ So the corpus corroborates the obstruction rather than solving it: with our flag
 yields retail's ordering and a call-return pointer does not, and there is no sample of the latter
 behaving like the former.
 
+## The unified cause: retail's colouring worklist is DEGREE-ordered, ours is INDEX-ordered
+
+`coloring_order()` recovers the compiler's linked worklist. Replaying the traced graph under candidate
+orders and comparing against retail's actual registers gives one answer for every remaining row:
+
+| row | our actual worklist | descending degree, ties by ascending index | retail wants |
+|---|---|---|---|
+| `bossdrakor_update` | state=r31 moveResult=r30 obj=r29 | **obj=r31 state=r30** | obj=r31 state=r30 |
+| `askProgressiveScanMode` | savedAlignment=r28 counter=r30 sel=r29 | **savedAlignment=r31 counter=r29** | savedAlignment=r31 counter=r29 sel=r28 |
+| `GM_MazeWell_update` | i=r29 questBitPtr=r28 | **i=r28 questBitPtr=r29** | the r28/r29 pair swapped |
+
+So these are not four unrelated allocator accidents. In every case retail's assignment is what a
+**degree-ordered** worklist produces and ours is what a **descending-node-index** worklist produces.
+That also explains why every source-level knob failed: declaration order, scope and the local set move
+node INDICES, which only matters while the worklist is index-ordered, and none of them changes the
+ordering discipline itself.
+
+**Why ours is index-ordered.** The trace reports "0 high-degree removals": our graphs simplify without
+ever invoking the spill heuristic, so the worklist comes out in the order the nodes were scanned, which
+is node index. A graph with genuine pressure -- nodes that cannot be simplified -- would be ordered by
+degree instead. Retail's graphs evidently had that pressure and ours do not.
+
+**What this does NOT yet give.** The knob that adds that pressure is more simultaneously-live values,
+which is a code change, not a spelling. The compiler axis is ruled out: GC/1.3 is retail's compiler for
+these units (EN matches byte-for-byte across the tree under it), 1.3.2 through 2.7 are +187 instructions
+on BossDrakor, and the GC/3.0 alphas are -8 and break EN. Eighteen per-function pragmas and twelve TU
+cflag profiles do not change the discipline either.
+
+This supersedes the earlier row-by-row "closed" verdicts: the rows are not individually capped, they
+share one cause, and the target is now specific -- make the allocator see enough pressure to order by
+degree. That is the first statement of this frontier that predicts all four rows at once.
+
 ## See also
 
 - `docs/source_shape_levers.md` — levers 9, 14 and 16 are the ones this frontier keeps invoking.
