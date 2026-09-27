@@ -681,25 +681,27 @@ void newshadows_initProceduralTextures(void) {
             overlaps = 0;
             for (i = 0; i < placedCount && !overlaps; i++) {
                 f32 xDistance, zDistance, wrappedDistance, distance;
-                xDistance = __fabsf(gNewShadowNoiseData.placements[placedCount].x - gNewShadowNoiseData.placements[i].x);
-                wrappedDistance =
-                    __fabsf((1.0f + gNewShadowNoiseData.placements[placedCount].x) - gNewShadowNoiseData.placements[i].x);
+                xDistance =
+                    __fabsf(gNewShadowNoiseData.placements[placedCount].x - gNewShadowNoiseData.placements[i].x);
+                wrappedDistance = __fabsf((1.0f + gNewShadowNoiseData.placements[placedCount].x) -
+                                          gNewShadowNoiseData.placements[i].x);
                 if (wrappedDistance < xDistance) {
                     xDistance = wrappedDistance;
                 }
-                wrappedDistance =
-                    __fabsf((gNewShadowNoiseData.placements[placedCount].x - 1.0f) - gNewShadowNoiseData.placements[i].x);
+                wrappedDistance = __fabsf((gNewShadowNoiseData.placements[placedCount].x - 1.0f) -
+                                          gNewShadowNoiseData.placements[i].x);
                 if (wrappedDistance < xDistance) {
                     xDistance = wrappedDistance;
                 }
-                zDistance = __fabsf(gNewShadowNoiseData.placements[placedCount].z - gNewShadowNoiseData.placements[i].z);
-                wrappedDistance =
-                    __fabsf((1.0f + gNewShadowNoiseData.placements[placedCount].z) - gNewShadowNoiseData.placements[i].z);
+                zDistance =
+                    __fabsf(gNewShadowNoiseData.placements[placedCount].z - gNewShadowNoiseData.placements[i].z);
+                wrappedDistance = __fabsf((1.0f + gNewShadowNoiseData.placements[placedCount].z) -
+                                          gNewShadowNoiseData.placements[i].z);
                 if (wrappedDistance < zDistance) {
                     zDistance = wrappedDistance;
                 }
-                wrappedDistance =
-                    __fabsf((gNewShadowNoiseData.placements[placedCount].z - 1.0f) - gNewShadowNoiseData.placements[i].z);
+                wrappedDistance = __fabsf((gNewShadowNoiseData.placements[placedCount].z - 1.0f) -
+                                          gNewShadowNoiseData.placements[i].z);
                 if (wrappedDistance < zDistance) {
                     zDistance = wrappedDistance;
                 }
