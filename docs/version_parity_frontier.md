@@ -38,6 +38,36 @@ means the defect is upstream of allocation.**
 
 ## Refutations, per unit
 
+### `wclevelcont_update` has NO FPR colouring graph — that row is not a colouring row at all
+
+```sh
+python3 tools/tricky_backend_trace.py --unit main/dlls/objects/653_WCLevelCont/WCLevelCont         --function wclevelcont_update --graph --register-class fpr
+# ValueError: missing requested register class in the graph capture
+```
+
+MWCC never builds an FPR interference graph for this function. Its `f0`/`f1` pair is therefore assigned
+by the code generator's scratch handling, not by graph colouring — so there is no graph to influence and
+**no source lever can reach it**, which finally explains why all ~40 spellings, the twelve `-opt`
+profiles, the whole non-`-opt` flag space, the declaration forms, the expression sweep and the helper
+boundary were every one of them exactly inert at 4. It also matches `priced_classes.md` §31e: "a
+declaration never touches `f0`-`f13`", measured over 8 085 differing FPR operands with 0 volatile.
+
+Do not spend further probes on this row. The GPR side of the function already matches.
+
+### `bossdrakor_update`: a real gradient, 150 -> 70, then a hard plateau
+
+The alias merge plus a reordered declaration list takes PAL from **150 to 70** positional diffs — the
+largest movement found anywhere on this frontier. The merge half is byte-identical in all five versions
+and is landed. The reorder half is not: it needs `state` declared late, EN wants it early (EN 0 -> 94),
+and the behaviour is **binary** rather than graded — every position from 2 to 14 gives exactly
+(EN 94, PAL 70) and positions 0-1 give (EN 0, PAL 150), with nothing in between. A randomised multi-move
+climb over all 15 declaration items, PAL-only, found 70 in three seconds and never beat it.
+
+The trace says why the row is close but not reachable: `obj` (deg 105), `drakorState` (102) and `state`
+(100) are nearly tied, so their colouring order is decided by a 3-5 point degree margin rather than the
+13-point gap `pauseMenuDraw` needs — which is what makes the movement possible at all — but the residual
+70 diffs involve temps below that trio.
+
 ### The graph is FORCED by the code — so every one of these rows is a selection difference
 
 This is the load-bearing result, and it is a theorem the trace then confirms. The interference graph is
