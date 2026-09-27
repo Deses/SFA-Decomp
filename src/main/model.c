@@ -2246,6 +2246,7 @@ void ObjModel_RelocateModelData(u8* m) {
 void* ObjModel_LoadModelData(int id) {
     int fileOffset, dataLen, animCount, cacheSize, amapFlag;
     int amapSize;
+    int totalSize;
     void* model;
     if (getTableFileEntry(MLDF_FILEID_MODELS_TAB_A, id, &fileOffset) == 0) {
         return NULL;
@@ -2254,7 +2255,11 @@ void* ObjModel_LoadModelData(int id) {
     cacheSize = roundUpTo8(cacheSize);
     cacheSize += 0xb0;
     amapSize = modelGetAmapSize(id, amapFlag, animCount);
-    model = (void*)roundUpTo16((int)mmAlloc(dataLen + amapSize + 0x1f4, 9, 0));
+    totalSize = dataLen + amapSize + 0x1f4;
+    model = (void*)roundUpTo16((int)mmAlloc(totalSize, 9, 0));
+#if !defined(VERSION_GSAE01) && !defined(VERSION_GSAJ01)
+    DCInvalidateRange(model, totalSize);
+#endif
     loadAndDecompressDataFile(MLDF_FILEID_MODELS_BIN_A, model, fileOffset, dataLen, 0, id, 0);
     ((ModelFileHeader*)model)->animationCacheSize = cacheSize;
     ((ModelFileHeader*)model)->modelId = id;
