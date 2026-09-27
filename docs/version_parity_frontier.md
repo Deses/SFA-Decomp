@@ -1131,6 +1131,53 @@ satisfied simultaneously from the shared list. `pauseMenuDraw` was closed by cha
 not the order, so the set lever is the right one to keep pushing -- it is simply exhausted on `step`,
 and `state`/`obj` is where the remaining gap lives.
 
+### The band contents, and the mirror-image shape retail produces
+
+Listing which value owns each saved register makes both remaining PAL rows small and precise.
+
+`bossdrakor_update` (7-wide band, `r25..r28` identical in both): only **three** values are permuted --
+the parameter copy `obj`, `state` from `obj->extra`, and a *second* load of `obj->extra` that comes from
+the inlined `bossdrakor_initAirMeter`.
+
+| | r31 | r30 | r29 |
+|---|---|---|---|
+| retail | `mr r31,r3` (obj) | `lwz r30,184(r31)` (state) | second load (air-meter) |
+| ours | state | second load | obj |
+
+`askProgressiveScanMode`: retail is `savedAlignment`, `box`, `counter`, `sel`, `messageY`,
+`shadeReduction` from `r31` down; ours is `box`, `counter`, `sel`, `savedAlignment`, `messageY`,
+`shadeReduction`. `r27`/`r26` already agree.
+
+Both rows are the same defect: **retail keeps the copy and the value loaded through it adjacent at the
+top of the band, and our compile separates them** -- and it does so in opposite directions in the two
+functions, which rules out a global cause. A census of all five retail builds shows the copy-on-top
+shape is not exotic: 103 functions in EN, 95 in PAL, and several of them (`Pollen_update`,
+`iceBaddie_update`, `WispBaddie_init`) are in *matched* units. `Pollen_update` even has
+bossdrakor's exact opening -- parameter, `State* state;` declared first, `state = obj->extra;` first
+statement -- and gets the copy on top. The difference is band width: Pollen's band is narrow, and per
+the cliff a narrow band is predictable while a 7-wide one is a rotation.
+
+### What is left after this session, stated precisely
+
+The flag sweeps earlier in this document were partly void: the unit already compiles with
+`-opt nopeephole,noschedule,nocse,nopropagation`, so appending `-opt nocse` or `-opt nopropagation`
+was a no-op. Sweeping the **positive** forms whole-unit (`-opt propagation`, `-opt cse`,
+`-opt cse,propagation`, and their combinations with peephole/schedule, plus `-opt all`/`-opt on`)
+makes things strictly worse in every case: the baseline profile is optimal.
+
+One source form does move `bossdrakor_update`, and it is plausible rather than a gated hack:
+`void bossdrakor_update(void* self) { GameObject* obj = self; ... }`, the `void*` callback signature
+this codebase already uses elsewhere (`GM_MazeWell_render(void* obj, ...)`). It gives PAL 136 and a
+bare 2-cycle residue -- but costs EN 65, and it only has any effect with the copy declared at position
+0 or 1. All 287 second single edits of the resulting 15-element declaration list were searched for one
+that restores EN to 0: none does. PAL-gated coalesced copies inside the existing `#if` arm
+(`curveState = state;`) are stream-identical and do **not** move the rotation, so it is specifically the
+parameter's own copy-class membership that matters, and that is shared by every version.
+
+So the row is not "one rotation step away and steerable"; it is one rotation step away with the only
+known lever tied to a declaration the versions must share. Closing it needs a mechanism not yet found,
+not another sweep of these axes.
+
 ## See also
 
 - `docs/source_shape_levers.md` — levers 9, 14 and 16 are the ones this frontier keeps invoking.
