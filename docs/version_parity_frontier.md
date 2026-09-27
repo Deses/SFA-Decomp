@@ -1110,6 +1110,27 @@ establishes is that this row is one rotation step wide and that the step is a re
 so the remaining work is finding a plausible PAL-only construct with the same effect, not proving the
 row movable.
 
+### Two exhaustion proofs, and why one shared declaration list cannot serve both versions
+
+`GM_MazeWell_update`: **all 2520 declaration orderings** of the list were built and scored (every
+permutation of the seven movable declarations, `questBits` before `questBits32`; `i` is pinned because
+moving it costs EN 7 diffs). Every one gives PAL 14 diffs. Bucketing the 71 single swaps and moves by
+`(EN, PAL)` shows the shape of the space: 34 orderings leave both untouched, nine are **EN-neutral and
+change PAL** -- to 21, never lower -- and the rest cost EN. So an EN-safe knob exists and provably does
+not reach retail.
+
+`bossdrakor_update`: all 247 single swaps and moves, bucketed the same way, contain **no EN-neutral
+ordering that changes PAL at all**. Every ordering that improves PAL does it by moving `state` off
+position 0, and all 22 of those give PAL 70 (down from 150) at a cost of EN 94. EN wants `state`
+declared first and PAL wants it later, and one list cannot do both. Splitting the reused locals -- the
+`set` lever that closed `pauseMenuDraw` -- is inert here: seven splits of `step` into its four distinct
+roles (yaw delta, rotY clamp, rotZ clamp, joint step) are all byte-identical in both versions.
+
+That is the same structure as `pauseMenuDraw` before it closed: two versions whose colourings cannot be
+satisfied simultaneously from the shared list. `pauseMenuDraw` was closed by changing the local *set*,
+not the order, so the set lever is the right one to keep pushing -- it is simply exhausted on `step`,
+and `state`/`obj` is where the remaining gap lives.
+
 ## See also
 
 - `docs/source_shape_levers.md` — levers 9, 14 and 16 are the ones this frontier keeps invoking.
