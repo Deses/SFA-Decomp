@@ -595,17 +595,21 @@ void ecshShrine_update(GameObject* obj) {
                             shufflePattern = randomGetRange(0, ECSH_SHRINE_ROUND_THREE_PATTERN_MAX);
                         }
                         if (shufflePattern == 0) {
+                            s16* cupSlots = puzzle->cupSlotMap;
+
                             for (cupIndex = 0; cupIndex < ECSH_SHRINE_CUP_COUNT; cupIndex++) {
-                                puzzle->cupSlotMap[cupIndex] += 1;
-                                if (puzzle->cupSlotMap[cupIndex] > ECSH_SHRINE_LAST_CUP_INDEX) {
-                                    puzzle->cupSlotMap[cupIndex] = 0;
+                                cupSlots[cupIndex] += 1;
+                                if (cupSlots[cupIndex] > ECSH_SHRINE_LAST_CUP_INDEX) {
+                                    cupSlots[cupIndex] = 0;
                                 }
                             }
                         } else if (shufflePattern == 1) {
+                            s16* cupSlots = puzzle->cupSlotMap;
+
                             for (cupIndex = 0; cupIndex < ECSH_SHRINE_CUP_COUNT; cupIndex++) {
-                                puzzle->cupSlotMap[cupIndex] -= 1;
-                                if (puzzle->cupSlotMap[cupIndex] < 0) {
-                                    puzzle->cupSlotMap[cupIndex] = 5;
+                                cupSlots[cupIndex] -= 1;
+                                if (cupSlots[cupIndex] < 0) {
+                                    cupSlots[cupIndex] = 5;
                                 }
                             }
                         } else if (shufflePattern == 2) {

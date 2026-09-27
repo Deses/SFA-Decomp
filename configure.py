@@ -317,16 +317,6 @@ cflags_dll_noopt_noautoinline_deferred = [
     "-inline", "noauto,deferred",
 ]
 
-cflags_dll_noopt_nostrength = [
-    *cflags_game,
-    "-opt", "nopeephole,noschedule,nostrength",
-]
-
-cflags_dll_noopt_nostrength_noautoinline = [
-    *cflags_dll_noopt_nostrength,
-    "-inline", "noauto",
-]
-
 cflags_dll_noopt_nocse = [
     *cflags_game,
     "-opt", "nopeephole,noschedule,nocse",
@@ -381,12 +371,6 @@ cflags_dll_noopt_noinline = [
 cflags_dll_noopt_noprop_noinline = [
     *cflags_game,
     "-opt", "nopeephole,noschedule,nopropagation",
-    "-inline", "off",
-]
-
-cflags_dll_noopt_nostrength_noinline = [
-    *cflags_game,
-    "-opt", "nopeephole,noschedule,nostrength",
     "-inline", "off",
 ]
 
@@ -1333,7 +1317,7 @@ config.libs = [
             Object(MatchingFor("GSAE01"), "dlls/objects/396_MMSH_Shrine/MMSH_Shrine.c", cflags=cflags_dll_noopt_noautoinline),
             Object(MatchingFor("GSAE01"), "dlls/objects/397_MMSH_Scales/MMSH_Scales.c"),
             Object(MatchingFor("GSAE01"), "dlls/objects/398_MMSH_WaterS/MMSH_WaterS.c"),
-            Object(MatchingFor("GSAE01"), "dlls/objects/399_ECSH_Shrine/ECSH_Shrine.c", cflags=cflags_dll_noopt_nostrength),
+            Object(MatchingFor("GSAE01"), "dlls/objects/399_ECSH_Shrine/ECSH_Shrine.c"),
             Object(MatchingFor("GSAE01"), "dlls/objects/400_ECSH_Cup/ECSH_Cup.c"),
             Object(MatchingFor("GSAE01"), "dlls/objects/401_ECSH_Creato/ECSH_Creato.c"),
             Object(MatchingFor("GSAE01"), "dlls/objects/402_GPSH_Shrine/GPSH_Shrine.c"),
@@ -1396,7 +1380,7 @@ config.libs = [
             Object(MatchingFor("GSAE01"), "dlls/objects/459_DIMWoodDoor/DIMWoodDoor.c"),
             Object(MatchingFor("GSAE01"), "dlls/objects/460_DIMMagicBri/DIMMagicBri.c", cflags=cflags_dll_noopt_noinline),
             Object(MatchingFor("GSAE01"), "dlls/objects/461_DIM_LevelCo/DIM_LevelCo.c"),
-            Object(MatchingFor("GSAE01"), "dlls/objects/462/462.c", cflags=cflags_dll_noopt_nostrength),
+            Object(MatchingFor("GSAE01"), "dlls/objects/462/462.c"),
             Object(MatchingFor("GSAE01"), "dlls/objects/463/463.c"),
             Object(MatchingFor("GSAE01"), "dlls/objects/464_DIM_tricky/DIM_tricky.c"),
             Object(MatchingFor("GSAE01"), "dlls/objects/465_DIMTruthHor/DIMTruthHor.c"),
@@ -1446,7 +1430,7 @@ config.libs = [
             Object(MatchingFor("GSAE01"), "dlls/objects/509_WM_LaserTar/WM_LaserTar.c"),
             Object(MatchingFor("GSAE01"), "dlls/objects/510/510.c"),
             Object(MatchingFor("GSAE01"), "dlls/objects/511/511.c"),
-            Object(MatchingFor("GSAE01"), "dlls/objects/512/512.c", cflags=cflags_dll_noopt_nostrength_noinline),
+            Object(MatchingFor("GSAE01"), "dlls/objects/512/512.c", cflags=cflags_dll_noopt_noinline),
             Object(MatchingFor("GSAE01"), "dlls/objects/513_WM_colrise/WM_colrise.c"),
             Object(MatchingFor("GSAE01"), "dlls/objects/514/514.c"),
             Object(MatchingFor("GSAE01"), "dlls/objects/515/515.c"),
@@ -1641,7 +1625,7 @@ config.libs = [
             Object(MatchingFor("GSAE01"), "dlls/objects/704/704.c"),
 
             Object(MatchingFor("GSAE01"), "main/render.c"),
-            Object(Matching, "main/audio.c", cflags=cflags_dll_noopt_nostrength_noautoinline),
+            Object(Matching, "main/audio.c", cflags=cflags_dll_noopt_noautoinline),
             Object(MatchingFor("GSAE01"), "main/audio_sfx.c", cflags=cflags_dll_noopt_noautoinline),
             Object(MatchingFor("GSAE01"), "main/audio_stream.c"),
             Object(MatchingFor("GSAE01"), "main/camera.c", cflags=cflags_dll_noopt_noautoinline),
@@ -1658,7 +1642,7 @@ config.libs = [
             Object(MatchingFor("GSAE01"), "main/modellight.c", cflags=cflags_dll_noopt_noautoinline),
             Object(Matching, "main/asset_load.c", cflags=[*cflags_dll_noopt, "-inline", "noauto"]),
             Object(Matching, "main/gameloop.c", cflags=[*cflags_dll_noopt, "-inline", "noauto"]),
-            Object(MatchingFor("GSAE01"), "main/vecmath.c", cflags=cflags_dll_noopt_nostrength),
+            Object(MatchingFor("GSAE01"), "main/vecmath.c"),
             Object(MatchingFor("GSAE01"), "main/vecmath_vec3.c"),
             Object(MatchingFor("GSAE01"), "main/mm.c", cflags=cflags_dll_noopt_noautoinline_deferred),
             Object(MatchingFor("GSAE01"), "main/model.c", cflags=cflags_dll_noopt_noautoinline),

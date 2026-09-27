@@ -1042,7 +1042,7 @@ u8 musicInitMidiWad(void) {
             }
             if (found != NULL) {
                 found->offset = arenaOffset;
-                found->size = ((int*)gMidiWadFileData)[track];
+                found->size = *(int*)((u8*)gMidiWadFileData + track * sizeof(int));
             }
             {
                 u32 size2 = found->size;
