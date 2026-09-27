@@ -817,6 +817,35 @@ retail's unit has exactly one `0.0f` atom serving both the clamp and the four `x
 (verified from the relocations), so the literal route costs the unit its registration. Naming either
 value does not move it, which is CLAUDE.md's coalescing rule.
 
+## The TU cflag axis, closed on all five rows (and the one thing it proved)
+
+`-opt`/`-inline` profiles are the sanctioned alternative to the banned per-function pragmas, so all
+five remaining functions were swept across twelve profiles on all five versions
+(as-configured, noprop, nocse, nocse+noprop, nolifetimes, nostrength, noloopinv, -inline noauto,
+-inline off, noprop+noauto, peephole, schedule).
+
+`askProgressiveScanMode`, `GM_MazeWell_update`, `saveCardBuildComment` and `bossdrakor_update` are
+flag-INERT: no profile beats the configured one (25, 14, 3 and 150 respectively), and every profile
+that changes anything makes it worse or changes the length.
+
+**`wclevelcont_update` is the exception, and it identifies the mechanism.** Under
+`-opt ...,nocse` the function matches on ALL FIVE versions. So the defect is that MWCC value-numbers
+the guard's load of the zero atom and the clamp's load of the same atom into ONE web: that web is
+created at the guard, which gives it the lowest node index, which means it is coloured LAST and takes
+the higher free register (f1) — while retail has the clamp's constant in f0, i.e. coloured first, i.e.
+a separately created web. `nocse` splits them and the assignment becomes retail's.
+
+It is still a cap, for a measured reason: with `nocse` the unit as a whole REGRESSES on every version,
+because `wclevelcont_traceMoveA` and `wclevelcont_traceMoveB` each grow 6 instructions (289 -> 295) —
+retail plainly compiled this TU with CSE ON. A DOL-confirmed TU takes one profile, and blocking the
+CSE from source would need a `volatile` or a pun, which CLAUDE.md bans by name. Retail's `.sdata2`
+offset 0x1c is alignment padding for the 8-byte int->float magic at 0x20, not a second zero atom, so
+there is no second atom to read either: the unit really does have exactly one `0.0f` serving the guard,
+the clamp and the four `x + 0.0f` adds.
+
+What would close it is the real source difference that makes retail's two loads distinct values while
+CSE is on. Nothing in the spellings tried reaches it.
+
 ## See also
 
 - `docs/source_shape_levers.md` — levers 9, 14 and 16 are the ones this frontier keeps invoking.
