@@ -754,29 +754,38 @@ exchange is a 3-cycle. When five or fewer locals are in play, run the full permu
 
 ## Still open, with what each one now needs
 
+EN v1.0 and JP are at 100.000000. PAL v1.0 99.199320, PAL v1.1 99.199420, EN v1.1 99.239685.
+
 | unit | share | versions | residue |
 |---|---|---|---|
-| `653_WCLevelCont` | 0.298 | all three | 4 diffs, one f0/f1 exchange — see below |
-| `main/gameloop` | 0.247 | PAL, PAL v1.1 | 25 diffs, band rotated by one; plateau |
-| `dlls/engine/2/maketex` | 0.238 | rev1 | `saveCardBuildComment`, 3 ordering diffs |
-| `589_BossDrakor` | 0.226 | all three | 150 diffs |
-| `611_GM_MazeWell` | 0.030 | PAL, PAL v1.1 | 14 diffs, `i` vs `questBitPtr`; plateau |
+| `653_WCLevelCont` | 0.298 | all three | 4 diffs, one f0/f1 exchange at the message-timer clamp |
+| `main/gameloop` | 0.247 | PAL, PAL v1.1 | 25 diffs, band rotated by one |
+| `dlls/engine/2/maketex` | 0.238 | EN v1.1 | `saveCardBuildComment`, 3 ordering diffs |
+| `589_BossDrakor` | 0.226 | all three | 150/154 diffs, one copy-vs-load exchange |
+| `611_GM_MazeWell` | 0.030 | PAL, PAL v1.1 | 14 diffs, `i` vs `questBitPtr` |
 
-`wclevelcont_update`'s 4 diffs are one f0/f1 exchange at the message-timer clamp: retail puts the
-reloaded field in f1 and the constant in f0. Writing the clamp with literal `0.0f` instead of
-`gWcLevelContZero[0]` matches the code on all five versions, but MWCC pools that literal as a SECOND
-`.sdata2` atom (an extra `00000000` at 0x34 — retail's section is 14 atoms / 56 bytes with exactly one
-zero at offset 0), which fails the whole 56-byte section and therefore loses the unit its
-`--write-matching` registration. Dropping the const array and using literals everywhere folds the four
-`x + 0.0f` sites away; keeping the const only at those four sites gives 100% code but still 15 atoms.
-Every single-atom spelling tried (block local, `*gWcLevelContZero`, reversed compare, `<=`, `!(>=)`,
-ternary, else-form, and six upstream reorderings of the guard and subtraction) gives 4 or worse. What
-is needed is a single-atom shape whose clamp constant web is created BEFORE the field reload.
+**WCLevelCont** needs a single-`.sdata2`-atom shape whose clamp constant is coloured before the field
+reload. Retail's unit has exactly one `0.0f` atom (offset 0) serving both the clamp and the four
+`x + 0.0f` adds in `traceMoveA`/`traceMoveB` — verified from the relocations — so the clamp cannot use a
+literal: a literal is always a second atom (measured: an extra `00000000` at 0x34, which fails all 56
+bytes and costs the unit its registration), and dropping the const array folds the four adds away.
+Measured flat at 4: block-local and function-scope locals for the constant, for the field, and for both
+with declaration and assignment order split all four ways; `*gWcLevelContZero`; reversed compare; `<=`;
+`!(>=)`; ternary; else-form; and six upstream reorderings of the guard and subtraction. Naming does not
+move it, which is CLAUDE.md's coalescing rule, and the flag space for this unit was measured inert
+earlier. The FPR band is far weaker than GPR for the band model, so this is the expected shape of a
+hard FP row.
 
-`askProgressiveScanMode` and `GM_MazeWell_update` are both measured plateaus, not unexplored: 30
-EN-safe declaration orderings x 2 guard positions for the former (all 25), and 38 EN+rev1-safe
-orderings plus 18 hoist positions for the latter (all 14). Their exchanges are genuine rotations, so
-per CLAUDE.md the lever is the SET of source locals, not their order.
+**gameloop**, **GM_MazeWell** and **BossDrakor** are measured plateaus on ordering: 30 EN-safe
+declaration orderings x 2 guard positions and 16 PAL-only block permutations for `askProgressiveScanMode`
+(all 25), 38 EN+rev1-safe orderings plus 18 hoist positions for `GM_MazeWell_update` (all 14). Their
+exchanges are rotations, which per CLAUDE.md ordering cannot reach at this band width, so the lever is
+the SET of locals — also probed: merging `i`/`j` in `askProgressiveScanMode` takes PAL 25 -> 23 but costs
+EN 6 diffs, and dropping the `showId` copy makes PAL a size mismatch. `bossdrakor_update` wants the
+parameter copy at the TOP of the band (`obj` = r31, `state` = r30) where ours puts the copy at the
+bottom; the named param-copy lever (`GameObject* self = obj;`) moves PAL 150 -> 136 but costs EN 65, in
+both declaration positions tried. `saveCardBuildComment` is flat at 3 across seven
+declaration/assignment splits.
 
 ## See also
 
