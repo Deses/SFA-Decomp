@@ -335,8 +335,8 @@ void EdibleMushroom_updateBehavior(GameObject* obj, EdibleMushroomState* state, 
         ObjAnim_SetCurrentMove(obj, moveId, 0.25f, 0);
     }
 
-    if (ObjAnim_AdvanceCurrentMove(obj, gEdibleMushroomAnimStepScaleTable[state->animState], timeDelta,
-                                   &animEvents) != 0) {
+    if (ObjAnim_AdvanceCurrentMove(obj, gEdibleMushroomAnimStepScaleTable[state->animState], timeDelta, &animEvents) !=
+        0) {
         state->flags |= EDIBLE_MUSHROOM_FLAG_ANIM_DONE;
     } else {
         state->flags &= ~EDIBLE_MUSHROOM_FLAG_ANIM_DONE;
@@ -449,8 +449,7 @@ void EdibleMushroom_hitDetect(GameObject* obj) {
         (((state->flags & EDIBLE_MUSHROOM_FLAG_MOVING) != 0) ||
          ((((ObjHitsPriorityState*)obj->anim.hitReactState)->flags & OBJHITS_PRIORITY_STATE_PAIR_RESPONSE_APPLIED) !=
           0))) {
-        hitCount =
-            trackGetHeight(obj, obj->anim.localPosX, obj->anim.localPosY, obj->anim.localPosZ, &hits, 0, 0);
+        hitCount = trackGetHeight(obj, obj->anim.localPosX, obj->anim.localPosY, obj->anim.localPosZ, &hits, 0, 0);
         for (i = 0; i < hitCount; i++) {
             if (hits[i]->height < 10.0f + obj->anim.localPosY) {
                 obj->anim.localPosY = hits[i]->height;
@@ -458,8 +457,8 @@ void EdibleMushroom_hitDetect(GameObject* obj) {
             }
         }
 
-        hitCount = trackGetLineIntersect(&obj->anim.previousLocalPosX, &obj->anim.localPosX, 6.0f, 2, &bboxHit, obj, 8, -1,
-                                      0xFF, 0x14);
+        hitCount = trackGetLineIntersect(&obj->anim.previousLocalPosX, &obj->anim.localPosX, 6.0f, 2, &bboxHit, obj, 8,
+                                         -1, 0xFF, 0x14);
         if ((placement->objectType == 4) && (hitCount != 0) && (bboxHit.surfaceType == 13)) {
             state->flags |= EDIBLE_MUSHROOM_FLAG_GROUNDED;
         }
