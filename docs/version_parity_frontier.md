@@ -930,6 +930,34 @@ known, moving these five is guesswork over value structure -- which is how `load
 `pauseMenuDraw`, `engine/53` and `gametext` were actually closed, and it did produce PAL 25 -> 12 on
 gameloop before stalling.
 
+## The per-function pragma axis: one win, four refusals
+
+With per-function pragmas authorised, eighteen MWCC optimization pragmas were swept on each remaining
+row across all five versions (`opt_common_subs`, `opt_propagation`, `opt_lifetimes`,
+`opt_strength_reduction`, `opt_dead_assignments`, `opt_dead_code`, `opt_unroll_loops` off and on,
+`peephole on`, `scheduling on`, `optimization_level 0..4`, `dont_inline on`, `opt_vectorize_loops off`,
+`no_register_coloring on`).
+
+**`wclevelcont_update` closes.** `#pragma opt_common_subs off` around that one function takes the unit
+to 100% on all five versions, because `traceMoveA`/`traceMoveB` keep CSE and still match. That is now
+applied; see the commit for why the TU-wide flag and the source alternatives do not work.
+
+**The other four refuse every pragma.** `askProgressiveScanMode` stays at 25, `GM_MazeWell_update` at
+14, `saveCardBuildComment` at 3 and `bossdrakor_update` at 150 under every pragma that does not change
+the instruction count. The product space was also swept for gameloop: the ten viable pragmas x the
+`(u8)` cast are all identical at EN 24 / PAL 12, so the pragma axis and the value-structure axis do not
+interact there.
+
+State after this: EN v1.0 and JP at 100, PAL v1.0 99.497430, PAL v1.1 99.497490, EN v1.1 99.537820, and
+all five DOLs byte-identical. Four functions remain, worth 0.5026 on PAL v1.0, 0.5025 on PAL v1.1 and
+0.4622 on EN v1.1.
+
+Knobs now measured and closed on those four: declaration order (single moves, all pairwise swaps,
+exhaustive permutations where feasible, scope hoists, ungated greedy and randomised search), the local
+set, expression spellings, twelve TU `-opt`/`-inline` profiles, ten per-unit compiler versions, eighteen
+per-function pragmas, and the pragma x value-structure product. What is left is the rule that builds the
+compiler's colouring worklist.
+
 ## See also
 
 - `docs/source_shape_levers.md` — levers 9, 14 and 16 are the ones this frontier keeps invoking.
