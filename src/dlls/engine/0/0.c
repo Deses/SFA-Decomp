@@ -2083,38 +2083,6 @@ s32 isTalkingToNpc(void) {
 #define NPC_DIALOGUE_WIDE_BOX_MARKER 0xf8f7
 #define NPC_DIALOGUE_WIDE_BOX_CODE   5
 
-#if !defined(VERSION_GSAE01) && !defined(VERSION_GSAJ01)
-void gameUiDrawNpcDialogueText(int a, int b, int c) {
-    TextSlot* box = gameTextGetBox(NPC_DIALOGUE_TEXT_BOX);
-    int slot;
-    char* phrase;
-    int encodedLength;
-    u32 ch;
-
-    if (curGameText == 0xffff || gNpcDialogueTextAlpha == 0) {
-        return;
-    }
-
-    gameTextSetColor(0xff, 0xff, 0xff, (u8)gNpcDialogueTextAlpha);
-    if (gNpcDialoguePageFrames != -1) {
-        phrase = gameTextGetPhrase(curGameText, gNpcDialoguePhraseState.display.charIndex);
-        ch = utf8GetNextChar((u8*)phrase, &encodedLength);
-        slot = NPC_DIALOGUE_NARROW_BOX;
-        if (ch == NPC_DIALOGUE_WIDE_BOX_MARKER) {
-            ch = utf8GetNextChar((u8*)(phrase + encodedLength), &encodedLength);
-            if (ch == NPC_DIALOGUE_WIDE_BOX_CODE) {
-                slot = NPC_DIALOGUE_TEXT_BOX;
-            }
-        }
-        box = gameTextGetBox(slot);
-        box->alpha = (u8)gNpcDialogueTextAlpha;
-        gameTextAppendStr(phrase, slot);
-    } else {
-        box->alpha = (u8)gNpcDialogueTextAlpha;
-        gameTextQueueReveal(curGameText, &gNpcDialoguePhraseState.display);
-    }
-}
-#endif
 void gameUiUpdateNpcDialogue(void) {
     Obj_GetPlayerObject();
     if (gNpcDialogueActive != 0) {
@@ -2172,6 +2140,38 @@ void gameUiUpdateNpcDialogue(void) {
         }
     }
 }
+#if !defined(VERSION_GSAE01) && !defined(VERSION_GSAJ01)
+void gameUiDrawNpcDialogueText(int a, int b, int c) {
+    TextSlot* box = gameTextGetBox(NPC_DIALOGUE_TEXT_BOX);
+    int slot;
+    char* phrase;
+    int encodedLength;
+    u32 ch;
+
+    if (curGameText == 0xffff || gNpcDialogueTextAlpha == 0) {
+        return;
+    }
+
+    gameTextSetColor(0xff, 0xff, 0xff, (u8)gNpcDialogueTextAlpha);
+    if (gNpcDialoguePageFrames != -1) {
+        phrase = gameTextGetPhrase(curGameText, gNpcDialoguePhraseState.display.charIndex);
+        ch = utf8GetNextChar((u8*)phrase, &encodedLength);
+        slot = NPC_DIALOGUE_NARROW_BOX;
+        if (ch == NPC_DIALOGUE_WIDE_BOX_MARKER) {
+            ch = utf8GetNextChar((u8*)(phrase + encodedLength), &encodedLength);
+            if (ch == NPC_DIALOGUE_WIDE_BOX_CODE) {
+                slot = NPC_DIALOGUE_TEXT_BOX;
+            }
+        }
+        box = gameTextGetBox(slot);
+        box->alpha = (u8)gNpcDialogueTextAlpha;
+        gameTextAppendStr(phrase, slot);
+    } else {
+        box->alpha = (u8)gNpcDialogueTextAlpha;
+        gameTextQueueReveal(curGameText, &gNpcDialoguePhraseState.display);
+    }
+}
+#endif
 
 /* C-menu per-frame driver: input gating,
  * item set selection, Y-button assignment, scroll, select/close handling. */
