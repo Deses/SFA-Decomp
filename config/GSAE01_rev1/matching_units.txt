@@ -891,6 +891,7 @@ main/curves.c
 main/debug_display.c
 main/fileio.c
 main/gameloop.c
+main/gametext.c
 main/gametext_data.c
 main/mm.c
 main/model.c

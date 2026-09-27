@@ -740,11 +740,22 @@ and deleting the guarded `int bulletY;` plus its `= 52` / `+= 42` statements mat
 all five versions. `(taskTextIndex + 1) * 42 + 10` is NOT equivalent to the allocator (52 diffs), so
 the walker's initial value and stride both have to come out right.
 
+## gametext: an exhaustive permutation, because single moves are a plateau
+
+`gameTextBuildSystemFontAtlas` sat at 36 diffs on EN v1.1 — a permutation of the SCRATCH band in the
+tile-copy block. Every scratch colour is enabled from the start, so `min(enabled - blockers)` makes the
+assignment a pure function of the colouring order, i.e. of that block's five declarations. Of the 120
+permutations exactly **four** keep EN byte-identical, and exactly **one** of those is also rev1-exact:
+
+    int tileColumn; int tileRow; int firstTileColumn; int firstTileRow; u32* glyphPixels;
+
+Every single move from the old order scored 36, so a single-move sweep could not have found this: the
+exchange is a 3-cycle. When five or fewer locals are in play, run the full permutation set.
+
 ## Still open, with what each one now needs
 
 | unit | share | versions | residue |
 |---|---|---|---|
-| `main/gametext` | 0.796 | rev1 | 36-diff permutation of the SCRATCH band in `gameTextBuildSystemFontAtlas` |
 | `653_WCLevelCont` | 0.298 | all three | 4 diffs, one f0/f1 exchange — see below |
 | `main/gameloop` | 0.247 | PAL, PAL v1.1 | 25 diffs, band rotated by one; plateau |
 | `dlls/engine/2/maketex` | 0.238 | rev1 | `saveCardBuildComment`, 3 ordering diffs |
