@@ -906,6 +906,30 @@ are integers, so they say nothing about the float pool atom. Retail's own reloca
 So the unit needs the clamp's constant web created late while CSE stays on, and the only instruments
 that do that are a per-function pragma (banned by name) or a `volatile`/pun (banned by name).
 
+## The per-unit compiler-version axis, closed on all five rows
+
+`mw_version` is a per-Object setting in `configure.py` and is already used in the tree for `mtx.c`,
+`vec.c`, `__mem.c` and `__start.c`, so a per-unit compiler is a sanctioned knob rather than a hack. All
+ten available GC compilers were swept on each remaining row, on all five versions:
+
+| row | result |
+|---|---|
+| `askProgressiveScanMode` | 1.3 .. 2.7 all identical (EN 0 / PAL 25); 1.2.5 and 1.2.5n change length |
+| `wclevelcont_update` | 1.3 .. 2.7 all identical (EN 0 / PAL 4); 1.2.5/1.2.5n change length |
+| `GM_MazeWell_update` | 1.3 .. 2.7 all identical (EN 0 / PAL 14); 1.2.5/1.2.5n change length |
+| `saveCardBuildComment` | 1.3 .. 2.7 all identical (PAL 0 / rev1 3); 1.2.5/1.2.5n worse |
+| `bossdrakor_update` | only 1.3 is viable at all; 1.3.2 and later are +187 instructions |
+
+So for these units GC/1.3 through 2.7 are output-identical and the axis carries no information. Together
+with declaration order, the local set, expression spellings, the twelve `-opt`/`-inline` profiles and the
+value-structure casts, every knob this project has is now measured on all five rows.
+
+The one instrument that is NOT exhausted is understanding: `coloring_order()` shows the colouring follows
+a compiler-internal linked worklist, and nothing here derives the rule that builds it. Until that rule is
+known, moving these five is guesswork over value structure -- which is how `loadMemCardImages`,
+`pauseMenuDraw`, `engine/53` and `gametext` were actually closed, and it did produce PAL 25 -> 12 on
+gameloop before stalling.
+
 ## See also
 
 - `docs/source_shape_levers.md` — levers 9, 14 and 16 are the ones this frontier keeps invoking.
