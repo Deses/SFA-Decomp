@@ -908,6 +908,7 @@ main/shader_dolphin.c
 main/shadow_dolphin.c
 main/skystars.c
 main/subtitle.c
+main/textrender_boxtex.c
 main/textrender_drawbox.c
 main/texture.c
 main/thp/THPRead.c
@@ -917,6 +918,7 @@ main/thp/dll_3b.c
 main/thp/dll_3e.c
 main/thp/n_options.c
 main/thp/picmenu.c
+main/track_dolphin.c
 main/vecmath.c
 main/vecmath_vec3.c
 main/voxmaps.c
