@@ -187,34 +187,30 @@ void modelCalcVtxGroupMtxs(ModelFileHeader* def, ObjModel* model) {
     Mtx mb;
     Mtx trans;
     int i;
-    ModelFileHeader* modelDef;
-    u8* modelBytes;
 
-    modelDef = def;
-    modelBytes = (u8*)model;
-
-    for (i = 0; i < modelDef->extraJointCount; i++) {
+    for (i = 0; i < def->extraJointCount; i++) {
         MtxPtr out;
-        MtxPtr m2;
         MtxPtr m1;
-        ModelBone* jd;
+        ModelBone* jointA;
+        ModelBone* jointB;
+        MtxPtr m2;
         ModelExtraJointDef* group;
         f32 w;
         f32 wi;
 
-        group = &modelDef->extraJointDefs[i];
-        out = (MtxPtr)ObjModel_GetJointMatrix(modelBytes, i + modelDef->jointCount);
-        m1 = (MtxPtr)ObjModel_GetJointMatrix(modelBytes, group->jointA);
-        m2 = (MtxPtr)ObjModel_GetJointMatrix(modelBytes, group->jointB);
+        group = &def->extraJointDefs[i];
+        out = (MtxPtr)ObjModel_GetJointMatrix((u8*)model, i + def->jointCount);
+        m1 = (MtxPtr)ObjModel_GetJointMatrix((u8*)model, group->jointA);
+        m2 = (MtxPtr)ObjModel_GetJointMatrix((u8*)model, group->jointB);
 
         w = (f32)group->weightA / 4.0f;
         wi = 1.0f - w;
 
-        jd = &((ModelBone*)modelDef->jointData)[group->jointA];
-        PSMTXTrans(trans, -jd->tail[0], -jd->tail[1], -jd->tail[2]);
+        jointA = &((ModelBone*)def->jointData)[group->jointA];
+        PSMTXTrans(trans, -jointA->tail[0], -jointA->tail[1], -jointA->tail[2]);
         PSMTXConcat(m1, trans, ma);
-        jd = &((ModelBone*)modelDef->jointData)[group->jointB];
-        PSMTXTrans(trans, -jd->tail[0], -jd->tail[1], -jd->tail[2]);
+        jointB = &((ModelBone*)def->jointData)[group->jointB];
+        PSMTXTrans(trans, -jointB->tail[0], -jointB->tail[1], -jointB->tail[2]);
         PSMTXConcat(m2, trans, mb);
 
         out[0][0] = ma[0][0] * w + mb[0][0] * wi;
@@ -1478,21 +1474,24 @@ static u32 objSetupRenderOpGxState(GameObject* obj, ModelFileHeader* modelFile, 
                                    ModelRenderInstrsState* stream) {
     Shader* shader;
     ModelRenderOpTextureRefs* textureRefs;
-    u32 shaderIndex;
+    int shaderIndex;
+    u32 renderOpIndex;
     u8 shad;
+    u8* projectionTexture;
+    int lightIndex;
+    s32 shadowColorMode;
     u8 zCompareBeforeTexture;
     int nlay;
     int envtex;
     ModelLightStruct** lp;
     u8* sp;
-    int i;
     ObjModelRenderCb cb;
     f32 m2[12];
     f32 t2[12];
     f32 wm[12];
     f32 t1[12];
-    int a;
-    int b;
+    int colorMode;
+    int alphaMode;
     u8 color[4];
     u8 fogc[4];
 
@@ -1580,19 +1579,20 @@ static u32 objSetupRenderOpGxState(GameObject* obj, ModelFileHeader* modelFile, 
             addWavyCausticTevStage();
             nlay = 0;
         } else if (b4 == 0) {
-            i = 0;
+            lightIndex = 0;
             lp = &gObjSelectedLights;
             sp = &gObjProjectedLightChannel;
-            for (; i < gObjSelectedLightCount; i++) {
-                u8* t = (u8*)modelLightStruct_getProjectionTexture(*lp);
-                if (t != 0) {
-                    modelLightStruct_getProjectionTevModes(*lp, &a, &b);
-                    if (a == 2) {
+            for (; lightIndex < gObjSelectedLightCount; lightIndex++) {
+                projectionTexture = (u8*)modelLightStruct_getProjectionTexture(*lp);
+                if (projectionTexture != 0) {
+                    modelLightStruct_getProjectionTevModes(*lp, &colorMode, &alphaMode);
+                    shadowColorMode = colorMode;
+                    if (shadowColorMode == 2) {
                         shad = 1;
                     }
                     {
                         f32* mtx = modelLightStruct_getProjectionTexMtx(*lp);
-                        addProjectedLightTevStage(t, mtx, a, b, *sp);
+                        addProjectedLightTevStage(projectionTexture, mtx, colorMode, alphaMode, *sp);
                     }
                 }
                 lp++;
@@ -1610,6 +1610,7 @@ static u32 objSetupRenderOpGxState(GameObject* obj, ModelFileHeader* modelFile, 
             addTexModulateReg2Stage();
         }
     }
+    renderOpIndex = shaderIndex;
     {
         u8 useChannelColor;
         useChannelColor = ((modelFile->shaderFlags & 2) && !(modelFile->flags24 & 2));
@@ -1713,7 +1714,7 @@ static u32 objSetupRenderOpGxState(GameObject* obj, ModelFileHeader* modelFile, 
     } else {
         GXSetCullMode(GX_CULL_NONE);
     }
-    return shaderIndex;
+    return renderOpIndex;
 }
 static void shaderSetGxFlags(GameObject* obj, u8* m, u8* shader) {
     u8 blend;
@@ -2250,8 +2251,10 @@ static void modelDoRenderInstrs(GameObject* obj, GameObject* owner, ModelFileHea
                 }
             }
         } else {
+            ObjModelJointMatrix* jointMatrix;
             ObjModel_ToggleMatrixBuffer(activeModel);
-            PSMTXCopy((MtxPtr)worldMatrix, (MtxPtr)(f32*)ObjModel_GetJointMatrix((u8*)activeModel, 0));
+            jointMatrix = ObjModel_GetJointMatrix((u8*)activeModel, 0);
+            PSMTXCopy((MtxPtr)worldMatrix, (MtxPtr)jointMatrix);
         }
         if ((fuzzPass == 0 && (passMaskCopy & 8) == 0) || gObjFuzzLayerIndex == 0) {
             if (modelFile->morphTargetCount != 0) {
