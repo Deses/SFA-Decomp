@@ -1200,6 +1200,10 @@ context, or fragment mirage. Worth knowing before anyone re-derives it:
   definition-order permutations of its copy-class call returns (current is the unique
   minimum). Residual is copy-class param homing plus a float magic constant with no named
   local behind it, at band width 6 — the >=5 regime where the model is ~0.1% predictive.
+  **Resolved 2026-09-27:** separate bone-pointer locals, their declaration order,
+  and removal of parameter aliases produce 100% in all five retail versions.
+  The live compiler graph identifies the low-degree threshold responsible;
+  see [objprint_dolphin matching](objprint_dolphin_matching.md#modelcalcvtxgroupmtxs).
 
 - `docs/data_axis.md` — the data axis, closed: the section-granular pairing law, two refuted gates, the vein taxonomy and the screen order.
 - `docs/allocation_model.md` — the saved-register band model, closed: four tiers with confirmed within-tier keys, the rematerialization-cost axis, and the measured boundary above width 4.

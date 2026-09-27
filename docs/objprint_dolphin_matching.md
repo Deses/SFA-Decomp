@@ -24,6 +24,51 @@ Validation on 2026-09-26:
 
 The complete TU remains `NonMatching`; other functions still have differences.
 
+## modelCalcVtxGroupMtxs
+
+The 2026-09-27 pass brings `modelCalcVtxGroupMtxs` from **99.15094% to 100%**
+in EN v1.0, EN rev1, JP, PAL v1.0, and PAL rev1. All 636 bytes (159
+instructions) match under the existing GC/1.3 TU profile.
+
+The two inverse-bind translations now use separate `jointA` and `jointB`
+bone pointers. The second input matrix pointer is declared after those locals,
+and the redundant model-header and model-byte aliases are removed. Calls,
+field accesses, arithmetic, and their order are unchanged.
+
+The verified compiler trace explains why declaration permutations alone did
+not resolve this function. Splitting the bone pointer raises the second
+matrix's initial interference degree from 28 to 29. Its declaration order
+places it before the bone pointers in the compiler's scan, so it survives the
+first low-degree sweep, whose threshold is strictly below 29. Removing the
+model-byte alias gives the model parameter the required position in the later
+sweep. The resulting allocation reproduces all 27 previously differing
+instructions. This establishes a matching source spelling, not the original
+local declarations.
+
+Reproduce with:
+
+```sh
+python3 tools/unitfuzzy.py objprint_dolphin --symbol modelCalcVtxGroupMtxs
+python3 tools/tricky_backend_trace.py --unit main/main/objprint_dolphin \
+    --function modelCalcVtxGroupMtxs --graph --output build/vtx_group_matching_trace
+```
+
+Validation:
+
+- All five input DOL hashes verified against their version configurations.
+- Fresh before/after objects change only this function's 31 instruction bytes
+  in each version. Other function scores and bytes, allocated section layouts,
+  non-text contents, named-symbol layouts, and relocation records are unchanged.
+- Instrumented and ordinary compilation produce identical raw objects; the
+  trace aligns all 159 instructions and replays all 22 physical register choices.
+- EN `ninja all_source` and the strict retail checksum target pass.
+- Formatting preserves the raw object; the TU and internal header pass
+  `clang-format --dry-run --Werror`.
+
+The complete TU remains `NonMatching` at 99.99440%; only
+`objSetupRenderOpGxState` still differs. No regional completion manifest is
+promoted. Compiler settings and TU boundaries are unchanged.
+
 ## modelDoRenderInstrs
 
 The 2026-09-27 pass brings `modelDoRenderInstrs` from **99.94304% to 100%**
