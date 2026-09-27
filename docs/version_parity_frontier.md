@@ -846,46 +846,41 @@ the clamp and the four `x + 0.0f` adds.
 What would close it is the real source difference that makes retail's two loads distinct values while
 CSE is on. Nothing in the spellings tried reaches it.
 
-## askProgressiveScanMode: a proof, from the graph, that the band cannot be rotated
+## askProgressiveScanMode: what is established, and what is NOT
 
 The PAL band is our band rotated by one: ours has (box, counter, sel, savedAlignment) =
-(r31, r30, r29, r28) and retail has (r30, r29, r28, r31), i.e. retail colours `savedAlignment` FIRST.
-Three facts from the traced graph close this.
+(r31, r30, r29, r28), retail has (r30, r29, r28, r31), i.e. retail colours `savedAlignment` FIRST.
 
-1. **`box`'s value is an unnamed temp, not the named local.** `box`'s register_object node has degree
-   **0** in every spelling tried (plain call, `(GameTextBox*)` cast, `&gameTextGetBox(0)[0]`,
-   `&(*gameTextGetBox(0))`): the value arrives in r3, a precoloured register, so the copy coalesces and
-   the temp must be the representative. `savedAlignment` is a plain load into its own home, so it keeps
-   its named node (degree 35).
-2. **`savedAlignment`'s degree can never exceed that temp's.** It is defined immediately after `box`
-   (`mr` then `lbz`) and both die at the same instruction, the `stb` restore, so its live range is a
-   strict subset of box's. Every web overlapping `savedAlignment` therefore also overlaps `box`:
-   `deg(savedAlignment) <= deg(box)` identically. Measured: both 35. Inserting a web between the two
-   definitions raises box's degree and not savedAlignment's, which is the wrong direction.
-3. **On a tie the temp wins.** The colouring order is degree >= 32 first, then descending node index,
-   and temps are numbered above every named local (here box's temp is 53, `savedAlignment` is 34).
+**Established from the traced graph.**
+1. `box`'s value is an unnamed temp, not the named local. Its register_object node has degree **0** in
+   every spelling tried (plain call, `(GameTextBox*)` cast, `&gameTextGetBox(0)[0]`,
+   `&(*gameTextGetBox(0))`): the return arrives in r3, a precoloured register, so the copy coalesces and
+   the temp is the representative. `savedAlignment` is a plain load into its own home and keeps its
+   named node (degree 35).
+2. `deg(savedAlignment) <= deg(box)` identically, and here they are equal at 35. `savedAlignment` is
+   defined immediately after `box` and both die at the same `stb`, so its live range is a strict subset
+   and every web overlapping it also overlaps box. Inserting a web between the two definitions raises
+   box's degree only, which is the wrong direction.
+3. In the observed worklist the temps are coloured before every named local, so `savedAlignment` is
+   coloured after box's temp and `min(enabled - blockers)` then hands it the lowest free register.
 
-So `savedAlignment` is coloured after `box` under every ordering, and `min(enabled - blockers)` then
-hands it the lowest free register rather than r31. Confirmed exhaustively as well: a DFS over all 10!
-orders of the named locals finds none that reproduces retail's registers, and two independent ungated
-searches (greedy and randomised multi-start over declaration order x guard position x the cast) both
-plateau at 10 diffs, never 0.
+**NOT established.** `coloring_order()` recovers the compiler's actual linked worklist
+(`prefix[0]` chains the nodes), not a priority derivable from degree and index. An earlier version of
+this section claimed a proof of impossibility from a DFS over all 10! orders of the named locals; that
+DFS was run against a STALE node-to-variable mapping and its conclusion should not be relied on. What
+the ordering evidence really shows is empirical: 30 EN-safe single moves x 2 guard positions, all 28
+pairwise swaps, 6 relative orders of the three band participants x 9 guard positions, and two ungated
+searches (greedy and randomised multi-start) all plateau, at 25 gated and 10 ungated -- never 0.
 
-What DID move it is the one value-structure lever: `savedAlignment = (u8)box->alignH;` takes PAL from
-25 to 12 diffs, the same class as the `(char*)` cast that closed `loadMemCardImages`. It changes which
-values exist rather than their order. It costs EN 24 diffs because the site is shared code, and it does
-not reach 0, so it is not applied.
+Because the worklist is compiler-internal, the lever that can move it is the one that changes which
+values exist, not their order. That is exactly what worked: `savedAlignment = (u8)box->alignH;` takes
+PAL from 25 to 12, the same class as the `(char*)` cast that closed `loadMemCardImages`. It costs EN 24
+diffs because the site is shared code, and it does not reach 0, so it is not applied.
 
-Reaching retail here needs `savedAlignment`'s web to be a temp outranking box's, or box's value to die
-before the restore. The first is not expressible in C for a value that must survive a loop; the second
-needs a second `gameTextGetBox` call, and retail has only one. Unless one of those premises is wrong,
-this row is closed.
-
-Pressure-counter probes, all inert at 25 (the rotation did not move): casts on `messageY` at either use
-or both, a cast inside the `shadeReduction` expression, `int` -> `s32` on either guarded local, and
-hoisting `dvdCheckError()` into a PAL-only local in either or both guarded blocks with the declaration
-above or below. A value that is defined and immediately consumed gets no web, which is why the last one
-changes nothing.
+Pressure-counter probes, all inert at 25: casts on `messageY` at either use or both, a cast inside the
+`shadeReduction` expression, `int` -> `s32` on either guarded local, and hoisting `dvdCheckError()` into
+a PAL-only local in either or both guarded blocks, declared above or below. A value defined and
+immediately consumed gets no web, which is why the last one changes nothing.
 
 ## WCLevelCont: the nocse escape hatch is closed too
 
