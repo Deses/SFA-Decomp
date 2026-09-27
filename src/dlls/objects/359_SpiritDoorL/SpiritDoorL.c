@@ -39,40 +39,40 @@ s32 gSpiritDoorLockTexScrollWrap = 39;
 const u32 gSpiritDoorLockOrbitOffsetBase[4] = {0, 0, 0x40E00000, 0};
 
 extern const f32 gSpiritDoorLockZero;
-extern const f32 gSpiritDoorLockDefaultScale;
-extern const f32 gSpiritDoorLockApproachRange;
-extern const f32 gSpiritDoorLockScaleFactor;
-extern const f32 gSpiritDoorLockScaleDecay;
-extern const f32 gSpiritDoorLockSpinDownRate;
-extern const f32 gSpiritDoorLockOrbitOffsetY;
-extern const f32 gSpiritDoorLockOrbitMaxDist;
 
-int SpiritDoorLock_getExtraSize(void) {
-    return sizeof(SpiritDoorLockState);
+static f32 spiritDoorLock_s32AsFloat(s32 value);
+
+void SpiritDoorLock_initialise(void) {
 }
 
-int SpiritDoorLock_getObjectTypeId(void) {
-    return 0;
+void SpiritDoorLock_release(void) {
 }
 
-void SpiritDoorLock_free(GameObject* obj) {
+void SpiritDoorLock_init(GameObject* obj, const SpiritDoorLockPlacement* placement, int startHidden) {
     SpiritDoorLockState* state = obj->extra;
+    f32 scale;
+    int isDefaultScale;
 
-    if (state->light != NULL) {
-        modelLightStruct_freeSlot(&state->light);
+    obj->anim.rotX = (s16)(placement->yaw << 8);
+    state->orbitCount = placement->orbitCount;
+    state->active = 0;
+
+    scale = placement->scale / 64.0f;
+    isDefaultScale = (scale != gSpiritDoorLockZero);
+    isDefaultScale = !isDefaultScale;
+    if (isDefaultScale) {
+        scale = 1.0f;
     }
-}
+    obj->anim.rootMotionScale = obj->anim.modelInstance->rootMotionScaleBase * scale;
+    state->spinAngle = 0;
 
-void SpiritDoorLock_render(GameObject* obj, int renderArg2, int renderArg3, int renderArg4, int renderArg5,
-                           s8 visible) {
-    s32 v = visible;
+    ObjHits_DisableObject(obj);
+    state->flags.unknown80 = 0;
 
-    if (v != 0) {
-        objRenderModelAndHitVolumes(obj, renderArg2, renderArg3, renderArg4, renderArg5, gSpiritDoorLockDefaultScale);
+    if (startHidden == 0) {
+        obj->anim.alpha = 0;
+        state->light = modelLightStruct_createPointLight(obj, 0xff, 0, 0x4d, 0);
     }
-}
-
-void SpiritDoorLock_hitDetect(void) {
 }
 
 void SpiritDoorLock_update(GameObject* obj) {
@@ -91,7 +91,7 @@ void SpiritDoorLock_update(GameObject* obj) {
     player = Obj_GetPlayerObject();
 
     if (mainGetBit(GAMEBIT_K1_SPIRITDOORLOCK_PLAYER_APPROACHED) == 0) {
-        if (Vec_xzDistance(&obj->anim.worldPosX, &player->anim.worldPosX) < gSpiritDoorLockApproachRange) {
+        if (Vec_xzDistance(&obj->anim.worldPosX, &player->anim.worldPosX) < 50.0f) {
             if (state->active != 0) {
                 (*gObjectTriggerInterface)->runSequence(0, obj, -1);
             }
@@ -103,8 +103,9 @@ void SpiritDoorLock_update(GameObject* obj) {
         if (mainGetBit(placement->doneGameBit) == 0) {
             state->active = mainGetBit(placement->activeGameBit);
             if (state->active != 0) {
-                f32 modelScale = obj->anim.modelInstance->rootMotionScaleBase * (f32)(s32)placement->scale;
-                obj->anim.rootMotionScale = modelScale * gSpiritDoorLockScaleFactor;
+                f32 modelScale =
+                    obj->anim.modelInstance->rootMotionScaleBase * spiritDoorLock_s32AsFloat(placement->scale);
+                obj->anim.rootMotionScale = modelScale / 64.0f;
                 if (state->light == NULL) {
                     state->light = modelLightStruct_createPointLight(obj, 0xff, 0, 0x4d, 0);
                 }
@@ -117,11 +118,11 @@ void SpiritDoorLock_update(GameObject* obj) {
                 obj->anim.alpha -= 1;
                 if (state->light != NULL) {
                     u32 attenuation = (u32)obj->anim.alpha >> 2;
-                    modelLightStruct_setDistanceAttenuation(state->light, (f32)(s32)attenuation,
-                                                            (f32)(s32)(attenuation + 10));
+                    modelLightStruct_setDistanceAttenuation(state->light, spiritDoorLock_s32AsFloat(attenuation),
+                                                            spiritDoorLock_s32AsFloat(attenuation + 10));
                 }
-                obj->anim.rootMotionScale *= gSpiritDoorLockScaleDecay;
-                obj->anim.rotZ = (f32)(int)obj->anim.rotZ - gSpiritDoorLockSpinDownRate * timeDelta;
+                obj->anim.rootMotionScale *= 0.99f;
+                obj->anim.rotZ = spiritDoorLock_s32AsFloat(obj->anim.rotZ) - 256.0f * timeDelta;
             } else {
                 if (state->light != NULL) {
                     modelLightStruct_freeSlot(&state->light);
@@ -143,9 +144,9 @@ void SpiritDoorLock_update(GameObject* obj) {
         orbitObjects = (GameObject**)objGetAllOfType(SPIRIT_DOOR_SPIRIT_OBJECT_GROUP, &orbitCount);
         angleStep = SPIRIT_DOOR_LOCK_FULL_TURN / state->orbitCount;
         angle = state->spinAngle;
-        orbitOffset[1] = gSpiritDoorLockOrbitOffsetY;
+        orbitOffset[1] = 80.0f;
         for (i = 0; i < orbitCount; i++) {
-            if (Vec_distance(&obj->anim.worldPosX, &orbitObjects[i]->anim.worldPosX) > gSpiritDoorLockOrbitMaxDist) {
+            if (Vec_distance(&obj->anim.worldPosX, &orbitObjects[i]->anim.worldPosX) > 1000.0f) {
                 continue;
             }
             obj->anim.rotZ = angle;
@@ -180,38 +181,39 @@ void SpiritDoorLock_update(GameObject* obj) {
     }
 }
 
-void SpiritDoorLock_init(GameObject* obj, const SpiritDoorLockPlacement* placement, int startHidden) {
+void SpiritDoorLock_hitDetect(void) {
+}
+
+void SpiritDoorLock_render(GameObject* obj, int renderArg2, int renderArg3, int renderArg4, int renderArg5,
+                           s8 visible) {
+    s32 v = visible;
+
+    if (v != 0) {
+        objRenderModelAndHitVolumes(obj, renderArg2, renderArg3, renderArg4, renderArg5, 1.0f);
+    }
+}
+
+void SpiritDoorLock_free(GameObject* obj) {
     SpiritDoorLockState* state = obj->extra;
-    f32 scale;
-    int isDefaultScale;
 
-    obj->anim.rotX = (s16)(placement->yaw << 8);
-    state->orbitCount = placement->orbitCount;
-    state->active = 0;
-
-    scale = placement->scale * gSpiritDoorLockScaleFactor;
-    isDefaultScale = (scale != gSpiritDoorLockZero);
-    isDefaultScale = !isDefaultScale;
-    if (isDefaultScale) {
-        scale = gSpiritDoorLockDefaultScale;
-    }
-    obj->anim.rootMotionScale = obj->anim.modelInstance->rootMotionScaleBase * scale;
-    state->spinAngle = 0;
-
-    ObjHits_DisableObject(obj);
-    state->flags.unknown80 = 0;
-
-    if (startHidden == 0) {
-        obj->anim.alpha = 0;
-        state->light = modelLightStruct_createPointLight(obj, 0xff, 0, 0x4d, 0);
+    if (state->light != NULL) {
+        modelLightStruct_freeSlot(&state->light);
     }
 }
 
-void SpiritDoorLock_release(void) {
+int SpiritDoorLock_getObjectTypeId(void) {
+    return 0;
 }
 
-void SpiritDoorLock_initialise(void) {
+int SpiritDoorLock_getExtraSize(void) {
+    return sizeof(SpiritDoorLockState);
 }
+
+static f32 spiritDoorLock_s32AsFloat(s32 value) {
+    return (f32)value;
+}
+
+const f32 gSpiritDoorLockZero = 0.0f;
 
 ObjectDescriptor gSpiritDoorLockObjDescriptor = {
     0,

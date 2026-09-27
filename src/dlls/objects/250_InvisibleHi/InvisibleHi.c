@@ -9,8 +9,6 @@
 #include "main/gamebits_api.h"
 #include "main/objhits.h"
 
-extern f32 gInvisibleHitSwitchScaleUnit;
-
 #define INVISIBLE_HIT_SWITCH_SCALE_UNITS 64
 
 #define INVISIBLE_HIT_SWITCH_FRAMES_PER_SECOND 60.0f
@@ -111,8 +109,9 @@ void InvisibleHitSwitch_init(GameObject* obj, InvisibleHitSwitchPlacement* place
     if (placement->radiusScale64 == 0) {
         obj->anim.rootMotionScale = obj->anim.modelInstance->rootMotionScaleBase;
     } else {
-        f32 scaledScale = (f32)(u32)placement->radiusScale64 * obj->anim.modelInstance->rootMotionScaleBase;
-        obj->anim.rootMotionScale = scaledScale * gInvisibleHitSwitchScaleUnit;
+        obj->anim.rootMotionScale =
+            ((f32)(u32)placement->radiusScale64 * obj->anim.modelInstance->rootMotionScaleBase) /
+            INVISIBLE_HIT_SWITCH_SCALE_UNITS;
     }
     ObjHitbox_SetSphereRadius(&obj->anim,
                               (s16)((placement->radiusScale64 * (int)obj->anim.modelInstance->primaryHitboxRadius) /
