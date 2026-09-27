@@ -1252,38 +1252,43 @@ So the pointer variant is a genuine, EN-safe colouring lever and simultaneously 
 reached the same registers with less pressure than any source we can write. Recorded so the lever is not
 mistaken for a near-miss that one more sweep would close.
 
-### A working knob for the rotation: file-scope register reservation
+### The rotation knob exists, and it is a banned construct -- rejected and reverted
 
-`GM_MazeWell_update` is closed, and the lever is a **dummy global register reservation** -- the
-construct CLAUDE.md bans. It is recorded here in full because the *mechanism* is general and was the
-missing piece, whatever is decided about the construct itself.
+A **dummy global register reservation** does move the rotation, and it is the only thing found that
+does. It was tried on these rows at the tree owner's request, landed on `GM_MazeWell.c`, and was then
+**rejected by the tree owner and reverted**. It must not be reintroduced; CLAUDE.md's ban stands. The
+mechanism is recorded because it is the first real handle on the rotation and it sharpens the frontier,
+not because the construct is available.
 
-MWCC accepts `register int x asm("rN");` only at **file scope**, and only in a contiguous run starting
-at `r14` (asking for `r24` alone errors with "gaps between assigned global register variables (nothing
-at 'r23') are not allowed"). Reserving registers shrinks the allocatable set, and **that shifts every
-function in the TU by one rotation step** -- including functions whose band never reaches the reserved
-registers. It is the only knob found that moves the rotation at all.
+Mechanics: MWCC accepts `register int x asm("rN");` only at **file scope**, and only in a contiguous run
+starting at `r14` (asking for `r24` alone errors with "gaps between assigned global register variables
+(nothing at 'r23') are not allowed"). Reserving registers shrinks the allocatable set, and that shifts
+**every function in the TU by one rotation step** -- including functions whose band never reaches the
+reserved registers.
 
-Measured, with three reservations (`r14`, `r15`, `r16`) in `GM_MazeWell.c`: every function in the unit
-matches on **all five versions**, PAL v1.0 goes 99.497430 -> 99.526980 and PAL v1.1 99.497490 ->
-99.527030, and all five DOLs stay byte-exact. One or two reservations leave `GM_MazeWell_update` at 14
-diffs; four take it to 21/27. The count is the knob, and three is the answer here.
+What it measured, before reverting:
 
-The lever is **not** general in its effect, because the shift applies TU-wide:
+- `GM_MazeWell.c` with three reservations: every function matched on all five versions, PAL v1.0
+  99.497430 -> 99.526980 and PAL v1.1 99.497490 -> 99.527030, all DOLs byte-exact. One or two
+  reservations left `GM_MazeWell_update` at 14 diffs; four took it to 21/27.
+- `589_BossDrakor/BossDrakor.c` with one reservation: `bossdrakor_update` 150 -> **0** on both PALs
+  (EN v1.1 154 -> 5), but `bossdrakor_spawnAttackObjects` 0 -> 31, which would regress EN and JP. That
+  sibling is the same defect class -- identical stream, its two parameter copies `obj`/`state` swapped --
+  and resisted everything tried: 248-ordering declaration sweeps at both 31 and 24, a body-scoped
+  parameter copy (31 -> 25), an `obj` alias (31 -> 24), splitting the embedded `lo=`/`hi=` assignments,
+  naming the `Obj_CanSetupObject` result, and dropping the `mstate` local. No reservation count fixes
+  both functions: four fixes the sibling but breaks three others.
+- `main/gameloop.c` and `dlls/engine/2/maketex.c`: no count helps at all.
 
-- `main/gameloop.c`: no count helps. `askProgressiveScanMode` stays at 25 with one reservation, goes to
-  37 with two, and three also breaks `mainSetBits`.
-- `589_BossDrakor/BossDrakor.c`: one reservation **fixes** `bossdrakor_update` on both PALs (150 -> 0,
-  and EN v1.1 154 -> 5) but shifts `bossdrakor_spawnAttackObjects` the wrong way (0 -> 31), which would
-  regress EN and JP. That sibling is now the same class of defect -- 31 diffs, identical stream, its two
-  parameter copies `obj`/`state` swapped. Its own declaration order is flat across 211 and 248
-  orderings; a body-scoped parameter copy takes it 31 -> 25 and an `obj` alias 31 -> 24, neither to zero.
-  So BossDrakor is one function away from closing for three versions.
+The useful residue is diagnostic. `bossdrakor_update`'s gap is **exactly one rotation step and nothing
+else** -- measured, not inferred -- so the search for a legitimate source form should target a one-step
+rotation shift in that single function, and the frontier is not four independent mysteries.
 
-**A measurement trap this exposed:** `ninja` with no arguments builds the DOL but **not** `report.json`,
-and DLL objects are not DOL dependencies -- so a DLL source edit can leave both the object and the
-report stale while `ninja` reports success. Always `ninja build/<V>/report.json` explicitly, and delete
-the object first, before believing a per-unit number.
+**A measurement trap found on the way:** `ninja` with no arguments builds the DOL but **not**
+`report.json`, and DLL objects are not DOL dependencies -- so a DLL source edit can leave both the object
+and the report stale while `ninja` reports success. It briefly showed 21 diffs on an already-matching
+function. Always delete the object and run `ninja build/<V>/report.json` explicitly before believing a
+per-unit number.
 
 ## See also
 
