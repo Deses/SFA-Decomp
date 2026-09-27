@@ -98,7 +98,7 @@ void __OSUnhandledException(__OSException exception, OSContext* context, u32 dsi
     PPCHalt();
 }
 
-/* 6 unreferenced zero bytes trail the "\n" literal at the end of this unit's
- * retail .sdata (0x803DC542); nothing references them. Emitted last so the
- * section layout matches. */
-u8 gap_09_803DC542_sdata[6] = { 0 };
+/* Six unreferenced zero bytes trail this unit's pooled newline literal in
+ * retail .sdata; nothing references them. Two are the pool padding the compiler
+ * already emits, so only four are declared here. */
+u8 gap_09_803DC542_sdata[4] = { 0 };
