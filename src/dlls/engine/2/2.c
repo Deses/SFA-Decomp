@@ -2467,10 +2467,10 @@ int seqDoSubCmd0B(GameObject* obj, GameObject* sourceObj, ObjSeqState* seq, u8* 
             if (sourceObj != obj) {
                 switch ((s8)gObjSeqMsgSendModes[operand]) {
                 case 1:
-                    ObjMsg_SendToObjects(0, 2, obj, gObjSeqMsgIds[operand], (u32)obj);
+                    ObjMsg_SendToObjects(0, 2, obj, gObjSeqMsgIds[operand], obj);
                     break;
                 case 2:
-                    ObjMsg_SendToNearbyObjects(0, 600.0f, 2, obj, gObjSeqMsgIds[operand], (u32)obj);
+                    ObjMsg_SendToNearbyObjects(0, 600.0f, 2, obj, gObjSeqMsgIds[operand], obj);
                     break;
                 default:
                     ObjMsg_SendToObject(sourceObj, gObjSeqMsgIds[operand], obj, 0);

@@ -367,21 +367,6 @@ cflags_dll_noopt_noprop_noautoinline = [
     "-inline", "noauto",
 ]
 
-cflags_dll_noopt_noloopinv = [
-    *cflags_game,
-    "-opt", "nopeephole,noschedule,noloopinvariants",
-]
-
-cflags_dll_noopt_noloopinv_noautoinline = [
-    *cflags_dll_noopt_noloopinv,
-    "-inline", "noauto",
-]
-
-cflags_dll_noopt_noloopinv_zerodata = [
-    *cflags_dll_noopt_noloopinv,
-    '-pragma "explicit_zero_data on"',
-]
-
 cflags_dll_noopt_nolifetimes_noautoinline = [
     *cflags_game,
     "-opt", "nopeephole,noschedule,nolifetimes",
@@ -941,7 +926,7 @@ config.libs = [
             Object(MatchingFor("GSAE01"), "dlls/engine/2/maketex.c", cflags=cflags_dll_noopt_noautoinline),
             # ObjSeq language reconstruction: declaration-order BSS and integer booleans.
             # Exact EN source link: docs/objseq_action_matching.md.
-            Object(MatchingFor("GSAE01"), "dlls/engine/2/2.c", cflags=cflags_dll_noopt_noloopinv_noautoinline,
+            Object(MatchingFor("GSAE01"), "dlls/engine/2/2.c", cflags=cflags_dll_noopt_noautoinline,
                    extra_cflags=["-lang=c++", "-bool", "off", "-msext", "on"]),
             Object(MatchingFor("GSAE01"), "dlls/engine/3/3.c", cflags=cflags_dll_noopt_noautoinline),
             Object(MatchingFor("GSAE01"), "dlls/engine/4/4.c"),
@@ -1696,7 +1681,7 @@ config.libs = [
             Object(Matching, "main/objlib.c"),
             Object(MatchingFor("GSAE01"), "main/objprint.c", cflags=cflags_dll_noopt_noautoinline),
             Object(MatchingFor("GSAE01"), "main/objprint_dolphin.c", cflags=[*cflags_dll_noopt_nolifetimes_zerodata, "-inline", "noauto"]),
-            Object(MatchingFor("GSAE01"), "main/pi_dolphin.c", cflags=[*cflags_dll_noopt_noloopinv_zerodata, "-inline", "noauto"]),
+            Object(MatchingFor("GSAE01"), "main/pi_dolphin.c", cflags=cflags_dll_noopt_zerodata_noautoinline),
             Object(MatchingFor("GSAE01"), "main/pi_videoinit.c", cflags=cflags_dll_noopt_nocse_nolifetimes_noprop_zerodata),
             Object(MatchingFor("GSAE01"), "main/pi_pathsearch.c", cflags=cflags_dll_noopt_zerodata_noautoinline),
             Object(Matching, "main/zlb.s"),

@@ -635,7 +635,7 @@ void defragMemory(int mode) {
     int passIndex;
     int stable;
     int previousFreeDelay;
-    u8* resourceAddress = gResourceFileTable;
+    u32 resourceAddress = (u32)gResourceFileTable;
     stable = 0;
     passIndex = 0;
     mmSetTextureAllocationState(2);
@@ -656,7 +656,7 @@ void defragMemory(int mode) {
         mmSetForceHeaps1and2Only(1);
         fileId = 0;
         {
-            char* biasedBase = (char*)resourceAddress + sizeof(MldfArenaBlock);
+            u32 biasedBase = resourceAddress + sizeof(MldfArenaBlock);
             moveBuffers = (void**)(biasedBase - (int)(sizeof(MldfArenaBlock) - offsetof(struct MldfTables, ptrs)));
             moveOwners = (s16*)(biasedBase - (int)(sizeof(MldfArenaBlock) - offsetof(struct MldfTables, owners)));
             moveSizes = (int*)(biasedBase - (int)(sizeof(MldfArenaBlock) - offsetof(struct MldfTables, sizes)));
@@ -723,15 +723,15 @@ void defragMemory(int mode) {
         } while (fileId <= MLDF_FILEID_ENVFXACT_BIN);
         mmSetForceHeaps1and2Only(-1);
     }
-    resourceAddress = (u8*)((char*)resourceAddress + sizeof(MldfArenaBlock));
+    resourceAddress = (u32)((char*)resourceAddress + sizeof(MldfArenaBlock));
     while (stable == 0 && passIndex < 10) {
         stable = 1;
         fileId = 0;
-        buffers = (void**)((char*)resourceAddress - (int)(sizeof(MldfArenaBlock) - offsetof(struct MldfTables, ptrs)));
-        owners = (s16*)((char*)resourceAddress - (int)(sizeof(MldfArenaBlock) - offsetof(struct MldfTables, owners)));
-        sizes = (int*)((char*)resourceAddress - (int)(sizeof(MldfArenaBlock) - offsetof(struct MldfTables, sizes)));
+        buffers = (void**)(resourceAddress - (int)(sizeof(MldfArenaBlock) - offsetof(struct MldfTables, ptrs)));
+        owners = (s16*)(resourceAddress - (int)(sizeof(MldfArenaBlock) - offsetof(struct MldfTables, owners)));
+        sizes = (int*)(resourceAddress - (int)(sizeof(MldfArenaBlock) - offsetof(struct MldfTables, sizes)));
         flags =
-            (u8*)((char*)resourceAddress - (int)(sizeof(MldfArenaBlock) - offsetof(struct MldfTables, loadedFlags)));
+            (u8*)(resourceAddress - (int)(sizeof(MldfArenaBlock) - offsetof(struct MldfTables, loadedFlags)));
         do {
             switch (fileId) {
             case MLDF_FILEID_ANIMCURV_BIN_A:
@@ -1350,9 +1350,9 @@ int getTableFileEntry(int fileId, int index, int* out) {
 }
 
 #define MAPTBLP(idx)   (*(int**)(((idx) << 2) + ((u32) & ((struct MldfTables*)base)->ptrs[0])))
-#define MAPID_RT(s)    (*(int*)(((s) << 2) + ((u32) & tbl->ids[0])))
-#define MAPPTR_RT(s)   (*(u32*)(((s) << 2) + ((u32) & tbl->ptrs[0])))
-#define MAPOWNER_RT(s) (*(s16*)(((s) << 1) + ((u32) & tbl->owners[0])))
+#define MAPID_RT(s)    (*(int*)(((s) << 2) + (resourceAddress + offsetof(struct MldfTables, ids))))
+#define MAPPTR_RT(s)   (*(u32*)(((s) << 2) + (resourceAddress + offsetof(struct MldfTables, ptrs))))
+#define MAPOWNER_RT(s) (*(s16*)(((s) << 1) + (resourceAddress + offsetof(struct MldfTables, owners))))
 
 void* getCurrentDataFile(int id) {
     u8* base = gResourceFileTable;
@@ -1379,6 +1379,7 @@ void* getCurrentDataFile(int id) {
 
 int mapUnload(int mapId, int flags) {
     struct MldfTables* tbl;
+    u32 resourceAddress;
     int* e;
     int f20;
     int f10;
@@ -1392,6 +1393,7 @@ int mapUnload(int mapId, int flags) {
     SaveGameCharacterPosition* st;
 
     tbl = (struct MldfTables*)gResourceFileTable;
+    resourceAddress = (u32)tbl;
     i = 0;
     needWait = 0;
     st = (SaveGameCharacterPosition*)(*gMapEventInterface)->getCurCharPos();
@@ -1452,9 +1454,9 @@ int mapUnload(int mapId, int flags) {
             }
             {
                 int idx = e[0];
-                if (((int**)((char*)tbl + 0x20000 + -0x6A28))[idx] != NULL) {
+                if (*(void**)((idx << 2) + (resourceAddress + offsetof(struct MldfTables, ptrs))) != NULL) {
                     s16 v;
-                    if (f80 || ((flags & e[1]) && mapId == ((s16*)((char*)tbl + 0x20000 + -0x68C8))[idx]) ||
+                    if (f80 || ((flags & e[1]) && mapId == *(s16*)((idx << 1) + (resourceAddress + offsetof(struct MldfTables, owners)))) ||
                         (f10 && mapId != MAPOWNER_RT(idx)) || (f20 && mapId == MAPOWNER_RT(idx))) {
                         if (gObjLevelLockSlots[0] != (v = MAPOWNER_RT(idx)) && lockp[1] != v) {
                             switch (idx) {
@@ -1487,22 +1489,23 @@ int mapUnload(int mapId, int flags) {
                                 mmSetFreeDelay(0);
                                 for (j = 0; j < 75; j++) {
                                     if (sMapFileNameIndexRemapTable[j] ==
-                                        *(s16*)((u32)tbl + 0x20000 + (e[0] << 1) - 0x68C8)) {
+                                        *(s16*)(resourceAddress + sizeof(MldfArenaBlock) + (e[0] << 1) -
+                                                 (sizeof(MldfArenaBlock) - offsetof(struct MldfTables, owners)))) {
                                         break;
                                     }
                                 }
                                 if (j <= 0x50 && j != 0x49 && j != 0x43 && j != 5) {
-                                    u32 slotAddr = (j << 2) + ((u32)&tbl->romList[0] + 0x6C08);
-                                    mm_free((void*)*(u32*)(slotAddr - 0x6C08));
-                                    *(u32*)(slotAddr - 0x6C08) = 0;
+                                    void** romListSlot = (void**)((j << 2) + (resourceAddress + offsetof(struct MldfTables, romList)));
+                                    mm_free(*romListSlot);
+                                    *romListSlot = NULL;
                                 }
                                 break;
                             }
                             mm_free((void*)MAPPTR_RT(e[0]));
                             mmSetFreeDelay(2);
-                            *(u32*)((e[0] << 2) + ((u32)tbl + 0x20000) - 0x6A28) = 0;
-                            *(s16*)((e[0] << 1) + ((u32)tbl + 0x20000) - 0x68C8) = -1;
-                            *(int*)((e[0] << 2) + ((u32)tbl + 0x20000) - 0x6D68) = 0;
+                            *(u32*)((e[0] << 2) + (resourceAddress + offsetof(struct MldfTables, ptrs))) = 0;
+                            *(s16*)((e[0] << 1) + (resourceAddress + offsetof(struct MldfTables, owners))) = -1;
+                            *(int*)((e[0] << 2) + (resourceAddress + offsetof(struct MldfTables, sizes))) = 0;
                             switch (e[0]) {
                             case 0x2a:
                             case 0x45:
