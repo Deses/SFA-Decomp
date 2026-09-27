@@ -289,7 +289,7 @@ Width >=5 saved band, identical mnemonic stream: the rotation-offset model — e
 | mapProcessRomList | main/shader | 560 | 99.643 | 8 | 0 | 5G/2F | 8 | signature: struc 0, band >=5, no recorded lever site |
 | trickyFindReachableRouteIndex | dlls/objects/196_Tricky/tricky | 468 | 99.573 | 8 | 0 | 8G/0F | 6 | surplus-queue tricky walls (5 exhaustive sweeps flat) |
 | modelInitBoneMtxs | main/model | 236 | 99.288 | 8 | 0 | 6G/0F | 8 | signature: struc 0, band >=5, no recorded lever site |
-| modelDoRenderInstrs | main/objprint_dolphin | 3160 | 99.943 | 9 | 0 | 15G/4F | 6 | transposition pass 08-03: pure r21<->r22 swap, obj2 param-copy vs `did` K-web (bias temp follows param home in both); probed did-decl-first, dead early obj2 use (eliminated pre-allocation) — all byte-inert; no source knob found |
+| modelDoRenderInstrs | main/objprint_dolphin | 3160 | 100 | 0 | 0 | 15G/4F | 6 | Resolved 2026-09-27: explicit first-joint matrix local fixes the owner/skin-matrix-flag allocation; exact in all five versions. See [matching notes](objprint_dolphin_matching.md#modeldorenderinstrs). |
 | tricky_updateBallRoll | dlls/objects/196_Tricky/tricky | 1516 | 99.881 | 9 | 0 | 7G/1F | 6 | surplus-queue tricky walls (5 exhaustive sweeps flat) |
 | objInterpretSeq | dlls/objects/294/294 | 3920 | 99.939 | 10 | 0 | 10G/0F | 1 | near100-band-census-2026-08-01 (16 dead ends) |
 | renderShadows | main/newshadows | 2596 | 99.730 | 10 | 2 | 18G/11F | 6 | near100-band-census-2026-08-01 (16 dead ends) |

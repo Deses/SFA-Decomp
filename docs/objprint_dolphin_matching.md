@@ -24,6 +24,46 @@ Validation on 2026-09-26:
 
 The complete TU remains `NonMatching`; other functions still have differences.
 
+## modelDoRenderInstrs
+
+The 2026-09-27 pass brings `modelDoRenderInstrs` from **99.94304% to 100%**
+in EN v1.0, EN rev1, JP, PAL v1.0, and PAL rev1. All 3,160 bytes (790
+instructions) match under the existing GC/1.3 TU profile.
+
+In the unanimated-model path, the first joint matrix now has an explicit
+`ObjModelJointMatrix*` local before it is passed to `PSMTXCopy`. The calls and
+their order are unchanged. This resolves the nine instructions that exchanged
+`owner` and `builtSkinMatrices` between `r21` and `r22`, including the later
+conversion constant that reuses the owner's register.
+
+The verified compiler graph grows from 256 to 257 nodes. The extra matrix
+local changes coalescing and keeps the skin-matrix flag above the low-degree
+threshold until the owner is removed. This reverses their coloring order and
+reproduces retail allocation. The instrumented compiler emits the same raw
+object as ordinary compilation and replays all 208 physical register choices.
+This establishes a matching source spelling, not the original local declaration.
+
+Reproduce with:
+
+```sh
+python3 tools/unitfuzzy.py objprint_dolphin --symbol modelDoRenderInstrs
+python3 tools/tricky_backend_trace.py --unit main/main/objprint_dolphin \
+    --function modelDoRenderInstrs --graph --output build/model_render_matching_trace
+```
+
+Validation:
+
+- All five input DOL hashes verified against their version configurations.
+- Fresh before/after objects change only this function's ten instruction bytes
+  in each version. Other function scores and bytes, allocated section layouts,
+  non-text contents, named-symbol layouts, and relocation records are unchanged.
+- EN `ninja all_source` and the strict retail checksum target pass.
+- Formatting preserves the raw object; the TU and internal header pass
+  `clang-format --dry-run --Werror`.
+
+The complete TU remains `NonMatching`; no regional completion manifest is
+promoted. Compiler settings and TU boundaries are unchanged.
+
 ## addShaderLayerStages
 
 `addShaderLayerStages` matches all 1,128 bytes (282 instructions) under the

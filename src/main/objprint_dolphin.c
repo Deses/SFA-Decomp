@@ -2250,8 +2250,10 @@ static void modelDoRenderInstrs(GameObject* obj, GameObject* owner, ModelFileHea
                 }
             }
         } else {
+            ObjModelJointMatrix* jointMatrix;
             ObjModel_ToggleMatrixBuffer(activeModel);
-            PSMTXCopy((MtxPtr)worldMatrix, (MtxPtr)(f32*)ObjModel_GetJointMatrix((u8*)activeModel, 0));
+            jointMatrix = ObjModel_GetJointMatrix((u8*)activeModel, 0);
+            PSMTXCopy((MtxPtr)worldMatrix, (MtxPtr)jointMatrix);
         }
         if ((fuzzPass == 0 && (passMaskCopy & 8) == 0) || gObjFuzzLayerIndex == 0) {
             if (modelFile->morphTargetCount != 0) {
