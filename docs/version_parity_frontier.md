@@ -38,6 +38,38 @@ means the defect is upstream of allocation.**
 
 ## Refutations, per unit
 
+### The graph is FORCED by the code — so every one of these rows is a selection difference
+
+This is the load-bearing result, and it is a theorem the trace then confirms. The interference graph is
+*derived* from liveness, and liveness is derived from the instruction stream. All five blockers have
+**byte-identical streams**, so our interference graph and retail's are the same graph. Retail's register
+assignment is therefore *necessarily* a valid colouring of our graph, and no amount of live-range work
+can be the fix.
+
+Measured confirmation on `askProgressiveScanMode`, reading retail's colours off the asm
+(`counter` 29, `sel` 28, `savedAlignment` 31, `i` 30, `j` 31, `showId` 30, `messageY` 27) and checking
+every edge among those nodes in our own graph: **0 conflicts**. The edges are real
+(`messageY`-`savedAlignment`-`sel`-`counter` form a clique, `j`-`showId` an edge) and retail's colours
+respect all of them. Same story on `pauseMenuDraw`: colour 29 is free for the case-2 node.
+
+**Beware the naive per-node test.** Asking "is retail's colour for node X free, given OUR colours for
+everything else" reports FALSE for `messageY` (blocked by `sel`) and `showId` (blocked by `j`) and looks
+like a live-range defect. It is not — those neighbours also move under retail's assignment. Always test
+retail's assignment as a whole.
+
+So the lever is the **colour-selection order** and nothing else. That order is set by the node count,
+the degrees, and the simplification worklist — i.e. by how many webs the FRONT END created, which can
+differ between two sources that emit identical code (a coalesced copy is a web the allocator counted and
+the code never shows). That is exactly why Jack's `modelDoRenderInstrs` fix is described as the graph
+growing 256 -> 257, and it is why liveness-shaped reasoning has been barren here.
+
+The practical corollary, measured twice: **naming a value does not create a web.** Adding a `fontId`
+temp left the graph at 294 nodes; hoisting GM_MazeWell's `isItemBeingUsed` result changed nothing. A
+value that is defined and immediately consumed coalesces straight back. The joint-matrix case added a
+node because its value had to survive the second argument's setup. So a node-count lever needs a value
+that genuinely *survives* something, and finding one that also leaves the stream intact is the open
+problem on this frontier.
+
 ### The allocator graph is directly observable — use `tools/tricky_backend_trace.py` FIRST
 
 This is the tool for this whole class and it turns blind sweeping into a measurement. It intercepts a
@@ -198,8 +230,33 @@ it is a true rotation at band width 7. The named-param-copy lever moves EN by 65
 is declared first and is inert when declared last. Coalescing-copy edits in the PAL-only
 `curveStep`/`advanceStep` block are flat or size-breaking.
 
-`askProgressiveScanMode` looks like a rotation of a 4-wide EN band that is 6 wide on PAL, but lever
-14's diagnostic says it is **not** a relabeling: the per-register definition counts are
+### The colouring order rule, read off the trace — and a correction to "gameloop is decl-inert"
+
+Colouring pops the simplification stack, so nodes are coloured in roughly **descending degree**, and
+**ties are broken by node index — which runs REVERSE to declaration position** (in
+`askProgressiveScanMode` the declarations `showId, counter, sel, textId, i, j, box, savedAlignment` get
+nodes 41, 40, 39, 38, 37, 36, 35, 34, so the last-declared local has the *lowest* index and is coloured
+first among equals).
+
+That makes a whole class of rows predictable instead of blind. In gameloop, `savedAlignment`, `sel` and
+`counter` **all have degree 35** — a three-way tie, and ours colours them in ascending index
+(34, 39, 40) taking 28, 29, 30. Retail's assignment is `sel` 28, `counter` 29, `savedAlignment` 31, so
+retail needs index order `sel < counter < savedAlignment`, i.e. **`sel` declared last, `counter` just
+before it, `savedAlignment` early**.
+
+The prediction holds: moving `savedAlignment` to the front alone takes PAL **25 -> 16**, and orders built
+to satisfy the full index requirement reach **14**, as does an independent randomised climb. **So this row
+is NOT declaration-order inert, and the earlier verdict here was wrong** — it came from a *single-move*
+sweep, which cannot express "move three locals to satisfy a joint index ordering". Count what a sweep
+can express before believing its zero.
+
+It still does not close: 14 is the floor over the orders tried, the residual is in `i`, `j`, `showId` and
+the second `messageY` web whose colours are not decided by that tie, and every order satisfying the
+requirement breaks EN (which wants `savedAlignment` last). A per-version declaration order is available
+in principle — this list already differs per version, since PAL carries `messageY`/`shadeReduction` that
+EN lacks — but it is only worth spending if a PAL order reaching 0 is found first.
+
+`askProgressiveScanMode`'s definition counts also say it is **not** a relabeling: the per-register definition counts are
 `[2,2,3,4,4,5]` in retail against `[1,2,2,4,5,6]` in ours, same total (20 definition points, same
 stream), different grouping. Retail coalesces the 600-frame counter and `messageY` into one register;
 we split them across two. That is a coalescing decision, so the lever is the local set, not the order

@@ -445,13 +445,26 @@ void allocLotsOfTextures(void) {
 
     gNewShadowRampTexture = textureAlloc(0x100, 4, 1, 0, 0, 0, 0, 0, 0);
     {
+        u8* textureBytes;
+        u8* pixelBase;
+        u8* tileBase;
         u8 value;
-        int x, y;
+        int tileColumnOffset;
+        int columnOffset;
+        int x;
+        int y;
         for (x = 0; x < 256; x++) {
-            for (y = 0; y < 4; y++) {
-                u8* pixelBase = (u8*)gNewShadowRampTexture + (x & 7);
-                u8* tileBase = pixelBase + (x >> 3) * 32;
-                value = x;
+            textureBytes = (u8*)gNewShadowRampTexture;
+            columnOffset = x & 7;
+            pixelBase = textureBytes + columnOffset;
+            tileColumnOffset = (x >> 3) * 32;
+            tileBase = pixelBase + tileColumnOffset;
+            value = x;
+            tileBase[sizeof(Texture)] = value;
+            for (y = 1; y < 4; y++) {
+                textureBytes = (u8*)gNewShadowRampTexture;
+                pixelBase = textureBytes + columnOffset;
+                tileBase = pixelBase + tileColumnOffset;
                 tileBase[(y & 3) * 8 + (y >> 2) * 1024 + sizeof(Texture)] = value;
             }
         }
@@ -460,13 +473,26 @@ void allocLotsOfTextures(void) {
 
     gNewShadowInverseRampTexture = textureAlloc(0x100, 4, 1, 0, 0, 0, 0, 1, 1);
     {
+        u8* textureBytes;
+        u8* pixelBase;
+        u8* tileBase;
         u8 value;
-        int x, y;
+        int tileColumnOffset;
+        int columnOffset;
+        int x;
+        int y;
         for (x = 0; x < 256; x++) {
-            for (y = 0; y < 4; y++) {
-                u8* pixelBase = (u8*)gNewShadowInverseRampTexture + (x & 7);
-                u8* tileBase = pixelBase + (x >> 3) * 32;
-                value = 255 - x;
+            textureBytes = (u8*)gNewShadowInverseRampTexture;
+            columnOffset = x & 7;
+            pixelBase = textureBytes + columnOffset;
+            tileColumnOffset = (x >> 3) * 32;
+            tileBase = pixelBase + tileColumnOffset;
+            value = 255 - x;
+            tileBase[sizeof(Texture)] = value;
+            for (y = 1; y < 4; y++) {
+                textureBytes = (u8*)gNewShadowInverseRampTexture;
+                pixelBase = textureBytes + columnOffset;
+                tileBase = pixelBase + tileColumnOffset;
                 tileBase[(y & 3) * 8 + (y >> 2) * 1024 + sizeof(Texture)] = value;
             }
         }
@@ -550,27 +576,22 @@ void allocLotsOfTextures(void) {
 
     gNewShadowLightningTexture = textureAlloc(0x20, 4, 1, 0, 0, 0, 0, 1, 1);
     {
-        int lowoff;
-        u8* base;
-        int off2;
-        int off;
+        u8* dst;
         int rowoff;
+        int lowoff;
         int i;
         int j;
         for (i = 0; i < 0x20; i++) {
             j = 0;
             rowoff = (i >> 3) * 0x20;
+            lowoff = i & 7;
+            cy = i - 16.0f;
             for (; j < 4; j++) {
-                lowoff = i & 7;
-                cy = i - 16.0f;
-                lowoff += rowoff;
-                base = (u8*)gNewShadowLightningTexture;
-                off = lowoff + (j & 3) * 8;
-                off += (j >> 2) * 0x80;
-                off2 = off + sizeof(Texture);
+                dst =
+                    (u8*)gNewShadowLightningTexture + lowoff + rowoff + (j & 3) * 8 + (j >> 2) * 0x80 + sizeof(Texture);
                 v = sqrtf(__fabsf(cy / 16.0f));
                 v = sqrtf(v);
-                base[off2] = 255.0f * (1.0f - v);
+                *dst = 255.0f * (1.0f - v);
             }
         }
     }
@@ -619,15 +640,30 @@ void allocLotsOfTextures(void) {
 
     gNewShadowReflectionGradientTexture = textureAlloc(4, 4, 3, 0, 0, 0, 0, 1, 1);
     {
-        int x, y;
+        int value;
+        int tileColumnOffset;
+        int columnOffset;
+        int x;
+        int y;
+        u8* textureBytes;
+        u8* pixelBase;
+        u8* texel;
         for (x = 0; x < 4; x++) {
             f32 horizontal = x / 3.0f - 0.5f;
-            for (y = 0; y < 4; y++) {
-                u8* pixelBase = (u8*)gNewShadowReflectionGradientTexture + (x & 3) * 2;
-                u8* texel = pixelBase + (x >> 2) * 0x20;
-                *(u16*)(texel + y * 8 + sizeof(Texture)) = (u16)((((int)(255.0f * horizontal + 128.0f) & 0xff) << 8) |
-                                                                 ((int)(255.0f * (y / 3.0f - 0.5f) + 128.0f) & 0xff));
+            textureBytes = (u8*)gNewShadowReflectionGradientTexture;
+            columnOffset = (x & 3) * 2;
+            pixelBase = textureBytes + columnOffset;
+            tileColumnOffset = (x >> 2) * 0x20;
+            texel = pixelBase + tileColumnOffset;
+            value = ((int)(255.0f * horizontal + 128.0f) & 0xff) << 8;
+            for (y = 0; y < 3; y++) {
+                pixelBase = (u8*)gNewShadowReflectionGradientTexture + columnOffset;
+                texel = pixelBase + tileColumnOffset;
+                *(u16*)(texel + y * 8 + sizeof(Texture)) =
+                    (u16)(value | ((int)(255.0f * (y / 3.0f - 0.5f) + 128.0f) & 0xff));
             }
+            *(u16*)((texel = (pixelBase = (u8*)gNewShadowReflectionGradientTexture + columnOffset) + tileColumnOffset) +
+                    y * 8 + sizeof(Texture)) = (u16)(value | ((int)(255.0f * (y / 3.0f - 0.5f) + 128.0f) & 0xff));
         }
     }
     DCFlushRange(gNewShadowReflectionGradientTexture + 1, gNewShadowReflectionGradientTexture->dataSize);
