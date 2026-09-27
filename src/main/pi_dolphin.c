@@ -730,8 +730,7 @@ void defragMemory(int mode) {
         buffers = (void**)(resourceAddress - (int)(sizeof(MldfArenaBlock) - offsetof(struct MldfTables, ptrs)));
         owners = (s16*)(resourceAddress - (int)(sizeof(MldfArenaBlock) - offsetof(struct MldfTables, owners)));
         sizes = (int*)(resourceAddress - (int)(sizeof(MldfArenaBlock) - offsetof(struct MldfTables, sizes)));
-        flags =
-            (u8*)(resourceAddress - (int)(sizeof(MldfArenaBlock) - offsetof(struct MldfTables, loadedFlags)));
+        flags = (u8*)(resourceAddress - (int)(sizeof(MldfArenaBlock) - offsetof(struct MldfTables, loadedFlags)));
         do {
             switch (fileId) {
             case MLDF_FILEID_ANIMCURV_BIN_A:
@@ -1456,7 +1455,9 @@ int mapUnload(int mapId, int flags) {
                 int idx = e[0];
                 if (*(void**)((idx << 2) + (resourceAddress + offsetof(struct MldfTables, ptrs))) != NULL) {
                     s16 v;
-                    if (f80 || ((flags & e[1]) && mapId == *(s16*)((idx << 1) + (resourceAddress + offsetof(struct MldfTables, owners)))) ||
+                    if (f80 ||
+                        ((flags & e[1]) &&
+                         mapId == *(s16*)((idx << 1) + (resourceAddress + offsetof(struct MldfTables, owners)))) ||
                         (f10 && mapId != MAPOWNER_RT(idx)) || (f20 && mapId == MAPOWNER_RT(idx))) {
                         if (gObjLevelLockSlots[0] != (v = MAPOWNER_RT(idx)) && lockp[1] != v) {
                             switch (idx) {
@@ -1490,12 +1491,13 @@ int mapUnload(int mapId, int flags) {
                                 for (j = 0; j < 75; j++) {
                                     if (sMapFileNameIndexRemapTable[j] ==
                                         *(s16*)(resourceAddress + sizeof(MldfArenaBlock) + (e[0] << 1) -
-                                                 (sizeof(MldfArenaBlock) - offsetof(struct MldfTables, owners)))) {
+                                                (sizeof(MldfArenaBlock) - offsetof(struct MldfTables, owners)))) {
                                         break;
                                     }
                                 }
                                 if (j <= 0x50 && j != 0x49 && j != 0x43 && j != 5) {
-                                    void** romListSlot = (void**)((j << 2) + (resourceAddress + offsetof(struct MldfTables, romList)));
+                                    void** romListSlot =
+                                        (void**)((j << 2) + (resourceAddress + offsetof(struct MldfTables, romList)));
                                     mm_free(*romListSlot);
                                     *romListSlot = NULL;
                                 }
