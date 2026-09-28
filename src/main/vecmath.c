@@ -487,41 +487,45 @@ void mtx44_mult(f32* a, f32* b, f32* out) {
     out[2] = t;
 }
 
-void mtx44_multSafe(f32* a, f32* b, f32* out) {
-    f32 tmp[16];
-    int o3, o2, o1;
-    int t;
-    int row;
-    f32* tp;
-    int i;
-    int j;
+void mtx44_multSafe(f32* lhs, f32* rhs, f32* out) {
+    f32 product[16];
+    int lhsColumn3Offset, lhsColumn2Offset, lhsColumn1Offset;
+    int elementIndex;
+    int rowStart;
+    u8* productBytes;
+    u8* lhsBytes = (u8*)lhs;
+    u8* rhsBytes = (u8*)rhs;
+    int rowIndex;
+    int column;
     f32 zero;
 
-    i = 0;
-    row = 0;
+    rowIndex = 0;
+    rowStart = 0;
     zero = gVecMathZero[0];
-    tp = tmp;
-    for (; i < 4; i++) {
-        j = 0;
-        t = row;
-        o1 = (row + 1) * 4;
-        o2 = (row + 2) * 4;
-        o3 = (row + 3) * 4;
-        for (; j < 4; j++) {
-            tp[t] = zero;
-            tp[t] += (a)[row] * (b)[j];
-            tp[t] += *(f32*)((int)a + o1) * *(f32*)((int)b + (j + 4) * 4);
-            tp[t] += *(f32*)((int)a + o2) * *(f32*)((int)b + (j + 8) * 4);
-            tp[t] += *(f32*)((int)a + o3) * *(f32*)((int)b + (j + 12) * 4);
-            t++;
+    productBytes = (u8*)product;
+    for (; rowIndex < 4; rowIndex++) {
+        column = 0;
+        elementIndex = rowStart;
+        lhsColumn1Offset = (rowStart + 1) * sizeof(f32);
+        lhsColumn2Offset = (rowStart + 2) * sizeof(f32);
+        lhsColumn3Offset = (rowStart + 3) * sizeof(f32);
+        for (; column < 4; column++) {
+            f32* element = (f32*)(productBytes + elementIndex * sizeof(f32));
+
+            *element = zero;
+            *element += *(f32*)(lhsBytes + rowStart * sizeof(f32)) * *(f32*)(rhsBytes + column * sizeof(f32));
+            *element += *(f32*)(lhsBytes + lhsColumn1Offset) * *(f32*)(rhsBytes + (column + 4) * sizeof(f32));
+            *element += *(f32*)(lhsBytes + lhsColumn2Offset) * *(f32*)(rhsBytes + (column + 8) * sizeof(f32));
+            *element += *(f32*)(lhsBytes + lhsColumn3Offset) * *(f32*)(rhsBytes + (column + 12) * sizeof(f32));
+            elementIndex++;
         }
-        row += 4;
+        rowStart += 4;
     }
-    for (i = 0; i < 16; i += 4) {
-        *(f32*)((int)out + (i << 2)) = *(f32*)((int)tmp + (i << 2));
-        *(f32*)((int)out + ((i + 1) << 2)) = *(f32*)((int)tmp + ((i + 1) << 2));
-        *(f32*)((int)out + ((i + 2) << 2)) = *(f32*)((int)tmp + ((i + 2) << 2));
-        *(f32*)((int)out + ((i + 3) << 2)) = *(f32*)((int)tmp + ((i + 3) << 2));
+    for (rowIndex = 0; rowIndex < 16; rowIndex += 4) {
+        *(f32*)((u8*)out + rowIndex * sizeof(f32)) = *(f32*)((u8*)product + rowIndex * sizeof(f32));
+        *(f32*)((u8*)out + (rowIndex + 1) * sizeof(f32)) = *(f32*)((u8*)product + (rowIndex + 1) * sizeof(f32));
+        *(f32*)((u8*)out + (rowIndex + 2) * sizeof(f32)) = *(f32*)((u8*)product + (rowIndex + 2) * sizeof(f32));
+        *(f32*)((u8*)out + (rowIndex + 3) * sizeof(f32)) = *(f32*)((u8*)product + (rowIndex + 3) * sizeof(f32));
     }
 }
 

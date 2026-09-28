@@ -87,23 +87,23 @@ void dll_1CE_update(GameObject* obj) {
     {
         int contactOffset;
         int i;
-        ObjHitboxTransformState* contactState;
+        u32 contactStateAddress;
         int contactCount;
         int keyFound = 0;
 
         contactOffset = 0;
-        contactState = obj->anim.hitboxTransformState;
-        contactCount = contactState->contactObjectCount;
+        contactStateAddress = (u32)obj->anim.hitboxTransformState;
+        contactCount = ((ObjHitboxTransformState*)contactStateAddress)->contactObjectCount;
         for (i = 0; i < contactCount; i++) {
-            GameObject* contact =
-                *(GameObject**)((u8*)contactState + contactOffset + offsetof(ObjHitboxTransformState, contactObjects));
+            GameObject* contact = *(GameObject**)(contactStateAddress + contactOffset +
+                                                  offsetof(ObjHitboxTransformState, contactObjects));
 
             if (contact->anim.romDefNo == DLL1CE_KEY_SEQUENCE_ID_DIM_SNOW_HORN ||
                 contact->anim.romDefNo == DIM_CANNON_BALL_SEQUENCE_ID) {
                 keyFound = 1;
                 break;
             }
-            contactOffset += sizeof(contactState->contactObjects[0]);
+            contactOffset += sizeof(GameObject*);
         }
         if (!keyFound) {
             return;

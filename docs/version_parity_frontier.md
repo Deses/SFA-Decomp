@@ -1252,6 +1252,65 @@ So the pointer variant is a genuine, EN-safe colouring lever and simultaneously 
 reached the same registers with less pressure than any source we can write. Recorded so the lever is not
 mistaken for a near-miss that one more sweep would close.
 
+### The rotation knob exists, and it is a banned construct -- rejected and reverted
+
+A **dummy global register reservation** does move the rotation, and it is the only thing found that
+does. It was tried on these rows at the tree owner's request, landed on `GM_MazeWell.c`, and was then
+**rejected by the tree owner and reverted**. It must not be reintroduced; CLAUDE.md's ban stands. The
+mechanism is recorded because it is the first real handle on the rotation and it sharpens the frontier,
+not because the construct is available.
+
+Mechanics: MWCC accepts `register int x asm("rN");` only at **file scope**, and only in a contiguous run
+starting at `r14` (asking for `r24` alone errors with "gaps between assigned global register variables
+(nothing at 'r23') are not allowed"). Reserving registers shrinks the allocatable set, and that shifts
+**every function in the TU by one rotation step** -- including functions whose band never reaches the
+reserved registers.
+
+What it measured, before reverting:
+
+- `GM_MazeWell.c` with three reservations: every function matched on all five versions, PAL v1.0
+  99.497430 -> 99.526980 and PAL v1.1 99.497490 -> 99.527030, all DOLs byte-exact. One or two
+  reservations left `GM_MazeWell_update` at 14 diffs; four took it to 21/27.
+- `589_BossDrakor/BossDrakor.c` with one reservation: `bossdrakor_update` 150 -> **0** on both PALs
+  (EN v1.1 154 -> 5), but `bossdrakor_spawnAttackObjects` 0 -> 31, which would regress EN and JP. That
+  sibling is the same defect class -- identical stream, its two parameter copies `obj`/`state` swapped --
+  and resisted everything tried: 248-ordering declaration sweeps at both 31 and 24, a body-scoped
+  parameter copy (31 -> 25), an `obj` alias (31 -> 24), splitting the embedded `lo=`/`hi=` assignments,
+  naming the `Obj_CanSetupObject` result, and dropping the `mstate` local. No reservation count fixes
+  both functions: four fixes the sibling but breaks three others.
+- `main/gameloop.c` and `dlls/engine/2/maketex.c`: no count helps at all.
+
+The useful residue is diagnostic. `bossdrakor_update`'s gap is **exactly one rotation step and nothing
+else** -- measured, not inferred -- so the search for a legitimate source form should target a one-step
+rotation shift in that single function, and the frontier is not four independent mysteries.
+
+**A measurement trap found on the way:** `ninja` with no arguments builds the DOL but **not**
+`report.json`, and DLL objects are not DOL dependencies -- so a DLL source edit can leave both the object
+and the report stale while `ninja` reports success. It briefly showed 21 diffs on an already-matching
+function. Always delete the object and run `ninja build/<V>/report.json` explicitly before believing a
+per-unit number.
+
+### `saveCardBuildComment`: retail's source shape confirmed, only the order differs
+
+Reading retail's 108 instructions settles the source question: `bl getCurLanguage`, `cmpwi r3,4`,
+`bne` to the else, one `sprintf` on the Italian path and two on the other. That is exactly our
+`if (language == OS_LANGUAGE_ITALIAN)` form -- not a `switch`, not a different call structure. The only
+difference in the whole function is that retail materializes the string address **before** the call
+(`lis r3; addi r31,r3,0; bl`) and we materialize it after (`bl; lis r4; addi r31,r4,0`). Ours has to use
+`r4` precisely because `r3` holds the call's result, which the next instruction compares.
+
+Moving the declaration ahead of the call does not reproduce retail: GC/1.3 then emits the
+three-instruction detour `lis r3; addi r0,r3,LO; mr r31,r0`. Thirty source-order x flag combinations
+were scored whole-unit on EN v1.1 (`-opt schedule`, `-opt peephole` and both, five `-inline` modes,
+`-O4`, `-O4,p`, `-opt nospeculative`/`speculative`/`noptrmerge`/`nolifetimes`): the baseline pair is the
+only one at 3 diffs and every deviation is worse, most breaking 7 to 11 of the unit's 17 functions.
+Also inert: giving the `extern char sMemoryCardFileNameString[]` declaration its real size `[20]`, and
+band pressure (six probes adding one to five long-lived locals never remove the detour).
+
+So this row is one compiler-behaviour difference wide, fully localized, with the source shape proven
+right and every reachable knob measured. It is the closest row at 3 diffs and the least likely to move
+without a different codegen.
+
 ## See also
 
 - `docs/source_shape_levers.md` — levers 9, 14 and 16 are the ones this frontier keeps invoking.

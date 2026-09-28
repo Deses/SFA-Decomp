@@ -60,13 +60,16 @@ request is present there, but the second read crosses into that position vector.
 EN's small-data separation places the independent mode-0 radius next to the mode-2
 radius instead. Preserve the two-count request and this retail adjacency.
 
-Define `gDRCloudRunnerMode2LocalRadius = 20.0f` and
-`gDRCloudRunnerMode0SegmentRadius = 0.0f` separately. The direct EN references at
-`802BF1C4` and `802BF270`, the separate donor roles, and the initialized zero at
-`803DC780` support these definitions. The TU's `explicit_zero_data on` setting
-keeps the explicitly initialized zero in `.sdata`; its genuinely uninitialized
-globals remain in their existing `.sbss` slots. GC/1.3 and all optimization and
-inlining options are unchanged. No new padding or interior alias is needed.
+Keep the mode-2 local radius and mode-0 segment radii as separate objects.
+The direct EN references at `802BF1C4` and `802BF270` and the donor roles establish
+that separation, but do not distinguish a scalar from a one-element array.
+`curves_setSegmentCollision` indexes its radius argument once per segment; mode 0
+passes a segment count of one. Define `gDRCloudRunnerMode0SegmentRadii[1] = {0.0f}`
+and pass the array directly. GC/1.3 emits this initialized global array in `.sdata`
+with its default zero-data handling. The earlier scalar reconstruction needed
+`explicit_zero_data on`; that override has now been removed. The four-byte extent,
+independent base address, following data offsets, and mode-2 overread are preserved.
+See [the zero-data audit](explicit_zero_data_cleanup.md) for the regional checks.
 
 The flight handler bounds its move index to 0..5 (unrecognized moves use index 4),
 then selects one roll limit per pair of moves. Use a three-element `s16` array
