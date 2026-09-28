@@ -1344,6 +1344,44 @@ allocatable GPRs instead of 29**, and the only construct that arranges that is t
 reservation. Anyone resuming this should either find a legitimate way to reach that count, or treat the
 row as capped -- but not re-grind the source axes, which are provably orthogonal to the threshold.
 
+### Proof: `bossdrakor_update` matches only at 28 allocatable GPRs
+
+Three traces settle this row completely, and the conclusion is a proof rather than an exhaustion
+argument.
+
+The colouring worklist's high-degree prefix is ordered by **descending node index** among the nodes with
+degree >= K. Observed:
+
+| variant | K | prefix (node, degree, name) | assignment |
+|---|---|---|---|
+| plain | 29 | `164/35/-`, `40/102/state`, `39/31/moveResult`, `32/104/obj` | state=r31, moveResult=r30, obj=r29 |
+| `void*` param copy | 29 | `165/35/-`, `41/104/obj`, `40/102/state`, `39/31/moveResult` | state=r31, obj=r30, moveResult=r29 |
+| one register reserved | 28 | `32/105/obj`, `164/36/-`, `40/103/state`, `39/32/moveResult` | obj=r31, state=r30 (**retail**) |
+
+The param copy raises `obj`'s node index from 32 to 41, moving it up one slot in the descending-index
+order -- which is exactly the 150 -> 136 improvement and the bare 2-cycle residue. To get retail, `obj`
+must be **first**, and under descending index that needs `obj` to outrank every other prefix member.
+It cannot: named locals occupy nodes 32..44 and compiler temps are numbered above them, so the temp at
+node 164/165 always outranks `obj`. The only alternative is for that temp to leave the prefix, which
+needs its degree cut from 35 to <= 28 -- seven fewer values live in the function's tail.
+
+**The decisive test.** The reservation case differs from plain in two ways at once: `K` falls 29 -> 28 and
+every degree rises by one (`obj` 104 -> 105). Adding one extra long-lived GPR value to the source
+reproduces the degree change alone -- `obj` reaches 105 at K=29 -- and `obj` **stays last** in the prefix
+(`[166, 41/state, 40/moveResult, 33/keep, 32/obj]`). So the degree is not the trigger. **K is.**
+
+Therefore `bossdrakor_update` matches if and only if the compiler has 28 allocatable GPRs instead of 29,
+and `K = 32 - |blocked|` with `blocked = {r1, r2, r13}`. Nothing in the source can change that count;
+no flag does either (`-sdata 0`, `-sdata2 0`, both, `-use_lmw_stmw on`, `-fp software` all change
+register usage but give size mismatches), and no compiler does (all 20 give a size mismatch except
+GC/1.3's 150 diffs). The only construct that reaches K=28 is a global register reservation, which is
+banned. A TU split does not help either: node indices and K are both per-compilation, so isolating the
+function changes neither.
+
+This row is therefore **capped under the project's rules**, and since it blocks PAL v1.0, PAL v1.1 and
+EN v1.1, no version can reach 100% while the cap stands. That is a decision about the rules, not a
+search problem.
+
 ## See also
 
 - `docs/source_shape_levers.md` — levers 9, 14 and 16 are the ones this frontier keeps invoking.
