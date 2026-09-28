@@ -1311,6 +1311,39 @@ So this row is one compiler-behaviour difference wide, fully localized, with the
 right and every reachable knob measured. It is the closest row at 3 diffs and the least likely to move
 without a different codegen.
 
+### Why the reservation was uniquely effective: the threshold is the allocatable-register count
+
+Tracing `bossdrakor_update` with and without the reservation isolates the whole mechanism, and the
+result is worth more than the hack was.
+
+The reservation's *only* effect on what the allocator sees is one extra entry in `blocked`
+(`[1,2,13]` -> `[1,2,13,14]`). Because the reserved register is a precoloured node that interferes with
+everything, **every node's degree rises by exactly one** -- `obj` 104 -> 105, `state` 102 -> 103,
+`moveResult` 31 -> 32, and so on uniformly. Relative degrees are therefore unchanged. What changes is the
+**order of the colouring worklist's high-degree prefix**:
+
+| | prefix | assignment |
+|---|---|---|
+| plain | `[temp164, state, moveResult, obj]` | state=r31, moveResult=r30, obj=r29 |
+| reserved | `[obj, temp164, state, moveResult]` | obj=r31, state=r30, moveResult=r29 (**retail**) |
+
+`obj` moves from last to first while everything else keeps its relative order. Since the degrees all
+shifted equally, the prefix cannot be ordered *by* degree -- it is ordered by **when each node crosses a
+degree threshold** as the interference graph is built, and that threshold is the number of allocatable
+GPRs: 29 plain (32 minus `r1`, `r2`, `r13`), 28 with one reserved. Lowering it by one makes the densest
+node -- `obj`, live across the whole function -- cross first instead of last.
+
+That is why nothing else worked. Declaration order, scope, the local set, expression spellings, inlined
+helpers, compilers and ~90 flag settings all leave the allocatable count at 29, so they permute values
+*within* the prefix shape but never reorder the crossings. Confirmed again here: `-sdata 0`,
+`-sdata2 0`, both together, `-use_lmw_stmw on` and `-fp software` all change register usage but produce
+size mismatches, and `-fp fmadd`, `-opt nointrinsics`, `-rostr` and `-msgstyle gcc` leave 150 diffs.
+
+So the row reduces to a single sentence: **`bossdrakor_update` matches when the compiler has 28
+allocatable GPRs instead of 29**, and the only construct that arranges that is the banned global register
+reservation. Anyone resuming this should either find a legitimate way to reach that count, or treat the
+row as capped -- but not re-grind the source axes, which are provably orthogonal to the threshold.
+
 ## See also
 
 - `docs/source_shape_levers.md` — levers 9, 14 and 16 are the ones this frontier keeps invoking.
