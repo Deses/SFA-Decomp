@@ -1344,38 +1344,42 @@ allocatable GPRs instead of 29**, and the only construct that arranges that is t
 reservation. Anyone resuming this should either find a legitimate way to reach that count, or treat the
 row as capped -- but not re-grind the source axes, which are provably orthogonal to the threshold.
 
-### Correction: the K=28 "proof" was WRONG -- obj-first is reachable at K=29
+### `bossdrakor_update`: obj=r31 is reachable EN-safely, but it conflicts with state=r30
 
-An earlier revision of this document claimed `bossdrakor_update` could only match at 28 allocatable
-GPRs, on the grounds that the colouring prefix is ordered by descending node index and `obj`, being the
-parameter at node 32, must therefore colour last. **That claim is false and is retracted.** The
-descending-index observation was induction from three samples, and a fourth sample breaks it.
+An earlier revision claimed this row could only match at 28 allocatable GPRs, because the colouring
+prefix looked descending-index-ordered and `obj`, the parameter at node 32, would therefore always colour
+last. **That claim was wrong and is retracted** -- it was induction from three samples, and a fourth
+breaks it.
 
-**Counter-example, legitimate and EN-safe.** Hoisting the two values the PAL-gated arm already computes --
-the `gRenderModeObj` load and the `&GXEurgb60Hz480IntDf` address -- to the top of the function, inside the
-existing `#if`, puts `obj` **first** in the prefix at K=29:
+**obj=r31 is reachable at K=29, legitimately and EN-safely.** Hoisting the two values the PAL-gated arm
+already computes -- the `gRenderModeObj` load and the `&GXEurgb60Hz480IntDf` address -- to the top of the
+function, inside the existing `#if`, puts `obj` first in the prefix and emits `mr r31,r3`, retail's
+register for `obj`, with EN and JP byte-identical, the band still 7 wide (`_savegpr_25`) and the
+instruction count unchanged at 659. Nothing is added; the computations move. Prefix *size* is what flips
+it: one hoisted value gives five members and `obj` stays last, two gives six and `obj` goes first.
+Hoisting either value alone instead puts the hoisted value in `r31` and `obj` in `r29`, and hoisting
+`&state->curveWalker` or `&state->curveFollowState` costs instructions.
 
-    prefix = [32/104/obj, 164/35/-, 63/34/-, 42/35/mode, 40/102/state, 39/31/moveResult]
+**Why it stops there.** The colour rule is `min(enabled - blockers)` with the saved bank expanding one
+register at a time. With the hoist the order is `[obj, temp164, temp63, state, moveResult, mode]`, and the
+trace gives: `obj` -> r31; `temp164` -> r30; `temp63` -> r30 as well (it does not interfere with 164);
+then `state` interferes with both `obj` (r31) and `temp63` (r30), so its blockers are {31, 30} and it is
+forced to **r29**. Retail needs `state` at r30.
 
-and the emitted code opens `mr r31,r3` -- **retail's register for `obj`** -- with EN, JP byte-identical
-(EN=0, JP=0), the band still 7 wide (`_savegpr_25`) and the instruction count unchanged at 659. Nothing is
-added: the two computations move rather than appear, which is why the stream length holds.
+That conflict is structural for this mechanism. `state` is defined at instruction 11, so **any** value
+hoisted to the top overlaps it and interferes with it; the hoisted value's temp is a compiler temp, and
+temps are numbered above all named locals, so it always outranks `state` and always colours first, taking
+r30. Hence **obj=r31 implies state != r30** whenever obj-first is bought by hoisting.
 
-What flipped it is the prefix *size*: one hoist gives five prefix members and `obj` stays last; two gives
-six and `obj` goes first. The nodes just below the threshold sit at degree 19, so extra members have to
-come from lifetime extension, not from raising an existing degree.
+Measured floors: 206 diffs with the gated pair declared first, 211 with it declared at position 7 or 14,
+and **496 ordinary-declaration orderings across two gated-pair positions are completely flat** at those
+values. Against a 150-diff baseline this is worse by the metric while being structurally right at the top.
 
-**Why it is not yet a win.** The two hoisted values become long-lived and take `r29`/`r30`, displacing
-`state` and the air-meter reload down to `r27`/`r28`, so PAL scores 206 diffs against a 150 baseline --
-worse by the metric while being structurally right at the top. Sweeping the hoisted pair's declaration
-position across all 15 slots does not move this (206 at the head, 211 everywhere else), so their colouring
-position is not controlled by declaration order the way the ordinary locals' is.
-
-**The live question** is therefore narrow and concrete: get `obj` first *and* keep the two hoisted values
-out of `r29`/`r30`, so `state` can take `r30`. They only need to be live long enough to be prefix members;
-anything that lets them share the registers of values dead before the arm (`player`, `d`, `vec`, `step`,
-or the shake temps) should do it. That is a real lead, not a cap, and it is EN-safe by construction
-because the hoist lives inside the PAL `#if`.
+**What would break it** is narrow and stated here so it is not re-derived: either make `obj` colour first
+*without* introducing a value live from the top (so no new temp interferes with `state`), or make the
+hoisted value's temp not interfere with `state`. This is a bounded negative for the hoist mechanism, not a
+cap on the row -- the K=28 episode is a standing reminder that "the prefix is ordered by X" claims here
+should be treated as observations, not laws.
 
 ## See also
 
