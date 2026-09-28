@@ -607,6 +607,7 @@ enum GameBitId {
     GAMEBIT_SH_OpenedPathToMagicCave2 = 0x1A4,           /* table 2; ref hollow/HitAnimator target */
     GAMEBIT_TTH_BombPlanted1A5 = 0x1A5,                  /* Rena's U0 dataset; table 2 */
     GAMEBIT_NW_MagicCaveCollected = 0x1A6,               /* table 2; ref wastes/MagicCaveTo Collected */
+    GAMEBIT_MusicLatchClear01A7 = 0x1A7,                 /* A GameBitLatch clear-bit shared by two areas: DIM_LevelCo passes it as the clearIfSet of its MUSICTRIG_drako_1 latch, and drmusiccont as the clearIfSet of its 0xE5 latch, both paired with GAMEBIT_SH_Landed064B as the clearIfClear - so it carries no area prefix */
     GAMEBIT_SH_WarpStoneRelated01A8 = 0x1A8,             /* table 0; toggled when talking to WarpStone, and in CRFort */
     GAMEBIT_NW_SeqNeed01A9 = 0x1A9,                      /* Named from map data alone - nothing in the code or in any name list mentions it: wastes/NWSteppingS objId= param=needBit; wastes/StaffLeverO objId= param=activated; table 2 */
     GAMEBIT_NW_SeqUsed01AA = 0x1AA,                      /* Named from map data alone - nothing in the code or in any name list mentions it: wastes/NWSteppingS objId= param=usedBit; table 2 */
@@ -624,6 +625,7 @@ enum GameBitId {
     GAMEBIT_SH_CaveOpenedBesideWarpStone = 0x1B7,        /* table 2; ref hollow/HitAnimator target */
     GAMEBIT_MagicCaveExitWarp = 0x1B8,                   /* table 2; size 8; WARPTAB index that magic cave will exit to */
     GAMEBIT_IM_TrickyRelated01B9 = 0x1B9,                /* table 0; set when starting Tricky landing scene */
+    GAMEBIT_MusicLatchClear01BA = 0x1BA,                 /* Another shared GameBitLatch clear-bit: DIM_LevelCo uses it as the clearIfSet of its day/night ambient latch, and IMIceMounta as the clearIfSet of a Tricky-state latch */
     GAMEBIT_NW_SomethingFreedFromIce = 0x1BB,            /* might be "ice breaking"; Rena's U0 dataset; table 2 */
     GAMEBIT_CC_SeqNeedBit1BC = 0x1BC,                    /* Rena's U0 dataset; table 2 */
     GAMEBIT_IM_SlippyWarnedCold = 0x1BD,                 /* table 2 */
@@ -719,6 +721,7 @@ enum GameBitId {
     GAMEBIT_WC_PlacedSunMoonStones = 0x235,              /* table 2; hint 411 */
     GAMEBIT_CC_Open0236 = 0x236,                         /* Named from map data alone - nothing in the code or in any name list mentions it: capeclaw/CCwaterShut objId= param=open; capeclaw/CCwaterShut objId= param=open; capeclaw/HitAnimator objId= param=target; table 2 */
     GAMEBIT_CC_SeqUsed0237 = 0x237,                      /* Named from map data alone - nothing in the code or in any name list mentions it: capeclaw/CCseqobj objId= param=usedBit; table 2 */
+    GAMEBIT_IM_TrickyRelated0238 = 0x238,                /* The clearIfClear of IMIceMounta's second Tricky-state music latch, whose clearIfSet is GAMEBIT_IM_TrickyRelated02C1 and whose condition is GAMEBIT_IM_TrickyRelated01ED */
     GAMEBIT_SH_MagicCaveVisible = 0x23A,                 /* table 1; ref hollow/MagicCaveTo Visible */
     GAMEBIT_SH_QueenPortalSpellCast023B = 0x23B,         /* Raised when the player casts the portal spell close enough to the Queen EarthWalker; its neighbour GAMEBIT_SH_Related023C is what then selects her portal-ready event table */
     GAMEBIT_SH_Related023C = 0x23C,                      /* table 2 */

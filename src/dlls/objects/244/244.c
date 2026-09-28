@@ -479,7 +479,7 @@ void DoorF4_init(GameObject* obj, DoorF4Placement* placement) {
     switch (sequenceId) {
     case 193:
     case 196:
-        state->requiredGameBit = 68;
+        state->requiredGameBit = GAMEBIT_ITEM_PrisonKey_Got;
         break;
     case 283:
     case 284:

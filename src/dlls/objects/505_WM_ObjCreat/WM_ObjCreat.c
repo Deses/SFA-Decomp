@@ -18,6 +18,7 @@
 #include "dlls/objects/529.h"
 #include "main/dll/partfx_interface.h"
 #include "main/frame_timing.h"
+#include "main/gamebit_ids.h"
 #include "main/gamebits.h"
 #include "main/object_render.h"
 #include "main/objtype.h"
@@ -264,7 +265,7 @@ void WM_ObjCreator_update(GameObject* obj) {
                     setup->posZ = obj->anim.localPosZ;
                     ((LFXEmitterPlacement*)setup)->lifeTimer = 400;
                     ((LFXEmitterPlacement*)setup)->actionIndex = 0xf;
-                    ((LFXEmitterPlacement*)setup)->enableGameBit = 0x222;
+                    ((LFXEmitterPlacement*)setup)->enableGameBit = GAMEBIT_WM_CrystalRiseStage6;
                     ((LFXEmitterPlacement*)setup)->spinRoll = 0;
                     ((LFXEmitterPlacement*)setup)->spinPitch = 0;
                     ((LFXEmitterPlacement*)setup)->spinYaw = 0;

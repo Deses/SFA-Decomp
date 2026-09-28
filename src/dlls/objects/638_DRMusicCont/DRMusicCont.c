@@ -15,6 +15,7 @@
 #include "main/audio/sfx_play_api.h"
 #include "main/audio/music_trigger_ids.h"
 #include "main/frame_timing.h"
+#include "main/gamebit_ids.h"
 #include "main/gamebits.h"
 #include "main/mapEventTypes.h"
 #include "main/render_envfx_api.h"
@@ -97,7 +98,8 @@ void drmusiccont_update(GameObject* obj)
         obj->userData1 = 1;
     }
 
-    GameBitLatch_Update(&state->gameBitLatch, 2, 0x1a7, GAMEBIT_SH_Landed064B, GAMEBIT_DR_MusicLatch0F0E, 0xe5);
+    GameBitLatch_Update(&state->gameBitLatch, 2, GAMEBIT_MusicLatchClear01A7, GAMEBIT_SH_Landed064B,
+                        GAMEBIT_DR_MusicLatch0F0E, 0xe5);
     GameBitLatch_UpdateInverted(&state->gameBitLatch, 1, -1, -1, GAMEBIT_DR_Unk0E26, 0xb8);
     GameBitLatch_Update(&state->gameBitLatch, 4, -1, -1, GAMEBIT_SHRINE_MUSIC_LOCK,
                         MUSICTRIG_PU3_Adventure_c4);

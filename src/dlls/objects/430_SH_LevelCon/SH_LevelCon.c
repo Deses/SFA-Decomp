@@ -257,7 +257,7 @@ void SH_LevelControl_setMusic(ShLevelControlState* state) {
         if (mainGetBit(GAMEBIT_SH_Landed064B) != 0) {
             mainSetBits(GAMEBIT_KrazTest1Related0390, 1);
         }
-        GameBitLatch_Update((GameBitLatchState*)&state->flags, 1, 0x1a7, GAMEBIT_SH_Landed064B,
+        GameBitLatch_Update((GameBitLatchState*)&state->flags, 1, GAMEBIT_MusicLatchClear01A7, GAMEBIT_SH_Landed064B,
                             GAMEBIT_KrazTest1Related0372, state->dayNightMusicLatch);
         GameBitLatch_Update((GameBitLatchState*)&state->flags, 2, GAMEBIT_SH_WarpStoneRelated01A8,
                             GAMEBIT_SH_Entered00C0, GAMEBIT_KrazTest1Related0390, state->musicLatch);
