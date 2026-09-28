@@ -550,7 +550,9 @@ enum GameBitId {
     GAMEBIT_ITEM_WCSunStone_Got = 0x201,                 /* table 2 */
     GAMEBIT_ITEM_WCSunStone_Used = 0x202,                /* table 2 */
     GAMEBIT_WC_TempleDiaBStage0 = 0x203,                 /* Walled City temple rotating-dial (bank B) - stage 0 complete, gWcTempleDiaGameBitsB[0]; bank chosen by ObjAnim.bankIndex != 0, otherwise as bank A */
+    GAMEBIT_WC_TrexRunStart = 0x204,                     /* The last condition before the T-rex challenge starts: with the run requested, wclevelcont waits on this to clear the four lever bits and enter its TREX_INIT mode */
     GAMEBIT_WC_AllSwitchesActivated = 0x205,             /* Walled City - set by wclevelcont_updateAct2State once all three floor switches (0xC58/0xC59/0xC5A) read set; latches WCLEVELCTL_FLAG_SWITCHES and plays the confirm sfx */
+    GAMEBIT_WC_TrexLever3Activated = 0x206,              /* One of the four wallcity staff levers the T-rex challenge runs on - wclevelcont raises all four at init and again when a run times out, and clears all four as a run starts; Rena records only a HitAnimator target (0x47FEF) for this one and no StaffLeverO, though the code writes it in lockstep with the other three everywhere */
     GAMEBIT_ITEM_DIM2CellKey_Used = 0x207,               /* table 2; ref snowmines2/DIM2CellKey open */
     GAMEBIT_ITEM_DIMSilverKey_Used = 0x208,              /* table 2; ref snowmines2/DIM2CellKey open */
     GAMEBIT_CF_FlewTo = 0x212,                           /* table 1; hint 324 */
@@ -558,6 +560,7 @@ enum GameBitId {
     GAMEBIT_ITEM_DIMSilverKey_Used_2 = 0x21A,            /* table 2 */
     GAMEBIT_WM_SpiritHead1Fired = 0x21D,                 /* table 1; when releasing spirit 1, head fired laser */
     GAMEBIT_DIM_FoundBelinaTe = 0x223,                   /* table 2; hint 290 */
+    GAMEBIT_WC_TrexLever1Activated = 0x226,              /* One of the four wallcity staff levers the T-rex challenge runs on - wclevelcont raises all four at init and again when a run times out, and clears all four as a run starts; Rena has it as wallcity HitAnimator 0x47FED's target and StaffLeverO 0x4CB3D's activated param */
     GAMEBIT_CC_LeverActivated228 = 0x228,                /* Rena's U0 dataset; table 2 */
     GAMEBIT_DIM3_ActNo = 0x229,                          /* table 1; size 4; snowmines3 (unused?) */
     GAMEBIT_ITEM_FireSpellStone1_Used = 0x22B,           /* table 2 */
@@ -572,13 +575,18 @@ enum GameBitId {
     GAMEBIT_WM_DoorToKrazTest1Opened = 0x24E,            /* table 2; ref warlock/HitAnimator target */
     GAMEBIT_ITEM_WCGoldTooth_Used = 0x25A,               /* table 2 */
     GAMEBIT_ITEM_WCSilverTooth_Used = 0x25B,             /* table 2 */
+    GAMEBIT_WC_TrexLever4Activated = 0x25F,              /* One of the four wallcity staff levers the T-rex challenge runs on - wclevelcont raises all four at init and again when a run times out, and clears all four as a run starts; Rena has it as wallcity HitAnimator 0x47FF0's target and StaffLeverO 0x4CB3F's activated param */
     GAMEBIT_ITEM_WCMoonStone_Got = 0x264,                /* table 2 */
     GAMEBIT_PushableRelated0272 = 0x272,                 /* table 2; ref snowmines2/HitAnimator target */
+    GAMEBIT_WC_TrexAnimTarget0274 = 0x274,               /* Wallcity HitAnimator 0x4CB89's target - wclevelcont raises it both as a T-rex run starts and when one is beaten, and drops it when a run times out */
     GAMEBIT_ITEM_Spirit1_Used = 0x277,                   /* table 1 */
     GAMEBIT_ITEM_SilverKey282_Got = 0x282,               /* table 2 */
     GAMEBIT_ITEM_SilverKey282_Used = 0x283,              /* table 2 */
     GAMEBIT_ITEM_Spirit2_Used = 0x29A,                   /* table 2; hint 316 */
     GAMEBIT_WM_SpiritPlace2Ready = 0x29B,                /* table 2; gates spirit-place 2 and its return pad */
+    GAMEBIT_WC_TrexChallengeComplete = 0x2A5,            /* The Walled City T-rex challenge has been beaten - polled through the timed run to end it with a checkpoint save, and the bit wclevelcont_init reads back into WCLEVELCTL_FLAG_TREX */
+    GAMEBIT_WC_TrexLever2Activated = 0x2A6,              /* One of the four wallcity staff levers the T-rex challenge runs on - wclevelcont raises all four at init and again when a run times out, and clears all four as a run starts; Rena has it as wallcity HitAnimator 0x47FEE's target and StaffLeverO 0x4CB3E's activated param, the same lever GAMEBIT_WC_TrexLever2Enabled switches on */
+    GAMEBIT_WC_TrexRunRequested = 0x2B1,                 /* A T-rex run has been asked for: while it is up and the challenge is unbeaten, wclevelcont arms the run, and a timeout clears it */
     GAMEBIT_SH_OpenedGateToCape = 0x2B2,                 /* table 2; ref hollow/StaffLeverO activated */
     GAMEBIT_LV_CapturedByLightFoot = 0x2B5,              /* table 2; hint 346 */
     GAMEBIT_LV_TestStrengthBestTime1 = 0x2B6,            /* table 2; size 16 */
@@ -602,6 +610,7 @@ enum GameBitId {
     GAMEBIT_ITEM_WaterSpellStone1_Got = 0x2E8,           /* table 2; hint 336; ref dfptop/VFP_PodiumP key */
     GAMEBIT_WC_TempleDiaBStage1 = 0x2EC,                 /* Walled City temple rotating-dial (bank B) - stage 1 complete, gWcTempleDiaGameBitsB[1]; bank chosen by ObjAnim.bankIndex != 0, otherwise as bank A */
     GAMEBIT_WC_TempleDiaBStage2 = 0x2EF,                 /* Walled City temple rotating-dial (bank B) - stage 2 complete, gWcTempleDiaGameBitsB[2]; bank chosen by ObjAnim.bankIndex != 0, otherwise as bank A */
+    GAMEBIT_WC_FinalStopwatchTarget = 0x2F0,             /* Wallcity CNTstopwatc 0x49129's target, raised as the Walled City final puzzle completes */
     GAMEBIT_WC_TempleDiaAStage0 = 0x2F8,                 /* Walled City temple rotating-dial (bank A) - stage 0 complete, gWcTempleDiaGameBitsA[0]; ORed into WCTempleDiaState.stageMask, which picks the dial speed from gWcTempleDiaTargetSpeedTableA and drives part visibility */
     GAMEBIT_CFRelated02FC = 0x2FC,                       /* table 1 */
     GAMEBIT_CFRelated02FD = 0x2FD,                       /* table 1 */
@@ -612,6 +621,7 @@ enum GameBitId {
     GAMEBIT_DIM3_WarpEnable313 = 0x313,                  /* Rena's U0 dataset; table 0 */
     GAMEBIT_ITEM_Key336_Got = 0x336,                     /* table 1; XXX where is this key from? */
     GAMEBIT_FinalBoss_ActNo = 0x349,                     /* table 1; size 4 */
+    GAMEBIT_WC_TrexRetryBlocked034D = 0x34D,             /* Blocks the retry: when a T-rex run times out, wclevelcont only re-arms the four levers if this is clear */
     GAMEBIT_DIM_Bike_HitboxEnabled = 0x35F,              /* Rena's U0 dataset; table 2 */
     GAMEBIT_WC_ObjGroups = 0x36A,                        /* table 3; size 32 */
     GAMEBIT_KrazTest1Related0372 = 0x372,                /* table 3; set when entering Krazoa test 1, cave beside WarpStone */
@@ -912,12 +922,20 @@ enum GameBitId {
     GAMEBIT_WC_TimedPuzzleBTrigger = 0x7EE,              /* Walled City timed push-block puzzle B - entry trigger; mirrors puzzle A, arming GAMEBIT_WC_TimedPuzzleBActive */
     GAMEBIT_WC_TimedPuzzleAActive = 0x7EF,               /* Walled City timed push-block puzzle A - armed/running; set by wclevelcont when the trigger fires and cleared on timeout or abort */
     GAMEBIT_WC_TimedPuzzleBActive = 0x7F0,               /* Walled City timed push-block puzzle B - armed/running; cleared on timeout or abort */
+    GAMEBIT_WC_IsNight = 0x7F1,                          /* Walled City is in its night state - wclevelcont writes it and GAMEBIT_WC_IsDay as a complementary pair off the sky interface's sun position every update */
+    GAMEBIT_WC_IsDay = 0x7F3,                            /* Walled City is in its day state; the complement of GAMEBIT_WC_IsNight */
     GAMEBIT_WC_TimedPuzzleAComplete = 0x7F7,             /* Walled City timed push-block puzzle A fully complete; wclevelcont_seqFn sets it once A's post-solve sequence timer runs out and saves a checkpoint at the player */
     GAMEBIT_WC_LitBeacons = 0x7F8,                       /* table 2; hint 362; ref wallcity/HitAnimator target */
     GAMEBIT_WC_TimedPuzzleASolved = 0x7F9,               /* Walled City timed push-block puzzle A solved; ends the 0x3C countdown, and if puzzle B is also solved wclevelcont plays the confirm sfx and runs sequence 0 instead of sequence 1 */
     GAMEBIT_WC_TimedPuzzleBSolved = 0x7FA,               /* Walled City timed push-block puzzle B solved; ends the 0x50 countdown, and pairs with puzzle A to pick the confirm sfx and sequence 0 */
     GAMEBIT_WC_FoundKing = 0x7FC,                        /* table 2; hint 363 */
     GAMEBIT_WC_TimedPuzzleBComplete = 0x802,             /* Walled City timed push-block puzzle B fully complete; the puzzle-B mirror of 0x7F7, also saving a checkpoint */
+    GAMEBIT_WC_PushBlockAFade = 0x808,                   /* Push-block puzzle A's fade flag, aliased locally in dll_0290_wcpushblock.h as WCPUSHBLOCK_GAMEBIT_A_FADE */
+    GAMEBIT_WC_PushBlockBFade = 0x809,                   /* Push-block puzzle B's fade flag (WCPUSHBLOCK_GAMEBIT_B_FADE) */
+    GAMEBIT_WC_PushBlockACount = 0x810,                  /* How many of push-block puzzle A's four blocks are placed - a counter, not a flag: wclevelcont marks the puzzle solved when it reads 4, and clears it on reset and at init beside restoring gWcTileGridA */
+    GAMEBIT_WC_PushBlockBCount = 0x811,                  /* Push-block puzzle B's placed-block count, the counterpart to GAMEBIT_WC_PushBlockACount */
+    GAMEBIT_WC_PushBlockASolved = 0x812,                 /* Push-block puzzle A solved, which wclevelcont_init reads back into WCLEVELCTL_FLAG_TILE_A; two DLLs alias it locally from either end - WCPUSHBLOCK_GAMEBIT_A_SOLVED for the cause and WCTILE_GAMEBIT_A_HIDE for its effect on the tiles */
+    GAMEBIT_WC_PushBlockBSolved = 0x813,                 /* Push-block puzzle B solved (WCPUSHBLOCK_GAMEBIT_B_SOLVED / WCTILE_GAMEBIT_B_HIDE), read back into WCLEVELCTL_FLAG_TILE_B */
     GAMEBIT_WC_OpenedSunMoonAreas = 0x817,               /* table 2; hint 410; ref wallcity/HitAnimator target */
     GAMEBIT_WC_FlewTo = 0x818,                           /* table 2; hint 360; ref wallcity/Landed_Arwi Visible */
     GAMEBIT_WC_OpenedBossDoor = 0x819,                   /* table 2; hint 365; ref wallcity/HitAnimator target */
@@ -1138,6 +1156,9 @@ enum GameBitId {
     GAMEBIT_TestCombatClawDeadBC1 = 0xBC1,               /* Rena's U0 dataset; table 0 */
     GAMEBIT_CR_SpellStoneRelatedBC3 = 0xBC3,             /* Rena's U0 dataset; table 1 */
     GAMEBIT_LINKI_ActNo = 0xBC7,                         /* table 0; This seems wrong... */
+    GAMEBIT_WC_FinalStopwatchEnabled = 0xBC8,            /* Wallcity CNTstopwatc 0x49129's enabled param, cleared as the final puzzle completes */
+    GAMEBIT_WC_FinalPuzzleComplete = 0xBCF,              /* The Walled City final puzzle is done - wclevelcont tears down the stopwatch and its animator, saves a checkpoint and raises WCLEVELCTL_FLAG_FINAL, which init reads back from this bit */
+    GAMEBIT_WC_FinalAnimTarget0BD0 = 0xBD0,              /* Wallcity HitAnimator 0x4917B's target, cleared as the final puzzle completes */
     GAMEBIT_SC_LVBlock3Related0BDC = 0xBDC,              /* One of the three bits sc_levelcontrol raises the moment GAMEBIT_ITEM_LVBlock3_Used is set */
     GAMEBIT_ITEM_LVBlock3_Used = 0xBDE,                  /* table 2; ref swapcircle/SC_blockpla open */
     GAMEBIT_SC_LVBlock1Related0BDF = 0xBDF,              /* One of the three bits sc_levelcontrol raises the moment GAMEBIT_ITEM_LVBlock1_Used is set; Rena has this one as the target of swapcircle's HitAnimator 0x49433 */
@@ -1391,6 +1412,7 @@ enum GameBitId {
     GAMEBIT_IM_DestroyedBox13 = 0xE69,                   /* table 2 */
     GAMEBIT_IM_BikeRelated0E6A = 0xE6A,                  /* table 2; set when gaining control of bike */
     GAMEBIT_IM_BikeRelated0E6B = 0xE6B,                  /* table 2; set when gaining control of bike */
+    GAMEBIT_WC_TrexLever2Enabled = 0xE6D,                /* Switches on the second T-rex lever - wallcity StaffLeverO 0x4CB3E's enabled param, the same object GAMEBIT_WC_TrexLever2Activated reports the pull of; wclevelcont clears it while arming a run */
     GAMEBIT_SH_ReturnedToWarpStone = 0xE6F,              /* table 0; hint 313; Fox returned with first spirit */
     GAMEBIT_MMP_EnteredKrazoaShrine = 0xE70,             /* table 0; hint 311 */
     GAMEBIT_ArwingRelated0E74 = 0xE74,                   /* table 0 */
@@ -1434,6 +1456,8 @@ enum GameBitId {
     GAMEBIT_SH_Related0EDE = 0xEDE,                      /* table 2; Triggers a communication after pushing switch at bottom of well */
     GAMEBIT_ITEM_SnowHornArtifactEE5 = 0xEE5,            /* table 2; set when using artifact */
     GAMEBIT_ITEM_SnowHornArtifactEE6 = 0xEE6,            /* table 2; set when using artifact */
+    GAMEBIT_WC_FinalPuzzleRelated0EEC = 0xEEC,           /* Cleared alongside the stopwatch and animator bits as the Walled City final puzzle completes; nothing in the code sets it or reads it, and Rena records no objref */
+    GAMEBIT_WC_TrexAnimTarget0EF1 = 0xEF1,               /* Wallcity HitAnimator 0x4CB88's target - raised while a T-rex run is being armed and cleared on both of the run's endings */
     GAMEBIT_VFP_EnvironmentRelated0EF6 = 0xEF6,           /* table 2; transporter-controlled VFP environment state */
     GAMEBIT_IN_KRAZOA_SHRINE = 0xEFA,                    /* table 0; set while any Krazoa shrine test is active */
     GAMEBIT_MC_IsActive = 0xEFB,                         /* table 0; set while the Magic Cave interior is active; selects SFX global control 0xD */

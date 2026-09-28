@@ -49,10 +49,10 @@ void wclevelcont_updateAct2State(GameObject* obj, WcLevelControlState* state) {
         state->mode = WCLEVELCTL_MODE_TREX_ACTIVE;
         break;
     case WCLEVELCTL_MODE_TREX_ACTIVE:
-        if (mainGetBit(0x2a5) != 0) {
+        if (mainGetBit(GAMEBIT_WC_TrexChallengeComplete) != 0) {
             GameObject* player;
-            mainSetBits(0x274, 1);
-            mainSetBits(0xef1, 0);
+            mainSetBits(GAMEBIT_WC_TrexAnimTarget0274, 1);
+            mainSetBits(GAMEBIT_WC_TrexAnimTarget0EF1, 0);
             player = (GameObject*)Obj_GetPlayerObject();
             (*gMapEventInterface)->savePoint(&player->anim.localPosX, player->anim.rotX, 1, 0);
             state->completionFlags |= WCLEVELCTL_FLAG_TREX;
@@ -60,28 +60,28 @@ void wclevelcont_updateAct2State(GameObject* obj, WcLevelControlState* state) {
             Sfx_PlayFromObject(0, SFXTRIG_mpick1_b);
             gameTimerStop();
         } else if (isGameTimerDisabled() != 0) {
-            mainSetBits(0x274, 0);
-            mainSetBits(0xef1, 0);
-            if (mainGetBit(0x34d) == 0) {
-                mainSetBits(0x2b1, 0);
-                mainSetBits(0x226, 1);
-                mainSetBits(0x2a6, 1);
-                mainSetBits(0x206, 1);
-                mainSetBits(0x25f, 1);
+            mainSetBits(GAMEBIT_WC_TrexAnimTarget0274, 0);
+            mainSetBits(GAMEBIT_WC_TrexAnimTarget0EF1, 0);
+            if (mainGetBit(GAMEBIT_WC_TrexRetryBlocked034D) == 0) {
+                mainSetBits(GAMEBIT_WC_TrexRunRequested, 0);
+                mainSetBits(GAMEBIT_WC_TrexLever1Activated, 1);
+                mainSetBits(GAMEBIT_WC_TrexLever2Activated, 1);
+                mainSetBits(GAMEBIT_WC_TrexLever3Activated, 1);
+                mainSetBits(GAMEBIT_WC_TrexLever4Activated, 1);
                 state->mode = WCLEVELCTL_MODE_IDLE;
             }
         }
         break;
     default:
-        if (!(state->completionFlags & WCLEVELCTL_FLAG_TREX) && mainGetBit(0x2b1) != 0) {
-            mainSetBits(0xef1, 1);
-            mainSetBits(0xe6d, 0);
-            if (mainGetBit(0x204) != 0) {
-                mainSetBits(0x226, 0);
-                mainSetBits(0x2a6, 0);
-                mainSetBits(0x206, 0);
-                mainSetBits(0x25f, 0);
-                mainSetBits(0x274, 1);
+        if (!(state->completionFlags & WCLEVELCTL_FLAG_TREX) && mainGetBit(GAMEBIT_WC_TrexRunRequested) != 0) {
+            mainSetBits(GAMEBIT_WC_TrexAnimTarget0EF1, 1);
+            mainSetBits(GAMEBIT_WC_TrexLever2Enabled, 0);
+            if (mainGetBit(GAMEBIT_WC_TrexRunStart) != 0) {
+                mainSetBits(GAMEBIT_WC_TrexLever1Activated, 0);
+                mainSetBits(GAMEBIT_WC_TrexLever2Activated, 0);
+                mainSetBits(GAMEBIT_WC_TrexLever3Activated, 0);
+                mainSetBits(GAMEBIT_WC_TrexLever4Activated, 0);
+                mainSetBits(GAMEBIT_WC_TrexAnimTarget0274, 1);
                 state->mode = WCLEVELCTL_MODE_TREX_INIT;
             }
         }
@@ -89,13 +89,13 @@ void wclevelcont_updateAct2State(GameObject* obj, WcLevelControlState* state) {
     }
 
     if (!(state->completionFlags & WCLEVELCTL_FLAG_TILE_A)) {
-        if ((u8)mainGetBit(WCPUSHBLOCK_GAMEBIT_A_COUNT) == 4) {
-            mainSetBits(WCPUSHBLOCK_GAMEBIT_A_SOLVED, 1);
+        if ((u8)mainGetBit(GAMEBIT_WC_PushBlockACount) == 4) {
+            mainSetBits(GAMEBIT_WC_PushBlockASolved, 1);
             Sfx_PlayFromObject(0, SFXTRIG_mpick1_b);
             state->completionFlags |= WCLEVELCTL_FLAG_TILE_A;
-        } else if (mainGetBit(WCPUSHBLOCK_GAMEBIT_A_FADE) != 0) {
+        } else if (mainGetBit(GAMEBIT_WC_PushBlockAFade) != 0) {
             if (state->tileAResetTimer <= gWcLevelContZero[0]) {
-                mainSetBits(WCPUSHBLOCK_GAMEBIT_A_COUNT, 0);
+                mainSetBits(GAMEBIT_WC_PushBlockACount, 0);
                 memcpy(gWcTileGridA, gWcTileGridAInitial.g, 0x40);
                 state->tileAResetTimer = gWcPushBlockTileResetTime[0];
             }
@@ -103,19 +103,19 @@ void wclevelcont_updateAct2State(GameObject* obj, WcLevelControlState* state) {
         if (state->tileAResetTimer > gWcLevelContZero[0]) {
             state->tileAResetTimer -= timeDelta;
             if (state->tileAResetTimer <= gWcLevelContZero[0]) {
-                mainSetBits(WCPUSHBLOCK_GAMEBIT_A_FADE, 0);
+                mainSetBits(GAMEBIT_WC_PushBlockAFade, 0);
             }
         }
     }
 
     if (!(state->completionFlags & WCLEVELCTL_FLAG_TILE_B)) {
-        if ((u8)mainGetBit(WCPUSHBLOCK_GAMEBIT_B_COUNT) == 4) {
-            mainSetBits(WCPUSHBLOCK_GAMEBIT_B_SOLVED, 1);
+        if ((u8)mainGetBit(GAMEBIT_WC_PushBlockBCount) == 4) {
+            mainSetBits(GAMEBIT_WC_PushBlockBSolved, 1);
             Sfx_PlayFromObject(0, SFXTRIG_mpick1_b);
             state->completionFlags |= WCLEVELCTL_FLAG_TILE_B;
-        } else if (mainGetBit(WCPUSHBLOCK_GAMEBIT_B_FADE) != 0) {
+        } else if (mainGetBit(GAMEBIT_WC_PushBlockBFade) != 0) {
             if (state->tileBResetTimer <= gWcLevelContZero[0]) {
-                mainSetBits(WCPUSHBLOCK_GAMEBIT_B_COUNT, 0);
+                mainSetBits(GAMEBIT_WC_PushBlockBCount, 0);
                 memcpy(gWcTileGridB, gWcTileGridBInitial.g, 0x40);
                 state->tileBResetTimer = gWcPushBlockTileResetTime[0];
             }
@@ -123,7 +123,7 @@ void wclevelcont_updateAct2State(GameObject* obj, WcLevelControlState* state) {
         if (state->tileBResetTimer > gWcLevelContZero[0]) {
             state->tileBResetTimer -= timeDelta;
             if (state->tileBResetTimer <= gWcLevelContZero[0]) {
-                mainSetBits(WCPUSHBLOCK_GAMEBIT_B_FADE, 0);
+                mainSetBits(GAMEBIT_WC_PushBlockBFade, 0);
             }
         }
     }
@@ -146,12 +146,12 @@ void wclevelcont_updateAct2State(GameObject* obj, WcLevelControlState* state) {
     }
 
     if (!(state->completionFlags & WCLEVELCTL_FLAG_FINAL)) {
-        if (mainGetBit(0xbcf) != 0) {
+        if (mainGetBit(GAMEBIT_WC_FinalPuzzleComplete) != 0) {
             GameObject* player;
-            mainSetBits(0xbc8, 0);
-            mainSetBits(0x2f0, 1);
-            mainSetBits(0xeec, 0);
-            mainSetBits(0xbd0, 0);
+            mainSetBits(GAMEBIT_WC_FinalStopwatchEnabled, 0);
+            mainSetBits(GAMEBIT_WC_FinalStopwatchTarget, 1);
+            mainSetBits(GAMEBIT_WC_FinalPuzzleRelated0EEC, 0);
+            mainSetBits(GAMEBIT_WC_FinalAnimTarget0BD0, 0);
             player = (GameObject*)Obj_GetPlayerObject();
             (*gMapEventInterface)->savePoint(&player->anim.localPosX, player->anim.rotX, 1, 0);
             Sfx_PlayFromObject(0, SFXTRIG_mpick1_b);
@@ -729,11 +729,11 @@ void wclevelcont_update(GameObject* obj) {
     }
     wclevelcont_syncProgressBits(state);
     if ((*gSkyInterface)->getSunPosition(&sunTime)) {
-        mainSetBits(0x7f3, 1);
-        mainSetBits(0x7f1, 0);
+        mainSetBits(GAMEBIT_WC_IsDay, 1);
+        mainSetBits(GAMEBIT_WC_IsNight, 0);
     } else {
-        mainSetBits(0x7f3, 0);
-        mainSetBits(0x7f1, 1);
+        mainSetBits(GAMEBIT_WC_IsDay, 0);
+        mainSetBits(GAMEBIT_WC_IsNight, 1);
     }
 }
 #pragma opt_common_subs reset
@@ -743,9 +743,9 @@ void wclevelcont_init(GameObject* obj) {
     u16 flags;
 
     obj->animEventCallback = wclevelcont_seqFn;
-    mainSetBits(0x810, 0);
+    mainSetBits(GAMEBIT_WC_PushBlockACount, 0);
     memcpy(gWcTileGridA, gWcTileGridAInitial.g, 0x40);
-    mainSetBits(0x811, 0);
+    mainSetBits(GAMEBIT_WC_PushBlockBCount, 0);
     memcpy(gWcTileGridB, gWcTileGridBInitial.g, 0x40);
 #if !defined(VERSION_GSAE01) && !defined(VERSION_GSAJ01)
     state->messageTimer = WCLEVELCONT_TILE_MESSAGE_FRAMES;
@@ -756,19 +756,19 @@ void wclevelcont_init(GameObject* obj) {
     if (mainGetBit(GAMEBIT_WC_TimedPuzzleASolved) != 0) {
         state->completionFlags |= WCLEVELCTL_FLAG_PUZZLE_A;
     }
-    if (mainGetBit(0x813) != 0) {
+    if (mainGetBit(GAMEBIT_WC_PushBlockBSolved) != 0) {
         state->completionFlags |= WCLEVELCTL_FLAG_TILE_B;
     }
-    if (mainGetBit(0x812) != 0) {
+    if (mainGetBit(GAMEBIT_WC_PushBlockASolved) != 0) {
         state->completionFlags |= WCLEVELCTL_FLAG_TILE_A;
     }
-    if (mainGetBit(0x2a5) != 0) {
+    if (mainGetBit(GAMEBIT_WC_TrexChallengeComplete) != 0) {
         state->completionFlags |= WCLEVELCTL_FLAG_TREX;
     }
     if (mainGetBit(GAMEBIT_WC_AllSwitchesActivated) != 0) {
         state->completionFlags |= WCLEVELCTL_FLAG_SWITCHES;
     }
-    if (mainGetBit(0xbcf) != 0) {
+    if (mainGetBit(GAMEBIT_WC_FinalPuzzleComplete) != 0) {
         state->completionFlags |= WCLEVELCTL_FLAG_FINAL;
     }
     if (mainGetBit(GAMEBIT_WC_FinalSequenceComplete) != 0) {
@@ -781,10 +781,10 @@ void wclevelcont_init(GameObject* obj) {
         state->mode = WCLEVELCTL_MODE_SEQUENCE;
     }
     objAddObjectType(obj, WCLEVELCONT_OBJGROUP);
-    mainSetBits(0x226, 1);
-    mainSetBits(0x2a6, 1);
-    mainSetBits(0x206, 1);
-    mainSetBits(0x25f, 1);
+    mainSetBits(GAMEBIT_WC_TrexLever1Activated, 1);
+    mainSetBits(GAMEBIT_WC_TrexLever2Activated, 1);
+    mainSetBits(GAMEBIT_WC_TrexLever3Activated, 1);
+    mainSetBits(GAMEBIT_WC_TrexLever4Activated, 1);
     (*gMapEventInterface)->getMapAct(obj->anim.mapEventSlot);
     state->dialogueFlags.b40 = mainGetBit(GAMEBIT_WC_Switch1Activated);
     state->dialogueFlags.b20 = mainGetBit(GAMEBIT_WC_Switch2Activated);

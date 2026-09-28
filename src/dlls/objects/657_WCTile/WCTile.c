@@ -13,6 +13,7 @@
  * FADE_OUT -> FADE_IN re-snaps the position. Bit meanings inferred.
  */
 #include "main/frame_timing.h"
+#include "main/gamebit_ids.h"
 #include "main/gamebits.h"
 #include "main/model.h"
 #include "main/dll/WC/dll_028D_wclevelcont.h"
@@ -35,9 +36,7 @@
 #define WCTILE_ALPHA_STEP_SHIFT 3
 #define WCTILE_ALPHA_OPAQUE     0xff
 
-#define WCTILE_GAMEBIT_A_HIDE 0x812
 #define WCTILE_GAMEBIT_A_FADE 0x808
-#define WCTILE_GAMEBIT_B_HIDE 0x813
 #define WCTILE_GAMEBIT_B_FADE 0x809
 
 #define WCTILE_STATE_IFACE(state) WC_LEVEL_CONT_INTERFACE((state)->controller)
@@ -94,14 +93,14 @@ void wctile_update(GameObject* obj)
     {
         if (objAnim->bankIndex == WCTILE_VARIANT_A)
         {
-            if (mainGetBit(WCTILE_GAMEBIT_A_HIDE) != 0)
+            if (mainGetBit(GAMEBIT_WC_PushBlockASolved) != 0)
                 state->mode = WCTILE_MODE_HIDDEN;
             else if (mainGetBit(WCTILE_GAMEBIT_A_FADE) != 0)
                 state->mode = WCTILE_MODE_FADE_OUT;
         }
         else
         {
-            if (mainGetBit(WCTILE_GAMEBIT_B_HIDE) != 0)
+            if (mainGetBit(GAMEBIT_WC_PushBlockBSolved) != 0)
                 state->mode = WCTILE_MODE_HIDDEN;
             else if (mainGetBit(WCTILE_GAMEBIT_B_FADE) != 0)
                 state->mode = WCTILE_MODE_FADE_OUT;

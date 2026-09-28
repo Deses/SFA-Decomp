@@ -24,6 +24,7 @@
 
 #include "MSL_C/PPCEABI/bare/H/math_api.h"
 #include "main/frame_timing.h"
+#include "main/gamebit_ids.h"
 #include "main/gamebits.h"
 #include "main/gameloop_gamebit_api.h"
 #include "main/mapEventTypes.h"
@@ -171,23 +172,23 @@ void wcpushblock_update(GameObject* obj) {
 
     if (WCPUSHBLOCK_FLAGS(state).phase != WCPUSHBLOCK_PHASE_SOLVED) {
         if (objAnim->bankIndex == WCPUSHBLOCK_VARIANT_A) {
-            if (mainGetBit(WCPUSHBLOCK_GAMEBIT_A_SOLVED) != 0) {
+            if (mainGetBit(GAMEBIT_WC_PushBlockASolved) != 0) {
                 WCPUSHBLOCK_FLAGS(state).phase = WCPUSHBLOCK_PHASE_SOLVED;
                 WCPUSHBLOCK_IFACE->getSolvedTileXYA(WCPUSHBLOCK_INITIAL_TILE(state), &state->block.cellX,
                                                     &state->block.cellZ, WCPUSHBLOCK_IFACE);
                 WCPUSHBLOCK_IFACE->tileAToWorldPos(obj, WCPUSHBLOCK_TILE_X(state), WCPUSHBLOCK_TILE_Y(state),
                                                    &obj->anim.localPosX, &obj->anim.localPosZ, WCPUSHBLOCK_IFACE);
-            } else if (mainGetBit(WCPUSHBLOCK_GAMEBIT_A_FADE) != 0) {
+            } else if (mainGetBit(GAMEBIT_WC_PushBlockAFade) != 0) {
                 WCPUSHBLOCK_FLAGS(state).phase = WCPUSHBLOCK_PHASE_FADE_OUT;
             }
         } else {
-            if (mainGetBit(WCPUSHBLOCK_GAMEBIT_B_SOLVED) != 0) {
+            if (mainGetBit(GAMEBIT_WC_PushBlockBSolved) != 0) {
                 WCPUSHBLOCK_FLAGS(state).phase = WCPUSHBLOCK_PHASE_SOLVED;
                 WCPUSHBLOCK_IFACE->getSolvedTileXYB(WCPUSHBLOCK_INITIAL_TILE(state), &state->block.cellX,
                                                     &state->block.cellZ, WCPUSHBLOCK_IFACE);
                 WCPUSHBLOCK_IFACE->tileBToWorldPos(obj, WCPUSHBLOCK_TILE_X(state), WCPUSHBLOCK_TILE_Y(state),
                                                    &obj->anim.localPosX, &obj->anim.localPosZ, WCPUSHBLOCK_IFACE);
-            } else if (mainGetBit(WCPUSHBLOCK_GAMEBIT_B_FADE) != 0) {
+            } else if (mainGetBit(GAMEBIT_WC_PushBlockBFade) != 0) {
                 WCPUSHBLOCK_FLAGS(state).phase = WCPUSHBLOCK_PHASE_FADE_OUT;
             }
         }
@@ -373,11 +374,11 @@ void wcpushblock_update(GameObject* obj) {
             if (moveResult == WCPUSHBLOCK_MOVE_RESULT_LOCKED) {
                 WCPUSHBLOCK_FLAGS(state).phase = WCPUSHBLOCK_PHASE_LOCKED;
                 if (objAnim->bankIndex == WCPUSHBLOCK_VARIANT_A) {
-                    if (gameBitIncrement(WCPUSHBLOCK_GAMEBIT_A_COUNT) != WCPUSHBLOCK_REQUIRED_LOCK_COUNT) {
+                    if (gameBitIncrement(GAMEBIT_WC_PushBlockACount) != WCPUSHBLOCK_REQUIRED_LOCK_COUNT) {
                         Sfx_PlayFromObject(0, SFXTRIG_sc_menuups16k_ca);
                     }
                 } else {
-                    if (gameBitIncrement(WCPUSHBLOCK_GAMEBIT_B_COUNT) != WCPUSHBLOCK_REQUIRED_LOCK_COUNT) {
+                    if (gameBitIncrement(GAMEBIT_WC_PushBlockBCount) != WCPUSHBLOCK_REQUIRED_LOCK_COUNT) {
                         Sfx_PlayFromObject(0, SFXTRIG_sc_menuups16k_ca);
                     }
                 }
@@ -389,9 +390,9 @@ void wcpushblock_update(GameObject* obj) {
                 }
             } else {
                 if (objAnim->bankIndex == WCPUSHBLOCK_VARIANT_A) {
-                    mainSetBits(WCPUSHBLOCK_GAMEBIT_A_FADE, 1);
+                    mainSetBits(GAMEBIT_WC_PushBlockAFade, 1);
                 } else {
-                    mainSetBits(WCPUSHBLOCK_GAMEBIT_B_FADE, 1);
+                    mainSetBits(GAMEBIT_WC_PushBlockBFade, 1);
                 }
             }
         }
