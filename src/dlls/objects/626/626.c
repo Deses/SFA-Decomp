@@ -332,7 +332,7 @@ int hightop_stateHandler05(GameObject* obj, HighTopRuntime* state) {
     }
     switch ((s8)runtime->substate) {
     case 1:
-        if (mainGetBit(0x62c) != 0) {
+        if (mainGetBit(GAMEBIT_DR_HighTopRelated062C) != 0) {
             runtime->substate = 2;
         }
         break;
@@ -487,13 +487,13 @@ int hightop_handleMotionEvent(GameObject* obj, u8 event) {
         (*gPlayerInterface)->setState(obj, runtime, 8);
         break;
     case 6:
-        mainSetBits(0x634, 1);
+        mainSetBits(GAMEBIT_DR_HighTopRideStarted, 1);
         (*gObjectTriggerInterface)->runSequence(4, obj, -1);
         break;
 #if defined(VERSION_GSAE01) || defined(VERSION_GSAJ01)
     case 7:
-        mainSetBits(0x634, 0);
-        mainSetBits(0x631, 1);
+        mainSetBits(GAMEBIT_DR_HighTopRideStarted, 0);
+        mainSetBits(GAMEBIT_DR_HighTopRideOver, 1);
         obj->anim.modelInstance->runtimeSourceHitMask |= 1;
         runtime->flagsC40 &= ~0x140;
         runtime->lookController.modeBits &= ~2;
@@ -557,7 +557,7 @@ int hightop_stateHandler02(GameObject* obj, HighTopRuntime* stateArg, f32 dt) {
     f32 moveSpeed;
     s16* vec;
 #if !defined(VERSION_GSAE01) && !defined(VERSION_GSAJ01)
-    if (mainGetBit(0x631) != 0) {
+    if (mainGetBit(GAMEBIT_DR_HighTopRideOver) != 0) {
         return 8;
     }
 #endif
@@ -674,7 +674,7 @@ int hightop_stateHandler00(GameObject* obj) {
     if (placement->spawnVariant != 0) {
         return 0xa;
     }
-    if (mainGetBit(0x631) != 0) {
+    if (mainGetBit(GAMEBIT_DR_HighTopRideOver) != 0) {
         return 8;
     }
     return 5;
@@ -895,11 +895,11 @@ void HighTop_hitDetect(GameObject* obj) {
         objfx_shakeCameraByDistance(obj, 1000.0f);
         if (runtime->airMeterRemaining <= 0) {
 #if defined(VERSION_GSAE01_rev1) || defined(VERSION_GSAP01_rev1)
-            mainSetBits(0xbf7, 0);
+            mainSetBits(GAMEBIT_DR_HighTopAirMeterRelated0BF7, 0);
 #endif
             (*gGameUIInterface)->airMeterShutdown();
             runtime->flagsC49.b7 = 0;
-            mainSetBits(0x634, 0);
+            mainSetBits(GAMEBIT_DR_HighTopRideStarted, 0);
             if ((u8)Obj_CanSetupObject() != 0) {
                 HighTopDeathSpawn* spawn = (HighTopDeathSpawn*)Obj_AllocObjectSetup(0x2c, HIGHTOP_DEATH_SPAWN_OBJ_ID);
                 spawn->base.color[0] = 2;
@@ -915,7 +915,7 @@ void HighTop_hitDetect(GameObject* obj) {
             obj->anim.rotZ = 0;
             runtime->baddie.physicsActive = 0;
             *(int*)runtime |= 0x1000000;
-            mainSetBits(0xb48, 1);
+            mainSetBits(GAMEBIT_DR_HighTopDrowned, 1);
             (*gGameUIInterface)->airMeterShutdown();
         }
     } else {

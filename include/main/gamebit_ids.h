@@ -434,7 +434,9 @@ enum GameBitId {
     GAMEBIT_TTH_SeqNeedBit122 = 0x122,                   /* Rena's U0 dataset; table 2 */
     GAMEBIT_ITEM_FireSpellStone1_Got = 0x123,            /* table 2; hint 297; ref temple/VFP_PodiumP key */
     GAMEBIT_TTH_SeqUsedBit124 = 0x124,                   /* table 2; Rena's U0 name (ThornTail Hollow, the SH_ prefix these sources later renamed to TTH_) - read by SH_LevelCon */
+    GAMEBIT_WM_KrazTest1Related0126 = 0x126,             /* Krazoa Test 1 - raised at init, on the test completing and on reset, and dropped where the controller releases its gfx handle after spawning its second effect */
     GAMEBIT_TestStrengthTexScrollRelated127 = 0x127,     /* table 0; Rena's U0 name - the Krazoa Test 1 controller raises it from an animation event and on each update, and clears it as the test completes */
+    GAMEBIT_WM_KrazTest1Related0128 = 0x128,             /* Krazoa Test 1 - raised by the one anim event whose own #define is named for this bit, which also kicks the DLL's shader stub */
     GAMEBIT_WM_EnteredKrazoaTest1_0129 = 0x129,          /* table 0; set when entering Krazoa test 1, cleared when talking to spirit */
     GAMEBIT_ITEM_TrickyFood_GrabInProgress = 0x12E,      /* Global latch: set by dll_01A7 EdibleMushroom when a GrubTub Fungus offers itself to the player (grab in range), cleared once the grab-complete reply lands and TrickyFood_Count (or the romDefNo-0x658 variant's bit) increments; read by Tricky's food check as a stand-in for already owning TrickyFood */
     GAMEBIT_HintTexts0 = 0x12F,                          /* table 2; size 32; related to hint texts; flags, set when Krystal boards ship */
@@ -530,9 +532,13 @@ enum GameBitId {
     GAMEBIT_ITEM_NWKey_Got2 = 0x1C3,                     /* table 2; hint 322 */
     GAMEBIT_CC_Located = 0x1C4,                          /* table 2; hint 317 */
     GAMEBIT_BaddieRelated1C8 = 0x1C8,                    /* table 0 */
+    GAMEBIT_WM_KrazTest1Solved = 0x1D1,                  /* table 1; Krazoa Test 1 passed - DLL 414 raises it and the test controller's RESOLVE phase waits on it before brightening and going to its DONE phase */
+    GAMEBIT_WM_KrazTest1AnimState01D2 = 0x1D2,           /* Krazoa Test 1 - driven purely from animation: two anim events exist to set and clear it (their #defines are named for this bit), and init, completion and reset all force it down */
     GAMEBIT_WM_KrazTest1TorchesActive = 0x1D3,           /* Krazoa Test 1 shrine-countdown active; set by dll_019B when the timer starts with no unlocks yet, read by dll_019C torch props to ignite; cleared on test failure */
+    GAMEBIT_WM_KrazTest1TimedOut = 0x1D4,                /* Krazoa Test 1 - raised the moment the countdown reaches zero, alongside the timeout sequence, and cleared again on reset */
     GAMEBIT_IM_TrickyRelated01D6 = 0x1D6,                /* table 3; set when starting Tricky landing scene, cleared after race */
     GAMEBIT_ITEM_DeletedSpell1D7 = 0x1D7,                /* table 2; in spell bits table but does nothing */
+    GAMEBIT_WM_KrazTest1TorchPulse = 0x1D8,              /* Krazoa Test 1 - a one-shot pulse the countdown phase consumes: seeing it raised bumps the controller's unlock count and clears it again, so it counts one torch at a time against GAMEBIT_WM_KrazTest1TorchesActive */
     GAMEBIT_CC_BridgeNeedBit = 0x1D9,                    /* table 2; Rena's U0 name - read by the wall-crawler DLL as an alternative to its proximity test, and by DFP_ForceAw */
     GAMEBIT_CC_BridgeUsedBit = 0x1DA,                    /* Rena's U0 dataset; table 2 */
     GAMEBIT_DIM_ReachedBoss = 0x1DF,                     /* table 1; hint 292 */
@@ -661,6 +667,7 @@ enum GameBitId {
     GAMEBIT_CC_ObjGroups = 0x3B7,                        /* table 3; size 32 */
     GAMEBIT_IM_BikeRelated03B9 = 0x3B9,                  /* table 1; set when approaching SharpClaws in hut, cleared after race */
     GAMEBIT_IM_BikeRelated03BA = 0x3BA,                  /* table 2; set at some point during race */
+    GAMEBIT_DBEggCarried = 0x3C4,                        /* An egg is already in hand - DB_egg raises it at both points an egg is taken, and refuses a fresh pickup while it is up, so it works as the carry lock */
     GAMEBIT_DIM_CapturedCannon = 0x3CF,                  /* table 2; hint 286 */
     GAMEBIT_ITEM_DinoHorn_3D8 = 0x3D8,                   /* table 0 */
     GAMEBIT_SB_ObjGroups = 0x3E0,                        /* table 3; size 32; frontend, galleonship, Ship Battle */
@@ -688,10 +695,14 @@ enum GameBitId {
     GAMEBIT_TTH_FuelCell_41B = 0x41B,                    /* Rena's U0 dataset; table 2 */
     GAMEBIT_TTH_FuelCell_41E = 0x41E,                    /* Rena's U0 dataset; table 2 */
     GAMEBIT_InsideGal_ObjGroups = 0x421,                 /* table 3; size 32 */
+    GAMEBIT_DBEggSinkEnabled = 0x426,                    /* While set, a drifting egg becomes grabbable and its water offset falls; once past -7 the egg counts itself into GAMEBIT_DBEggsSunkCount and goes to its sinking mode */
+    GAMEBIT_DBEggsSunkCount = 0x428,                     /* How many eggs have sunk - a counter, incremented by read-add-write rather than set as a flag */
     GAMEBIT_WM_GalleonRelated429 = 0x429,                /* table 2; related to savegame/obj groups/galleon */
+    GAMEBIT_DBEggRespawn = 0x42A,                        /* Waiting to respawn, an egg rebuilds itself from its placement def the moment this is set; while it is clear the egg just puffs particles */
     GAMEBIT_MMP_ObjGroups = 0x42E,                       /* table 3; size 32 */
     GAMEBIT_DIM3_ObjGroups = 0x443,                      /* table 3; size 32 */
     GAMEBIT_TTH_FuelCell_447 = 0x447,                    /* Rena's U0 dataset; table 2 */
+    GAMEBIT_DBEggCurveStart = 0x44D,                     /* An egg held for its curve ride waits on this bit and nothing else before entering its curve mode */
     GAMEBIT_MenuRelated044F = 0x44F,                     /* table 0; set by n_rareware DLL */
     GAMEBIT_SH_ObjGroups = 0x452,                        /* table 3; size 32; also LinkG 0x00: bloops 0x06: switch to open Queen cave? */
     GAMEBIT_ITEM_MMPKey_Used = 0x453,                    /* table 2; hint 299; ref moonpass/HitAnimator target */
@@ -857,10 +868,13 @@ enum GameBitId {
     GAMEBIT_LV_ChiefTestDone0627 = 0x627,                /* The half of GAMEBIT_LV_DoneTests' condition that sc_levelcontrol only reads - the LightFoot chief's other test, completed outside this DLL */
     GAMEBIT_DR_HighTop_RunSeq = 0x62A,                   /* table 1; name from Rena's kiosk-build data, confirmed by the code - hightop_stateHandler04 sets it the moment all four of GAMEBIT_DR_HighTopSwitch1-4 are hit */
     GAMEBIT_DR_HighTop_SeqDone = 0x62B,                  /* table 1; kiosk-build name - while set, HighTop sets GAMEBIT_DR_HighTop_SeqDone2, arms its curve-follow ride and starts the air meter */
+    GAMEBIT_DR_HighTopRelated062C = 0x62C,               /* Read once by HighTop, to drop its runtime into substate 2 */
     GAMEBIT_DR_HighTop_Riding62D = 0x62D,                /* Rena's kiosk dataset; table 1 */
     GAMEBIT_DR_HighTop_SeqDone2 = 0x62F,                 /* table 1; kiosk-build name - raised by HighTop as it begins the ride */
     GAMEBIT_DR_HighTop_Riding630 = 0x630,                /* table 1; kiosk-build name - HighTop's substate 0xA hands control to the riding state while it is set */
+    GAMEBIT_DR_HighTopRideOver = 0x631,                  /* HighTop's ride is over - DR_Creator and HighTop's own case 7 raise it, and two of HighTop's state handlers send the object straight to state 8 while it is up */
     GAMEBIT_DR_RescuedHighTop = 0x632,                   /* table 2; hint 391; ref dragrock/HitAnimator target */
+    GAMEBIT_DR_HighTopRideStarted = 0x634,               /* Raised as HighTop's case 6 runs its sequence 4 and dropped both by case 7 and when the air meter empties, so it stands for the ride being under way */
     GAMEBIT_OFP_PuzzlePadPressed = 0x635,                /* Ocean Force Point electric-floor puzzle pad is pressed */
     GAMEBIT_SC_totempuzzle_running = 0x639,              /* table 2 */
     GAMEBIT_ITEM_SpellStone3_Got = 0x63C,                /* table 2; hint 373 */
@@ -979,6 +993,7 @@ enum GameBitId {
     GAMEBIT_ITEM_MoonSeed_Used = 0x857,                  /* table 2; hint 309; ref moonpass/HitAnimator target */
     GAMEBIT_DIM2_CannonRelated085E = 0x85E,              /* table 2; ref snowmines2/HitAnimator target */
     GAMEBIT_ITEM_MoonSeed_Count = 0x86A,                 /* table 2; size 3 */
+    GAMEBIT_DBEggPickedUp086D = 0x86D,                   /* Raised beside GAMEBIT_DBEggCarried at both pickup points, with nothing in the code reading it back */
     GAMEBIT_DIM2_CannonRelated0874 = 0x874,              /* table 2; ref snowmines2/HitAnimator target */
     GAMEBIT_MMPAsteroidRelated087B = 0x87B,              /* table 2; size 2 */
     GAMEBIT_SH_WarpStoneRelated0884 = 0x884,             /* table 2 */
@@ -1137,6 +1152,7 @@ enum GameBitId {
     GAMEBIT_CFRelated0B3E = 0xB3E,                       /* table 1 */
     GAMEBIT_CFRelated0B3F = 0xB3F,                       /* table 1 */
     GAMEBIT_CFRelated0B46 = 0xB46,                       /* table 1; ref fortress/CNTstopwatc enabled */
+    GAMEBIT_DR_HighTopDrowned = 0xB48,                   /* Raised when HighTop's air meter empties: the DLL shuts the meter down, spawns its death effect and stops the physics */
     GAMEBIT_CF_ClawDeadB4B = 0xB4B,                      /* Rena's U0 dataset; table 2 */
     GAMEBIT_CF_ClawDeadB4C = 0xB4C,                      /* Rena's U0 dataset; table 2 */
     GAMEBIT_CF_ClawDeadB4D = 0xB4D,                      /* Rena's U0 dataset; table 2 */
@@ -1205,6 +1221,7 @@ enum GameBitId {
     GAMEBIT_DR_CloudRunnerRoute3Active = 0xBF3,          /* Dragon Rock CloudRunner mount - route 3 selector, gDRCloudRunnerGameBitIds[3]; dr_cloudRunner takes the FIRST set bit of the four and steers toward gDRCloudRunnerCurveIds[3] (curve 23) */
     GAMEBIT_CC_SeqBF4 = 0xBF4,                           /* Rena's U0 dataset; table 2 */
     GAMEBIT_CC_SeqBF5 = 0xBF5,                           /* Rena's U0 dataset; table 2 */
+    GAMEBIT_DR_HighTopAirMeterRelated0BF7 = 0xBF7,       /* Cleared when HighTop's air meter empties, but only in the v1.1 builds - the v1.0 DOLs have no write of it at all */
     GAMEBIT_SH_initObjGroups = 0xBF8,                    /* table 0 */
     GAMEBIT_ITEM_TestCombatSpirit_Got = 0xBFD,           /* table 2; hint 312 */
     GAMEBIT_TTH_MusicLatch0BFE = 0xBFE,                  /* ThornTail Hollow - SH_LevelCon's GameBitLatch condition for music trigger 0xC3 */
@@ -1216,6 +1233,9 @@ enum GameBitId {
     GAMEBIT_DIM_ClawDeadC1B = 0xC1B,                     /* Rena's U0 dataset; table 2 */
     GAMEBIT_DIM_ClawDeadC1C = 0xC1C,                     /* Rena's U0 dataset; table 2 */
     GAMEBIT_DIM_ClawDeadC1D = 0xC1D,                     /* Rena's U0 dataset; table 2 */
+    GAMEBIT_DIM_BossFightEnded = 0xC1E,                  /* table 3; the one bit DIMboss_free raises rather than clears as the DarkIce Mines boss fight tears down */
+    GAMEBIT_DIM_BossRelated0C1F = 0xC1F,                 /* table 3; cleared by DIMboss_free on teardown and, quite separately, by player.c as the player mounts the snow bike or CloudRunner bike to MUSICTRIG_drako_2 */
+    GAMEBIT_DIM_BossRelated0C20 = 0xC20,                 /* table 3; cleared by DIMboss_free on teardown, with no other reference in the code */
     GAMEBIT_ITEM_LVBlock1_Got = 0xC25,                   /* table 2; ref swapcircle/SC_blockpla key */
     GAMEBIT_ITEM_LVBlock2_Got = 0xC26,                   /* table 2; ref swapcircle/SC_blockpla key */
     GAMEBIT_ITEM_LVBlock3_Got = 0xC27,                   /* table 2; ref swapcircle/SC_blockpla key */
@@ -1363,6 +1383,7 @@ enum GameBitId {
     GAMEBIT_WC_MagicCaveVisible = 0xD7D,                 /* table 2; ref wallcity/MagicCaveTo Visible */
     GAMEBIT_WC_BombPlantedD7E = 0xD7E,                   /* Rena's U0 dataset; table 2 */
     GAMEBIT_NW_GotPastBribeClaw = 0xD83,                 /* table 2; hint 266 */
+    GAMEBIT_DIM_BossRelated0D8F = 0xD8F,                 /* table 3; cleared by DIMboss_free beside GAMEBIT_SETPIECE_ACTIVE and GAMEBIT_DIM_TriggerLostInBlizzard, with no other reference in the code */
     GAMEBIT_ITEM_FuelCell_ShowCount = 0xD97,             /* table 2; on HUD */
     GAMEBIT_WC_StopwatchEnabled = 0xDA9,                 /* Walled City countdown stopwatch enabled - Rena has it driving wallcity's CNTstopwatc 'enabled' param; wclevelcont treats it, or gameTimerIsRunning, as 'a countdown is up' while the push-block timer is off, and clears it when the final sequence completes */
     GAMEBIT_DIMLightRelatedDAB = 0xDAB,                  /* Rena's U0 dataset; table 3 */

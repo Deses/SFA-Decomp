@@ -146,8 +146,8 @@ int dll411_processAnimEvents(GameObject* obj, int unusedArg, ObjSeqState* animUp
                 state->phase = DLL19B_PHASE_COMPLETE;
                 state->pendingEvent = 2;
                 mainSetBits(GAMEBIT_WM_EnteredKrazoaTest1_0129, 1);
-                mainSetBits(0x1d2, 0);
-                mainSetBits(0x126, 1);
+                mainSetBits(GAMEBIT_WM_KrazTest1AnimState01D2, 0);
+                mainSetBits(GAMEBIT_WM_KrazTest1Related0126, 1);
                 state->brightnessBVelocity = DLL19B_BRIGHTNESS_FADE_RATE;
                 break;
             case DLL19B_ANIM_EVENT_RESET:
@@ -157,14 +157,14 @@ int dll411_processAnimEvents(GameObject* obj, int unusedArg, ObjSeqState* animUp
                 mainSetBits(GAMEBIT_WM_EnteredKrazoaTest1_0129, 1);
                 break;
             case DLL19B_ANIM_EVENT_GAMEBIT_01D2_SET:
-                mainSetBits(0x1d2, 1);
+                mainSetBits(GAMEBIT_WM_KrazTest1AnimState01D2, 1);
                 break;
             case DLL19B_ANIM_EVENT_GAMEBIT_01D2_CLEAR:
-                mainSetBits(0x1d2, 0);
+                mainSetBits(GAMEBIT_WM_KrazTest1AnimState01D2, 0);
                 state->brightnessBVelocity = DLL19B_BRIGHTNESS_FADE_RATE;
                 break;
             case DLL19B_ANIM_EVENT_GAMEBIT_0128_SET:
-                mainSetBits(0x128, 1);
+                mainSetBits(GAMEBIT_WM_KrazTest1Related0128, 1);
                 if (gDll19BShaderResult == 0) {
                     gDll19BShaderResult = shaderReturnZeroStub(1);
                 }
@@ -307,7 +307,7 @@ void dll411_update(GameObject* obj) {
                     (*res)->spawn(obj, 0, NULL, 1, -1, NULL);
                     Resource_Release(res);
                 }
-                mainSetBits(0x126, 0);
+                mainSetBits(GAMEBIT_WM_KrazTest1Related0126, 0);
                 (*gModgfxInterface)->releaseHandle(&state->gfxHandle);
             }
             break;
@@ -321,14 +321,14 @@ void dll411_update(GameObject* obj) {
             if (state->unlockCount == 0 && mainGetBit(GAMEBIT_WM_KrazTest1TorchesActive) == 0) {
                 mainSetBits(GAMEBIT_WM_KrazTest1TorchesActive, 1);
             }
-            if (mainGetBit(0x1d8) != 0) {
+            if (mainGetBit(GAMEBIT_WM_KrazTest1TorchPulse) != 0) {
                 state->unlockCount += 1;
-                mainSetBits(0x1d8, 0);
+                mainSetBits(GAMEBIT_WM_KrazTest1TorchPulse, 0);
             }
             state->countdown -= (s16)timeDelta;
             logPrintf(sDll411CountdownFormat, state->countdown);
             if (state->countdown <= 0) {
-                mainSetBits(0x1d4, 1);
+                mainSetBits(GAMEBIT_WM_KrazTest1TimedOut, 1);
                 (*gObjectTriggerInterface)->runSequence(DLL19B_SEQUENCE_TIMEOUT, obj, -1);
                 state->timer = DLL19B_TIMEOUT_DELAY;
                 state->phase = DLL19B_PHASE_RESET;
@@ -342,7 +342,7 @@ void dll411_update(GameObject* obj) {
             }
             break;
         case DLL19B_PHASE_RESOLVE:
-            if (mainGetBit(0x1d1) != 0) {
+            if (mainGetBit(GAMEBIT_WM_KrazTest1Solved) != 0) {
                 state->brightnessB = 1;
                 gTitleMenuControlInterface->vtable->onSelectSave(3, 0x2c, 0x50, state->brightnessB & 0xff, 0);
                 state->brightnessBVelocity = DLL19B_BRIGHTNESS_RISE_RATE;
@@ -350,7 +350,7 @@ void dll411_update(GameObject* obj) {
                 state->phase = DLL19B_PHASE_DONE;
             } else {
                 playerCancelSpell(player, -1);
-                mainSetBits(0x126, 0);
+                mainSetBits(GAMEBIT_WM_KrazTest1Related0126, 0);
                 gTitleMenuControlInterface->vtable->onSelectSave(3, 0x2a, 0x50, state->brightnessB & 0xff, 0);
                 state->brightnessBVelocity = DLL19B_BRIGHTNESS_RISE_RATE;
                 (*gObjectTriggerInterface)->runSequence(DLL19B_SEQUENCE_RESOLVE, obj, -1);
@@ -361,7 +361,7 @@ void dll411_update(GameObject* obj) {
             if (mainGetBit(GAMEBIT_WGSH_warpEnabled0FD) == 0) {
                 mainSetBits(GAMEBIT_WGSH_warpEnabled0FD, 1);
             }
-            mainSetBits(0x1d2, 0);
+            mainSetBits(GAMEBIT_WM_KrazTest1AnimState01D2, 0);
             mainSetBits(GAMEBIT_TestStrengthTexScrollRelated127, 0);
             state->phase = DLL19B_PHASE_DONE;
             gTitleMenuControlInterface->vtable->onSelectSave(3, 0x2c, 0x50, state->brightnessB & 0xff, 0);
@@ -371,17 +371,17 @@ void dll411_update(GameObject* obj) {
             state->pendingEvent = 0;
             state->timer = DLL19B_RESET_DELAY;
             mainSetBits(GAMEBIT_WM_EnteredKrazoaTest1_0129, 1);
-            mainSetBits(0x126, 1);
+            mainSetBits(GAMEBIT_WM_KrazTest1Related0126, 1);
             mainSetBits(GAMEBIT_TestStrengthTexScrollRelated127, 1);
             {
                 Dll6AInterface** handle = Resource_Acquire(DLL19B_RESOURCE_PARTICLE, 1);
                 state->gfxHandle = (*handle)->spawn(obj, 2, NULL, DLL19B_PARTICLE_SPAWN_FLAGS, -1, NULL);
                 Resource_Release(handle);
             }
-            mainSetBits(0x1d8, 0);
+            mainSetBits(GAMEBIT_WM_KrazTest1TorchPulse, 0);
             state->unlockCount = 0;
             state->countdown = DLL19B_COUNTDOWN_START;
-            mainSetBits(0x1d4, 0);
+            mainSetBits(GAMEBIT_WM_KrazTest1TimedOut, 0);
             break;
         }
     }
@@ -404,13 +404,13 @@ void dll411_init(GameObject* obj, const Dll19BPlacement* placement) {
     obj->animEventCallback = dll411_processAnimEvents;
     ObjMsg_AllocQueue(obj, DLL19B_MESSAGE_QUEUE_CAPACITY);
     mainSetBits(GAMEBIT_WM_EnteredKrazoaTest1_0129, 1);
-    mainSetBits(0x1d2, 0);
-    mainSetBits(0x126, 1);
+    mainSetBits(GAMEBIT_WM_KrazTest1AnimState01D2, 0);
+    mainSetBits(GAMEBIT_WM_KrazTest1Related0126, 1);
     mainSetBits(GAMEBIT_TestStrengthTexScrollRelated127, 1);
     mainSetBits(GAMEBIT_STAFF_ABILITY_FIRE_BLASTER, 1);
     mainSetBits(GAMEBIT_STAFF_ABILITY_SHARPCLAW_DISGUISE, 1);
     mainSetBits(GAMEBIT_ITEM_DeletedSpell1D7, 1);
-    mainSetBits(0x1d8, 0);
+    mainSetBits(GAMEBIT_WM_KrazTest1TorchPulse, 0);
     state->brightnessA = DLL19B_BRIGHTNESS_A_MIN;
     state->brightnessB = DLL19B_BRIGHTNESS_B_NEAR;
     state->timer = DLL19B_INITIAL_DISPLAY_TIMER;
