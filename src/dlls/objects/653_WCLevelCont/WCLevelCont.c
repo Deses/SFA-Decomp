@@ -676,16 +676,16 @@ void wclevelcont_syncProgressBits(WcLevelControlState* state) {
             Music_Trigger(MUSICTRIG_fox_arwing, 1);
         }
     }
-    GameBitLatch_Update(&state->gameBitLatch, 0x8, -1, -1, 0xba6, 0xd2);
-    GameBitLatch_Update(&state->gameBitLatch, 0x4, -1, -1, 0xcce, 0x36);
-    GameBitLatch_Update(&state->gameBitLatch, 0x10, -1, -1, 0xcd0, 0xd4);
+    GameBitLatch_Update(&state->gameBitLatch, 0x8, -1, -1, GAMEBIT_WC_PushBlockTimerActive, 0xd2);
+    GameBitLatch_Update(&state->gameBitLatch, 0x4, -1, -1, GAMEBIT_WC_WarpActive0CCE, 0x36);
+    GameBitLatch_Update(&state->gameBitLatch, 0x10, -1, -1, GAMEBIT_WC_MusicLatch0CD0, 0xd4);
     GameBitLatch_Update(&state->gameBitLatch, 0x40, -1, -1, GAMEBIT_SHRINE_MUSIC_LOCK, MUSICTRIG_PU3_Adventure_c4);
     flag = 0;
     if (mainGetBit(GAMEBIT_WC_PushBlockTimerActive) == 0 && (mainGetBit(GAMEBIT_WC_StopwatchEnabled) != 0 || gameTimerIsRunning() != 0)) {
         flag = 1;
     }
-    mainSetBits(0xf31, flag);
-    GameBitLatch_Update(&state->gameBitLatch, 0x80, -1, -1, 0xf31, 0xaf);
+    mainSetBits(GAMEBIT_CountdownTimerRunning, flag);
+    GameBitLatch_Update(&state->gameBitLatch, 0x80, -1, -1, GAMEBIT_CountdownTimerRunning, 0xaf);
 }
 
 /* Retail compiled this function with common-subexpression elimination off: with it on, the
@@ -765,7 +765,7 @@ void wclevelcont_init(GameObject* obj) {
     if (mainGetBit(0x2a5) != 0) {
         state->completionFlags |= WCLEVELCTL_FLAG_TREX;
     }
-    if (mainGetBit(0x205) != 0) {
+    if (mainGetBit(GAMEBIT_WC_AllSwitchesActivated) != 0) {
         state->completionFlags |= WCLEVELCTL_FLAG_SWITCHES;
     }
     if (mainGetBit(0xbcf) != 0) {

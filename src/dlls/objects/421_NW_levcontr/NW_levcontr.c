@@ -187,9 +187,9 @@ void nwLevelControl_update(GameObject* obj) {
             }
         }
     }
-    GameBitLatch_Update((GameBitLatchState*)&state->flags, 8, -1, -1, 0x3a0, 0x35);
-    GameBitLatch_Update((GameBitLatchState*)&state->flags, 0x10, -1, -1, 0x3a1, (int)state->dayNightMusicId);
-    GameBitLatch_Update((GameBitLatchState*)&state->flags, 0x20, -1, -1, 0x393, 0x36);
+    GameBitLatch_Update((GameBitLatchState*)&state->flags, 8, -1, -1, GAMEBIT_IM_WaterRelated03A0, 0x35);
+    GameBitLatch_Update((GameBitLatchState*)&state->flags, 0x10, -1, -1, GAMEBIT_IM_Done, (int)state->dayNightMusicId);
+    GameBitLatch_Update((GameBitLatchState*)&state->flags, 0x20, -1, -1, GAMEBIT_WarpActive0393, 0x36);
     GameBitLatch_Update((GameBitLatchState*)&state->flags, 0x40, -1, -1, GAMEBIT_SHRINE_MUSIC_LOCK,
                         MUSICTRIG_PU3_Adventure_c4);
     timerActive = 0;
@@ -198,8 +198,9 @@ void nwLevelControl_update(GameObject* obj) {
     if (((rescueBit ^ gameBit) != 0) && (timerRunning = gameTimerIsRunning(), timerRunning != 0)) {
         timerActive = 1;
     }
-    mainSetBits(0xf31, timerActive);
-    GameBitLatch_Update((GameBitLatchState*)&state->flags, 0x80, -1, -1, 0xf31, NW_LEVEL_CONTROL_TIMER_END_MUSIC_ID);
+    mainSetBits(GAMEBIT_CountdownTimerRunning, timerActive);
+    GameBitLatch_Update((GameBitLatchState*)&state->flags, 0x80, -1, -1, GAMEBIT_CountdownTimerRunning,
+                        NW_LEVEL_CONTROL_TIMER_END_MUSIC_ID);
     gameBit = mainGetBit(GAMEBIT_NW_GeyserComplete);
     if ((gameBit != 0) &&
         (status = (*gMapEventInterface)->getObjGroupStatus((int)obj->anim.mapEventSlot, NW_GEYSER_OBJECT_GROUP),

@@ -221,11 +221,11 @@ void WM_LevelControl_update(GameObject* obj) {
         condition >>= 5;
         if ((((int)condition == 0) || (sequenceId = getCurSeqNo(), sequenceId == 0)) ||
             (condition = mainGetBit(GAMEBIT_WMRelated0A7F), condition == 0)) {
-            GameBitLatch_UpdateInverted(&state->musicLatch, 0x10, -1, -1, 0xA7F, 0xA6);
-            GameBitLatch_Update(&state->musicLatch, 2, -1, -1, 0xA7F, 0xA8);
+            GameBitLatch_UpdateInverted(&state->musicLatch, 0x10, -1, -1, GAMEBIT_WMRelated0A7F, 0xA6);
+            GameBitLatch_Update(&state->musicLatch, 2, -1, -1, GAMEBIT_WMRelated0A7F, 0xA8);
         }
         if (state->frameCounter > 0x3C) {
-            GameBitLatch_Update(&state->musicLatch, 1, -1, -1, 0xADA, 0xAC);
+            GameBitLatch_Update(&state->musicLatch, 1, -1, -1, GAMEBIT_ITEM_WMGoldKey_Used, 0xAC);
         }
         GameBitLatch_Update(&state->musicLatch, 0x20, -1, -1, GAMEBIT_SHRINE_MUSIC_LOCK, MUSICTRIG_PU3_Adventure_c4);
     }

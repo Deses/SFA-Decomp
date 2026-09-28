@@ -618,6 +618,7 @@ enum GameBitId {
     GAMEBIT_IM_HutRelated0382 = 0x382,                   /* table 2; changed when near hut */
     GAMEBIT_WM_FinaleQuakeActive = 0x38D,                /* Krazoa Palace finale: set by WM_Crystal (dll_020E) once fully risen after the 6th spirit is returned, gating the WM_sun bank-0 quake/envfx countdown until it clears and 0x38F fires */
     GAMEBIT_KrazTest1Related0390 = 0x390,                /* table 3; set when entering Krazoa test 1, cleared when talking to WarpStone */
+    GAMEBIT_WarpActive0393 = 0x393,                      /* A warp is in progress - NW_levcontr and SH_LevelCon both make it the GameBitLatch condition their level controllers attach to MUSICTRIG_Teleport (0x36, track 85 SNGTeleport) */
     GAMEBIT_DBAY_ObjGroups = 0x397,                      /* table 3; size 32 */
     GAMEBIT_NW_GeyserComplete = 0x398,                   /* SnowHorn Wastes geyser completion; set by NW_geyser after its disable bit hides it, consumed by NW_levcontr to re-enable the geyser object group */
     GAMEBIT_IM_WaterRelated03A0 = 0x3A0,                 /* table 3; set when getting out of water */
@@ -747,8 +748,13 @@ enum GameBitId {
     GAMEBIT_ITEM_TrickyStayFind_Got = 0x544,             /* table 2; hint 263 */
     GAMEBIT_TREX_ActNo = 0x547,                          /* table 1; size 4 */
     GAMEBIT_TREX_ObjGroups = 0x548,                      /* table 3; size 32 */
+    GAMEBIT_DR_KTrexBranchState0 = 0x54A,                /* Galdon T-rex arena branch field 0, a 4-wide field rather than a flag; ktrexlevel_updatePathGameBits writes (2,2,1,1) across the four when GAMEBIT_DR_KTrexPathA is up and (1,1,2,2) for path B, and ktrexlevel_clearPathGameBits zeroes all four - there are as many of these as the arena has lanes, but nothing in the code pins a field to a lane */
+    GAMEBIT_DR_KTrexBranchState1 = 0x54E,                /* Galdon T-rex arena branch field 1; takes the same value as field 0 in both path layouts */
+    GAMEBIT_DR_KTrexBranchState2 = 0x552,                /* Galdon T-rex arena branch field 2; takes the value opposite fields 0 and 1 */
+    GAMEBIT_DR_KTrexBranchState3 = 0x556,                /* Galdon T-rex arena branch field 3; moves with field 2 */
     GAMEBIT_DR_KTrexPathA = 0x55A,                       /* Dragon Rock K-Trex (Galdon) arena - path A active; toggles with 0x55b when a floor plate is charged to max, selecting which branch-path bits ktrexlevel applies */
     GAMEBIT_DR_KTrexPathB = 0x55B,                       /* Alternate branch-path selector for the Galdon T-rex arena (Dragon Rock); mutually exclusive with 0x55a, set when a floor switch's charge cycle maxes out and polled by ktrexlevel_updatePathGameBits to choose the arena's second path-bit layout */
+    GAMEBIT_DR_KTrexArenaEnvReady = 0x55E,               /* Raised on the Galdon arena's first update tick, in the same breath as its sky slot flag, its three envfx and its light index */
     GAMEBIT_DR_KTrexLane0Mode = 0x560,                   /* Dragon Rock K-Trex (Galdon) arena - lane 0 mode selector, gKTRexLaneModeGameBits[0]; ktrex_update ORs lane 0 into KTRexArenaState.laneMode only while the lane is in currentLaneMask and this bit is set */
     GAMEBIT_DR_KTrexLane1Mode = 0x561,                   /* Dragon Rock K-Trex (Galdon) arena - lane 1 mode selector, gKTRexLaneModeGameBits[1]; ktrex_update ORs lane 1 into KTRexArenaState.laneMode only while the lane is in currentLaneMask and this bit is set */
     GAMEBIT_DR_KTrexLane2Mode = 0x562,                   /* Dragon Rock K-Trex (Galdon) arena - lane 2 mode selector, gKTRexLaneModeGameBits[2]; ktrex_update ORs lane 2 into KTRexArenaState.laneMode only while the lane is in currentLaneMask and this bit is set */
@@ -758,6 +764,7 @@ enum GameBitId {
     GAMEBIT_DR_KTrexLane1Enabled = 0x567,                /* Dragon Rock K-Trex (Galdon) arena - lane 1 enabled, gKTRexLaneEnabledGameBits[1]; ktrex_update ORs lane 1 into KTRexArenaState.activeLaneMask when set */
     GAMEBIT_DR_KTrexLane2Enabled = 0x568,                /* Dragon Rock K-Trex (Galdon) arena - lane 2 enabled, gKTRexLaneEnabledGameBits[2]; ktrex_update ORs lane 2 into KTRexArenaState.activeLaneMask when set */
     GAMEBIT_DR_KTrexLane3Enabled = 0x569,                /* Dragon Rock K-Trex (Galdon) arena - lane 3 enabled, gKTRexLaneEnabledGameBits[3]; ktrex_update ORs lane 3 into KTRexArenaState.activeLaneMask when set; KT_RexLevel_init opens lanes 0 and 3 on arena entry */
+    GAMEBIT_DR_KTrexArenaEntered = 0x56E,                /* table 1; KT_RexLevel_init raises it while zeroing the phase counter, opening lanes 0 and 3 and selecting path A, and nothing clears it */
     GAMEBIT_DR_KTrexPhaseCounter = 0x572,                /* Dragon Rock K.Rex (Galdon) boss-arena phase/stage counter, advanced by the fight's state machine and read by DR floor switches (shifted right 1) to pick their rise curve */
     GAMEBIT_ITEM_IMAlpineRoot_Count = 0x576,             /* table 2; size 3 */
     GAMEBIT_ITEM_AlpineRoot_Used = 0x578,                /* table 2; size 3 */
@@ -992,6 +999,7 @@ enum GameBitId {
     GAMEBIT_PushableRelated0A1A = 0xA1A,                 /* table 0 */
     GAMEBIT_DIM_CannonRelated0A21 = 0xA21,               /* table 2; related to DIM cannon */
     GAMEBIT_SH_RescuedEggs = 0xA31,                      /* table 1; hint 358; ref hollow/CNTstopwatc target */
+    GAMEBIT_TTH_MusicLatch0A32 = 0xA32,                  /* ThornTail Hollow - SH_LevelCon's GameBitLatch condition for music trigger 0x98 */
     GAMEBIT_SBRelated0A3C = 0xA3C,                       /* table 0 */
     GAMEBIT_SB_IsRaining = 0xA3D,                        /* table 0 */
     GAMEBIT_SBRelated0A3E = 0xA3E,                       /* table 0 */
@@ -1129,6 +1137,7 @@ enum GameBitId {
     GAMEBIT_CC_SeqBF5 = 0xBF5,                           /* Rena's U0 dataset; table 2 */
     GAMEBIT_SH_initObjGroups = 0xBF8,                    /* table 0 */
     GAMEBIT_ITEM_TestCombatSpirit_Got = 0xBFD,           /* table 2; hint 312 */
+    GAMEBIT_TTH_MusicLatch0BFE = 0xBFE,                  /* ThornTail Hollow - SH_LevelCon's GameBitLatch condition for music trigger 0xC3 */
     GAMEBIT_MaybeHaveTricky = 0xC11,                     /* table 2; maybe wrong */
     GAMEBIT_DIM_CannonRelated0C17 = 0xC17,               /* table 2; related to DIM cannon */
     GAMEBIT_DIM_ClawDeadC18 = 0xC18,                     /* Rena's U0 dataset; table 2 */
@@ -1213,6 +1222,11 @@ enum GameBitId {
     GAMEBIT_GF_PepperTalking = 0xCC5,                    /* table 0 */
     GAMEBIT_SHBOT_BombPlantedCCA = 0xCCA,                /* Rena's U0 dataset; table 2 */
     GAMEBIT_StaffPowerupAnimRunning = 0xCCC,             /* table 0; set when collecting an upgrade */
+    GAMEBIT_MusicLatch0CCD = 0xCCD,                      /* No reader anywhere in the code and no map objref; the only evidence is KT_RexLevel_free clearing it on arena teardown beside GAMEBIT_SETPIECE_ACTIVE, GAMEBIT_SHRINE_MUSIC_LOCK and the neighbouring music-latch conditions 0xCCE/0xCD0, so it is named for the band it sits in */
+    GAMEBIT_WC_WarpActive0CCE = 0xCCE,                   /* Walled City's own warp-in-progress bit - WCLevelCont makes it the GameBitLatch condition their level controllers attach to MUSICTRIG_Teleport (0x36, track 85 SNGTeleport) */
+    GAMEBIT_MusicLatch0CCF = 0xCCF,                      /* As GAMEBIT_MusicLatch0CCD: named for its band, on the strength of KT_RexLevel_free alone */
+    GAMEBIT_WC_MusicLatch0CD0 = 0xCD0,                   /* WCLevelCont's GameBitLatch condition for music trigger 0xD4, whose track this project has not yet identified; KT_RexLevel_free clears it on teardown */
+    GAMEBIT_MusicLatch0CD1 = 0xCD1,                      /* As GAMEBIT_MusicLatch0CCD: named for its band, on the strength of KT_RexLevel_free alone */
     GAMEBIT_SH_ThornTailRelated0CD5 = 0xCD5,             /* table 2; probably "talked to guy who tells you to get a lantern" */
     GAMEBIT_SH_ThornTailRelated0CD6 = 0xCD6,             /* table 2 */
     GAMEBIT_NW_ReturnedTo = 0xCE1,                       /* table 2; hint 277 */
@@ -1318,6 +1332,7 @@ enum GameBitId {
     GAMEBIT_MMP_WallExplodingE09 = 0xE09,                /* Rena's U0 dataset; table 2 */
     GAMEBIT_MMP_BombPlantedE0A = 0xE0A,                  /* Rena's U0 dataset; table 2 */
     GAMEBIT_CFRelated0E1D = 0xE1D,                       /* table 3 */
+    GAMEBIT_WarpActive0E1E = 0xE1E,                      /* Another warp-in-progress bit - SC_levelcon makes it the GameBitLatch condition their level controllers attach to MUSICTRIG_Teleport (0x36, track 85 SNGTeleport), and LINK_levcon stops choosing ambient music for its area while it is set, which is what that DLL's local enum was reading as an area disable */
     GAMEBIT_CFRelated0E23 = 0xE23,                       /* table 3 */
     GAMEBIT_OpenedSecondPathThroughTemple = 0xE25,       /* table 2; hint 371; ref temple/HitAnimator target */
     GAMEBIT_DR_Unk0E26 = 0xE26,                          /* table 3; toggled constantly in Dragon Rock */
@@ -1392,6 +1407,7 @@ enum GameBitId {
     GAMEBIT_FoundSpellStoneWarpPad_0ECF = 0xECF,         /* table 0; hint 304 */
     GAMEBIT_OFP_FoundSpellStoneWarpPad = 0xED0,          /* table 0; hint 341 */
     GAMEBIT_DR_OnCloudRunner = 0xED7,                    /* table 0 */
+    GAMEBIT_WC_TempleBridgeActive = 0xEDB,               /* Walled City temple bridge live - WCTempleBri raises it as the bridge solves and drops it when the bridge goes inactive or the player passes 1000 units away; KT_RexLevel_free also clears it so its arena leaves no stale global state */
     GAMEBIT_WC_TimedPuzzleBTimerActive = 0xEDC,          /* Walled City timed push-block puzzle B - countdown displayed; raised with GAMEBIT_WC_PushBlockTimerActive while B runs and cleared on solve, timeout or abort */
     GAMEBIT_WC_TimedPuzzleATimerActive = 0xEDD,          /* Walled City timed push-block puzzle A - countdown displayed; raised with GAMEBIT_WC_PushBlockTimerActive while A runs and cleared on solve, timeout or abort */
     GAMEBIT_SH_Related0EDE = 0xEDE,                      /* table 2; Triggers a communication after pushing switch at bottom of well */
@@ -1407,6 +1423,7 @@ enum GameBitId {
     GAMEBIT_DR_FireCrawlerDeadF00 = 0xF00,               /* Rena's U0 dataset; table 2 */
     GAMEBIT_LV_LocatedKrazoaShrine = 0xF07,              /* table 0; hint 351 */
     GAMEBIT_NW_DidPadHornTest = 0xF08,                   /* table 0; hint 379 */
+    GAMEBIT_DR_MusicLatch0F0E = 0xF0E,                   /* Dragon Rock - drmusiccont's GameBitLatch condition for music trigger 0xE5, cleared by 0x1A7 when set and by GAMEBIT_SH_Landed064B when clear */
     GAMEBIT_MapBits = 0xF10,                             /* table 2; up to F1C? */
     GAMEBIT_WorldMap_DragonRock = 0xF11,                 /* Rena's U0 dataset; table 2 */
     GAMEBIT_IM_Unk0F12 = 0xF12,                          /* table 2; set when first entering */
@@ -1425,6 +1442,7 @@ enum GameBitId {
     GAMEBIT_NW_RescueBush2Cleared = 0xF23,               /* SnowHorn Gate Keeper rescue: tumbleweed bush cleared marker reset by NW_levcontr and consumed by NW_mammoth */
     GAMEBIT_NW_RescueBush3Cleared = 0xF24,               /* SnowHorn Gate Keeper rescue: tumbleweed bush cleared marker reset by NW_levcontr and consumed by NW_mammoth */
     GAMEBIT_NW_RescueBush4Cleared = 0xF25,               /* SnowHorn Gate Keeper rescue: tumbleweed bush cleared marker reset by NW_levcontr and consumed by NW_mammoth */
+    GAMEBIT_CountdownTimerRunning = 0xF31,               /* A countdown is running: NW_levcontr writes its own timer-active flag straight into it and latches its timer-end music off it, and WCLevelCont writes the same flag computed from the push-block timer, GAMEBIT_WC_StopwatchEnabled and gameTimerIsRunning */
     GAMEBIT_ITEM_CheatToken0_Used = 0xF34,               /* table 2; Display Credits */
     GAMEBIT_ITEM_CheatToken3_Used = 0xF35,               /* table 2; Dino Language */
     GAMEBIT_ITEM_CheatToken2_Used = 0xF36,               /* table 2; Music Test */

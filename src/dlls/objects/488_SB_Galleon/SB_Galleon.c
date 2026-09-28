@@ -1235,7 +1235,7 @@ void SB_Galleon_update(GameObject* obj) {
             state->cameraState = SBGALLEON_CAM_DONE;
             break;
         }
-        GameBitLatch_Update((GameBitLatchState*)state->gameBitLatch, 1, -1, -1, 0xa71, 0xa4);
+        GameBitLatch_Update((GameBitLatchState*)state->gameBitLatch, 1, -1, -1, GAMEBIT_SBRelated0A71, 0xa4);
     }
 }
 

@@ -97,8 +97,8 @@ void drmusiccont_update(GameObject* obj)
         obj->userData1 = 1;
     }
 
-    GameBitLatch_Update(&state->gameBitLatch, 2, 0x1a7, 0x64b, 0xf0e, 0xe5);
-    GameBitLatch_UpdateInverted(&state->gameBitLatch, 1, -1, -1, 0xe26, 0xb8);
+    GameBitLatch_Update(&state->gameBitLatch, 2, 0x1a7, GAMEBIT_SH_Landed064B, GAMEBIT_DR_MusicLatch0F0E, 0xe5);
+    GameBitLatch_UpdateInverted(&state->gameBitLatch, 1, -1, -1, GAMEBIT_DR_Unk0E26, 0xb8);
     GameBitLatch_Update(&state->gameBitLatch, 4, -1, -1, GAMEBIT_SHRINE_MUSIC_LOCK,
                         MUSICTRIG_PU3_Adventure_c4);
 
