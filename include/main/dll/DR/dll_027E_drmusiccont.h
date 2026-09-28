@@ -8,22 +8,22 @@
 
 typedef struct DrMusicContFlags
 {
-    u8 b_state : 1;
+    u8 restartPointSet : 1;
     u8 pad8_lo : 1;
-    u8 b_e30 : 1;
-    u8 b_e31 : 1;
-    u8 b_e32 : 1;
-    u8 b_e33 : 1;
-    u8 b_e9c : 1;
-    u8 b_e38 : 1;
-    u8 b_e3c : 1;
-    u8 b_e3d : 1;
-    u8 b_e3e : 1;
-    u8 b_e39 : 1;
-    u8 b_9e0 : 1;
-    u8 b_9e1 : 1;
-    u8 b_9e2 : 1;
-    u8 b_9e7 : 1;
+    u8 prevGenerator1 : 1;
+    u8 prevGenerator2 : 1;
+    u8 prevGenerator3 : 1;
+    u8 prevGenerator4 : 1;
+    u8 shieldsDown : 1;
+    u8 prevRobot1 : 1;
+    u8 prevRobot2 : 1;
+    u8 prevRobot3 : 1;
+    u8 prevRobot4 : 1;
+    u8 robotsChimePlayed : 1;
+    u8 prevTowerSwitch1 : 1;
+    u8 prevTowerSwitch2 : 1;
+    u8 prevTowerSwitch3 : 1;
+    u8 prevTowerSwitch4 : 1;
 } DrMusicContFlags;
 
 typedef struct DrmusiccontState

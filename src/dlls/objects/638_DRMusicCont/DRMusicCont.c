@@ -69,18 +69,18 @@ void drmusiccont_update(GameObject* obj)
 {
     DrmusiccontState* state = obj->extra;
     DrMusicContFlags* flags = &state->flags;
-    u8 bitE30;
-    u8 bitE31;
-    u8 bitE32;
-    u8 bitE33;
-    u8 bitE38;
-    u8 bitE3C;
-    u8 bitE3D;
-    u8 bitE3E;
-    u8 bit9E0;
-    u8 bit9E1;
-    u8 bit9E2;
-    u8 bit9E7;
+    u8 generator1;
+    u8 generator2;
+    u8 generator3;
+    u8 generator4;
+    u8 robot1;
+    u8 robot2;
+    u8 robot3;
+    u8 robot4;
+    u8 towerSwitch1;
+    u8 towerSwitch2;
+    u8 towerSwitch3;
+    u8 towerSwitch4;
 
     cloudSetOverridePosition(DRMUSICCONT_CLOUD_OVERRIDE_POS_X, DRMUSICCONT_CLOUD_OVERRIDE_POS_Y,
                              DRMUSICCONT_CLOUD_OVERRIDE_POS_Z);
@@ -102,50 +102,50 @@ void drmusiccont_update(GameObject* obj)
     GameBitLatch_Update(&state->gameBitLatch, 4, -1, -1, GAMEBIT_SHRINE_MUSIC_LOCK,
                         MUSICTRIG_PU3_Adventure_c4);
 
-    bitE30 = (u8)mainGetBit(0xe30);
-    bitE31 = (u8)mainGetBit(0xe31);
-    bitE32 = (u8)mainGetBit(0xe32);
-    bitE33 = (u8)mainGetBit(0xe33);
-    if (flags->b_e9c == 0 && bitE30 && bitE31 && bitE32 && bitE33)
+    generator1 = (u8)mainGetBit(GAMEBIT_DR_RobotGenerator1Destroyed);
+    generator2 = (u8)mainGetBit(GAMEBIT_DR_RobotGenerator2Destroyed);
+    generator3 = (u8)mainGetBit(GAMEBIT_DR_RobotGenerator3Destroyed);
+    generator4 = (u8)mainGetBit(GAMEBIT_DR_RobotGenerator4Destroyed);
+    if (flags->shieldsDown == 0 && generator1 && generator2 && generator3 && generator4)
     {
-        flags->b_e9c = 1;
+        flags->shieldsDown = 1;
         mainSetBits(GAMEBIT_DR_ShutDownRobotShields, 1);
         Sfx_PlayFromObject(0, SFXTRIG_mpick1_b);
     }
-    else if (bitE30 != flags->b_e30 || bitE31 != flags->b_e31 || bitE32 != flags->b_e32 || bitE33 != flags->b_e33)
+    else if (generator1 != flags->prevGenerator1 || generator2 != flags->prevGenerator2 || generator3 != flags->prevGenerator3 || generator4 != flags->prevGenerator4)
     {
         Sfx_PlayFromObject(0, SFXTRIG_menuups16k);
     }
-    flags->b_e30 = bitE30;
-    flags->b_e31 = bitE31;
-    flags->b_e32 = bitE32;
-    flags->b_e33 = bitE33;
+    flags->prevGenerator1 = generator1;
+    flags->prevGenerator2 = generator2;
+    flags->prevGenerator3 = generator3;
+    flags->prevGenerator4 = generator4;
 
-    bitE38 = (u8)mainGetBit(0xe38);
-    bitE3C = (u8)mainGetBit(0xe3c);
-    bitE3D = (u8)mainGetBit(0xe3d);
-    bitE3E = (u8)mainGetBit(0xe3e);
-    if (flags->b_e39 == 0 && bitE38 && bitE3C && bitE3D && bitE3E)
+    robot1 = (u8)mainGetBit(GAMEBIT_DR_Robot1Destroyed);
+    robot2 = (u8)mainGetBit(GAMEBIT_DR_Robot2Destroyed);
+    robot3 = (u8)mainGetBit(GAMEBIT_DR_Robot3Destroyed);
+    robot4 = (u8)mainGetBit(GAMEBIT_DR_Robot4Destroyed);
+    if (flags->robotsChimePlayed == 0 && robot1 && robot2 && robot3 && robot4)
     {
-        flags->b_e39 = 1;
+        flags->robotsChimePlayed = 1;
         Sfx_PlayFromObject(0, SFXTRIG_mpick1_b);
     }
-    else if (bitE38 != flags->b_e38 || bitE3C != flags->b_e3c || bitE3D != flags->b_e3d || bitE3E != flags->b_e3e)
+    else if (robot1 != flags->prevRobot1 || robot2 != flags->prevRobot2 || robot3 != flags->prevRobot3 || robot4 != flags->prevRobot4)
     {
         Sfx_PlayFromObject(0, SFXTRIG_menuups16k);
     }
-    flags->b_e38 = bitE38;
-    flags->b_e3c = bitE3C;
-    flags->b_e3d = bitE3D;
-    flags->b_e3e = bitE3E;
+    flags->prevRobot1 = robot1;
+    flags->prevRobot2 = robot2;
+    flags->prevRobot3 = robot3;
+    flags->prevRobot4 = robot4;
 
-    bit9E0 = (u8)mainGetBit(0x9e0);
-    bit9E1 = (u8)mainGetBit(0x9e1);
-    bit9E2 = (u8)mainGetBit(0x9e2);
-    bit9E7 = (u8)mainGetBit(0x9e7);
-    if (!(bit9E0 && bit9E1 && bit9E2 && bit9E7))
+    towerSwitch1 = (u8)mainGetBit(GAMEBIT_DR_TowerSwitch1);
+    towerSwitch2 = (u8)mainGetBit(GAMEBIT_DR_TowerSwitch2);
+    towerSwitch3 = (u8)mainGetBit(GAMEBIT_DR_TowerSwitch3);
+    towerSwitch4 = (u8)mainGetBit(GAMEBIT_DR_TowerSwitch4);
+    if (!(towerSwitch1 && towerSwitch2 && towerSwitch3 && towerSwitch4))
     {
-        if (bit9E0 != flags->b_9e0 || bit9E1 != flags->b_9e1 || bit9E2 != flags->b_9e2 || bit9E7 != flags->b_9e7)
+        if (towerSwitch1 != flags->prevTowerSwitch1 || towerSwitch2 != flags->prevTowerSwitch2 || towerSwitch3 != flags->prevTowerSwitch3 || towerSwitch4 != flags->prevTowerSwitch4)
         {
             state->stingerTimer = DRMUSICCONT_STINGER_TIMER_DURATION;
         }
@@ -162,29 +162,29 @@ void drmusiccont_update(GameObject* obj)
             }
         }
     }
-    flags->b_9e0 = bit9E0;
-    flags->b_9e1 = bit9E1;
-    flags->b_9e2 = bit9E2;
-    flags->b_9e7 = bit9E7;
+    flags->prevTowerSwitch1 = towerSwitch1;
+    flags->prevTowerSwitch2 = towerSwitch2;
+    flags->prevTowerSwitch3 = towerSwitch3;
+    flags->prevTowerSwitch4 = towerSwitch4;
 
-    if (flags->b_state != 0)
+    if (flags->restartPointSet != 0)
     {
-        if (mainGetBit(0x9f0) == 0 || mainGetBit(GAMEBIT_DR_RescuedHighTop) != 0)
+        if (mainGetBit(GAMEBIT_DR_HighTopRestartArmed) == 0 || mainGetBit(GAMEBIT_DR_RescuedHighTop) != 0)
         {
             (*gMapEventInterface)->clearRestartPoint();
-            flags->b_state = 0;
+            flags->restartPointSet = 0;
         }
     }
     else
     {
-        if (mainGetBit(0x9f0) != 0 && mainGetBit(GAMEBIT_DR_RescuedHighTop) == 0)
+        if (mainGetBit(GAMEBIT_DR_HighTopRestartArmed) != 0 && mainGetBit(GAMEBIT_DR_RescuedHighTop) == 0)
         {
             f32 vec[3];
             vec[0] = DRMUSICCONT_RESTART_POINT_X;
             vec[1] = DRMUSICCONT_RESTART_POINT_Y;
             vec[2] = DRMUSICCONT_RESTART_POINT_Z;
             (*gMapEventInterface)->restartPoint(vec, 0x7fff, 0, 0);
-            flags->b_state = 1;
+            flags->restartPointSet = 1;
         }
     }
 }
@@ -194,20 +194,20 @@ void drmusiccont_init(GameObject* obj)
     DrmusiccontState* state = obj->extra;
     DrMusicContFlags* flags = &state->flags;
 
-    flags->b_e30 = mainGetBit(0xe30);
-    flags->b_e31 = mainGetBit(0xe31);
-    flags->b_e32 = mainGetBit(0xe32);
-    flags->b_e33 = mainGetBit(0xe33);
-    flags->b_e9c = mainGetBit(GAMEBIT_DR_ShutDownRobotShields);
-    flags->b_e38 = mainGetBit(0xe38);
-    flags->b_e3c = mainGetBit(0xe3c);
-    flags->b_e3d = mainGetBit(0xe3d);
-    flags->b_e3e = mainGetBit(0xe3e);
-    flags->b_e39 = mainGetBit(0xe39);
-    flags->b_9e0 = mainGetBit(0x9e0);
-    flags->b_9e1 = mainGetBit(0x9e1);
-    flags->b_9e2 = mainGetBit(0x9e2);
-    flags->b_9e7 = mainGetBit(0x9e7);
+    flags->prevGenerator1 = mainGetBit(GAMEBIT_DR_RobotGenerator1Destroyed);
+    flags->prevGenerator2 = mainGetBit(GAMEBIT_DR_RobotGenerator2Destroyed);
+    flags->prevGenerator3 = mainGetBit(GAMEBIT_DR_RobotGenerator3Destroyed);
+    flags->prevGenerator4 = mainGetBit(GAMEBIT_DR_RobotGenerator4Destroyed);
+    flags->shieldsDown = mainGetBit(GAMEBIT_DR_ShutDownRobotShields);
+    flags->prevRobot1 = mainGetBit(GAMEBIT_DR_Robot1Destroyed);
+    flags->prevRobot2 = mainGetBit(GAMEBIT_DR_Robot2Destroyed);
+    flags->prevRobot3 = mainGetBit(GAMEBIT_DR_Robot3Destroyed);
+    flags->prevRobot4 = mainGetBit(GAMEBIT_DR_Robot4Destroyed);
+    flags->robotsChimePlayed = mainGetBit(GAMEBIT_DR_RobotsDestroyedChimePlayed);
+    flags->prevTowerSwitch1 = mainGetBit(GAMEBIT_DR_TowerSwitch1);
+    flags->prevTowerSwitch2 = mainGetBit(GAMEBIT_DR_TowerSwitch2);
+    flags->prevTowerSwitch3 = mainGetBit(GAMEBIT_DR_TowerSwitch3);
+    flags->prevTowerSwitch4 = mainGetBit(GAMEBIT_DR_TowerSwitch4);
 }
 
 void drmusiccont_release(void)
