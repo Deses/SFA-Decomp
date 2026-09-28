@@ -322,10 +322,10 @@ void NW_mammoth_updateGatekeeper(GameObject* obj, NwMammothState* state, NwMammo
         break;
     case NW_MAMMOTH_STATE_GATEKEEPER_COLLECTING: {
         int n = 4;
-        if (mainGetBit(0x120) == 0) {
+        if (mainGetBit(GAMEBIT_NW_ClawDead120) == 0) {
             n = 3;
         }
-        if (mainGetBit(0x121) == 0) {
+        if (mainGetBit(GAMEBIT_NW_ClawDead121) == 0) {
             n -= 1;
         }
         {

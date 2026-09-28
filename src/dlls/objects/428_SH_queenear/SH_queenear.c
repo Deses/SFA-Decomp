@@ -18,6 +18,7 @@
 #include "main/dll/player_api.h"
 #include "main/dll/tricky_api.h"
 #include "main/frame_timing.h"
+#include "main/gamebit_ids.h"
 #include "main/gamebits.h"
 #include "main/mapEvent.h"
 #include "main/objprint_character_api.h"
@@ -310,7 +311,7 @@ void sh_queenearthwalker_update(GameObject* obj) {
             characterHeadLookCalm(obj, (s16*)&state->look, QUEEN_EARTH_WALKER_HEAD_LOOK_BLEND);
             break;
         case 7:
-            if (mainGetBit(0x199) != 0) {
+            if (mainGetBit(GAMEBIT_TTH_SeqNeedBit199) != 0) {
                 state->eventTable = gQueenEarthWalkerEventTableComplete;
             } else {
                 state->eventTable = gQueenEarthWalkerEventTableBerry;

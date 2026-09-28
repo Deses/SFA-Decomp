@@ -374,6 +374,7 @@ enum GameBitId {
     GAMEBIT_SH_OpenedTunnelToWell = 0xCC,                /* table 2; ref hollow/HitAnimator target */
     GAMEBIT_IMRelated00CE = 0xCE,                        /* table 2 */
     GAMEBIT_WM_GalleonRelated00D0 = 0xD0,                /* table 2 */
+    GAMEBIT_SawCannonExplanation = 0xDB,                 /* table 2; Rena's U0 name - DIMCannon raises it the first time it explains itself and tests it to skip the explanation thereafter */
     GAMEBIT_ITEM_TrickyCall_Got = 0xDD,                  /* table 2; hint 264 */
     GAMEBIT_SHBOT_MagicCaveVisible = 0xDE,               /* table 2; ref hollow2/HitAnimator target */
     GAMEBIT_HT_ActNo = 0xDF,                             /* table 1; size 4; Hightop (unused)? */
@@ -394,6 +395,7 @@ enum GameBitId {
     GAMEBIT_DFSH_ActNo = 0xEF,                           /* table 1; size 4; dfshrine (Test of Combat) */
     GAMEBIT_AnimTest_ActNo = 0xF0,                       /* table 1; size 4 */
     GAMEBIT_SH_KilledBloop16 = 0xF5,                     /* table 1 */
+    GAMEBIT_WGSH_warpEnabled0FD = 0xFD,                  /* table 0; Rena's U0 name, annotated there as belonging to an unused map - the Krazoa Test 1 controller latches it once in its COMPLETE phase */
     GAMEBIT_ITEM_SpiritTestFear_Got = 0xFF,              /* table 2; hint 355; have the Krazoa Spirit from Test of Fear (and haven't released it) */
     GAMEBIT_NW_RescuedSnowHornGateKeeper = 0x102,        /* table 2; hint 279 */
     GAMEBIT_SH_KilledBloop17 = 0x104,                    /* table 1 */
@@ -406,7 +408,11 @@ enum GameBitId {
     GAMEBIT_AndrossRelated010D = 0x10D,                  /* table 0; random Andross hit-cue bit */
     GAMEBIT_NW_MagicCaveVisible = 0x113,                 /* table 2; ref wastes/MagicCaveTo Visible */
     GAMEBIT_SH_KilledBloop18 = 0x115,                    /* table 1 */
+    GAMEBIT_NW_ClawDead120 = 0x120,                      /* table 2; Rena's U0 name - NW_mammoth tests it alongside GAMEBIT_NW_ClawDead121 */
+    GAMEBIT_NW_ClawDead121 = 0x121,                      /* table 2; Rena's U0 name - the second SharpClaw NW_mammoth checks */
     GAMEBIT_ITEM_FireSpellStone1_Got = 0x123,            /* table 2; hint 297; ref temple/VFP_PodiumP key */
+    GAMEBIT_TTH_SeqUsedBit124 = 0x124,                   /* table 2; Rena's U0 name (ThornTail Hollow, the SH_ prefix these sources later renamed to TTH_) - read by SH_LevelCon */
+    GAMEBIT_TestStrengthTexScrollRelated127 = 0x127,     /* table 0; Rena's U0 name - the Krazoa Test 1 controller raises it from an animation event and on each update, and clears it as the test completes */
     GAMEBIT_WM_EnteredKrazoaTest1_0129 = 0x129,          /* table 0; set when entering Krazoa test 1, cleared when talking to spirit */
     GAMEBIT_ITEM_TrickyFood_GrabInProgress = 0x12E,      /* Global latch: set by dll_01A7 EdibleMushroom when a GrubTub Fungus offers itself to the player (grab in range), cleared once the grab-complete reply lands and TrickyFood_Count (or the romDefNo-0x658 variant's bit) increments; read by Tricky's food check as a stand-in for already owning TrickyFood */
     GAMEBIT_HintTexts0 = 0x12F,                          /* table 2; size 32; related to hint texts; flags, set when Krystal boards ship */
@@ -458,6 +464,7 @@ enum GameBitId {
     GAMEBIT_ITEM_MoonPassKey_Got = 0x193,                /* table 2; hint 298 */
     GAMEBIT_ITEM_FireWeed_Count = 0x194,                 /* table 2; size 2 */
     GAMEBIT_SawBombPlantPatch = 0x196,                   /* table 2 */
+    GAMEBIT_TTH_SeqNeedBit199 = 0x199,                   /* table 2; Rena's U0 name - a sequence precondition SH_queenear tests */
     GAMEBIT_SH_ReturnedAfter4thStone = 0x19C,            /* table 2; hint 408 */
     GAMEBIT_SnowHornArtifact19D = 0x19D,                 /* table 2; set when using artifact */
     GAMEBIT_SnowHornArtifact19F = 0x19F,                 /* table 2; checked when using artifact */
@@ -486,6 +493,7 @@ enum GameBitId {
     GAMEBIT_WM_KrazTest1TorchesActive = 0x1D3,           /* Krazoa Test 1 shrine-countdown active; set by dll_019B when the timer starts with no unlocks yet, read by dll_019C torch props to ignite; cleared on test failure */
     GAMEBIT_IM_TrickyRelated01D6 = 0x1D6,                /* table 3; set when starting Tricky landing scene, cleared after race */
     GAMEBIT_ITEM_DeletedSpell1D7 = 0x1D7,                /* table 2; in spell bits table but does nothing */
+    GAMEBIT_CC_BridgeNeedBit = 0x1D9,                    /* table 2; Rena's U0 name - read by the wall-crawler DLL as an alternative to its proximity test, and by DFP_ForceAw */
     GAMEBIT_DIM_ReachedBoss = 0x1DF,                     /* table 1; hint 292 */
     GAMEBIT_DIM_LocatedCogs = 0x1E5,                     /* table 2; hint 287; ref snowmines/HitAnimator target */
     GAMEBIT_IM_TrickyRelated01ED = 0x1ED,                /* table 3; set when warping to Ice Mountain, cleared when starting Tricky landing scene */
@@ -685,6 +693,10 @@ enum GameBitId {
     GAMEBIT_SHOP_Unk0617 = 0x617,                        /* table 0; set when entering shop */
     GAMEBIT_LV_DoneTests = 0x61C,                        /* table 2; hint 349 */
     GAMEBIT_SHOP_ScarabGameRunning = 0x626,              /* table 0; ref swapstore/HitAnimator target */
+    GAMEBIT_DR_HighTop_RunSeq = 0x62A,                   /* table 1; name from Rena's kiosk-build data, confirmed by the code - hightop_stateHandler04 sets it the moment all four of GAMEBIT_DR_HighTopSwitch1-4 are hit */
+    GAMEBIT_DR_HighTop_SeqDone = 0x62B,                  /* table 1; kiosk-build name - while set, HighTop sets GAMEBIT_DR_HighTop_SeqDone2, arms its curve-follow ride and starts the air meter */
+    GAMEBIT_DR_HighTop_SeqDone2 = 0x62F,                 /* table 1; kiosk-build name - raised by HighTop as it begins the ride */
+    GAMEBIT_DR_HighTop_Riding630 = 0x630,                /* table 1; kiosk-build name - HighTop's substate 0xA hands control to the riding state while it is set */
     GAMEBIT_DR_RescuedHighTop = 0x632,                   /* table 2; hint 391; ref dragrock/HitAnimator target */
     GAMEBIT_OFP_PuzzlePadPressed = 0x635,                /* Ocean Force Point electric-floor puzzle pad is pressed */
     GAMEBIT_SC_totempuzzle_running = 0x639,              /* table 2 */
@@ -818,6 +830,7 @@ enum GameBitId {
     GAMEBIT_SBRelated0A3E = 0xA3E,                       /* table 0 */
     GAMEBIT_SBRelated0A3F = 0xA3F,                       /* table 0 */
     GAMEBIT_VFP_ReturnedWithSpellStone = 0xA43,          /* table 2; hint 370; ref temple/HitAnimator target */
+    GAMEBIT_WarpstoneRelated0A45 = 0xA45,                /* table 2; Rena's U0 name - SH_swapston drives the WarpStone's look-at-player behaviour straight from it */
     GAMEBIT_SB_DoorOpen = 0xA4B,                         /* table 0; ref frontend/HitAnimator target */
     GAMEBIT_SC_TotemBondRing4 = 0xA4C,                   /* LightFoot Village totem-bond puzzle - ring slot 4 bonded, gTotemBondRingGameBits[4]; set to 1 when the ring is bonded and passed as the spawned orb's activeGameBit */
     GAMEBIT_SC_TotemBondRing5 = 0xA4D,                   /* LightFoot Village totem-bond puzzle - ring slot 5 bonded, gTotemBondRingGameBits[5]; set to 1 when the ring is bonded and passed as the spawned orb's activeGameBit */
@@ -879,6 +892,7 @@ enum GameBitId {
     GAMEBIT_CFRelated0B46 = 0xB46,                       /* table 1; ref fortress/CNTstopwatc enabled */
     GAMEBIT_CFRelated0B6C = 0xB6C,                       /* table 1 */
     GAMEBIT_LINKA_ActNo = 0xB81,                         /* table 1; size 4 */
+    GAMEBIT_OFB_PinPonDeadB8C = 0xB8C,                   /* table 2; Rena's U0 name - DFP_LevelCo gates on it together with 0x792 */
     GAMEBIT_CF_DeathGasActive = 0xB97,                   /* table 1; ref fortress/deathGasNoF active */
     GAMEBIT_ITEM_BombSpore_ShowCount = 0xB98,            /* table 2; on HUD */
     GAMEBIT_ITEM_TrickyFood_ShowCount = 0xB99,           /* table 2 */

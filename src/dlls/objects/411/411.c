@@ -170,7 +170,7 @@ int dll411_processAnimEvents(GameObject* obj, int unusedArg, ObjSeqState* animUp
                 }
                 break;
             case DLL19B_ANIM_EVENT_GAMEBIT_0127_SET:
-                mainSetBits(0x127, 1);
+                mainSetBits(GAMEBIT_TestStrengthTexScrollRelated127, 1);
                 break;
             case DLL19B_ANIM_EVENT_BRIGHTNESS:
                 state->brightnessB = DLL19B_BRIGHTNESS_EVENT;
@@ -233,7 +233,7 @@ void dll411_update(GameObject* obj) {
             break;
         }
     }
-    mainSetBits(0x127, 1);
+    mainSetBits(GAMEBIT_TestStrengthTexScrollRelated127, 1);
     if ((value = state->brightnessAVelocity) != 0) {
         state->brightnessA += (s16)value;
         if (state->brightnessA <= DLL19B_BRIGHTNESS_A_MIN) {
@@ -358,11 +358,11 @@ void dll411_update(GameObject* obj) {
             }
             break;
         case DLL19B_PHASE_COMPLETE:
-            if (mainGetBit(0xfd) == 0) {
-                mainSetBits(0xfd, 1);
+            if (mainGetBit(GAMEBIT_WGSH_warpEnabled0FD) == 0) {
+                mainSetBits(GAMEBIT_WGSH_warpEnabled0FD, 1);
             }
             mainSetBits(0x1d2, 0);
-            mainSetBits(0x127, 0);
+            mainSetBits(GAMEBIT_TestStrengthTexScrollRelated127, 0);
             state->phase = DLL19B_PHASE_DONE;
             gTitleMenuControlInterface->vtable->onSelectSave(3, 0x2c, 0x50, state->brightnessB & 0xff, 0);
             break;
@@ -372,7 +372,7 @@ void dll411_update(GameObject* obj) {
             state->timer = DLL19B_RESET_DELAY;
             mainSetBits(GAMEBIT_WM_EnteredKrazoaTest1_0129, 1);
             mainSetBits(0x126, 1);
-            mainSetBits(0x127, 1);
+            mainSetBits(GAMEBIT_TestStrengthTexScrollRelated127, 1);
             {
                 Dll6AInterface** handle = Resource_Acquire(DLL19B_RESOURCE_PARTICLE, 1);
                 state->gfxHandle = (*handle)->spawn(obj, 2, NULL, DLL19B_PARTICLE_SPAWN_FLAGS, -1, NULL);
@@ -406,7 +406,7 @@ void dll411_init(GameObject* obj, const Dll19BPlacement* placement) {
     mainSetBits(GAMEBIT_WM_EnteredKrazoaTest1_0129, 1);
     mainSetBits(0x1d2, 0);
     mainSetBits(0x126, 1);
-    mainSetBits(0x127, 1);
+    mainSetBits(GAMEBIT_TestStrengthTexScrollRelated127, 1);
     mainSetBits(GAMEBIT_STAFF_ABILITY_FIRE_BLASTER, 1);
     mainSetBits(GAMEBIT_STAFF_ABILITY_SHARPCLAW_DISGUISE, 1);
     mainSetBits(GAMEBIT_ITEM_DeletedSpell1D7, 1);

@@ -17,6 +17,7 @@
 #include "sys/objects.h"
 #include "dlls/objects/430_SH_LevelCon.h"
 #include "main/mapEventTypes.h"
+#include "main/gamebit_ids.h"
 #include "main/gamebits.h"
 #include "main/frame_timing.h"
 #include "main/audio/sfx_trigger_ids.h"
@@ -57,7 +58,8 @@ void DFP_LevelControl_updateAct2(GameObject* obj) {
         mainSetBits(0x5e3, 1);
     }
 
-    if (mainGetBit(0x792) == 0 && mainGetBit(0xb8c) != 0 && mainGetBit(0xb8c) != 0) {
+    if (mainGetBit(0x792) == 0 && mainGetBit(GAMEBIT_OFB_PinPonDeadB8C) != 0 &&
+        mainGetBit(GAMEBIT_OFB_PinPonDeadB8C) != 0) {
         Sfx_PlayFromObject(obj, SFXTRIG_wp_espk2_c);
         mainSetBits(0x792, 1);
     }

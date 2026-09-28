@@ -311,9 +311,9 @@ int DIMCannon_SeqFn(GameObject* obj, int unused, ObjSeqState* animUpdate) {
                 (*gGameUIInterface)->initAirMeter(gDimCannonMaxCharge, DIM_CANNON_AIR_METER_BACKGROUND_TEXTURE);
             }
         } else {
-            if (!mainGetBit(0xdb)) {
+            if (!mainGetBit(GAMEBIT_SawCannonExplanation)) {
                 (*gGameUIInterface)->showNpcDialogue(0x4b9, 0x14, 0x8c, 1);
-                mainSetBits(0xdb, 1);
+                mainSetBits(GAMEBIT_SawCannonExplanation, 1);
             }
             aimDelta = (int)(-gDimCannonAimStickScale * padGetStickX(0));
             if (aimDelta != 0) {

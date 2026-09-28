@@ -337,7 +337,7 @@ int hightop_stateHandler05(GameObject* obj, HighTopRuntime* state) {
         }
         break;
     case 0xa:
-        if (mainGetBit(0x630) != 0) {
+        if (mainGetBit(GAMEBIT_DR_HighTop_Riding630) != 0) {
             return 7;
         }
         break;
@@ -363,10 +363,10 @@ int hightop_stateHandler04(GameObject* obj, HighTopRuntime* stateArg) {
     }
     count = mainGetBit(GAMEBIT_DR_HighTopSwitch1) + mainGetBit(GAMEBIT_DR_HighTopSwitch2) +
             mainGetBit(GAMEBIT_DR_HighTopSwitch3) + mainGetBit(GAMEBIT_DR_HighTopSwitch4);
-    if (mainGetBit(0x62b) != 0) {
+    if (mainGetBit(GAMEBIT_DR_HighTop_SeqDone) != 0) {
         HighTopRuntime* state2;
         RomCurveInterface* curve;
-        mainSetBits(0x62f, 1);
+        mainSetBits(GAMEBIT_DR_HighTop_SeqDone2, 1);
         ObjHits_MarkObjectPositionDirty(&obj->anim);
         ObjHits_ClearSourceMask(&obj->anim, 1);
         obj->anim.modelInstance->runtimeSourceHitMask &= ~1;
@@ -383,7 +383,7 @@ int hightop_stateHandler04(GameObject* obj, HighTopRuntime* stateArg) {
         return 7;
     }
     if (count == 4) {
-        mainSetBits(0x62a, 1);
+        mainSetBits(GAMEBIT_DR_HighTop_RunSeq, 1);
         return 0;
     }
     objKfAnimUpdate(obj, &state->keyframeAnimState);

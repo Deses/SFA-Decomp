@@ -292,7 +292,7 @@ void SH_LevelControl_runBloopEvent(GameObject* obj, ShLevelControlState* state) 
         }
         break;
     case 1:
-        if (mainGetBit(0x124) != 0) {
+        if (mainGetBit(GAMEBIT_TTH_SeqUsedBit124) != 0) {
             (*gMapEventInterface)->savePoint(&player->anim.localPosX, player->anim.rotX, 1, 0);
             state->airMeterTimer = 100000.0f;
             (*gGameUIInterface)->initAirMeter(100000, SHLEVELCONTROL_AIRMETER_BGTEXTURE);
