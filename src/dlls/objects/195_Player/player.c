@@ -8470,7 +8470,7 @@ int playerState08(GameObject* obj, struct PlayerState* state, f32 fv) {
     if (inner->curAnimId != 0x44 && (*gGameUIInterface)->isAnyItemBeingUsed() != 0 &&
         (*gGameUIInterface)->isItemBeingUsed(0x13e) != 0 &&
         (objGetAllOfType(LANTERNFIREFLY_OBJGROUP, &cnt30), cnt30 == 0)) {
-        gameBitDecrement(0x13d);
+        gameBitDecrement(GAMEBIT_ITEM_Firefly_Count);
         if ((u8)Obj_CanSetupObject() != 0) {
             ObjPlacement* setup = Obj_AllocObjectSetup(0x24, 0x43b);
             setup->objectId = 0x43b;

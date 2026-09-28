@@ -212,7 +212,7 @@ void PressureSwitch_init(GameObject* obj, const PressureSwitchPlacementView* pla
     if (ident == 0x1F1A) {
         state->mapGameBit = GAMEBIT_WM_SwitchDoorOpen;
     } else if (ident == 0x47293) {
-        state->mapGameBit = 0xF46;
+        state->mapGameBit = GAMEBIT_WM_PressureSwitchDoor0F46;
     } else {
         state->mapGameBit = -1;
     }

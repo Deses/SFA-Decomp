@@ -483,7 +483,7 @@ void DoorF4_init(GameObject* obj, DoorF4Placement* placement) {
         break;
     case 283:
     case 284:
-        state->requiredGameBit = 152;
+        state->requiredGameBit = GAMEBIT_CC_DoorRequired0098;
         break;
     case 318:
     case 890:
