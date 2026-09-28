@@ -211,7 +211,9 @@ int Lightfoot_UpdateChallengeGateInteraction(GameObject* obj, BaddieState* state
                 switch (r4c->base.ident)
                 {
                 case 0x46a51:
-                    if (mainGetBit(0xc38) != 0 && mainGetBit(0xc39) != 0 && mainGetBit(0xc3a) != 0)
+                    if (mainGetBit(GAMEBIT_LV_ChallengeGate1Baby0Delivered) != 0 &&
+                        mainGetBit(GAMEBIT_LV_ChallengeGate1Baby1Delivered) != 0 &&
+                        mainGetBit(GAMEBIT_LV_ChallengeGate1Baby2Delivered) != 0)
                     {
                         if (mainGetBit(GAMEBIT_LV_ChallengeGate1Complete) == 0)
                         {
@@ -227,7 +229,9 @@ int Lightfoot_UpdateChallengeGateInteraction(GameObject* obj, BaddieState* state
                     }
                     break;
                 case 0x46a55:
-                    if (mainGetBit(0xc3b) != 0 && mainGetBit(0xc3c) != 0 && mainGetBit(0xc3d) != 0)
+                    if (mainGetBit(GAMEBIT_LV_ChallengeGate2Baby0Delivered) != 0 &&
+                        mainGetBit(GAMEBIT_LV_ChallengeGate2Baby1Delivered) != 0 &&
+                        mainGetBit(GAMEBIT_LV_ChallengeGate2Baby2Delivered) != 0)
                     {
                         if (mainGetBit(GAMEBIT_LV_ChallengeGate2Complete) == 0)
                         {
@@ -243,7 +247,9 @@ int Lightfoot_UpdateChallengeGateInteraction(GameObject* obj, BaddieState* state
                     }
                     break;
                 case 0x49928:
-                    if (mainGetBit(0xc3e) != 0 && mainGetBit(0xc3f) != 0 && mainGetBit(0xc40) != 0)
+                    if (mainGetBit(GAMEBIT_SC_ChallengeGate3Baby0Delivered) != 0 &&
+                        mainGetBit(GAMEBIT_SC_ChallengeGate3Baby1Delivered) != 0 &&
+                        mainGetBit(GAMEBIT_SC_ChallengeGate3Baby2Delivered) != 0)
                     {
                         if (mainGetBit(GAMEBIT_SC_ChallengeGate3Complete) == 0)
                         {
@@ -546,17 +552,17 @@ void Lightfoot_RecordCompletedChallengeTargetHit(GameObject* obj, GroundBaddieSt
         return;
 
     idx = (ObjPlacement*)obj->anim.placementData;
-    if (idx->ident == 0x46A51 && mainGetBit(0xc49) == 0)
+    if (idx->ident == 0x46A51 && mainGetBit(GAMEBIT_LV_ChallengeGate1TargetHit) == 0)
     {
-        mainSetBits(0xc49, 1);
+        mainSetBits(GAMEBIT_LV_ChallengeGate1TargetHit, 1);
     }
-    else if (idx->ident == 0x46A55 && mainGetBit(0xc4a) == 0)
+    else if (idx->ident == 0x46A55 && mainGetBit(GAMEBIT_LV_ChallengeGate2TargetHit) == 0)
     {
-        mainSetBits(0xc4a, 1);
+        mainSetBits(GAMEBIT_LV_ChallengeGate2TargetHit, 1);
     }
-    else if (idx->ident == 0x49928 && mainGetBit(0xc4b) == 0)
+    else if (idx->ident == 0x49928 && mainGetBit(GAMEBIT_SC_ChallengeGate3TargetHit) == 0)
     {
-        mainSetBits(0xc4b, 1);
+        mainSetBits(GAMEBIT_SC_ChallengeGate3TargetHit, 1);
     }
     animState->challengeCompletePending = 0;
 }
@@ -877,7 +883,7 @@ void Lightfoot_update(GameObject* obj) {
         case 0x4993F:
         case 0x49940:
         case 0x49941:
-            if (mainGetBit(0xC44)) {
+            if (mainGetBit(GAMEBIT_LV_ChallengeGate1BabiesActive)) {
                 obj->userData1 = mainGetBit(inner->groundBaddie.gameBitA);
             } else {
                 obj->userData1 = 1;
@@ -886,7 +892,7 @@ void Lightfoot_update(GameObject* obj) {
         case 0x499AC:
         case 0x499AE:
         case 0x499AF:
-            if (mainGetBit(0xC42) && mainGetBit(inner->groundBaddie.gameBitA) == 0) {
+            if (mainGetBit(GAMEBIT_LV_ChallengeGate2BabiesActive) && mainGetBit(inner->groundBaddie.gameBitA) == 0) {
                 GameObject* other = ObjList_FindObjectById(0x499B5);
 
                 if (other != NULL &&
@@ -899,7 +905,9 @@ void Lightfoot_update(GameObject* obj) {
                         objfx_spawnDirectionalBurst(obj, 5, 5.0f, 5, 6, 0x64, 10.0f,
                                                     effectParams, 0);
                     }
-                    if (mainGetBit(0xC3B) && mainGetBit(0xC3C) && mainGetBit(0xC3D)) {
+                    if (mainGetBit(GAMEBIT_LV_ChallengeGate2Baby0Delivered) &&
+                        mainGetBit(GAMEBIT_LV_ChallengeGate2Baby1Delivered) &&
+                        mainGetBit(GAMEBIT_LV_ChallengeGate2Baby2Delivered)) {
                         Sfx_PlayFromObject(0, SFXTRIG_mpick1_b);
                     } else {
                         Sfx_PlayFromObject(0, SFXTRIG_sc_menuups16k_409);
@@ -913,7 +921,7 @@ void Lightfoot_update(GameObject* obj) {
         case 0x499B0:
         case 0x499B1:
         case 0x499B2:
-            if (mainGetBit(0xC46) && mainGetBit(inner->groundBaddie.gameBitA) == 0) {
+            if (mainGetBit(GAMEBIT_SC_ChallengeGate3BabiesActive) && mainGetBit(inner->groundBaddie.gameBitA) == 0) {
                 GameObject* other = ObjList_FindObjectById(0x499B6);
 
                 if (other != NULL &&
@@ -926,7 +934,9 @@ void Lightfoot_update(GameObject* obj) {
                         objfx_spawnDirectionalBurst(obj, 5, 5.0f, 5, 6, 0x64, 10.0f,
                                                     effectParams, 0);
                     }
-                    if (mainGetBit(0xC3E) && mainGetBit(0xC3F) && mainGetBit(0xC40)) {
+                    if (mainGetBit(GAMEBIT_SC_ChallengeGate3Baby0Delivered) &&
+                        mainGetBit(GAMEBIT_SC_ChallengeGate3Baby1Delivered) &&
+                        mainGetBit(GAMEBIT_SC_ChallengeGate3Baby2Delivered)) {
                         Sfx_PlayFromObject(0, SFXTRIG_mpick1_b);
                     } else {
                         Sfx_PlayFromObject(0, SFXTRIG_sc_menuups16k_409);
@@ -952,10 +962,16 @@ void Lightfoot_update(GameObject* obj) {
     }
 
     if (obj->userData1 != 0) {
-        if (((((LightfootPlacement*)workValue)->base.ident == 0x499B5 && mainGetBit(0xC42) &&
-              (mainGetBit(0xC3B) == 0 || mainGetBit(0xC3C) == 0 || mainGetBit(0xC3D) == 0)) ||
-             (((LightfootPlacement*)workValue)->base.ident == 0x499B6 && mainGetBit(0xC46) &&
-              (mainGetBit(0xC3E) == 0 || mainGetBit(0xC3F) == 0 || mainGetBit(0xC40) == 0)))) {
+        if (((((LightfootPlacement*)workValue)->base.ident == 0x499B5 &&
+              mainGetBit(GAMEBIT_LV_ChallengeGate2BabiesActive) &&
+              (mainGetBit(GAMEBIT_LV_ChallengeGate2Baby0Delivered) == 0 ||
+               mainGetBit(GAMEBIT_LV_ChallengeGate2Baby1Delivered) == 0 ||
+               mainGetBit(GAMEBIT_LV_ChallengeGate2Baby2Delivered) == 0)) ||
+             (((LightfootPlacement*)workValue)->base.ident == 0x499B6 &&
+              mainGetBit(GAMEBIT_SC_ChallengeGate3BabiesActive) &&
+              (mainGetBit(GAMEBIT_SC_ChallengeGate3Baby0Delivered) == 0 ||
+               mainGetBit(GAMEBIT_SC_ChallengeGate3Baby1Delivered) == 0 ||
+               mainGetBit(GAMEBIT_SC_ChallengeGate3Baby2Delivered) == 0)))) {
             effectParams[3] = 0.0f;
             effectParams[4] = 24.0f;
             effectParams[5] = 0.0f;
