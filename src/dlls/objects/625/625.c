@@ -360,7 +360,7 @@ int drakorhoverpad_updateDirection(GameObject* obj) {
             }
         }
     }
-    if (f->b01 != mainGetBit(1654)) {
+    if (f->b01 != mainGetBit(GAMEBIT_DRBOT_HoverPadReverse)) {
         f->b01 ^= 1;
         p->commandSpeed = -p->commandSpeed;
         if (f->state == 3) {

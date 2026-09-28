@@ -373,6 +373,9 @@ enum GameBitId {
     GAMEBIT_SH_KilledBloop8 = 0xAE,                      /* table 1 */
     GAMEBIT_SH_KilledBloop9 = 0xAF,                      /* table 1 */
     GAMEBIT_SH_KilledBloop10 = 0xB0,                     /* table 1 */
+    GAMEBIT_WM_NpcHintPrereq00B1 = 0xB1,                 /* One of three bits DLL 0x200's NPC checks together: with the player out of magic, any one of them still clear sends the NPC down its sequence 1 instead of its sequence 2. Retail spells all three in decimal */
+    GAMEBIT_WM_NpcHintPrereq00B2 = 0xB2,                 /* One of three bits DLL 0x200's NPC checks together: with the player out of magic, any one of them still clear sends the NPC down its sequence 1 instead of its sequence 2. Retail spells all three in decimal */
+    GAMEBIT_WM_NpcHintPrereq00B3 = 0xB3,                 /* One of three bits DLL 0x200's NPC checks together: with the player out of magic, any one of them still clear sends the NPC down its sequence 1 instead of its sequence 2. Retail spells all three in decimal */
     GAMEBIT_ITEM_Unknown_Used = 0xB4,                    /* table 2; Item name is "Unknown" */
     GAMEBIT_SH_KilledBloop11 = 0xBE,                     /* table 1 */
     GAMEBIT_SH_ReturnedToQueen = 0xBF,                   /* table 2; hint 270; Talked to queen after bringing Tricky back from Ice Mountain */
@@ -597,6 +600,8 @@ enum GameBitId {
     GAMEBIT_ITEM_WCSilverTooth_Used = 0x25B,             /* table 2 */
     GAMEBIT_WC_TrexLever4Activated = 0x25F,              /* One of the four wallcity staff levers the T-rex challenge runs on - wclevelcont raises all four at init and again when a run times out, and clears all four as a run starts; Rena has it as wallcity HitAnimator 0x47FF0's target and StaffLeverO 0x4CB3F's activated param */
     GAMEBIT_ITEM_WCMoonStone_Got = 0x264,                /* table 2 */
+    GAMEBIT_WC_FloorTileRelated0265 = 0x265,             /* Read by WCFloorTile as the last branch of its fall logic, purely to raise its own flag 4 */
+    GAMEBIT_DIM_BossFootstepShake = 0x26B,               /* Raised on every DarkIce Mines boss footstep, in the same breath as the dampened camera shake and the rumble - the boss counterpart to GAMEBIT_DR_KTrexFootfallShake */
     GAMEBIT_PushableRelated0272 = 0x272,                 /* table 2; ref snowmines2/HitAnimator target */
     GAMEBIT_WC_TrexAnimTarget0274 = 0x274,               /* Wallcity HitAnimator 0x4CB89's target - wclevelcont raises it both as a T-rex run starts and when one is beaten, and drops it when a run times out */
     GAMEBIT_ITEM_Spirit1_Used = 0x277,                   /* table 1 */
@@ -634,6 +639,7 @@ enum GameBitId {
     GAMEBIT_WC_TempleDiaBStage2 = 0x2EF,                 /* Walled City temple rotating-dial (bank B) - stage 2 complete, gWcTempleDiaGameBitsB[2]; bank chosen by ObjAnim.bankIndex != 0, otherwise as bank A */
     GAMEBIT_WC_FinalStopwatchTarget = 0x2F0,             /* Wallcity CNTstopwatc 0x49129's target, raised as the Walled City final puzzle completes */
     GAMEBIT_WC_TempleDiaAStage0 = 0x2F8,                 /* Walled City temple rotating-dial (bank A) - stage 0 complete, gWcTempleDiaGameBitsA[0]; ORed into WCTempleDiaState.stageMask, which picks the dial speed from gWcTempleDiaTargetSpeedTableA and drives part visibility */
+    GAMEBIT_WM_NpcIdleSuppressed02FB = 0x2FB,            /* table 0; while clear, DLL 0x200's NPC runs its idle animation - raising it stops the idle outright. Spelled 763 in retail */
     GAMEBIT_CFRelated02FC = 0x2FC,                       /* table 1 */
     GAMEBIT_CFRelated02FD = 0x2FD,                       /* table 1 */
     GAMEBIT_CFRelated02FE = 0x2FE,                       /* table 1 */
@@ -644,6 +650,7 @@ enum GameBitId {
     GAMEBIT_DIM3_WarpEnable313 = 0x313,                  /* Rena's U0 dataset; table 0 */
     GAMEBIT_WM_NpcSecondItemUsed = 0x314,                /* Raised from the DLL 0x200 NPC's anim event 1 once its interaction count reaches 2, so the second item has landed */
     GAMEBIT_ITEM_Key336_Got = 0x336,                     /* table 1; XXX where is this key from? */
+    GAMEBIT_WC_FloorTilesReset = 0x338,                  /* Puts a Walled City floor tile back: on sight of it the tile snaps to its placement Y and enters its restore phase. Spelled 824 in retail */
     GAMEBIT_FinalBoss_ActNo = 0x349,                     /* table 1; size 4 */
     GAMEBIT_WC_TrexRetryBlocked034D = 0x34D,             /* Blocks the retry: when a T-rex run times out, wclevelcont only re-arms the four levers if this is clear */
     GAMEBIT_DIM_Bike_HitboxEnabled = 0x35F,              /* Rena's U0 dataset; table 2 */
@@ -914,6 +921,7 @@ enum GameBitId {
     GAMEBIT_DRBOT_HoverPadRouteOpen = 0x661,             /* The Drakor hover pad's route ahead is open: codes 4 and 9 both bring the pad to a dead stop, zeroing its commanded speed, whenever this is clear */
     GAMEBIT_ITEM_BombSpore_Count = 0x66C,                /* table 2; size 3 */
     GAMEBIT_ITEM_WhiteShroom_Count = 0x66D,              /* table 2; size 3 */
+    GAMEBIT_DRBOT_HoverPadReverse = 0x676,               /* The Drakor hover pad's reverse bit: the pad caches its last value and negates its commanded speed the moment the two disagree, which is the polling the DLL's own header comment describes */
     GAMEBIT_DRBOT_HoverPadLeverActivated = 0x67F,        /* Rena has it as dragbot StaffLeverT 0x45C6A's activated param and the target of two HitAnimators; the hover pad's code 8 does nothing but report its state back to the curve */
     GAMEBIT_DRBOT_HoverPadRelated0689 = 0x689,           /* The Drakor hover pad's curve carries event codes, and this is one of the bits DLL 625 writes as the pad runs them - code 10 latches it once, and checks it first so it fires only the first time the pad passes */
     GAMEBIT_DRBOT_HoverPadRidden068A = 0x68A,            /* The Drakor hover pad's curve carries event codes, and this is one of the bits DLL 625 writes as the pad runs them - code 11 raises it only while the player is actually parented to the pad, and code 13 needs it before it will double-bounce */
@@ -1310,6 +1318,7 @@ enum GameBitId {
     GAMEBIT_LINKF_TexScrollC5B = 0xC5B,                  /* Rena's U0 dataset; table 2 */
     GAMEBIT_LINKF_TexScrollC5C = 0xC5C,                  /* Rena's U0 dataset; table 0 */
     GAMEBIT_ITEM_Viewfinder_Got = 0xC64,                 /* table 2; hint 409; aka High-Defnition Display Device or Zoom Goggles */
+    GAMEBIT_DR_Related0C67 = 0xC67,                      /* Read by DLL 620: while set, the object tests its X against a narrow window and raises either its placement's own openedGameBit or GAMEBIT_DR_Related0EA4 */
     GAMEBIT_ITEM_SpiritTestStrength_Got = 0xC6E,         /* table 2; hint 380 */
     GAMEBIT_ITEM_Spirit4_Used = 0xC70,                   /* table 2; hint 382 */
     GAMEBIT_WM_SpiritPlace4Ready = 0xC71,                /* table 2; gates spirit-place 4 and its return pad */
@@ -1529,6 +1538,7 @@ enum GameBitId {
     GAMEBIT_WM_DestroyedBox6 = 0xEA0,                    /* table 2 */
     GAMEBIT_WC_EnteredShrine = 0xEA1,                    /* table 0; hint 413 */
     GAMEBIT_K6_Entered = 0xEA2,                          /* table 0; hint 421 */
+    GAMEBIT_DR_Related0EA4 = 0xEA4,                      /* Raised by DLL 620 when its X falls outside the window that would instead have raised its placement's openedGameBit */
     GAMEBIT_OFPBOT_StaffBoostEnabled = 0xEA5,            /* table 2; ref kraztest/StaffBoostP enabled */
     GAMEBIT_ToldGetSnowHornArtifact = 0xEA6,             /* table 0 */
     GAMEBIT_NW_GateKeeperCommsPlayed = 0xEA7,            /* one-shot incoming-communication latch in the SnowHorn Gate Keeper post-rescue/default dialogue path */

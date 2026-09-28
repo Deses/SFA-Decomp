@@ -202,7 +202,7 @@ void DR_CageWith_hitDetect(GameObject* obj)
     }
     if (bf31->b0 == 0)
     {
-        if (mainGetBit(3175) != 0)
+        if (mainGetBit(GAMEBIT_DR_Related0C67) != 0)
         {
             px = obj->anim.localPosX;
             if (px >= -16990.0f && px <= -16968.0f)
@@ -211,12 +211,12 @@ void DR_CageWith_hitDetect(GameObject* obj)
             }
             else
             {
-                mainSetBits(3748, 1);
+                mainSetBits(GAMEBIT_DR_Related0EA4, 1);
             }
         }
         else
         {
-            mainSetBits(3748, 0);
+            mainSetBits(GAMEBIT_DR_Related0EA4, 0);
         }
     }
 }

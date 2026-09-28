@@ -452,7 +452,7 @@ int DIMbossHitDetect_liftImpact(GameObject* obj, BaddieState* state) {
         CameraShake_Enable();
         CameraShake_StartDampened(5.0f, 10.0f, 4.0f);
         doRumble(20.0f);
-        mainSetBits(619, 1);
+        mainSetBits(GAMEBIT_DIM_BossFootstepShake, 1);
     }
     return 0;
 }
