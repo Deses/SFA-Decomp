@@ -129,17 +129,17 @@ void wclevelcont_updateAct2State(GameObject* obj, WcLevelControlState* state) {
     }
 
     if (!(state->completionFlags & WCLEVELCTL_FLAG_SWITCHES)) {
-        if (mainGetBit(0xc58) != 0 && mainGetBit(0xc59) != 0 && mainGetBit(0xc5a) != 0) {
-            mainSetBits(0x205, 1);
+        if (mainGetBit(GAMEBIT_WC_Switch1Activated) != 0 && mainGetBit(GAMEBIT_WC_Switch2Activated) != 0 && mainGetBit(GAMEBIT_WC_Switch3Activated) != 0) {
+            mainSetBits(GAMEBIT_WC_AllSwitchesActivated, 1);
             Sfx_PlayFromObject(0, SFXTRIG_mpick1_b);
             state->completionFlags |= WCLEVELCTL_FLAG_SWITCHES;
-        } else if (!state->dialogueFlags.b40 && mainGetBit(0xc58) != 0) {
+        } else if (!state->dialogueFlags.b40 && mainGetBit(GAMEBIT_WC_Switch1Activated) != 0) {
             Sfx_PlayFromObject(0, SFXTRIG_menuups16k);
             state->dialogueFlags.b40 = 1;
-        } else if (!state->dialogueFlags.b20 && mainGetBit(0xc59) != 0) {
+        } else if (!state->dialogueFlags.b20 && mainGetBit(GAMEBIT_WC_Switch2Activated) != 0) {
             Sfx_PlayFromObject(0, SFXTRIG_menuups16k);
             state->dialogueFlags.b20 = 1;
-        } else if (!state->dialogueFlags.b18 && mainGetBit(0xc5a) != 0) {
+        } else if (!state->dialogueFlags.b18 && mainGetBit(GAMEBIT_WC_Switch3Activated) != 0) {
             Sfx_PlayFromObject(0, SFXTRIG_menuups16k);
             state->dialogueFlags.b18 = 1;
         }
@@ -183,18 +183,18 @@ void wclevelcont_updateAct1State(GameObject* obj, WcLevelControlState* state) {
                           0x3c);
             gameTimerResume();
             mainSetBits(GAMEBIT_WC_PushBlockTimerActive, 1);
-            mainSetBits(0xedd, 1);
-        } else if (mainGetBit(0x7f9) != 0) {
+            mainSetBits(GAMEBIT_WC_TimedPuzzleATimerActive, 1);
+        } else if (mainGetBit(GAMEBIT_WC_TimedPuzzleASolved) != 0) {
             state->completionFlags |= WCLEVELCTL_FLAG_PUZZLE_A;
             gameTimerStop();
-            if (mainGetBit(0x7fa) != 0) {
+            if (mainGetBit(GAMEBIT_WC_TimedPuzzleBSolved) != 0) {
                 Sfx_PlayFromObject(0, SFXTRIG_mpick1_b);
             } else {
                 Sfx_PlayFromObject(0, SFXTRIG_menuups16k);
             }
             mainSetBits(GAMEBIT_WC_PushBlockTimerActive, 0);
-            mainSetBits(0xedd, 0);
-            if (mainGetBit(0x7fa) != 0) {
+            mainSetBits(GAMEBIT_WC_TimedPuzzleATimerActive, 0);
+            if (mainGetBit(GAMEBIT_WC_TimedPuzzleBSolved) != 0) {
                 (*gObjectTriggerInterface)->runSequence(0, obj, -1);
                 state->mode = WCLEVELCTL_MODE_SEQUENCE;
             } else {
@@ -203,10 +203,10 @@ void wclevelcont_updateAct1State(GameObject* obj, WcLevelControlState* state) {
             }
             state->completionFlags |= WCLEVELCTL_FLAG_EVENT_ACTIVE;
         } else if (isGameTimerDisabled() != 0) {
-            mainSetBits(0x7ef, 0);
-            mainSetBits(0x7ed, 0);
+            mainSetBits(GAMEBIT_WC_TimedPuzzleAActive, 0);
+            mainSetBits(GAMEBIT_WC_TimedPuzzleATrigger, 0);
             mainSetBits(GAMEBIT_WC_PushBlockTimerActive, 0);
-            mainSetBits(0xedd, 0);
+            mainSetBits(GAMEBIT_WC_TimedPuzzleATimerActive, 0);
             state->mode = WCLEVELCTL_MODE_IDLE;
         }
         break;
@@ -216,18 +216,18 @@ void wclevelcont_updateAct1State(GameObject* obj, WcLevelControlState* state) {
                           0x50);
             gameTimerResume();
             mainSetBits(GAMEBIT_WC_PushBlockTimerActive, 1);
-            mainSetBits(0xedc, 1);
-        } else if (mainGetBit(0x7fa) != 0) {
+            mainSetBits(GAMEBIT_WC_TimedPuzzleBTimerActive, 1);
+        } else if (mainGetBit(GAMEBIT_WC_TimedPuzzleBSolved) != 0) {
             state->completionFlags |= WCLEVELCTL_FLAG_PUZZLE_B;
             gameTimerStop();
-            if (mainGetBit(0x7f9) != 0) {
+            if (mainGetBit(GAMEBIT_WC_TimedPuzzleASolved) != 0) {
                 Sfx_PlayFromObject(0, SFXTRIG_mpick1_b);
             } else {
                 Sfx_PlayFromObject(0, SFXTRIG_menuups16k);
             }
             mainSetBits(GAMEBIT_WC_PushBlockTimerActive, 0);
-            mainSetBits(0xedc, 0);
-            if (mainGetBit(0x7f9) != 0) {
+            mainSetBits(GAMEBIT_WC_TimedPuzzleBTimerActive, 0);
+            if (mainGetBit(GAMEBIT_WC_TimedPuzzleASolved) != 0) {
                 (*gObjectTriggerInterface)->runSequence(0, obj, -1);
                 state->mode = WCLEVELCTL_MODE_SEQUENCE;
             } else {
@@ -236,10 +236,10 @@ void wclevelcont_updateAct1State(GameObject* obj, WcLevelControlState* state) {
             }
             state->completionFlags |= WCLEVELCTL_FLAG_EVENT_ACTIVE;
         } else if (isGameTimerDisabled() != 0) {
-            mainSetBits(0x7f0, 0);
-            mainSetBits(0x7ee, 0);
+            mainSetBits(GAMEBIT_WC_TimedPuzzleBActive, 0);
+            mainSetBits(GAMEBIT_WC_TimedPuzzleBTrigger, 0);
             mainSetBits(GAMEBIT_WC_PushBlockTimerActive, 0);
-            mainSetBits(0xedc, 0);
+            mainSetBits(GAMEBIT_WC_TimedPuzzleBTimerActive, 0);
             state->mode = WCLEVELCTL_MODE_IDLE;
         }
         break;
@@ -256,15 +256,15 @@ void wclevelcont_updateAct1State(GameObject* obj, WcLevelControlState* state) {
     case WCLEVELCTL_MODE_DONE:
         break;
     default:
-        if (!(state->completionFlags & WCLEVELCTL_FLAG_PUZZLE_A) && mainGetBit(0x7ed) != 0) {
-            mainSetBits(0x7ef, 1);
+        if (!(state->completionFlags & WCLEVELCTL_FLAG_PUZZLE_A) && mainGetBit(GAMEBIT_WC_TimedPuzzleATrigger) != 0) {
+            mainSetBits(GAMEBIT_WC_TimedPuzzleAActive, 1);
             state->eventTimer = 70.0f;
             state->mode = WCLEVELCTL_MODE_PUZZLE_A;
             state->completionFlags |= WCLEVELCTL_FLAG_EVENT_ACTIVE;
             break;
         }
-        if (!(state->completionFlags & WCLEVELCTL_FLAG_PUZZLE_B) && mainGetBit(0x7ee) != 0) {
-            mainSetBits(0x7f0, 1);
+        if (!(state->completionFlags & WCLEVELCTL_FLAG_PUZZLE_B) && mainGetBit(GAMEBIT_WC_TimedPuzzleBTrigger) != 0) {
+            mainSetBits(GAMEBIT_WC_TimedPuzzleBActive, 1);
             state->eventTimer = 70.0f;
             state->mode = WCLEVELCTL_MODE_PUZZLE_B;
             state->completionFlags |= WCLEVELCTL_FLAG_EVENT_ACTIVE;
@@ -632,15 +632,15 @@ void wclevelcont_free(GameObject* obj) {
     objFreeObjectType(obj, WCLEVELCONT_OBJGROUP);
     mode = state->mode;
     if (mode == 1) {
-        mainSetBits(0x7ef, 0);
-        mainSetBits(0x7ed, 0);
+        mainSetBits(GAMEBIT_WC_TimedPuzzleAActive, 0);
+        mainSetBits(GAMEBIT_WC_TimedPuzzleATrigger, 0);
         mainSetBits(GAMEBIT_WC_PushBlockTimerActive, 0);
-        mainSetBits(0xedd, 0);
+        mainSetBits(GAMEBIT_WC_TimedPuzzleATimerActive, 0);
     } else if (mode == 2) {
-        mainSetBits(0x7f0, 0);
-        mainSetBits(0x7ee, 0);
+        mainSetBits(GAMEBIT_WC_TimedPuzzleBActive, 0);
+        mainSetBits(GAMEBIT_WC_TimedPuzzleBTrigger, 0);
         mainSetBits(GAMEBIT_WC_PushBlockTimerActive, 0);
-        mainSetBits(0xedc, 0);
+        mainSetBits(GAMEBIT_WC_TimedPuzzleBTimerActive, 0);
     }
     gameTimerStop();
 }
@@ -750,10 +750,10 @@ void wclevelcont_init(GameObject* obj) {
 #if !defined(VERSION_GSAE01) && !defined(VERSION_GSAJ01)
     state->messageTimer = WCLEVELCONT_TILE_MESSAGE_FRAMES;
 #endif
-    if (mainGetBit(0x7fa) != 0) {
+    if (mainGetBit(GAMEBIT_WC_TimedPuzzleBSolved) != 0) {
         state->completionFlags |= WCLEVELCTL_FLAG_PUZZLE_B;
     }
-    if (mainGetBit(0x7f9) != 0) {
+    if (mainGetBit(GAMEBIT_WC_TimedPuzzleASolved) != 0) {
         state->completionFlags |= WCLEVELCTL_FLAG_PUZZLE_A;
     }
     if (mainGetBit(0x813) != 0) {
@@ -786,9 +786,9 @@ void wclevelcont_init(GameObject* obj) {
     mainSetBits(0x206, 1);
     mainSetBits(0x25f, 1);
     (*gMapEventInterface)->getMapAct(obj->anim.mapEventSlot);
-    state->dialogueFlags.b40 = mainGetBit(0xc58);
-    state->dialogueFlags.b20 = mainGetBit(0xc59);
-    state->dialogueFlags.b18 = mainGetBit(0xc5a);
+    state->dialogueFlags.b40 = mainGetBit(GAMEBIT_WC_Switch1Activated);
+    state->dialogueFlags.b20 = mainGetBit(GAMEBIT_WC_Switch2Activated);
+    state->dialogueFlags.b18 = mainGetBit(GAMEBIT_WC_Switch3Activated);
 }
 
 void wclevelcont_release(void) {

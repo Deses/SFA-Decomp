@@ -498,6 +498,7 @@ enum GameBitId {
     GAMEBIT_ITEM_WCSunStone_Got = 0x201,                 /* table 2 */
     GAMEBIT_ITEM_WCSunStone_Used = 0x202,                /* table 2 */
     GAMEBIT_WC_TempleDiaBStage0 = 0x203,                 /* Walled City temple rotating-dial (bank B) - stage 0 complete, gWcTempleDiaGameBitsB[0]; bank chosen by ObjAnim.bankIndex != 0, otherwise as bank A */
+    GAMEBIT_WC_AllSwitchesActivated = 0x205,             /* Walled City - set by wclevelcont_updateAct2State once all three floor switches (0xC58/0xC59/0xC5A) read set; latches WCLEVELCTL_FLAG_SWITCHES and plays the confirm sfx */
     GAMEBIT_ITEM_DIM2CellKey_Used = 0x207,               /* table 2; ref snowmines2/DIM2CellKey open */
     GAMEBIT_ITEM_DIMSilverKey_Used = 0x208,              /* table 2; ref snowmines2/DIM2CellKey open */
     GAMEBIT_CF_FlewTo = 0x212,                           /* table 1; hint 324 */
@@ -716,7 +717,13 @@ enum GameBitId {
     GAMEBIT_ITEM_MapDR_Got = 0x7DD,                      /* table 2 */
     GAMEBIT_ITEM_MapWM_Got = 0x7E5,                      /* table 2 */
     GAMEBIT_ITEM_MapOFP_Got = 0x7E9,                     /* table 2 */
+    GAMEBIT_WC_TimedPuzzleATrigger = 0x7ED,              /* Walled City timed push-block puzzle A - entry trigger; wclevelcont polls it in the default mode and, while PUZZLE_A is unfinished, arms the puzzle by setting GAMEBIT_WC_TimedPuzzleAActive and a 70-unit event timer */
+    GAMEBIT_WC_TimedPuzzleBTrigger = 0x7EE,              /* Walled City timed push-block puzzle B - entry trigger; mirrors puzzle A, arming GAMEBIT_WC_TimedPuzzleBActive */
+    GAMEBIT_WC_TimedPuzzleAActive = 0x7EF,               /* Walled City timed push-block puzzle A - armed/running; set by wclevelcont when the trigger fires and cleared on timeout or abort */
+    GAMEBIT_WC_TimedPuzzleBActive = 0x7F0,               /* Walled City timed push-block puzzle B - armed/running; cleared on timeout or abort */
     GAMEBIT_WC_LitBeacons = 0x7F8,                       /* table 2; hint 362; ref wallcity/HitAnimator target */
+    GAMEBIT_WC_TimedPuzzleASolved = 0x7F9,               /* Walled City timed push-block puzzle A solved; ends the 0x3C countdown, and if puzzle B is also solved wclevelcont plays the confirm sfx and runs sequence 0 instead of sequence 1 */
+    GAMEBIT_WC_TimedPuzzleBSolved = 0x7FA,               /* Walled City timed push-block puzzle B solved; ends the 0x50 countdown, and pairs with puzzle A to pick the confirm sfx and sequence 0 */
     GAMEBIT_WC_FoundKing = 0x7FC,                        /* table 2; hint 363 */
     GAMEBIT_WC_OpenedSunMoonAreas = 0x817,               /* table 2; hint 410; ref wallcity/HitAnimator target */
     GAMEBIT_WC_FlewTo = 0x818,                           /* table 2; hint 360; ref wallcity/Landed_Arwi Visible */
@@ -900,6 +907,9 @@ enum GameBitId {
     GAMEBIT_LV_ChallengeGate2Complete = 0xC53,           /* One-shot reward latch for LightFoot Village challenge-gate NPC 2 (ident 0x46A55): fires once bits 0xc3b/0xc3c/0xc3d (the three baby-lightfoot-delivered flags) are all set, permanently disabling that NPC's interaction and unlocking swapcircle map objgroup 0xa */
     GAMEBIT_SC_ChallengeGate3Complete = 0xC54,           /* One-shot latch: Lightfoot Village's third target-hit challenge gate (encounterType 0x49928) has been completed and its reward sequence (7) already played */
     GAMEBIT_ITEM_SuperQuake_Got = 0xC55,                 /* table 2; hint 364; ref wallcity/MagicCaveTo Collected */
+    GAMEBIT_WC_Switch1Activated = 0xC58,                 /* Walled City floor switch 1 activated; wclevelcont_updateAct2State chimes once on the rising edge (dialogueFlags.b40) and needs all of 0xC58/0xC59/0xC5A for GAMEBIT_WC_AllSwitchesActivated */
+    GAMEBIT_WC_Switch2Activated = 0xC59,                 /* Walled City floor switch 2 activated; chimes once via dialogueFlags.b20, counts toward GAMEBIT_WC_AllSwitchesActivated */
+    GAMEBIT_WC_Switch3Activated = 0xC5A,                 /* Walled City floor switch 3 activated; chimes once via dialogueFlags.b18, counts toward GAMEBIT_WC_AllSwitchesActivated */
     GAMEBIT_ITEM_Viewfinder_Got = 0xC64,                 /* table 2; hint 409; aka High-Defnition Display Device or Zoom Goggles */
     GAMEBIT_ITEM_SpiritTestStrength_Got = 0xC6E,         /* table 2; hint 380 */
     GAMEBIT_ITEM_Spirit4_Used = 0xC70,                   /* table 2; hint 382 */
@@ -1048,6 +1058,8 @@ enum GameBitId {
     GAMEBIT_FoundSpellStoneWarpPad_0ECF = 0xECF,         /* table 0; hint 304 */
     GAMEBIT_OFP_FoundSpellStoneWarpPad = 0xED0,          /* table 0; hint 341 */
     GAMEBIT_DR_OnCloudRunner = 0xED7,                    /* table 0 */
+    GAMEBIT_WC_TimedPuzzleBTimerActive = 0xEDC,          /* Walled City timed push-block puzzle B - countdown displayed; raised with GAMEBIT_WC_PushBlockTimerActive while B runs and cleared on solve, timeout or abort */
+    GAMEBIT_WC_TimedPuzzleATimerActive = 0xEDD,          /* Walled City timed push-block puzzle A - countdown displayed; raised with GAMEBIT_WC_PushBlockTimerActive while A runs and cleared on solve, timeout or abort */
     GAMEBIT_SH_Related0EDE = 0xEDE,                      /* table 2; Triggers a communication after pushing switch at bottom of well */
     GAMEBIT_ITEM_SnowHornArtifactEE5 = 0xEE5,            /* table 2; set when using artifact */
     GAMEBIT_ITEM_SnowHornArtifactEE6 = 0xEE6,            /* table 2; set when using artifact */
