@@ -563,6 +563,7 @@ enum GameBitId {
     GAMEBIT_DIM_CrossedBlizzard = 0x1FA,                 /* table 2; hint 289 */
     GAMEBIT_SnowBikeRelated01FB = 0x1FB,                 /* table 2 */
     GAMEBIT_WM_FoundKrystal = 0x1FC,                     /* table 2; hint 315; Reached top of Krazoa Palace */
+    GAMEBIT_LINKB_TrickyStateA = 0x1FD,                  /* Read by LINKB_levco at its stage 3 to jump straight to stage 4 */
     GAMEBIT_ITEM_WCSunStone_Got = 0x201,                 /* table 2 */
     GAMEBIT_ITEM_WCSunStone_Used = 0x202,                /* table 2 */
     GAMEBIT_WC_TempleDiaBStage0 = 0x203,                 /* Walled City temple rotating-dial (bank B) - stage 0 complete, gWcTempleDiaGameBitsB[0]; bank chosen by ObjAnim.bankIndex != 0, otherwise as bank A */
@@ -596,6 +597,7 @@ enum GameBitId {
     GAMEBIT_ITEM_WCMoonStone_Used = 0x243,               /* table 2 */
     GAMEBIT_ITEM_TrickyFlame_Got = 0x245,                /* table 2 */
     GAMEBIT_WM_DoorToKrazTest1Opened = 0x24E,            /* table 2; ref warlock/HitAnimator target */
+    GAMEBIT_LINKB_TrickyStateB = 0x256,                  /* LINKB_levco's second Tricky state bit, paired with GAMEBIT_LINKB_TrickyStateA */
     GAMEBIT_ITEM_WCGoldTooth_Used = 0x25A,               /* table 2 */
     GAMEBIT_ITEM_WCSilverTooth_Used = 0x25B,             /* table 2 */
     GAMEBIT_WC_TrexLever4Activated = 0x25F,              /* One of the four wallcity staff levers the T-rex challenge runs on - wclevelcont raises all four at init and again when a run times out, and clears all four as a run starts; Rena has it as wallcity HitAnimator 0x47FF0's target and StaffLeverO 0x4CB3F's activated param */
@@ -655,6 +657,7 @@ enum GameBitId {
     GAMEBIT_WC_TrexRetryBlocked034D = 0x34D,             /* Blocks the retry: when a T-rex run times out, wclevelcont only re-arms the four levers if this is clear */
     GAMEBIT_DIM_Bike_HitboxEnabled = 0x35F,              /* Rena's U0 dataset; table 2 */
     GAMEBIT_WC_ObjGroups = 0x36A,                        /* table 3; size 32 */
+    GAMEBIT_LINKB_TrickyStateLatch = 0x36E,              /* The GameBitLatch condition LINKB_levco hangs its Tricky-state music on */
     GAMEBIT_WM_CrystalRumbleActive = 0x370,              /* table 0; raised while the rising crystal is randomly shaking the camera, and dropped the moment the finale quake proper takes over */
     GAMEBIT_KrazTest1Related0372 = 0x372,                /* table 3; set when entering Krazoa test 1, cave beside WarpStone */
     GAMEBIT_DIM2_ObjGroups = 0x373,                      /* table 3; size 32 */
@@ -665,9 +668,12 @@ enum GameBitId {
     GAMEBIT_IM_FinishedRace = 0x37A,                     /* table 2; hint 262 */
     GAMEBIT_IMRelated037B = 0x37B,                       /* table 2 */
     GAMEBIT_IM_BikeRelated037C = 0x37C,                  /* Cleared by IMIceMounta's bike teardown, in the run of bits that also drops GAMEBIT_IM_OnBike and closes objgroup 2 */
+    GAMEBIT_LINKB_AlternatePath = 0x380,                 /* Seen at LINKB_levco's stage 3, it routes the sequence down its alternate path instead of advancing immediately */
     GAMEBIT_IM_HutRelated0382 = 0x382,                   /* table 2; changed when near hut */
-    GAMEBIT_TrickyFoodCellEnabled0384 = 0x384,           /* In map cell 0x38 Tricky only offers to find food while this is up and GAMEBIT_TrickyFoodCellBlocked0385 is down */
-    GAMEBIT_TrickyFoodCellBlocked0385 = 0x385,           /* Blocks Tricky's find-food offer in map cell 0x38 - the negative half of the pair with GAMEBIT_TrickyFoodCellEnabled0384 */
+    GAMEBIT_LINKB_Stage1Reached = 0x384,                 /* One of the five stages LINKB_levco's Tricky sequence resumes from - on load it walks them from 5 down to 1 and restarts at the highest one reached; stage 1, the one tricky.c pairs with stage 2 to find its window - in map cell 0x38 Tricky offers to find food only while stage 1 is reached and stage 2 is not */
+    GAMEBIT_LINKB_Stage2Reached = 0x385,                 /* One of the five stages LINKB_levco's Tricky sequence resumes from - on load it walks them from 5 down to 1 and restarts at the highest one reached; stage 2, raised once the player has Tricky food in hand, and the bit whose absence keeps tricky.c's find-food offer open */
+    GAMEBIT_LINKB_Stage3Reached = 0x386,                 /* One of the five stages LINKB_levco's Tricky sequence resumes from - on load it walks them from 5 down to 1 and restarts at the highest one reached; raised once Tricky has taken enough hits */
+    GAMEBIT_LINKB_Stage4Reached = 0x387,                 /* One of the five stages LINKB_levco's Tricky sequence resumes from - on load it walks them from 5 down to 1 and restarts at the highest one reached; raised off GAMEBIT_LINKB_TrickyStateA or the alternate path */
     GAMEBIT_WM_FinaleQuakeActive = 0x38D,                /* Krazoa Palace finale: set by WM_Crystal (dll_020E) once fully risen after the 6th spirit is returned, gating the WM_sun bank-0 quake/envfx countdown until it clears and 0x38F fires */
     GAMEBIT_WM_FinaleQuakeDone = 0x38F,                  /* The Warlock Mountain finale quake has run its course - WM_sun raises it as the quake timer expires and clears GAMEBIT_WM_FinaleQuakeActive, and WM_Crystal frees itself on sight of it */
     GAMEBIT_KrazTest1Related0390 = 0x390,                /* table 3; set when entering Krazoa test 1, cleared when talking to WarpStone */
@@ -810,6 +816,7 @@ enum GameBitId {
     GAMEBIT_VFP_FuelCell_535 = 0x535,                    /* Rena's U0 dataset; table 2 */
     GAMEBIT_VFP_FuelCell_536 = 0x536,                    /* Rena's U0 dataset; table 2 */
     GAMEBIT_DIM_Entered540 = 0x540,                      /* table 1 */
+    GAMEBIT_LINKB_Stage5Reached = 0x543,                 /* One of the five stages LINKB_levco's Tricky sequence resumes from - on load it walks them from 5 down to 1 and restarts at the highest one reached; the last stage, which LINKB_levco only ever reads */
     GAMEBIT_ITEM_TrickyStayFind_Got = 0x544,             /* table 2; hint 263 */
     GAMEBIT_TREX_ActNo = 0x547,                          /* table 1; size 4 */
     GAMEBIT_TREX_ObjGroups = 0x548,                      /* table 3; size 32 */
@@ -1180,7 +1187,7 @@ enum GameBitId {
     GAMEBIT_CFRelated0B30 = 0xB30,                       /* table 1 */
     GAMEBIT_CFRelated0B31 = 0xB31,                       /* table 1 */
     GAMEBIT_CFRelated0B32 = 0xB32,                       /* table 1 */
-    GAMEBIT_LINKB_LightRelatedB36 = 0xB36,               /* Rena's U0 dataset; table 3 */
+    GAMEBIT_LINKB_LightRelatedB36 = 0xB36,               /* Rena's U0 dataset; table 3. LINKB_levco reads it as the GameBitLatch condition for MUSICTRIG_citytombs, which its own alias spelled CITYTOMBS_MUSIC */
     GAMEBIT_CFRelated0B37 = 0xB37,                       /* table 1 */
     GAMEBIT_CFRelated0B38 = 0xB38,                       /* table 1 */
     GAMEBIT_CFRelated0B39 = 0xB39,                       /* table 1 */
