@@ -811,7 +811,7 @@ int SnowBike_SeqFn(GameObject* obj, int unused, ObjSeqState* seq) {
         case 2:
             if (obj->anim.romDefNo != SNOWBIKE_IM_CLAWBIKE_V0_OBJ &&
                 obj->anim.romDefNo != SNOWBIKE_IM_CLAWBIKE_V1_OBJ) {
-                mainSetBits(GAMEBIT_IM_SnowbikeEvent0499, 1);
+                mainSetBits(GAMEBIT_CloudRaceInFinishVolume, 1);
             }
             break;
         case 3:
