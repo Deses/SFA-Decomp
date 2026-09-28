@@ -311,13 +311,13 @@ enum GameBitId {
     GAMEBIT_AndrossRelated0012 = 0x12,                   /* table 0 */
     GAMEBIT_SH_KilledBloop3 = 0x13,                      /* table 1 */
     GAMEBIT_SH_KilledBloop4 = 0x14,                      /* table 1 */
-    GAMEBIT_DIM_BossDefeatStateB0017 = 0x17,             /* Named locally by more than one DLL, and they disagree: DIM_LEVEL_CONTROL_GAMEBIT_0017 in DIM_LevelCo.c; DIMBOSS_GAMEBIT_DEFEAT_STATE_B in DIM_Boss.c */
+    GAMEBIT_DIM_BossDefeatStateB0017 = 0x17,             /* Two DarkIce DLLs name it and differently: DIM_Boss raises it as its defeat state B, and DIM_LevelCo reads it as one half of a compound condition. Both fit the boss going down, but nothing in the code proves that, so the id stays in the name */
     GAMEBIT_NW_ClimbOnSnowHorn = 0x18,                   /* table 0; climbing onto SnowHorn (will warp you to nearby one) */
     GAMEBIT_NW_ClimbOffSnowHorn = 0x19,                  /* table 0 */
     GAMEBIT_PlayerPeriodicHitImmune = 0x21,              /* While set the player stops taking the repeating damage surface type 28 deals - the surface handler only runs its periodic-hit timer while this is clear */
     GAMEBIT_SH_FoundQueen = 0x22,                        /* table 2; hint 256 */
     GAMEBIT_SH_SouthCave_Opening = 0x23,                 /* table 2; ref hollow/HitAnimator target */
-    GAMEBIT_CC_LevelControlMusicEA0024 = 0x24,           /* Named locally by more than one DLL, and they disagree: CC_LIGHTFOOT_ENCOUNTER_DESPAWN_GAMEBIT in CClightfoot.c; CC_LEVEL_CONTROL_MUSIC_EA_GAMEBIT in CClevcontro.c */
+    GAMEBIT_CC_LevelControlMusicEA0024 = 0x24,           /* Two Cape Claw DLLs name it and differently: CClightfoot despawns its LightFoot encounter while it is set, and CClevcontro makes it the GameBitLatch condition for music 0xEA - one area state, read for two purposes */
     GAMEBIT_ITEM_TrickyBall_Bought = 0x25,               /* table 2 */
     GAMEBIT_DIM_FoundInjuredSnowHorn = 0x27,             /* table 2; hint 284 */
     GAMEBIT_ITEM_AlpineRoot_028 = 0x28,                  /* table 2 */
@@ -571,7 +571,7 @@ enum GameBitId {
     GAMEBIT_BaddieRelated1C8 = 0x1C8,                    /* table 0 */
     GAMEBIT_PushableMagicGemNear = 0x1C9,                /* The DLL names this one itself: PUSHABLE_MAGIC_GEM_NEAR_GAME_BIT in 239.c */
     GAMEBIT_Dll199Related01CD = 0x1CD,                   /* The DLL names this one itself: DLL199_GAMEBIT_01CD in 409.c */
-    GAMEBIT_Dll199Related01CE = 0x1CE,                   /* Named locally by more than one DLL, and they disagree: DLL199_GAMEBIT_01CE in 409.c; DLL19A_DROPPED_ITEM_GAMEBIT in 410.c */
+    GAMEBIT_Dll19ADroppedItem = 0x1CE,                   /* DLL 0x19A calls it its dropped-item bit while DLL 0x199 only has a placeholder for it, so the name follows the DLL that knows what it is */
     GAMEBIT_Dll199Related01CF = 0x1CF,                   /* The DLL names this one itself: DLL199_GAMEBIT_01CF in 409.c */
     GAMEBIT_WM_KrazTest1Solved = 0x1D1,                  /* table 1; Krazoa Test 1 passed - DLL 414 raises it and the test controller's RESOLVE phase waits on it before brightening and going to its DONE phase */
     GAMEBIT_WM_KrazTest1AnimState01D2 = 0x1D2,           /* Krazoa Test 1 - driven purely from animation: two anim events exist to set and clear it (their #defines are named for this bit), and init, completion and reset all force it down */
@@ -932,7 +932,7 @@ enum GameBitId {
     GAMEBIT_LINKH_FuelCell_5B0 = 0x5B0,                  /* Rena's U0 dataset; table 2 */
     GAMEBIT_Dll199Related05B2 = 0x5B2,                   /* The DLL names this one itself: DLL199_GAMEBIT_05B2 in 409.c */
     GAMEBIT_Dll199Related05B5 = 0x5B5,                   /* The DLL names this one itself: DLL199_GAMEBIT_05B5 in 409.c */
-    GAMEBIT_Dll199Related05B9 = 0x5B9,                   /* Named locally by more than one DLL, and they disagree: DLL199_GAMEBIT_05B9 in 409.c; DLL19A_RESET_GAMEBIT in 410.c */
+    GAMEBIT_Dll19AReset = 0x5B9,                         /* DLL 0x19A calls it its reset bit while DLL 0x199 only has a placeholder for it */
     GAMEBIT_NW_SnowHown05BA = 0x5BA,                     /* table 0; related to riding SnowHorn */
     GAMEBIT_NW_SnowHown05BB = 0x5BB,                     /* table 0; related to riding SnowHorn */
     GAMEBIT_ITEM_OpenPortal_Got = 0x5BD,                 /* table 2; ref hollow/MagicCaveTo Collected */
@@ -1016,7 +1016,7 @@ enum GameBitId {
     GAMEBIT_DRBOT_HoverPadRelated0689 = 0x689,           /* The Drakor hover pad's curve carries event codes, and this is one of the bits DLL 625 writes as the pad runs them - code 10 latches it once, and checks it first so it fires only the first time the pad passes */
     GAMEBIT_DRBOT_HoverPadRidden068A = 0x68A,            /* The Drakor hover pad's curve carries event codes, and this is one of the bits DLL 625 writes as the pad runs them - code 11 raises it only while the player is actually parented to the pad, and code 13 needs it before it will double-bounce */
     GAMEBIT_DRBOT_HoverPadRidden068B = 0x68B,            /* The Drakor hover pad's curve carries event codes, and this is one of the bits DLL 625 writes as the pad runs them - code 12's counterpart to GAMEBIT_DRBOT_HoverPadRidden068A, again only while the player is riding */
-    GAMEBIT_LandedArwingReverseChase0698 = 0x698,        /* Named locally by more than one DLL, and they disagree: LANDED_ARWING_REVERSE_CHASE_GAMEBIT in 211.c; LANTERN_FIREFLY_ACTIVE_COUNT_GAMEBIT in LanternFire.c */
+    GAMEBIT_LanternFireflyActiveCount = 0x698,           /* A count, not a flag: LanternFire runs gameBitIncrement and gameBitDecrement on it as its fireflies come and go. DLL 211 reads the same bit as a plain boolean to reverse the landed Arwing's chase direction, and had named it for that */
     GAMEBIT_TTH_BafomDad_69C = 0x69C,                    /* Rena's U0 dataset; table 2 */
     GAMEBIT_TTH_BafomDad_69D = 0x69D,                    /* Rena's U0 dataset; table 2 */
     GAMEBIT_TTH_BafomDad_69E = 0x69E,                    /* Rena's U0 dataset; table 2 */
@@ -1247,7 +1247,7 @@ enum GameBitId {
     GAMEBIT_ECSH_Shrine0A6D = 0xA6D,                     /* The DLL names this one itself: ECSH_SHRINE_GAMEBIT_0A6D in ECSH_Shrine.c */
     GAMEBIT_ECSH_Shrine0A6F = 0xA6F,                     /* The DLL names this one itself: ECSH_SHRINE_GAMEBIT_0A6F in ECSH_Shrine.c */
     GAMEBIT_ECSH_Shrine0A70 = 0xA70,                     /* The DLL names this one itself: ECSH_SHRINE_GAMEBIT_0A70 in ECSH_Shrine.c */
-    GAMEBIT_SBRelated0A71 = 0xA71,                       /* table 0 */
+    GAMEBIT_SBRelated0A71 = 0xA71,                       /* Rena's U0 dataset; table 1. Two DLLs name it and they agree: LargeCrate and SB_Galleon both read it as the SFX mute, and SB_Galleon additionally hangs a GameBitLatch music trigger on it */
     GAMEBIT_WM_DestroyedBox1 = 0xA72,                    /* table 2; box blocking ramp at start */
     GAMEBIT_WM_DestroyedBox2 = 0xA74,                    /* table 2 */
     GAMEBIT_WM_DestroyedBox3 = 0xA75,                    /* table 2 */
@@ -1318,7 +1318,7 @@ enum GameBitId {
     GAMEBIT_CFRelated0B6C = 0xB6C,                       /* table 1 */
     GAMEBIT_DFSH_TestFailed = 0xB70,                     /* table 0; raised where the Test of Combat shrine reaches its post-finish state without success, on the way to reset */
     GAMEBIT_DFSH_Related0B71 = 0xB71,                    /* table 0; the Test of Combat shrine only ever clears it, as part of its reset block */
-    GAMEBIT_CC_LevelControlAlienMusic0B72 = 0xB72,       /* Named locally by more than one DLL, and they disagree: LINK_GAMEBIT_AREA_48_ALIEN_MUSIC in LINK_levcon.c; CC_LEVEL_CONTROL_ALIEN_MUSIC_GAMEBIT in CClevcontro.c */
+    GAMEBIT_AlienMusicActive0B72 = 0xB72,                /* Both DLLs that name it agree it is the alien music: LINK_levcon selects MUSICTRIG_mmpassalien off it for its area, and CClevcontro names it the same way, so the name drops either area's prefix */
     GAMEBIT_CC_LevelControlMusicBF = 0xB73,              /* The DLL names this one itself: CC_LEVEL_CONTROL_MUSIC_BF_GAMEBIT in CClevcontro.c */
     GAMEBIT_DFSH_RewardAnimTarget0B76 = 0xB76,           /* Raised as the Test of Combat shrine opens and starts its 0xD2-tick countdown, and cleared on both ways out; Rena has it as dfshrine HitAnimator 0x482BF's target */
     GAMEBIT_DIM2_ClawDeadB77 = 0xB77,                    /* Rena's U0 dataset; table 2 */
@@ -1743,7 +1743,7 @@ enum GameBitId {
     GAMEBIT_WorldMap_CloudRunner = 0xF1B,                /* Rena's U0 dataset; table 2 */
     GAMEBIT_WorldMap_CapeClaw = 0xF1C,                   /* Rena's U0 dataset; table 2 */
     GAMEBIT_SC_TotemStrengthSequenceActive = 0xF1D,      /* The DLL names this one itself: SC_TOTEM_STRENGTH_GAMEBIT_SEQUENCE_ACTIVE in SC_totemstr.c */
-    GAMEBIT_SB_CanShootPropeller = 0xF1E,                /* table 0 */
+    GAMEBIT_SB_CanShootPropeller = 0xF1E,                /* Rena's U0 dataset; table 2. Three readings, all of one galleon-fight phase: SB_Galleon sets it as a dive begins and clears it as that ends, SB_Cloudrun gates the CloudRunner's hit SFX on it, and Rena's name has it as when the propeller can be shot */
     GAMEBIT_NW_RescueBush1Cleared = 0xF22,               /* SnowHorn Gate Keeper rescue: tumbleweed bush cleared marker reset by NW_levcontr and consumed by NW_mammoth */
     GAMEBIT_NW_RescueBush2Cleared = 0xF23,               /* SnowHorn Gate Keeper rescue: tumbleweed bush cleared marker reset by NW_levcontr and consumed by NW_mammoth */
     GAMEBIT_NW_RescueBush3Cleared = 0xF24,               /* SnowHorn Gate Keeper rescue: tumbleweed bush cleared marker reset by NW_levcontr and consumed by NW_mammoth */
