@@ -1387,6 +1387,13 @@ prefix to six members here (two extra long-lived gated values) leaves the order 
 with `savedAlignment` still fourth. So whatever pulls `obj` to the front in bossdrakor is **not** prefix
 size, and it is still unidentified.
 
+**Also closed: the reserved-register set is not a flag.** `K = 32 - |blocked|` with
+`blocked = {r1, r2, r13}` in every configuration tried. Ten `-proc` targets (`gekko`, `750`, `7400`,
+`603e`, `604e`, `821`, `860`, `generic`, `e500`) all leave `bossdrakor_update` at 150 diffs, as do the
+sdata/sdata2/lmw_stmw/fp-software options, ~90 other flag settings and all 20 compilers. So K is not
+reachable through configuration, and the only construct that moves it remains the banned register
+reservation.
+
 **Where that leaves the two rows.** `bossdrakor_update` has an EN-safe configuration that gets its
 hardest register right and is blocked on one further swap whose cause is understood. `askProgressiveScanMode`
 needs its lowest-index prefix member to colour first and no known lever does that. Neither is proven
