@@ -116,7 +116,7 @@ enum GameBitId {
      * worldplanet.h. Live-verified: set at the post-prologue map (unlockedPlanetMask
      * bit 2), Dinosaur Planet selectable.
      */
-    GAMEBIT_WORLDMAP_OPEN = 0xA63,
+    GAMEBIT_WORLDMAP_OPEN = 0xA63,                       /* WORLDplanet names the same bit its world-map-open bit */
 
     /*
      * Arwing on-rails flight ring-gate result - the first gamebits set after the
@@ -329,7 +329,7 @@ enum GameBitId {
     GAMEBIT_CF_EnteredFort = 0x41,                       /* table 1; hint 326 */
     GAMEBIT_CF_SavedQueen = 0x43,                        /* table 2; hint 329; ref fortress/CFExplodeFl onExplode */
     GAMEBIT_ITEM_PrisonKey_Got = 0x44,                   /* table 1 */
-    GAMEBIT_CF_GuardianFreed = 0x48,                     /* table 1; the caged CloudRunner guardian has broken out */
+    GAMEBIT_CF_GuardianFreed = 0x48,                     /* table 1; the caged CloudRunner guardian has broken out. CFGuardian reads the same bit as its prison guard standing down */
     GAMEBIT_CF_GuardianQuestState = 0x4B,                /* The DLL names this one itself: GAMEBIT_CFGUARDIAN_QUEST_STATE in CFGuardian.c */
     GAMEBIT_CF_PrisonCageOpened = 0x4D,                  /* table 2; old CloudRunner's cage is open */
     GAMEBIT_CF_GuardianCageOpen = 0x4E,                  /* The DLL names this one itself: GAMEBIT_CFGUARDIAN_CAGE_OPEN in CFGuardian.c */
@@ -348,7 +348,7 @@ enum GameBitId {
     GAMEBIT_IM_TrickyRelated006F = 0x6F,                 /* table 2; set when entering hut */
     GAMEBIT_IM_RescuedTricky = 0x70,                     /* table 2; hint 261; set at start of bike scene */
     GAMEBIT_IM_RaceStarted = 0x72,                       /* table 2; set when the race actually starts */
-    GAMEBIT_ITEM_Staff_Got = 0x75,                       /* table 1; clearing on Galleon restarts ship battle */
+    GAMEBIT_ITEM_Staff_Got = 0x75,                       /* table 1; clearing on Galleon restarts ship battle. CAUTION: SB_Galleon names the same bit its intro gate. Having the staff plausibly gates that intro, but the two readings have not been reconciled against the code */
     GAMEBIT_WM_Galleon_despawn = 0x78,                   /* table 2 */
     GAMEBIT_IM_StartRace = 0x79,                         /* table 1; setting starts the race scene */
     GAMEBIT_SC_TestPhaseOver007A = 0x7A,                 /* Swapcircle (the LightFoot totem circle) has left its test phase - while set, sc_levelcontrol raises GAMEBIT_SC_HitAnimTarget0085 at every opportunity; while clear it instead watches 0x627 and GAMEBIT_SC_TotemRunCompleted for GAMEBIT_LV_DoneTests */
@@ -356,10 +356,10 @@ enum GameBitId {
     GAMEBIT_SC_LevelControlTotemCombo2 = 0x7E,           /* The DLL names this one itself: SC_LEVEL_CONTROL_GAMEBIT_TOTEM_COMBO_2 in 438_SC_levelcon.h */
     GAMEBIT_SC_LevelControlTotemCombo3 = 0x7F,           /* The DLL names this one itself: SC_LEVEL_CONTROL_GAMEBIT_TOTEM_COMBO_3 in 438_SC_levelcon.h */
     GAMEBIT_SC_LevelControlTotemComboComplete = 0x80,    /* The DLL names this one itself: SC_LEVEL_CONTROL_GAMEBIT_TOTEM_COMBO_COMPLETE in SC_levelcon.c */
-    GAMEBIT_LV_Totem1_Activated = 0x81,                  /* needs verification; Rena's U0 dataset; table 2 */
-    GAMEBIT_LV_Totem2_Activated = 0x82,                  /* Rena's U0 dataset; table 2 */
-    GAMEBIT_LV_Totem3_Activated = 0x83,                  /* Rena's U0 dataset; table 2 */
-    GAMEBIT_LV_Totem4_Activated = 0x84,                  /* Rena's U0 dataset; table 2 */
+    GAMEBIT_LV_Totem1_Activated = 0x81,                  /* Rena's U0 dataset; table 2, corroborated by SC_totempol naming the same bit the totem pole's FRONT face */
+    GAMEBIT_LV_Totem2_Activated = 0x82,                  /* Rena's U0 dataset; table 2, corroborated by SC_totempol naming the same bit the totem pole's LEFT face */
+    GAMEBIT_LV_Totem3_Activated = 0x83,                  /* Rena's U0 dataset; table 2, corroborated by SC_totempol naming the same bit the totem pole's RIGHT face */
+    GAMEBIT_LV_Totem4_Activated = 0x84,                  /* Rena's U0 dataset; table 2, corroborated by SC_totempol naming the same bit the totem pole's REAR face */
     GAMEBIT_SC_HitAnimTarget0085 = 0x85,                 /* Rena has it as the target of swapcircle's HitAnimator 0x4C837; sc_levelcontrol raises it whenever GAMEBIT_SC_TestPhaseOver007A is up and clears it as a timed totem run starts */
     GAMEBIT_SC_LVBlock2Related0087 = 0x87,               /* One of the three bits sc_levelcontrol raises the moment GAMEBIT_ITEM_LVBlock2_Used is set */
     GAMEBIT_SH_WarpStonePathOpen = 0x88,                 /* table 2; did blow up wall leading to WarpStone */
@@ -374,7 +374,7 @@ enum GameBitId {
     GAMEBIT_Always1 = 0x95,                              /* table 0; used for always-available shop items */
     GAMEBIT_Always0 = 0x96,                              /* table 0; used for never-available (unused) shop items */
     GAMEBIT_SH_KilledBloop7 = 0x99,                      /* table 1 */
-    GAMEBIT_Tricky_Learned_Distract = 0x9E,               /* table 2; DP names this Tricky_Learned_Distract; set by SH_queenear after the Queen EarthWalker accepts all required white grubtubs; gates Tricky's Baddie Alert/Distract prompt */
+    GAMEBIT_Tricky_Learned_Distract = 0x9E,              /* table 2; DP names this Tricky_Learned_Distract; set by SH_queenear after the Queen EarthWalker accepts all required white grubtubs; gates Tricky's Baddie Alert/Distract prompt. CAUTION: DIM_Boss names the same bit its LightFoot snowball gate. Needing Tricky's distract for that would explain it, but nothing here proves the two are the same thing */
     GAMEBIT_SB_GalleonTransitionArmed = 0x9F,            /* SB_Galleon's protection minigame arms its transition with this; Rena's U0 name for it was NpcTalkRelated009F, which says nothing */
     GAMEBIT_SB_GalleonTransitionUsed = 0xA0,             /* The used half of GAMEBIT_SB_GalleonTransitionArmed's pair, per SB_Galleon's own alias */
     GAMEBIT_TTH_BombPlanted0A1 = 0xA1,                   /* Rena's U0 dataset; table 2 */
@@ -465,7 +465,7 @@ enum GameBitId {
     GAMEBIT_WM_KrazTest1Related0128 = 0x128,             /* Krazoa Test 1 - raised by the one anim event whose own #define is named for this bit, which also kicks the DLL's shader stub */
     GAMEBIT_WM_EnteredKrazoaTest1_0129 = 0x129,          /* table 0; set when entering Krazoa test 1, cleared when talking to spirit */
     GAMEBIT_MMSH_Shrine012A = 0x12A,                     /* The DLL names this one itself: MMSH_SHRINE_GAMEBIT_012A in MMSH_Shrine.c */
-    GAMEBIT_SHRINE_SpiritGranted012B = 0x12B,            /* Shared across the Krazoa shrines rather than belonging to one: GPSH raises it as it grants its spirit, beside GAMEBIT_ITEM_Spirit5_Got, and MMSH clears it in its own reset - hence the SHRINE_ prefix it shares with GAMEBIT_SHRINE_MUSIC_LOCK */
+    GAMEBIT_SHRINE_SpiritGranted012B = 0x12B,            /* Shared across the Krazoa shrines rather than belonging to one: GPSH raises it as it grants its spirit, beside GAMEBIT_ITEM_Spirit5_Got, and MMSH clears it in its own reset - hence the SHRINE_ prefix it shares with GAMEBIT_SHRINE_MUSIC_LOCK. MMSH_Shrine has only a placeholder alias for it */
     GAMEBIT_MMSH_Shrine012D = 0x12D,                     /* The DLL names this one itself: MMSH_SHRINE_GAMEBIT_012D in MMSH_Shrine.c */
     GAMEBIT_ITEM_TrickyFood_GrabInProgress = 0x12E,      /* Global latch: set by dll_01A7 EdibleMushroom when a GrubTub Fungus offers itself to the player (grab in range), cleared once the grab-complete reply lands and TrickyFood_Count (or the romDefNo-0x658 variant's bit) increments; read by Tricky's food check as a stand-in for already owning TrickyFood */
     GAMEBIT_HintTexts0 = 0x12F,                          /* table 2; size 32; related to hint texts; flags, set when Krystal boards ship */
@@ -476,7 +476,7 @@ enum GameBitId {
     GAMEBIT_HintTexts5 = 0x134,                          /* table 2; size 32 */
     GAMEBIT_HintTexts6 = 0x135,                          /* table 2; size 32 */
     GAMEBIT_HintTexts7 = 0x136,                          /* table 2; size 32 */
-    GAMEBIT_ITEM_Firefly_Count = 0x13D,                  /* table 2; size 5 */
+    GAMEBIT_ITEM_Firefly_Count = 0x13D,                  /* table 2; size 5. FireFly calls it collect-count bit A, agreeing that it is a count */
     GAMEBIT_ITEM_FireflyLantern_Got = 0x13E,             /* table 2; hint 273 */
     GAMEBIT_ITEM_BigScarabBag_Got = 0x13F,               /* table 1; hint 375; From rescuing ThornTails from Bloops */
     GAMEBIT_SH_FirstMagicCaveFound = 0x140,              /* table 2; whether entrance is active (glowing, can enter) */
@@ -576,12 +576,12 @@ enum GameBitId {
     GAMEBIT_WM_KrazTest1Solved = 0x1D1,                  /* table 1; Krazoa Test 1 passed - DLL 414 raises it and the test controller's RESOLVE phase waits on it before brightening and going to its DONE phase */
     GAMEBIT_WM_KrazTest1AnimState01D2 = 0x1D2,           /* Krazoa Test 1 - driven purely from animation: two anim events exist to set and clear it (their #defines are named for this bit), and init, completion and reset all force it down */
     GAMEBIT_WM_KrazTest1TorchesActive = 0x1D3,           /* Krazoa Test 1 shrine-countdown active; set by dll_019B when the timer starts with no unlocks yet, read by dll_019C torch props to ignite; cleared on test failure */
-    GAMEBIT_WM_KrazTest1TimedOut = 0x1D4,                /* Krazoa Test 1 - raised the moment the countdown reaches zero, alongside the timeout sequence, and cleared again on reset */
+    GAMEBIT_WM_KrazTest1TimedOut = 0x1D4,                /* Krazoa Test 1 - raised the moment the countdown reaches zero, alongside the timeout sequence, and cleared again on reset. DLL 412 reads it as its rearm bit, which follows from a timeout */
     GAMEBIT_WM_KrazTest1KeepSolved01D5 = 0x1D5,          /* Holds GAMEBIT_WM_KrazTest1Solved down: DLL 414 only clears the pass bit at the end of its sequence while this one is clear */
     GAMEBIT_IM_TrickyRelated01D6 = 0x1D6,                /* table 3; set when starting Tricky landing scene, cleared after race */
     GAMEBIT_ITEM_DeletedSpell1D7 = 0x1D7,                /* table 2; in spell bits table but does nothing */
     GAMEBIT_WM_KrazTest1TorchPulse = 0x1D8,              /* Krazoa Test 1 - a one-shot pulse the countdown phase consumes: seeing it raised bumps the controller's unlock count and clears it again, so it counts one torch at a time against GAMEBIT_WM_KrazTest1TorchesActive */
-    GAMEBIT_CC_BridgeNeedBit = 0x1D9,                    /* table 2; Rena's U0 name - read by the wall-crawler DLL as an alternative to its proximity test, and by DFP_ForceAw */
+    GAMEBIT_CC_BridgeNeedBit = 0x1D9,                    /* table 2; Rena's U0 name - read by the wall-crawler DLL as an alternative to its proximity test, and by DFP_ForceAw. CAUTION: DLL 262 names the same bit its scarab burst-suppress, and DLL 529 and DFP_ForceAw read it too - three consumers with no shared reading established */
     GAMEBIT_CC_BridgeUsedBit = 0x1DA,                    /* Rena's U0 dataset; table 2 */
     GAMEBIT_DIM_SnowHornSeq4Triggered = 0x1DB,           /* Raised as the DarkIce SnowHorn's trigger case 4 puts it into trigger mode 9, and read back in two of its state handlers */
     GAMEBIT_DIM_ReachedBoss = 0x1DF,                     /* table 1; hint 292 */
@@ -603,7 +603,7 @@ enum GameBitId {
     GAMEBIT_WM_FoundKrystal = 0x1FC,                     /* table 2; hint 315; Reached top of Krazoa Palace */
     GAMEBIT_LINKB_TrickyStateA = 0x1FD,                  /* Read by LINKB_levco at its stage 3 to jump straight to stage 4 */
     GAMEBIT_ITEM_WCSunStone_Got = 0x201,                 /* table 2 */
-    GAMEBIT_ITEM_WCSunStone_Used = 0x202,                /* table 2 */
+    GAMEBIT_ITEM_WCSunStone_Used = 0x202,                /* table 2. the sun temple DLL checks it as one of its four Walled City inventory bits, its C */
     GAMEBIT_WC_TempleDiaBStage0 = 0x203,                 /* Walled City temple rotating-dial (bank B) - stage 0 complete, gWcTempleDiaGameBitsB[0]; bank chosen by ObjAnim.bankIndex != 0, otherwise as bank A */
     GAMEBIT_WC_TrexRunStart = 0x204,                     /* The last condition before the T-rex challenge starts: with the run requested, wclevelcont waits on this to clear the four lever bits and enter its TREX_INIT mode */
     GAMEBIT_WC_AllSwitchesActivated = 0x205,             /* Walled City - set by wclevelcont_updateAct2State once all three floor switches (0xC58/0xC59/0xC5A) read set; latches WCLEVELCTL_FLAG_SWITCHES and plays the confirm sfx */
@@ -639,19 +639,19 @@ enum GameBitId {
     GAMEBIT_SH_ThornTailRelated023D = 0x23D,             /* table 1; related to ThornTail */
     GAMEBIT_ITEM_SilverKey241_Got = 0x241,               /* table 0 */
     GAMEBIT_ITEM_SilverKey241_Used = 0x242,              /* table 2 */
-    GAMEBIT_ITEM_WCMoonStone_Used = 0x243,               /* table 2 */
+    GAMEBIT_ITEM_WCMoonStone_Used = 0x243,               /* table 2. the sun temple DLL checks it as its Walled City inventory bit D */
     GAMEBIT_ITEM_TrickyFlame_Got = 0x245,                /* table 2 */
     GAMEBIT_WM_DoorToKrazTest1Opened = 0x24E,            /* table 2; ref warlock/HitAnimator target */
     GAMEBIT_LINKB_TrickyStateB = 0x256,                  /* LINKB_levco's second Tricky state bit, paired with GAMEBIT_LINKB_TrickyStateA */
-    GAMEBIT_ITEM_WCGoldTooth_Used = 0x25A,               /* table 2 */
-    GAMEBIT_ITEM_WCSilverTooth_Used = 0x25B,             /* table 2 */
+    GAMEBIT_ITEM_WCGoldTooth_Used = 0x25A,               /* table 2. the sun temple DLL checks it as its Walled City inventory bit A */
+    GAMEBIT_ITEM_WCSilverTooth_Used = 0x25B,             /* table 2. the sun temple DLL checks it as its Walled City inventory bit B */
     GAMEBIT_DIM2_IcicleActive = 0x25E,                   /* The DLL names this one itself: GAMEBIT_DIM2_ICICLE_ACTIVE in DIM_Boss.c */
     GAMEBIT_WC_TrexLever4Activated = 0x25F,              /* One of the four wallcity staff levers the T-rex challenge runs on - wclevelcont raises all four at init and again when a run times out, and clears all four as a run starts; Rena has it as wallcity HitAnimator 0x47FF0's target and StaffLeverO 0x4CB3F's activated param */
     GAMEBIT_ITEM_WCMoonStone_Got = 0x264,                /* table 2 */
     GAMEBIT_WC_FloorTileRelated0265 = 0x265,             /* Read by WCFloorTile as the last branch of its fall logic, purely to raise its own flag 4 */
     GAMEBIT_DIM2_IciclePhase2Win = 0x266,                /* The DLL names this one itself: GAMEBIT_DIM2_ICICLE_PHASE2_WIN in DIM_Boss.c */
     GAMEBIT_DIM_BossTonsilRouteLow = 0x268,              /* The DLL names this one itself: DIMBOSSTONSIL_GAMEBIT_ROUTE_LOW in DIM_BossTon.c */
-    GAMEBIT_DIM_BossFootstepShake = 0x26B,               /* Raised on every DarkIce Mines boss footstep, in the same breath as the dampened camera shake and the rumble - the boss counterpart to GAMEBIT_DR_KTrexFootfallShake */
+    GAMEBIT_DIM_BossFootstepShake = 0x26B,               /* Raised on every DarkIce Mines boss footstep, in the same breath as the dampened camera shake and the rumble - the boss counterpart to GAMEBIT_DR_KTrexFootfallShake. MAGICMaker reads the same bit as its spawn bit, so the boss's footfalls are what spawn its magic */
     GAMEBIT_PushableRelated0272 = 0x272,                 /* table 2; ref snowmines2/HitAnimator target */
     GAMEBIT_WC_TrexAnimTarget0274 = 0x274,               /* Wallcity HitAnimator 0x4CB89's target - wclevelcont raises it both as a T-rex run starts and when one is beaten, and drops it when a run times out */
     GAMEBIT_ITEM_Spirit1_Used = 0x277,                   /* table 1 */
@@ -687,7 +687,7 @@ enum GameBitId {
     GAMEBIT_LV_TestStrengthBestTime3 = 0x2D8,            /* table 2; size 16 */
     GAMEBIT_BlastedDamageBase = 0x2DE,                   /* The DLL names this one itself: BLASTED_GAMEBIT_DAMAGE_BASE in 345.c */
     GAMEBIT_LV_ChiefStartedTest = 0x2E7,                 /* table 2; hint 348 */
-    GAMEBIT_ITEM_WaterSpellStone1_Got = 0x2E8,           /* table 2; hint 336; ref dfptop/VFP_PodiumP key */
+    GAMEBIT_ITEM_WaterSpellStone1_Got = 0x2E8,           /* table 2; hint 336; ref dfptop/VFP_PodiumP key. CAUTION: CRCloudRace names the same bit its abort trigger, which is not obviously the same thing as holding the stone */
     GAMEBIT_WC_TempleDiaBStage1 = 0x2EC,                 /* Walled City temple rotating-dial (bank B) - stage 1 complete, gWcTempleDiaGameBitsB[1]; bank chosen by ObjAnim.bankIndex != 0, otherwise as bank A */
     GAMEBIT_WC_TempleDiaBStage2 = 0x2EF,                 /* Walled City temple rotating-dial (bank B) - stage 2 complete, gWcTempleDiaGameBitsB[2]; bank chosen by ObjAnim.bankIndex != 0, otherwise as bank A */
     GAMEBIT_WC_FinalStopwatchTarget = 0x2F0,             /* Wallcity CNTstopwatc 0x49129's target, raised as the Walled City final puzzle completes */
@@ -792,13 +792,13 @@ enum GameBitId {
     GAMEBIT_ITEM_MMPKey_Used = 0x453,                    /* table 2; hint 299; ref moonpass/HitAnimator target */
     GAMEBIT_TTH_FuelCell_456 = 0x456,                    /* Rena's U0 dataset; table 2 */
     GAMEBIT_TTH_FuelCell_457 = 0x457,                    /* Rena's U0 dataset; table 2 */
-    GAMEBIT_CF_ObjGroups = 0x458,                        /* table 3; size 32 */
+    GAMEBIT_CF_ObjGroups = 0x458,                        /* table 3; size 32. CAUTION: this is an ObjGroups mask, several bits wide, yet CRCloudRace reads it as a single boolean it calls drag-rock-cleared - one of the two readings is wrong */
     GAMEBIT_CT_ObjGroups = 0x45A,                        /* table 3; size 32 */
     GAMEBIT_NW_FuelCell_45D = 0x45D,                     /* Rena's U0 dataset; table 2 */
     GAMEBIT_NW_FuelCell_45E = 0x45E,                     /* accidentally assigned to two fuel cells; Rena's U0 dataset; table 2 */
     GAMEBIT_NW_FuelCell_45F = 0x45F,                     /* Rena's U0 dataset; table 2 */
     GAMEBIT_IM_FuelCell_465 = 0x465,                     /* Rena's U0 dataset; table 2 */
-    GAMEBIT_TRICKYCURVE_PLAYER_HIT = 0x468,              /* Hard-coded, area-agnostic "TrickyCurve" hazard-trigger hit-while-sliding signal: set by DFP_ForceAw/DFSH_LaserB/the generic laserbeam when the player enters the trigger box in the sliding anim state (0x1d7) instead of taking a normal hit; polled and cleared by the generic bone-particle-effect module, which arms a particle timer and plays an SFXsc_mumble01 reaction */
+    GAMEBIT_TRICKYCURVE_PLAYER_HIT = 0x468,              /* Hard-coded, area-agnostic "TrickyCurve" hazard-trigger hit-while-sliding signal: set by DFP_ForceAw/DFSH_LaserB/the generic laserbeam when the player enters the trigger box in the sliding anim state (0x1d7) instead of taking a normal hit; polled and cleared by the generic bone-particle-effect module, which arms a particle timer and plays an SFXsc_mumble01 reaction. DFP_ForceAw names the same bit TRICKY_CURVE_GAMEBIT_HIT */
     GAMEBIT_Dll1CEContentsGate = 0x46D,                  /* The DLL names this one itself: DLL1CE_CONTENTS_GATE_GAMEBIT in 462.c */
     GAMEBIT_Dll197StageComplete = 0x472,                 /* The DLL names this one itself: DLL197_STAGE_COMPLETE_GAMEBIT in 407.c */
     GAMEBIT_DBSH_ObjGroups = 0x473,                      /* table 3; size 32 */
@@ -862,7 +862,7 @@ enum GameBitId {
     GAMEBIT_Tricky_Spawns = 0x4E5,                       /* table 2; DP names this Tricky_Spawns; gates Tricky warp-helper/spawn placement */
     GAMEBIT_ITEM_SpellStone1_Used = 0x4E9,               /* table 2; hint 305 */
     GAMEBIT_Dll21BReset = 0x4EA,                         /* The DLL names this one itself: DLL_21B_RESET_BIT in 539.c */
-    GAMEBIT_VFP_PodiumsActivated = 0x4EC,                /* Latched by VFP_LevelCo the first update both GAMEBIT_VFP_PodiumPrereq09B1 and ...09B2 are up; Rena has it driving param 0x22 on two temple VFP_PodiumP objects and a HitAnimator target */
+    GAMEBIT_VFP_PodiumsActivated = 0x4EC,                /* Latched by VFP_LevelCo the first update both GAMEBIT_VFP_PodiumPrereq09B1 and ...09B2 are up; Rena has it driving param 0x22 on two temple VFP_PodiumP objects and a HitAnimator target. DLL 0x21B reads the same bit as its reached bit */
     GAMEBIT_Dll21BMoving = 0x4ED,                        /* The DLL names this one itself: DLL_21B_MOVING_BIT in 539.c */
     GAMEBIT_VFP_Lift1Ready = 0x4EE,                      /* The DLL names this one itself: VFPLIFT1_READY_GAMEBIT in 541.c */
     GAMEBIT_VFP_ClawDead4F4 = 0x4F4,                     /* Rena's U0 dataset; table 2 */
@@ -917,7 +917,7 @@ enum GameBitId {
     GAMEBIT_ITEM_AlpineRoot_Used = 0x578,                /* table 2; size 3 */
     GAMEBIT_LINKE_FuelCell_57E = 0x57E,                  /* Rena's U0 dataset; table 2 */
     GAMEBIT_VFP_FuelCell_588 = 0x588,                    /* Rena's U0 dataset; table 2 */
-    GAMEBIT_DFSH_ShrineIdle = 0x589,                     /* table 0; the Test of Combat shrine is idle and available - dropped the moment the player activates it, and put back at reset */
+    GAMEBIT_DFSH_ShrineIdle = 0x589,                     /* table 0; the Test of Combat shrine is idle and available - dropped the moment the player activates it, and put back at reset. DFSH_ObjCre reads it as its disable bit, which follows - the creator is off while the shrine is idle */
     GAMEBIT_NoMapData = 0x58D,                           /* table 0; Force No Map Data */
     GAMEBIT_Dll199Related0594 = 0x594,                   /* The DLL names this one itself: DLL199_GAMEBIT_0594 in 409.c */
     GAMEBIT_ITEM_MapVFP_Got = 0x59D,                     /* table 2; Have Volcano Force Point Map */
@@ -940,7 +940,7 @@ enum GameBitId {
     GAMEBIT_KrazTest_ActNo = 0x5D0,                      /* table 1; size 4; also dfptop */
     GAMEBIT_KrazTest_ObjGroups = 0x5D1,                  /* table 3; size 32; also dfptop */
     GAMEBIT_LINKH_FuelCell_5D4 = 0x5D4,                  /* Rena's U0 dataset; table 2 */
-    GAMEBIT_ITEM_FireflyNotShown_Count = 0x5D6,          /* table 2; size 5 */
+    GAMEBIT_ITEM_FireflyNotShown_Count = 0x5D6,          /* table 2; size 5. FireFly calls it collect-count bit B, the partner of GAMEBIT_ITEM_Firefly_Count */
     GAMEBIT_DR_ObjGroups = 0x5DB,                        /* table 3; size 32 */
     GAMEBIT_DRBOT_ObjGroups = 0x5DC,                     /* table 3; size 32 */
     GAMEBIT_DR_CreatorInitClear = 0x5DD,                 /* DR_Creator clears it at init, which is all its own alias claimed for it */
@@ -1072,7 +1072,7 @@ enum GameBitId {
     GAMEBIT_OFP_LoadBlockSlidePuzzle2 = 0x7A1,           /* loads Ocean Force Point object group 6, the lower block-slide puzzle */
     GAMEBIT_DR_HighTop_JumpingOn = 0x7A4,                /* Rena's kiosk dataset; table 1 */
     GAMEBIT_OFB_StaffBoostEnabled7A8 = 0x7A8,            /* Rena's U0 dataset; table 2 */
-    GAMEBIT_DR_CloudRunnerCurveSlot = 0x7A9,             /* table 1; a stored curve slot, not a flag: a spawning CloudRunner reads it and, if non-zero, places itself at curve action target slot + 0x13 */
+    GAMEBIT_DR_CloudRunnerCurveSlot = 0x7A9,             /* table 1; a stored curve slot, not a flag: a spawning CloudRunner reads it and, if non-zero, places itself at curve action target slot + 0x13. DR_CloudPer names it the active-cloud bit, which fits a stored slot */
     GAMEBIT_DR_CloudRunnerAirTime = 0x7AA,               /* table 1; a stored value: DR_CloudRunner_free writes its remaining air time straight into it, and DLL 620 seeds it with 5 */
     GAMEBIT_DRBOT_HoverPadRelated07BA = 0x7BA,           /* The Drakor hover pad's curve carries event codes, and this is one of the bits DLL 625 writes as the pad runs them - raised by code 2 and read nowhere in the code */
     GAMEBIT_DR_EarthWarriorUnknown_2 = 0x7BC,            /* set by DR_EarthWar.c when mounted and cleared when dismounted */
@@ -1098,8 +1098,8 @@ enum GameBitId {
     GAMEBIT_WC_EarthWalkerTalked = 0x7FB,                /* Raised the first time the player activates the Walled City EarthWalker; Rena has it as wallcity HitAnimator 0x4B707's target */
     GAMEBIT_WC_FoundKing = 0x7FC,                        /* table 2; hint 363 */
     GAMEBIT_WC_TimedPuzzleBComplete = 0x802,             /* Walled City timed push-block puzzle B fully complete; the puzzle-B mirror of 0x7F7, also saving a checkpoint */
-    GAMEBIT_WC_PushBlockAFade = 0x808,                   /* Push-block puzzle A's fade flag, aliased locally in dll_0290_wcpushblock.h as WCPUSHBLOCK_GAMEBIT_A_FADE */
-    GAMEBIT_WC_PushBlockBFade = 0x809,                   /* Push-block puzzle B's fade flag (WCPUSHBLOCK_GAMEBIT_B_FADE) */
+    GAMEBIT_WC_PushBlockAFade = 0x808,                   /* Push-block puzzle A's fade flag, aliased locally in dll_0290_wcpushblock.h as WCPUSHBLOCK_GAMEBIT_A_FADE. WCTile names the same bit its own tile-A fade */
+    GAMEBIT_WC_PushBlockBFade = 0x809,                   /* Push-block puzzle B's fade flag (WCPUSHBLOCK_GAMEBIT_B_FADE). WCTile names the same bit its own tile-B fade */
     GAMEBIT_WC_PushBlockACount = 0x810,                  /* How many of push-block puzzle A's four blocks are placed - a counter, not a flag: wclevelcont marks the puzzle solved when it reads 4, and clears it on reset and at init beside restoring gWcTileGridA */
     GAMEBIT_WC_PushBlockBCount = 0x811,                  /* Push-block puzzle B's placed-block count, the counterpart to GAMEBIT_WC_PushBlockACount */
     GAMEBIT_WC_PushBlockASolved = 0x812,                 /* Push-block puzzle A solved, which wclevelcont_init reads back into WCLEVELCTL_FLAG_TILE_A; two DLLs alias it locally from either end - WCPUSHBLOCK_GAMEBIT_A_SOLVED for the cause and WCTILE_GAMEBIT_A_HIDE for its effect on the tiles */
@@ -1119,7 +1119,7 @@ enum GameBitId {
     GAMEBIT_ITEM_WaterSpellStone2_Got = 0x83C,           /* table 2; hint 401; ref dfptop/VFP_PodiumP key */
     GAMEBIT_ITEM_MoonSeed_Used = 0x857,                  /* table 2; hint 309; ref moonpass/HitAnimator target */
     GAMEBIT_DIM2_CannonRelated085E = 0x85E,              /* table 2; ref snowmines2/HitAnimator target */
-    GAMEBIT_ITEM_MoonSeed_Count = 0x86A,                 /* table 2; size 3 */
+    GAMEBIT_ITEM_MoonSeed_Count = 0x86A,                 /* table 2; size 3. MSPlantingS names it GAMEBIT_MOONSEED_COUNT, agreeing it is a count */
     GAMEBIT_DBEggPickedUp086D = 0x86D,                   /* Raised beside GAMEBIT_DBEggCarried at both pickup points, with nothing in the code reading it back */
     GAMEBIT_DIM2_CannonRelated0874 = 0x874,              /* table 2; ref snowmines2/HitAnimator target */
     GAMEBIT_MMPAsteroidRelated087B = 0x87B,              /* table 2; size 2 */
@@ -1127,7 +1127,7 @@ enum GameBitId {
     GAMEBIT_ITEM_RockCandyRelated0886 = 0x886,           /* table 2; related to rock candy */
     GAMEBIT_SH_SawWarpStoneIntro = 0x887,                /* table 2 */
     GAMEBIT_MMP_AsteroidRelated088B = 0x88B,             /* Cleared by the Moon Mountain Pass asteroid once its own clear-timer runs out, with nothing in the code setting it */
-    GAMEBIT_MMP_AsteroidIntensity = 0x88C,               /* An intensity level, not a flag: the asteroid reads it straight into its intensity field, except while GAMEBIT_MMP_AsteroidForceIntensity overrides it to 1 */
+    GAMEBIT_MMP_MoonRockPedestalCount = 0x88C,           /* How many moon rocks are on their pedestals - a count, not a flag. MMP_moonroc reads it beside GAMEBIT_MMP_MoonRockInventoryCount, and the Moon Mountain Pass asteroid reads that same count straight into its own intensity, except while GAMEBIT_MMP_AsteroidForceIntensity pins it to 1 */
     GAMEBIT_MMP_MoonRockInventoryCount = 0x894,          /* The DLL names this one itself: MMP_MOON_ROCK_INVENTORY_COUNT_GAMEBIT in MMP_moonroc.c */
     GAMEBIT_MMP_MovedMeteor = 0x89B,                     /* table 2; hint 310; ref moonpass/HitAnimator target */
     GAMEBIT_DIM_LevelControl089D = 0x89D,                /* The DLL names this one itself: DIM_LEVEL_CONTROL_GAMEBIT_089D in DIM_LevelCo.c */
@@ -1148,7 +1148,7 @@ enum GameBitId {
     GAMEBIT_ITEM_WaterSpellStone1_902 = 0x902,           /* table 1 */
     GAMEBIT_WM_SwitchCamActive = 0x905,                  /* table 2; camera pointing at door opened by pressure switch */
     GAMEBIT_SC_LVBlock2Related090B = 0x90B,              /* One of the three bits sc_levelcontrol raises the moment GAMEBIT_ITEM_LVBlock2_Used is set */
-    GAMEBIT_SawMagic = 0x90D,                            /* table 2; Have collected a Staff Energy Gem (if 0, explain it when you collect one) */
+    GAMEBIT_SawMagic = 0x90D,                            /* table 2; Have collected a Staff Energy Gem (if 0, explain it when you collect one). CAUTION: DLL 255 names the same bit its magic-gem claimed latch, describing it as a per-frame single-pickup latch rather than anything the player saw */
     GAMEBIT_SawBigHealth = 0x90E,                        /* table 2 */
     GAMEBIT_SawApple = 0x90F,                            /* table 2; small health pickup */
     GAMEBIT_SawScarab = 0x910,                           /* table 2 */
@@ -1221,7 +1221,7 @@ enum GameBitId {
     GAMEBIT_SH_RescuedEggs = 0xA31,                      /* table 1; hint 358; ref hollow/CNTstopwatc target */
     GAMEBIT_TTH_MusicLatch0A32 = 0xA32,                  /* ThornTail Hollow - SH_LevelCon's GameBitLatch condition for music trigger 0x98 */
     GAMEBIT_SB_GalleonCycleAPending = 0xA3C,             /* One of the galleon protection minigame's four cycle bits, per SB_Galleon's own aliases - pending and done for cycles A and B; Rena had it only as SBRelated0A3C */
-    GAMEBIT_SB_IsRaining = 0xA3D,                        /* table 0 */
+    GAMEBIT_SB_IsRaining = 0xA3D,                        /* table 0. CAUTION: SB_Galleon reads it as cycle B pending, the fourth of the galleon cycle bits 0xA3C/0xA3E/0xA3F - which would make the rain reading either wrong or the same cycle seen from outside */
     GAMEBIT_SB_GalleonCycleADone = 0xA3E,                /* Cycle A of the galleon protection minigame is done, per SB_Galleon's own alias */
     GAMEBIT_SB_GalleonCycleBDone = 0xA3F,                /* Cycle B of the galleon protection minigame is done, per SB_Galleon's own alias */
     GAMEBIT_VFP_ReturnedWithSpellStone = 0xA43,          /* table 2; hint 370; ref temple/HitAnimator target */
@@ -1270,7 +1270,7 @@ enum GameBitId {
     GAMEBIT_SHOP_Unk0AD3 = 0xAD3,                        /* table 2; set when entering shop */
     GAMEBIT_WM_SeqAD4 = 0xAD4,                           /* Rena's U0 dataset; table 2 */
     GAMEBIT_ITEM_WMGoldKey_Used = 0xADA,                 /* table 2; ref warlock/WM_padlock 0x1C */
-    GAMEBIT_SawBarrelGen = 0xADB,                        /* table 2 */
+    GAMEBIT_SawBarrelGen = 0xADB,                        /* table 2. BarrelGener names it its triggered bit */
     GAMEBIT_IM_CannonGuy1Dead = 0xADC,                   /* table 2 */
     GAMEBIT_IM_CannonGuy2Dead = 0xADD,                   /* table 2 */
     GAMEBIT_IM_SwitchVisible = 0xADE,                    /* table 0 */
@@ -1542,7 +1542,7 @@ enum GameBitId {
     GAMEBIT_CFRestartPointRelated0D3D = 0xD3D,           /* table 1 */
     GAMEBIT_VFPLightRelated0D44 = 0xD44,                 /* table 3; ref temple/LGTDirectio 0x1E */
     GAMEBIT_MMP_LevelControlEnvironmentA = 0xD47,        /* The DLL names this one itself: MMP_LEVEL_CONTROL_GAMEBIT_ENVIRONMENT_A in MMP_levelco.c */
-    GAMEBIT_MMP_AsteroidForceIntensity = 0xD52,          /* Pins the Moon Mountain Pass asteroid's intensity at 1 regardless of GAMEBIT_MMP_AsteroidIntensity; Rena has it as moonpass HitAnimator 0x4B451's target */
+    GAMEBIT_MMP_AsteroidForceIntensity = 0xD52,          /* Pins the Moon Mountain Pass asteroid's intensity at 1 regardless of GAMEBIT_MMP_MoonRockPedestalCount; Rena has it as moonpass HitAnimator 0x4B451's target */
     GAMEBIT_WarpPointRelatedD53 = 0xD53,                 /* table 1 */
     GAMEBIT_OFT_ClawAliveD56 = 0xD56,                    /* Rena's U0 dataset; table 2 */
     GAMEBIT_DFP_LevelControlSfxTriggerD59 = 0xD59,       /* The DLL names this one itself: DFP_LEVEL_CONTROL_SFX_TRIGGER_D59 in DFP_LevelCo.c */
