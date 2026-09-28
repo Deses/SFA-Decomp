@@ -1378,6 +1378,14 @@ GC/1.3's 150 diffs). The only construct that reaches K=28 is a global register r
 banned. A TU split does not help either: node indices and K are both per-compilation, so isolating the
 function changes neither.
 
+The argument needs no appeal to the temp's degree, which makes it deductive rather than inductive.
+With a **shared** source -- the only kind available, since EN v1.0 and JP already match byte-for-byte --
+`obj` is the parameter and therefore node **32**, the lowest index of any node in the prefix. Under
+descending-index ordering it is coloured **last**, always, whatever the other prefix members are. Retail
+needs it coloured **first**. Raising its index requires a named copy of the parameter, which reaches only
+node 41 (one slot) and costs EN 65 diffs, so it is not available to a shared source. Hence no shared-source
+change can reorder the prefix; only changing the ordering discipline itself -- that is, K -- can.
+
 This row is therefore **capped under the project's rules**, and since it blocks PAL v1.0, PAL v1.1 and
 EN v1.1, no version can reach 100% while the cap stands. That is a decision about the rules, not a
 search problem.
