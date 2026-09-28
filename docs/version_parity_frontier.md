@@ -1344,42 +1344,53 @@ allocatable GPRs instead of 29**, and the only construct that arranges that is t
 reservation. Anyone resuming this should either find a legitimate way to reach that count, or treat the
 row as capped -- but not re-grind the source axes, which are provably orthogonal to the threshold.
 
-### `bossdrakor_update`: obj=r31 is reachable EN-safely, but it conflicts with state=r30
+### What is measured about the colouring order, and what is NOT a law
 
-An earlier revision claimed this row could only match at 28 allocatable GPRs, because the colouring
-prefix looked descending-index-ordered and `obj`, the parameter at node 32, would therefore always colour
-last. **That claim was wrong and is retracted** -- it was induction from three samples, and a fourth
-breaks it.
+This section has twice stated a "rule" for the colouring order that a later sample broke. Both are
+retracted, and the standing instruction is: **treat prefix-ordering statements here as observations on
+named samples, never as laws.** The two retracted claims were (a) that the prefix is always ordered by
+descending node index, so `obj` must colour last and only K=28 could help; and (b) that prefix *size* is
+what reorders it. Neither survives.
 
-**obj=r31 is reachable at K=29, legitimately and EN-safely.** Hoisting the two values the PAL-gated arm
-already computes -- the `gRenderModeObj` load and the `&GXEurgb60Hz480IntDf` address -- to the top of the
-function, inside the existing `#if`, puts `obj` first in the prefix and emits `mr r31,r3`, retail's
-register for `obj`, with EN and JP byte-identical, the band still 7 wide (`_savegpr_25`) and the
-instruction count unchanged at 659. Nothing is added; the computations move. Prefix *size* is what flips
-it: one hoisted value gives five members and `obj` stays last, two gives six and `obj` goes first.
-Hoisting either value alone instead puts the hoisted value in `r31` and `obj` in `r29`, and hoisting
-`&state->curveWalker` or `&state->curveFollowState` costs instructions.
+**What is solidly measured.**
 
-**Why it stops there.** The colour rule is `min(enabled - blockers)` with the saved bank expanding one
-register at a time. With the hoist the order is `[obj, temp164, temp63, state, moveResult, mode]`, and the
-trace gives: `obj` -> r31; `temp164` -> r30; `temp63` -> r30 as well (it does not interfere with 164);
-then `state` interferes with both `obj` (r31) and `temp63` (r30), so its blockers are {31, 30} and it is
-forced to **r29**. Retail needs `state` at r30.
+The colour rule itself holds up: `colour = min(enabled - blockers)`, with the saved bank expanding one
+register at a time in reserve order, `blockers` being the colours of already-coloured neighbours only.
+Every assignment below was reproduced from the traced graph with that rule.
 
-That conflict is structural for this mechanism. `state` is defined at instruction 11, so **any** value
-hoisted to the top overlaps it and interferes with it; the hoisted value's temp is a compiler temp, and
-temps are numbered above all named locals, so it always outranks `state` and always colours first, taking
-r30. Hence **obj=r31 implies state != r30** whenever obj-first is bought by hoisting.
+`bossdrakor_update` (K=29, 184 nodes, prefix members are the four nodes of degree >= 29):
 
-Measured floors: 206 diffs with the gated pair declared first, 211 with it declared at position 7 or 14,
-and **496 ordinary-declaration orderings across two gated-pair positions are completely flat** at those
-values. Against a 150-diff baseline this is worse by the metric while being structurally right at the top.
+| variant | prefix | result |
+|---|---|---|
+| plain | `temp164, state, moveResult, obj` | state=r31, obj=r29 |
+| one value hoisted | `temp164, mode, state, moveResult, obj` | hoisted=r31, obj=r29 |
+| **two values hoisted** | `obj, temp164, temp63, mode, state, moveResult` | **obj=r31**, state=r29 |
+| one register reserved (banned) | `obj, temp164, state, moveResult` | obj=r31, state=r30 (retail) |
 
-**What would break it** is narrow and stated here so it is not re-derived: either make `obj` colour first
-*without* introducing a value live from the top (so no new temp interferes with `state`), or make the
-hoisted value's temp not interfere with `state`. This is a bounded negative for the hoist mechanism, not a
-cap on the row -- the K=28 episode is a standing reminder that "the prefix is ordered by X" claims here
-should be treated as observations, not laws.
+Hoisting the two values the PAL-gated arm already computes -- the `gRenderModeObj` load and the
+`&GXEurgb60Hz480IntDf` address -- to the top of the function, inside the existing `#if`, is
+**instruction-neutral** (659 instructions, band still 7 wide, `_savegpr_25`) and **EN-safe** (EN and JP
+byte-identical), and it produces `mr r31,r3` -- retail's register for `obj`. That is real and repeatable.
+
+Why it then stops: `state` interferes with both `obj` (r31) and `temp63` (r30), so its blockers are
+{31,30} and `min` forces it to **r29** where retail needs r30. `state` is defined at instruction 11, so
+any value hoisted to the top overlaps it, and the hoisted value's temp is numbered above all named locals
+so it always colours before `state`. Measured floors: 206 diffs with the gated pair declared first, 211 at
+positions 7 and 14, with **496 ordinary-declaration orderings across two gated-pair positions completely
+flat**.
+
+`askProgressiveScanMode` (K=29, 104 nodes) shows the ordering is *not* size-driven. Its prefix is four
+nodes all at degree 35, ordered by descending index -- `box`'s temp 53 -> r31, `counter` 40 -> r30,
+`sel` 39 -> r29, `savedAlignment` 34 -> r28 -- and retail wants `savedAlignment` first, i.e. the
+*lowest*-index member first, which is what the bossdrakor hoist appeared to do for `obj`. Forcing the
+prefix to six members here (two extra long-lived gated values) leaves the order strictly descending-index
+with `savedAlignment` still fourth. So whatever pulls `obj` to the front in bossdrakor is **not** prefix
+size, and it is still unidentified.
+
+**Where that leaves the two rows.** `bossdrakor_update` has an EN-safe configuration that gets its
+hardest register right and is blocked on one further swap whose cause is understood. `askProgressiveScanMode`
+needs its lowest-index prefix member to colour first and no known lever does that. Neither is proven
+capped -- only unsolved.
 
 ## See also
 
