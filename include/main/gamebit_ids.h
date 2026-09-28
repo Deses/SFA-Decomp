@@ -1275,6 +1275,9 @@ enum GameBitId {
     GAMEBIT_EnableCMenu = 0xA7B,                         /* table 1; set when collecting key on ship */
     GAMEBIT_WMRelated0A7F = 0xA7F,                       /* table 3; related to music? toggled constantly in KP */
     GAMEBIT_DIM_FlewTo = 0xA82,                          /* table 2; hint 281; ref snowmines/Landed_Arwi Visible */
+    GAMEBIT_WM_WindLiftActivation0A94 = 0xA94,           /* A Warlock Mountain wind-lift activation bit - gWindLiftEnableGameBitTable pairs it with GAMEBIT_Always1, so the lift it activates is unconditionally enabled; Rena places it in warlock */
+    GAMEBIT_WM_WindLiftActivation0A98 = 0xA98,           /* A Warlock Mountain wind-lift activation bit - gWindLiftEnableGameBitTable pairs it with GAMEBIT_Always1, so the lift it activates is unconditionally enabled; Rena places it in warlock */
+    GAMEBIT_WM_WindLiftActivation0A99 = 0xA99,           /* A Warlock Mountain wind-lift activation bit - gWindLiftEnableGameBitTable pairs it with GAMEBIT_Always1, so the lift it activates is unconditionally enabled; Rena places it in warlock */
     GAMEBIT_NW_FuelCell_A9D = 0xA9D,                     /* Rena's U0 dataset; table 2 */
     GAMEBIT_TTH_FuelCell_A9E = 0xA9E,                    /* Rena's U0 dataset; table 2 */
     GAMEBIT_WarpStoneUnlockedCC = 0xABA,                 /* table 1; Unused feature where WarpStone would send you to more places. Setting these bits enables an invisble destination menu, b */
@@ -1684,6 +1687,7 @@ enum GameBitId {
     GAMEBIT_IM_BikeRelated0E6A = 0xE6A,                  /* table 2; set when gaining control of bike */
     GAMEBIT_IM_BikeRelated0E6B = 0xE6B,                  /* table 2; set when gaining control of bike */
     GAMEBIT_WC_TrexLever2Enabled = 0xE6D,                /* Switches on the second T-rex lever - wallcity StaffLeverO 0x4CB3E's enabled param, the same object GAMEBIT_WC_TrexLever2Activated reports the pull of; wclevelcont clears it while arming a run */
+    GAMEBIT_ProjectileSwitchParent0E6E = 0xE6E,          /* The gamebit a projectile switch inherits when its parent's placement ident is 0x31CE0, the second row of gProjectileSwitchParentGameBitMap; the first row hands out GAMEBIT_VFP_DragHeadSpawnBlocked */
     GAMEBIT_SH_ReturnedToWarpStone = 0xE6F,              /* table 0; hint 313; Fox returned with first spirit */
     GAMEBIT_MMP_EnteredKrazoaShrine = 0xE70,             /* table 0; hint 311 */
     GAMEBIT_ArwingRelated0E74 = 0xE74,                   /* table 0 */

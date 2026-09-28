@@ -5,6 +5,7 @@
  * Switch state is mirrored to a game bit and to the model's first texture.
  */
 #include "dlls/objects/249.h"
+#include "main/gamebit_ids.h"
 #include "main/audio/sfx_trigger_ids.h"
 #include "main/frame_timing.h"
 #include "main/gamebits_api.h"
@@ -43,8 +44,8 @@ STATIC_ASSERT(offsetof(ProjectileSwitchParentGameBitEntry, gameBitId) == 0x4);
 STATIC_ASSERT(sizeof(ProjectileSwitchParentGameBitEntry) == 0x8);
 
 ProjectileSwitchParentGameBitEntry gProjectileSwitchParentGameBitMap[PROJECTILE_SWITCH_PARENT_GAME_BIT_COUNT] = {
-    {0x00031CCF, 0x00000522},
-    {0x00031CE0, 0x00000E6E},
+    {0x00031CCF, GAMEBIT_VFP_DragHeadSpawnBlocked},
+    {0x00031CE0, GAMEBIT_ProjectileSwitchParent0E6E},
 };
 
 int ProjectileSwitch_getExtraSize(void) {
