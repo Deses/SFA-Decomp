@@ -593,6 +593,7 @@ enum GameBitId {
     GAMEBIT_LV_TestTrackingBestTime1 = 0x2B7,            /* table 2; size 16 */
     GAMEBIT_SC_StaffLeversEnabled = 0x2B8,               /* Rena has it driving the enabled param of all four swapcircle StaffLeverO objects; sc_levelcontrol raises it as a timed totem run begins and drops it at init and on both ways out of the run */
     GAMEBIT_ENV_dayNo = 0x2BA,                           /* table 3; size 8; Counts from 0 to 27, increasing every morning in-game time. Used for environmental effects. */
+    GAMEBIT_WM_NpcRenderGate02BD = 0x2BD,                /* In DLL 0x200's gated map act the NPC draws nothing at all unless this is set */
     GAMEBIT_SH_FirstMagicCaveDoorOpen = 0x2C0,           /* table 2; ref hollow/HitAnimator target */
     GAMEBIT_IM_TrickyRelated02C1 = 0x2C1,                /* table 0; set when starting tricky landing scene */
     GAMEBIT_DIM_ReachedBottom = 0x2C3,                   /* table 2; hint 291 */
@@ -617,8 +618,10 @@ enum GameBitId {
     GAMEBIT_CFRelated02FE = 0x2FE,                       /* table 1 */
     GAMEBIT_CFRelated02FF = 0x2FF,                       /* table 1 */
     GAMEBIT_KytesMumQuestB = 0x30A,                      /* Kyte's Mum second quest stage gate, gKytesMumQuestBits[1] (trigger id 2); the first stage is gated on GAMEBIT_CF_SavedQueen = 0x43 */
+    GAMEBIT_WM_NpcItemUsed0310 = 0x310,                  /* Raised the instant the player uses one of DLL 0x200's accepted items on that NPC - only reachable once GAMEBIT_WM_FoundKrystal is set - together with GAMEBIT_WM_NpcItemUsed04D1 and a bump to the NPC's interaction count */
     GAMEBIT_DIM3_WarpEnable312 = 0x312,                  /* Rena's U0 dataset; table 0 */
     GAMEBIT_DIM3_WarpEnable313 = 0x313,                  /* Rena's U0 dataset; table 0 */
+    GAMEBIT_WM_NpcSecondItemUsed = 0x314,                /* Raised from the DLL 0x200 NPC's anim event 1 once its interaction count reaches 2, so the second item has landed */
     GAMEBIT_ITEM_Key336_Got = 0x336,                     /* table 1; XXX where is this key from? */
     GAMEBIT_FinalBoss_ActNo = 0x349,                     /* table 1; size 4 */
     GAMEBIT_WC_TrexRetryBlocked034D = 0x34D,             /* Blocks the retry: when a T-rex run times out, wclevelcont only re-arms the four levers if this is clear */
@@ -729,6 +732,7 @@ enum GameBitId {
     GAMEBIT_TargetRelated04B7 = 0x4B7,                   /* table 1; related to object targeting */
     GAMEBIT_SC_StaffLeversDisabled = 0x4BD,              /* The exact complement of GAMEBIT_SC_StaffLeversEnabled - written 1 at every point that one is written 0 and 0 where it is written 1, so it presumably enables the levers' idle-state counterparts */
     GAMEBIT_SC_CaptureWarpDone = 0x4D0,                  /* One-shot: once GAMEBIT_LV_CapturedByLightFoot appears, sc_levelcontrol latches this, opens swapcircle objgroup 2, warps to map 0x50 and closes objgroup 1, so the capture warp fires only once */
+    GAMEBIT_WM_NpcItemUsed04D1 = 0x4D1,                  /* table 0; written in the same breath as GAMEBIT_WM_NpcItemUsed0310 when an item is used on the DLL 0x200 NPC */
     GAMEBIT_NW_FuelCell_4D2 = 0x4D2,                     /* Rena's U0 dataset; table 2 */
     GAMEBIT_IM_PushBlock_Placed = 0x4D3,                 /* table 2 */
     GAMEBIT_LV_FuelCell_4D4 = 0x4D4,                     /* Rena's U0 dataset; table 2 */
@@ -857,8 +861,14 @@ enum GameBitId {
     GAMEBIT_SC_TotemBondRing3 = 0x650,                   /* LightFoot Village totem-bond puzzle - ring slot 3 bonded, gTotemBondRingGameBits[3]; set to 1 when the ring is bonded and passed as the spawned orb's activeGameBit */
     GAMEBIT_ITEM_DinoHorn_651 = 0x651,                   /* table 2 */
     GAMEBIT_DIM_ClawDead652 = 0x652,                     /* Rena's U0 dataset; table 2 */
+    GAMEBIT_DRBOT_HoverPadRelated0660 = 0x660,           /* The Drakor hover pad's curve carries event codes, and this is one of the bits DLL 625 writes as the pad runs them - code 4 raises it when the pad's b40 flag is up */
+    GAMEBIT_DRBOT_HoverPadRouteOpen = 0x661,             /* The Drakor hover pad's route ahead is open: codes 4 and 9 both bring the pad to a dead stop, zeroing its commanded speed, whenever this is clear */
     GAMEBIT_ITEM_BombSpore_Count = 0x66C,                /* table 2; size 3 */
     GAMEBIT_ITEM_WhiteShroom_Count = 0x66D,              /* table 2; size 3 */
+    GAMEBIT_DRBOT_HoverPadLeverActivated = 0x67F,        /* Rena has it as dragbot StaffLeverT 0x45C6A's activated param and the target of two HitAnimators; the hover pad's code 8 does nothing but report its state back to the curve */
+    GAMEBIT_DRBOT_HoverPadRelated0689 = 0x689,           /* The Drakor hover pad's curve carries event codes, and this is one of the bits DLL 625 writes as the pad runs them - code 10 latches it once, and checks it first so it fires only the first time the pad passes */
+    GAMEBIT_DRBOT_HoverPadRidden068A = 0x68A,            /* The Drakor hover pad's curve carries event codes, and this is one of the bits DLL 625 writes as the pad runs them - code 11 raises it only while the player is actually parented to the pad, and code 13 needs it before it will double-bounce */
+    GAMEBIT_DRBOT_HoverPadRidden068B = 0x68B,            /* The Drakor hover pad's curve carries event codes, and this is one of the bits DLL 625 writes as the pad runs them - code 12's counterpart to GAMEBIT_DRBOT_HoverPadRidden068A, again only while the player is riding */
     GAMEBIT_TTH_BafomDad_69C = 0x69C,                    /* Rena's U0 dataset; table 2 */
     GAMEBIT_TTH_BafomDad_69D = 0x69D,                    /* Rena's U0 dataset; table 2 */
     GAMEBIT_TTH_BafomDad_69E = 0x69E,                    /* Rena's U0 dataset; table 2 */
@@ -905,9 +915,11 @@ enum GameBitId {
     GAMEBIT_DR_ActNo = 0x76E,                            /* table 1; size 4 */
     GAMEBIT_DRBOT_ActNo = 0x76F,                         /* table 1; size 4 */
     GAMEBIT_ITEM_DeletedSpell777_Got = 0x777,            /* table 2; in spell bits table but does nothing */
+    GAMEBIT_DRBOT_HoverPadHalted = 0x788,                /* Raised at both points DLL 625 brings the hover pad to a halt: code 4 with the route closed, and code 15 with the pad's b40 flag down */
     GAMEBIT_OFP_LoadBlockSlidePuzzle2 = 0x7A1,           /* loads Ocean Force Point object group 6, the lower block-slide puzzle */
     GAMEBIT_DR_HighTop_JumpingOn = 0x7A4,                /* Rena's kiosk dataset; table 1 */
     GAMEBIT_OFB_StaffBoostEnabled7A8 = 0x7A8,            /* Rena's U0 dataset; table 2 */
+    GAMEBIT_DRBOT_HoverPadRelated07BA = 0x7BA,           /* The Drakor hover pad's curve carries event codes, and this is one of the bits DLL 625 writes as the pad runs them - raised by code 2 and read nowhere in the code */
     GAMEBIT_DR_EarthWarriorUnknown_2 = 0x7BC,            /* set by DR_EarthWar.c when mounted and cleared when dismounted */
     GAMEBIT_ITEM_SpellStone7BD_Got = 0x7BD,              /* table 2; unused? */
     GAMEBIT_ITEM_SpellStone7BF_Got = 0x7BF,              /* table 1 */

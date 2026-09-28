@@ -21,6 +21,7 @@
  * carry the ride and path-event bits.
  */
 #include "dlls/objects/625_DrakorHoverpad.h"
+#include "main/gamebit_ids.h"
 #include "dlls/objects/common/vehicle.h"
 #include "dolphin/mtx/vec.h"
 #include "MSL_C/PPCEABI/bare/H/math_api.h"
@@ -431,9 +432,9 @@ int drakorhoverpad_handlePathPointEvent(GameObject* obj, u8 eventCode, u8 subCod
             break;
         }
         if (f->b40 != 0) {
-            mainSetBits(0x660, 1);
-        } else if (mainGetBit(0x661) == 0) {
-            mainSetBits(0x788, 1);
+            mainSetBits(GAMEBIT_DRBOT_HoverPadRelated0660, 1);
+        } else if (mainGetBit(GAMEBIT_DRBOT_HoverPadRouteOpen) == 0) {
+            mainSetBits(GAMEBIT_DRBOT_HoverPadHalted, 1);
             f->state = 1;
             p->commandSpeed = 0.0f;
         } else {
@@ -444,7 +445,7 @@ int drakorhoverpad_handlePathPointEvent(GameObject* obj, u8 eventCode, u8 subCod
         if (p->speed >= 0.0f) {
             break;
         }
-        if (mainGetBit(0x661) == 0) {
+        if (mainGetBit(GAMEBIT_DRBOT_HoverPadRouteOpen) == 0) {
             f->state = 1;
             p->commandSpeed = 0.0f;
         } else {
@@ -481,10 +482,10 @@ int drakorhoverpad_handlePathPointEvent(GameObject* obj, u8 eventCode, u8 subCod
         if (g->p1 == 0) {
             break;
         }
-        if (mainGetBit(0x689) != 0) {
+        if (mainGetBit(GAMEBIT_DRBOT_HoverPadRelated0689) != 0) {
             break;
         }
-        mainSetBits(0x689, 1);
+        mainSetBits(GAMEBIT_DRBOT_HoverPadRelated0689, 1);
         break;
     case 11:
         if (g->p1 == 0) {
@@ -493,7 +494,7 @@ int drakorhoverpad_handlePathPointEvent(GameObject* obj, u8 eventCode, u8 subCod
         if (player->anim.parent != (void*)obj) {
             break;
         }
-        mainSetBits(0x68a, 1);
+        mainSetBits(GAMEBIT_DRBOT_HoverPadRidden068A, 1);
         break;
     case 12:
         if (g->p1 == 0) {
@@ -502,10 +503,10 @@ int drakorhoverpad_handlePathPointEvent(GameObject* obj, u8 eventCode, u8 subCod
         if (player->anim.parent != (void*)obj) {
             break;
         }
-        mainSetBits(0x68b, 1);
+        mainSetBits(GAMEBIT_DRBOT_HoverPadRidden068B, 1);
         break;
     case 13:
-        if (mainGetBit(0x68a) == 0) {
+        if (mainGetBit(GAMEBIT_DRBOT_HoverPadRidden068A) == 0) {
             break;
         }
         if (p->commandSpeed >= 0.0f) {
@@ -524,7 +525,7 @@ int drakorhoverpad_handlePathPointEvent(GameObject* obj, u8 eventCode, u8 subCod
         if (f->b40 != 0) {
             break;
         }
-        mainSetBits(0x788, 1);
+        mainSetBits(GAMEBIT_DRBOT_HoverPadHalted, 1);
         break;
     case 16:
         absP = ABS_EXPR(p->commandSpeed);
@@ -546,14 +547,14 @@ int drakorhoverpad_handlePathPointEvent(GameObject* obj, u8 eventCode, u8 subCod
     }
     switch (subCode) {
     case 8:
-        if (mainGetBit(0x67f) != 0) {
+        if (mainGetBit(GAMEBIT_DRBOT_HoverPadLeverActivated) != 0) {
             *out = 1;
         } else {
             *out = 0;
         }
         break;
     case 2:
-        mainSetBits(0x7ba, 1);
+        mainSetBits(GAMEBIT_DRBOT_HoverPadRelated07BA, 1);
         break;
     case 18:
         *out = 0;
