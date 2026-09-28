@@ -572,7 +572,7 @@ void NW_mammoth_updateFeedQuest(GameObject* obj, NwMammothState* state, NwMammot
     switch (state->stateIndex) {
     case NW_MAMMOTH_STATE_FEED_INTRO:
         state->triggerList = gNwMammothFeedIntroTriggerList;
-        if (mainGetBit(211) != 0) {
+        if (mainGetBit(GAMEBIT_NW_ClawDead0D3) != 0) {
             state->stateIndex = NW_MAMMOTH_STATE_FEED_FIRST_ROOT;
         }
         break;

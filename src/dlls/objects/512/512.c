@@ -124,7 +124,7 @@ void dll_200_updateMapAct6(GameObject* obj) {
         buttonDisable(0, PAD_BUTTON_A);
     } else if ((obj->anim.resetHitboxFlags & INTERACT_FLAG_ACTIVATED) != 0) {
         if ((*gGameUIInterface)->isOneOfItemsBeingUsed(itemSet.itemIds, DLL200_ITEM_COUNT) > -1) {
-            mainSetBits(784, 1);
+            mainSetBits(GAMEBIT_WM_NpcItemUsed0310, 1);
             state->interactionCount += 1;
             buttonDisable(0, PAD_BUTTON_A);
         }
