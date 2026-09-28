@@ -3,14 +3,30 @@
 
 /*
  * GameBitId - symbolic ids for the game's persistent quest/story/event flags,
- * the integer `eventId` passed to mainGetBit / mainSetBits / gameBitIncrement.
+ * the integer `eventId` passed to mainGetBit / mainSetBits / gameBitIncrement /
+ * gameBitDecrement, and to GameBitLatch_Update's three bit arguments.
  *
- * Most bits are addressed by raw id from level/placement data, so their meaning
- * lives in the data, not the code; the codebase therefore still uses bare
- * literals at most call sites. ONLY add an entry here once the bit's meaning is
- * actually established (traced to its setter, or confirmed live) - an
- * unverified GAMEBIT_0xNNN is no more useful than the literal. Leave unknown
- * ids as hex and grow this enum as bits are identified.
+ * No bare bit id is left anywhere in src/: every one of those call sites, every
+ * bit id assigned into a *gameBit* struct field, and every gamebit lookup table
+ * names the bit it touches. Keep it that way - when a new id turns up, name it
+ * here rather than spelling it as a literal, and do not add a second name for a
+ * bit that already has one, since two DLLs disagreeing about one id is how the
+ * worst mistakes in here got made.
+ *
+ * ONLY add an entry once the bit's meaning is established, and say in the
+ * comment what established it. The evidence ladder, strongest first: the code
+ * that writes it; a gametext label the game itself shows for it; Rena's map
+ * objrefs (which map, which object, which param); adjacency to a named group.
+ * Where only the weakest rung applies the name says so - Related, or an id
+ * suffix - and where two sources conflict the comment says CAUTION rather than
+ * picking a winner. A name that overstates what is known is worse than a hex
+ * literal.
+ *
+ * Coverage: of the 3920 bit descriptors the game defines, every one with any
+ * evidence at all is named. The rest have no code reference, no map objref, no
+ * hint text and no entry in any of Rena's four name sets, so there is presently
+ * nothing to derive them from - they are reachable only from map or script data
+ * this project cannot yet read.
  */
 enum GameBitId {
     /*
@@ -290,7 +306,12 @@ enum GameBitId {
      * (data/U0/gamebits.xml in github.com/RenaKunisaki/StarFoxAdventures), then
      * extended with names and notes recovered from this project's code. Rena's
      * names are NOT independently verified here; treat them as leads, not
-     * ground truth. The value is the global mainGetBit id (xml id, confirmed to
+     * ground truth. Four of Rena's sets were mined, not one: SFA-Browser's U0
+     * (1041 names, against the 713 in the StarFoxAdventures copy this section
+     * was first built from), SFA-Browser's K0 kiosk set, and SFA-Amethyst's
+     * gamebits.h. The kiosk ids were checked before use: of 709 ids named in
+     * both it and U0, 548 names match and every one of the 161 differences is a
+     * prefix rename (SH_ to TTH_), never a change of meaning. The value is the global mainGetBit id (xml id, confirmed to
      * match this enum on known bits). Unordered - chronological activation
      * position is unknown. Ids already named above are omitted (their verified
      * names take precedence).
