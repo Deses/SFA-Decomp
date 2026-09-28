@@ -111,7 +111,7 @@ int kytesmum_updateQuestStateCallback(GameObject* obj, int unused, u8* arg)
     {
         runtime->idleSfxTable = (ObjSoundDef*)gKytesMumQuestIdleSfxTable;
     }
-    mainSetBits(0xeb9, count == 1);
+    mainSetBits(GAMEBIT_CF_KytesMumQuestStage1, count == 1);
     next = triggerIds[count];
     if (next == -1)
     {
@@ -408,8 +408,8 @@ void kytesmum_init(GameObject* obj, KytesMumSetup* setup)
         break;
     case KYTESMUM_MODE_QUEST_A:
     case KYTESMUM_MODE_QUEST_B:
-        mainSetBits(0x934, 0);
-        mainSetBits(0x933, 0);
+        mainSetBits(GAMEBIT_CF_KytesMumRelated0934, 0);
+        mainSetBits(GAMEBIT_CF_KytesMumRelated0933, 0);
         runtime->moveSet = &moveSets[2];
         runtime->updateCallback = (KytesMumUpdateCallback)kytesmum_updateQuestStateCallback;
         runtime->eventSfxTable = gKytesMumQuestEventSfxTable;

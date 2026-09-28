@@ -177,7 +177,7 @@ void wmwallcrawler_update(GameObject* obj) {
                  ? Obj_GetPlayerObject()
                  : objGetNearestTypeTo(VEHICLE_OBJECT_GROUP, ob, &best);
     if (player != 0) {
-        sq = mainGetBit(0x789);
+        sq = mainGetBit(GAMEBIT_WallCrawlerSpeedLevel);
         gWallCrawlerSpeedCap = 0.1f * sq + 0.1f;
         if (state->mode == WMWALLCRAWLER_MODE_DIE) {
             ob->anim.resetHitboxFlags |= INTERACT_FLAG_DISABLED;

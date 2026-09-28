@@ -483,7 +483,7 @@ int DIMSnowHorn1_stateHandler05(GameObject* obj, DIMSnowHorn1State* state) {
             break;
         case 4:
             inner->triggerMode = 9;
-            mainSetBits(0x1db, 1);
+            mainSetBits(GAMEBIT_DIM_SnowHornSeq4Triggered, 1);
             break;
         }
         (*gObjectTriggerInterface)->runSequence(inner->triggerMode, (void*)obj, -1);
@@ -662,14 +662,14 @@ int DIMSnowHorn1_stateHandler00(GameObject* obj) {
 
     switch (inner->mode) {
     case 0:
-        if (mainGetBit(0xf3)) {
+        if (mainGetBit(GAMEBIT_DIM_SnowHornSeqPending00F3)) {
             inner->flags |= SNOWHORN1_FLAG_SEQ_TRIGGERED;
         }
         return 2;
     case 5:
         return 3;
     case 4:
-        if (mainGetBit(0x1db)) {
+        if (mainGetBit(GAMEBIT_DIM_SnowHornSeq4Triggered)) {
             return 8;
         }
         return 6;
@@ -1265,7 +1265,7 @@ void DIMSnowHorn1_init(GameObject* obj, DIMSnowHorn1Placement* def, int spawnFla
             idx = 1;
             break;
         case 4:
-            if (mainGetBit(0x1db)) {
+            if (mainGetBit(GAMEBIT_DIM_SnowHornSeq4Triggered)) {
                 idx = 2;
             }
             break;

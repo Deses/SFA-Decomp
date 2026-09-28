@@ -931,7 +931,7 @@ void ktrex_updateAttackEffects(GameObject* obj) {
         if (mag > 0.1f) {
             CameraShake_Enable();
             CameraShake_SetOffset(mag);
-            mainSetBits(0x554, 1);
+            mainSetBits(GAMEBIT_DR_KTrexFootfallShake, 1);
         }
     }
     if ((gKTRexState->phaseFlags & 0xc) != 0) {
@@ -940,7 +940,7 @@ void ktrex_updateAttackEffects(GameObject* obj) {
         if (mag > 0.1f) {
             CameraShake_Enable();
             CameraShake_SetOffset(2.0f * mag);
-            mainSetBits(0x554, 1);
+            mainSetBits(GAMEBIT_DR_KTrexFootfallShake, 1);
         }
     }
     if ((gKTRexState->phaseFlags & 0x30) != 0) {
@@ -949,7 +949,7 @@ void ktrex_updateAttackEffects(GameObject* obj) {
         if (mag > 0.1f) {
             CameraShake_Enable();
             CameraShake_SetOffset(3.0f * mag);
-            mainSetBits(0x554, 1);
+            mainSetBits(GAMEBIT_DR_KTrexFootfallShake, 1);
         }
     }
     if ((gKTRexState->phaseFlags & 0x100000) == 0) {

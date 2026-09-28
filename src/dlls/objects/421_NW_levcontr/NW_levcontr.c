@@ -217,14 +217,14 @@ void nwLevelControl_update(GameObject* obj) {
             if (gameBit != 0) {
                 (*gObjectTriggerInterface)->runSequence(0, obj, -1);
                 state->mode = NW_LEVEL_CONTROL_MODE_WALK_TABLE;
-                mainSetBits(0xecd, 1);
+                mainSetBits(GAMEBIT_NW_WalkSequenceRunning, 1);
             }
             break;
         case NW_LEVEL_CONTROL_MODE_INIT_START:
             (*gObjectTriggerInterface)->preempt((int)obj, 0x64a);
             (*gObjectTriggerInterface)->runSequence(0, obj, 0x20);
             state->mode = NW_LEVEL_CONTROL_MODE_WALK_TABLE;
-            mainSetBits(0xecd, 1);
+            mainSetBits(GAMEBIT_NW_WalkSequenceRunning, 1);
             break;
         case NW_LEVEL_CONTROL_MODE_WALK_TABLE:
             sequenceResult = nwLevelControl_advanceSequenceTable(state);
@@ -279,9 +279,9 @@ void nwLevelControl_update(GameObject* obj) {
             }
             break;
         case NW_LEVEL_CONTROL_MODE_CLEANUP:
-            gameBit = mainGetBit(0xecd);
+            gameBit = mainGetBit(GAMEBIT_NW_WalkSequenceRunning);
             if (gameBit != 0) {
-                mainSetBits(0xecd, 0);
+                mainSetBits(GAMEBIT_NW_WalkSequenceRunning, 0);
             }
             break;
         case NW_LEVEL_CONTROL_MODE_RESCUE_RETRIGGER:

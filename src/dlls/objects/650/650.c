@@ -34,6 +34,7 @@
 #include "MSL_C/PPCEABI/bare/H/math_api.h"
 #include "main/curve.h"
 #include "main/frame_timing.h"
+#include "main/gamebit_ids.h"
 #include "main/gamebits.h"
 #include "main/object_render.h"
 #include "main/mapEventTypes.h"
@@ -162,7 +163,7 @@ void earthwalker_update(GameObject* obj) {
     case 0:
         if (ewObj->anim.resetHitboxFlags & INTERACT_FLAG_ACTIVATED) {
             buttonDisable(0, PAD_BUTTON_A);
-            mainSetBits(0x7fb, 1);
+            mainSetBits(GAMEBIT_WC_EarthWalkerTalked, 1);
             ewState->interactionState = 2;
             ewState->flags |= 1;
         }
@@ -180,9 +181,9 @@ void earthwalker_update(GameObject* obj) {
                     } else {
                         newState = 0x14;
                     }
-                } else if ((s32)mainGetBit(0xc90) != 0) {
+                } else if ((s32)mainGetBit(GAMEBIT_WC_EarthWalkerTopic0C90) != 0) {
                     newState = 5;
-                } else if ((s32)mainGetBit(0xc36) != 0) {
+                } else if ((s32)mainGetBit(GAMEBIT_WC_EarthWalkerTopic0C36) != 0) {
                     newState = 4;
                 } else if ((s32)mainGetBit(GAMEBIT_ITEM_SuperQuake_Got) != 0) {
                     newState = 3;
@@ -203,9 +204,9 @@ void earthwalker_update(GameObject* obj) {
                     } else {
                         newState = 0x16;
                     }
-                } else if ((s32)mainGetBit(0xc90) != 0) {
+                } else if ((s32)mainGetBit(GAMEBIT_WC_EarthWalkerTopic0C90) != 0) {
                     newState = 0xa;
-                } else if ((s32)mainGetBit(0xc36) != 0) {
+                } else if ((s32)mainGetBit(GAMEBIT_WC_EarthWalkerTopic0C36) != 0) {
                     newState = 9;
                 } else if ((s32)mainGetBit(GAMEBIT_ITEM_SuperQuake_Got) != 0) {
                     newState = 8;
@@ -228,9 +229,9 @@ void earthwalker_update(GameObject* obj) {
                     } else {
                         newState = 0x18;
                     }
-                } else if ((s32)mainGetBit(0xc90) != 0) {
+                } else if ((s32)mainGetBit(GAMEBIT_WC_EarthWalkerTopic0C90) != 0) {
                     newState = 0xf;
-                } else if ((s32)mainGetBit(0xc36) != 0) {
+                } else if ((s32)mainGetBit(GAMEBIT_WC_EarthWalkerTopic0C36) != 0) {
                     newState = 0xe;
                 } else if ((s32)mainGetBit(GAMEBIT_ITEM_SuperQuake_Got) != 0) {
                     newState = 0xd;
@@ -253,9 +254,9 @@ void earthwalker_update(GameObject* obj) {
                     } else {
                         newState = 0x1c;
                     }
-                } else if ((s32)mainGetBit(0xc90) != 0) {
+                } else if ((s32)mainGetBit(GAMEBIT_WC_EarthWalkerTopic0C90) != 0) {
                     newState = 0x13;
-                } else if ((s32)mainGetBit(0xc36) != 0) {
+                } else if ((s32)mainGetBit(GAMEBIT_WC_EarthWalkerTopic0C36) != 0) {
                     if (ewState->lastTriggeredState == 0x11) {
                         newState = 0x12;
                     } else {
@@ -277,9 +278,9 @@ void earthwalker_update(GameObject* obj) {
                     } else {
                         newState = 8;
                     }
-                } else if ((s32)mainGetBit(0xc90) != 0) {
+                } else if ((s32)mainGetBit(GAMEBIT_WC_EarthWalkerTopic0C90) != 0) {
                     newState = 7;
-                } else if ((s32)mainGetBit(0xc36) != 0) {
+                } else if ((s32)mainGetBit(GAMEBIT_WC_EarthWalkerTopic0C36) != 0) {
                     newState = 6;
                 } else if ((s32)mainGetBit(GAMEBIT_ITEM_SuperQuake_Got) != 0) {
                     newState = 5;

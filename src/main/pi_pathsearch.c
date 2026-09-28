@@ -2,6 +2,7 @@
 #include "main/dll/rom_curve_interface.h"
 #include "main/dll/dll_0015_curves.h"
 #include "main/dll/rom_curve_def.h"
+#include "main/gamebit_ids.h"
 #include "main/gamebits.h"
 #include "main/pi_dolphin.h"
 #include "main/mm.h"
@@ -237,7 +238,7 @@ void pathSearchExpandNode(PathSearch* search, PathSearchNode* node, int idx) {
                 case ROMCURVE_TYPE_TRICKY: {
                     s16 requiredBit;
                     s16 forbiddenBit;
-                    mainGetBit(0x4e2);
+                    mainGetBit(GAMEBIT_TrickyPathRelated04E2);
                     requiredBit = linked->requiredBit;
                     if (requiredBit == -1 || mainGetBit(requiredBit) != 0) {
                         forbiddenBit = linked->forbiddenBit;

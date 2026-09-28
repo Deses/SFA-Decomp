@@ -6359,7 +6359,7 @@ int playerStateMountBike(GameObject* obj, PlayerState* state, f32 fv) {
             inner->moveSequence = (s16*)(base + 0x3f0);
             inner->moveSequenceFlags = 3;
             if (coordsToMapCell(obj->anim.localPosX, obj->anim.localPosZ) == 0x13) {
-                mainSetBits(0xf0a, 1);
+                mainSetBits(GAMEBIT_PlayerBoardedVehicle0F0A, 1);
             }
             (*gCameraInterface)->setMode(0x45, 1, 0, 0, NULL, 0, 0xff);
             break;
@@ -13943,7 +13943,7 @@ void playerUpdateSurfaceResponse(GameObject* obj, PlayerState* state, PlayerStat
             ObjHits_RecordObjectHit(obj, NULL, 1, 0, 0);
             break;
         case 28:
-            if (mainGetBit(0x21) == 0) {
+            if (mainGetBit(GAMEBIT_PlayerPeriodicHitImmune) == 0) {
                 state->periodicHitTimer += dt;
                 if (0x78 < state->periodicHitTimer) {
                     state->periodicHitTimer -= 0x78;
@@ -13984,7 +13984,7 @@ void playerUpdateSurfaceResponse(GameObject* obj, PlayerState* state, PlayerStat
             }
             break;
         case 31:
-            mainSetBits(0x643, 1);
+            mainSetBits(GAMEBIT_PlayerTouchedSurface31, 1);
             break;
         default:
             state->hitIntervalTimer = 0;

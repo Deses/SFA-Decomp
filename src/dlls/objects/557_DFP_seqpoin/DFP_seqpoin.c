@@ -7,6 +7,7 @@
 #include "dlls/objects/557_DFP_seqpoin.h"
 #include "main/map_load.h"
 #include "main/object_render.h"
+#include "main/gamebit_ids.h"
 #include "main/gamebits.h"
 #include "game/objects/object_setup.h"
 #include "main/mapEventTypes.h"
@@ -101,7 +102,7 @@ void DFP_seqpoint_update(GameObject* obj) {
     player = Obj_GetPlayerObject();
     state = self->extra;
     if (state->flags0F.b80 != 0) {
-        mainSetBits(0xef7, 1);
+        mainSetBits(GAMEBIT_OFP_SeqPointTriggered0EF7, 1);
         state->flags0F.b80 = 0;
     }
     gameBit = state->disableGameBit;

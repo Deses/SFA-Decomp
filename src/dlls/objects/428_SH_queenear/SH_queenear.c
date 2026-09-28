@@ -161,7 +161,7 @@ void sh_queenearthwalker_updatePortal(GameObject* obj, QueenEarthWalkerState* st
 
     player = Obj_GetPlayerObject();
     obj->anim.resetHitboxFlags &= ~INTERACT_FLAG_DISABLED;
-    if (mainGetBit(0xc48) != 0) {
+    if (mainGetBit(GAMEBIT_SH_QueenQuestComplete0C48) != 0) {
         state->eventTable = gQueenEarthWalkerEventTableComplete;
     } else if (mainGetBit(GAMEBIT_SH_Related023C) != 0) {
         state->eventTable = gQueenEarthWalkerEventTablePortalReady;
@@ -170,7 +170,7 @@ void sh_queenearthwalker_updatePortal(GameObject* obj, QueenEarthWalkerState* st
         if (playerHasSpell(player, QUEEN_EARTH_WALKER_PORTAL_SPELL_ID) != 0 &&
             getXZDistanceSquared(&player->anim.worldPosX, &obj->anim.worldPosX) <
                 QUEEN_EARTH_WALKER_PORTAL_SPELL_DISTANCE_SQ) {
-            mainSetBits(0x23b, 1);
+            mainSetBits(GAMEBIT_SH_QueenPortalSpellCast023B, 1);
         }
     } else if (mainGetBit(GAMEBIT_SH_RescuedEggs) != 0) {
         state->eventTable = gQueenEarthWalkerEventTableComplete;

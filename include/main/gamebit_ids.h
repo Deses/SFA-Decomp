@@ -311,6 +311,7 @@ enum GameBitId {
     GAMEBIT_SH_KilledBloop4 = 0x14,                      /* table 1 */
     GAMEBIT_NW_ClimbOnSnowHorn = 0x18,                   /* table 0; climbing onto SnowHorn (will warp you to nearby one) */
     GAMEBIT_NW_ClimbOffSnowHorn = 0x19,                  /* table 0 */
+    GAMEBIT_PlayerPeriodicHitImmune = 0x21,              /* While set the player stops taking the repeating damage surface type 28 deals - the surface handler only runs its periodic-hit timer while this is clear */
     GAMEBIT_SH_FoundQueen = 0x22,                        /* table 2; hint 256 */
     GAMEBIT_SH_SouthCave_Opening = 0x23,                 /* table 2; ref hollow/HitAnimator target */
     GAMEBIT_ITEM_TrickyBall_Bought = 0x25,               /* table 2 */
@@ -351,6 +352,7 @@ enum GameBitId {
     GAMEBIT_SH_WarpStonePathOpen = 0x88,                 /* table 2; did blow up wall leading to WarpStone */
     GAMEBIT_SH_SouthCave_BombPlanted = 0x8A,             /* table 2; ref hollow/BombPlant exists */
     GAMEBIT_SH_WarpStoneBombPlanted = 0x8B,              /* table 2; ref hollow/BombPlant exists */
+    GAMEBIT_CampFireRelated008C = 0x8C,                  /* table 0; read once by CampFire at setup, purely to latch its own CAMPFIRE_STATE_FLAG_GAME_BIT_8C_SET */
     GAMEBIT_TTH_BombPlanted08F = 0x8F,                   /* Rena's U0 dataset; table 2 */
     GAMEBIT_SH_Related0090 = 0x90,                       /* table 2; ref hollow/HitAnimator target */
     GAMEBIT_SH_KilledBloop5 = 0x92,                      /* table 1 */
@@ -383,6 +385,7 @@ enum GameBitId {
     GAMEBIT_SH_KilledBloop15 = 0xC6,                     /* table 1 */
     GAMEBIT_ITEM_Unknown_Got = 0xC7,                     /* table 2; Item name is "Unknown" */
     GAMEBIT_IM_OnBike = 0xC8,                            /* table 1; set when you can actually steer but also during the cutscene of "rescuing" Tricky */
+    GAMEBIT_IM_HudHidden00CB = 0xCB,                     /* Raised where IMIceMounta hides its HUD, the branch opposite the one that raises GAMEBIT_IM_BikeRelated0379 for the world map */
     GAMEBIT_SH_OpenedTunnelToWell = 0xCC,                /* table 2; ref hollow/HitAnimator target */
     GAMEBIT_IMRelated00CE = 0xCE,                        /* table 2 */
     GAMEBIT_WM_GalleonRelated00D0 = 0xD0,                /* table 2 */
@@ -408,6 +411,7 @@ enum GameBitId {
     GAMEBIT_DFSH_ActNo = 0xEF,                           /* table 1; size 4; dfshrine (Test of Combat) */
     GAMEBIT_AnimTest_ActNo = 0xF0,                       /* table 1; size 4 */
     GAMEBIT_CC_SeqNeedBit0F1 = 0xF1,                     /* Rena's U0 dataset; table 2 */
+    GAMEBIT_DIM_SnowHornSeqPending00F3 = 0xF3,           /* The DarkIce SnowHorn latches its sequence-triggered flag on sight of this in its idle state */
     GAMEBIT_SH_KilledBloop16 = 0xF5,                     /* table 1 */
     GAMEBIT_TestCombatClawAlive0F6 = 0xF6,               /* Rena's U0 dataset; table 0 */
     GAMEBIT_TestCombatClawAlive0F7 = 0xF7,               /* Rena's U0 dataset; table 0 */
@@ -438,6 +442,7 @@ enum GameBitId {
     GAMEBIT_TestStrengthTexScrollRelated127 = 0x127,     /* table 0; Rena's U0 name - the Krazoa Test 1 controller raises it from an animation event and on each update, and clears it as the test completes */
     GAMEBIT_WM_KrazTest1Related0128 = 0x128,             /* Krazoa Test 1 - raised by the one anim event whose own #define is named for this bit, which also kicks the DLL's shader stub */
     GAMEBIT_WM_EnteredKrazoaTest1_0129 = 0x129,          /* table 0; set when entering Krazoa test 1, cleared when talking to spirit */
+    GAMEBIT_GPSH_SpiritGranted012B = 0x12B,              /* Raised by the Test of Knowledge shrine's grant-spirit anim event, beside GAMEBIT_ITEM_Spirit5_Got and the switch to its reward map act */
     GAMEBIT_ITEM_TrickyFood_GrabInProgress = 0x12E,      /* Global latch: set by dll_01A7 EdibleMushroom when a GrubTub Fungus offers itself to the player (grab in range), cleared once the grab-complete reply lands and TrickyFood_Count (or the romDefNo-0x658 variant's bit) increments; read by Tricky's food check as a stand-in for already owning TrickyFood */
     GAMEBIT_HintTexts0 = 0x12F,                          /* table 2; size 32; related to hint texts; flags, set when Krystal boards ship */
     GAMEBIT_HintTexts1 = 0x130,                          /* table 2; size 32 */
@@ -536,11 +541,13 @@ enum GameBitId {
     GAMEBIT_WM_KrazTest1AnimState01D2 = 0x1D2,           /* Krazoa Test 1 - driven purely from animation: two anim events exist to set and clear it (their #defines are named for this bit), and init, completion and reset all force it down */
     GAMEBIT_WM_KrazTest1TorchesActive = 0x1D3,           /* Krazoa Test 1 shrine-countdown active; set by dll_019B when the timer starts with no unlocks yet, read by dll_019C torch props to ignite; cleared on test failure */
     GAMEBIT_WM_KrazTest1TimedOut = 0x1D4,                /* Krazoa Test 1 - raised the moment the countdown reaches zero, alongside the timeout sequence, and cleared again on reset */
+    GAMEBIT_WM_KrazTest1KeepSolved01D5 = 0x1D5,          /* Holds GAMEBIT_WM_KrazTest1Solved down: DLL 414 only clears the pass bit at the end of its sequence while this one is clear */
     GAMEBIT_IM_TrickyRelated01D6 = 0x1D6,                /* table 3; set when starting Tricky landing scene, cleared after race */
     GAMEBIT_ITEM_DeletedSpell1D7 = 0x1D7,                /* table 2; in spell bits table but does nothing */
     GAMEBIT_WM_KrazTest1TorchPulse = 0x1D8,              /* Krazoa Test 1 - a one-shot pulse the countdown phase consumes: seeing it raised bumps the controller's unlock count and clears it again, so it counts one torch at a time against GAMEBIT_WM_KrazTest1TorchesActive */
     GAMEBIT_CC_BridgeNeedBit = 0x1D9,                    /* table 2; Rena's U0 name - read by the wall-crawler DLL as an alternative to its proximity test, and by DFP_ForceAw */
     GAMEBIT_CC_BridgeUsedBit = 0x1DA,                    /* Rena's U0 dataset; table 2 */
+    GAMEBIT_DIM_SnowHornSeq4Triggered = 0x1DB,           /* Raised as the DarkIce SnowHorn's trigger case 4 puts it into trigger mode 9, and read back in two of its state handlers */
     GAMEBIT_DIM_ReachedBoss = 0x1DF,                     /* table 1; hint 292 */
     GAMEBIT_DIM_BridgeRelated1E4 = 0x1E4,                /* Rena's U0 dataset; table 2 */
     GAMEBIT_DIM_LocatedCogs = 0x1E5,                     /* table 2; hint 287; ref snowmines/HitAnimator target */
@@ -571,12 +578,14 @@ enum GameBitId {
     GAMEBIT_WM_CrystalRiseStage5 = 0x221,                /* One step of the Warlock Mountain crystal's rise: WM_Crystal walks the whole chain every update and keeps the highest target any set bit asks for, this one raising it to 0x640 */
     GAMEBIT_WM_CrystalRiseStage6 = 0x222,                /* One step of the Warlock Mountain crystal's rise: WM_Crystal walks the whole chain every update and keeps the highest target any set bit asks for, this one raising it to 0x1900, and alone among them it triples the rise rate; once the crystal tops out on this stage it sets GAMEBIT_WM_FinaleQuakeActive */
     GAMEBIT_DIM_FoundBelinaTe = 0x223,                   /* table 2; hint 290 */
+    GAMEBIT_NW_GateKeeperBit224 = 0x224,                 /* Swaps the post-rescue gatekeeper onto its alternative trigger list, the one the code names gNwMammothGatekeeperBit224TriggerList; Rena has it as the target of two snowmines2 HitAnimators */
     GAMEBIT_WC_TrexLever1Activated = 0x226,              /* One of the four wallcity staff levers the T-rex challenge runs on - wclevelcont raises all four at init and again when a run times out, and clears all four as a run starts; Rena has it as wallcity HitAnimator 0x47FED's target and StaffLeverO 0x4CB3D's activated param */
     GAMEBIT_CC_LeverActivated228 = 0x228,                /* Rena's U0 dataset; table 2 */
     GAMEBIT_DIM3_ActNo = 0x229,                          /* table 1; size 4; snowmines3 (unused?) */
     GAMEBIT_ITEM_FireSpellStone1_Used = 0x22B,           /* table 2 */
     GAMEBIT_WC_PlacedSunMoonStones = 0x235,              /* table 2; hint 411 */
     GAMEBIT_SH_MagicCaveVisible = 0x23A,                 /* table 1; ref hollow/MagicCaveTo Visible */
+    GAMEBIT_SH_QueenPortalSpellCast023B = 0x23B,         /* Raised when the player casts the portal spell close enough to the Queen EarthWalker; its neighbour GAMEBIT_SH_Related023C is what then selects her portal-ready event table */
     GAMEBIT_SH_Related023C = 0x23C,                      /* table 2 */
     GAMEBIT_SH_ThornTailRelated023D = 0x23D,             /* table 1; related to ThornTail */
     GAMEBIT_ITEM_SilverKey241_Got = 0x241,               /* table 0 */
@@ -599,6 +608,7 @@ enum GameBitId {
     GAMEBIT_WC_TrexLever2Activated = 0x2A6,              /* One of the four wallcity staff levers the T-rex challenge runs on - wclevelcont raises all four at init and again when a run times out, and clears all four as a run starts; Rena has it as wallcity HitAnimator 0x47FEE's target and StaffLeverO 0x4CB3E's activated param, the same lever GAMEBIT_WC_TrexLever2Enabled switches on */
     GAMEBIT_WC_TrexRunRequested = 0x2B1,                 /* A T-rex run has been asked for: while it is up and the challenge is unbeaten, wclevelcont arms the run, and a timeout clears it */
     GAMEBIT_SH_OpenedGateToCape = 0x2B2,                 /* table 2; ref hollow/StaffLeverO activated */
+    GAMEBIT_TimeListPromptAccepted = 0x2B3,              /* The best-times prompt was answered with its first option; GAMEBIT_TimeListPromptDeclined covers every other answer */
     GAMEBIT_LV_CapturedByLightFoot = 0x2B5,              /* table 2; hint 346 */
     GAMEBIT_LV_TestStrengthBestTime1 = 0x2B6,            /* table 2; size 16 */
     GAMEBIT_LV_TestTrackingBestTime1 = 0x2B7,            /* table 2; size 16 */
@@ -641,12 +651,16 @@ enum GameBitId {
     GAMEBIT_WM_CrystalRumbleActive = 0x370,              /* table 0; raised while the rising crystal is randomly shaking the camera, and dropped the moment the finale quake proper takes over */
     GAMEBIT_KrazTest1Related0372 = 0x372,                /* table 3; set when entering Krazoa test 1, cave beside WarpStone */
     GAMEBIT_DIM2_ObjGroups = 0x373,                      /* table 3; size 32 */
+    GAMEBIT_IM_BikeRelated0374 = 0x374,                  /* Cleared by IMIceMounta's bike teardown, in the run of bits that also drops GAMEBIT_IM_OnBike and closes objgroup 2 */
     GAMEBIT_IM_DoorOpen = 0x377,                         /* table 2; ref newicemount/HitAnimator target */
     GAMEBIT_IM_BikeRelated0378 = 0x378,                  /* table 1; set when approaching SharpClaws in hut, cleared after race */
     GAMEBIT_IM_BikeRelated0379 = 0x379,                  /* table 2; set to 0x19 when finishing race even though max is 1 - in kiosk, related to demo mode - map 0x19 is newicemount3 */
     GAMEBIT_IM_FinishedRace = 0x37A,                     /* table 2; hint 262 */
     GAMEBIT_IMRelated037B = 0x37B,                       /* table 2 */
+    GAMEBIT_IM_BikeRelated037C = 0x37C,                  /* Cleared by IMIceMounta's bike teardown, in the run of bits that also drops GAMEBIT_IM_OnBike and closes objgroup 2 */
     GAMEBIT_IM_HutRelated0382 = 0x382,                   /* table 2; changed when near hut */
+    GAMEBIT_TrickyFoodCellEnabled0384 = 0x384,           /* In map cell 0x38 Tricky only offers to find food while this is up and GAMEBIT_TrickyFoodCellBlocked0385 is down */
+    GAMEBIT_TrickyFoodCellBlocked0385 = 0x385,           /* Blocks Tricky's find-food offer in map cell 0x38 - the negative half of the pair with GAMEBIT_TrickyFoodCellEnabled0384 */
     GAMEBIT_WM_FinaleQuakeActive = 0x38D,                /* Krazoa Palace finale: set by WM_Crystal (dll_020E) once fully risen after the 6th spirit is returned, gating the WM_sun bank-0 quake/envfx countdown until it clears and 0x38F fires */
     GAMEBIT_WM_FinaleQuakeDone = 0x38F,                  /* The Warlock Mountain finale quake has run its course - WM_sun raises it as the quake timer expires and clears GAMEBIT_WM_FinaleQuakeActive, and WM_Crystal frees itself on sight of it */
     GAMEBIT_KrazTest1Related0390 = 0x390,                /* table 3; set when entering Krazoa test 1, cleared when talking to WarpStone */
@@ -738,6 +752,7 @@ enum GameBitId {
     GAMEBIT_CC_FuelCell_494 = 0x494,                     /* Rena's U0 dataset; table 2 */
     GAMEBIT_CC_FuelCell_495 = 0x495,                     /* Rena's U0 dataset; table 2 */
     GAMEBIT_CC_FuelCell_496 = 0x496,                     /* Rena's U0 dataset; table 2 */
+    GAMEBIT_IM_SnowbikeEvent0499 = 0x499,                /* Raised by a snowbike's anim event 2, but only on the bikes that are not the SharpClaw clawbike variants */
     GAMEBIT_SpellStoneRelated049A = 0x49A,               /* table 1 */
     GAMEBIT_CF_DiscoveredGoldMine = 0x49B,               /* table 1; hint 331 */
     GAMEBIT_CF_ObjGroups2 = 0x4A3,                       /* table 3; size 32 */
@@ -761,6 +776,7 @@ enum GameBitId {
     GAMEBIT_OFT_FuelCell_4D9 = 0x4D9,                    /* Rena's U0 dataset; table 2 */
     GAMEBIT_CF_AllPowerBasesPowered = 0x4E0,             /* table 1; set after all three power-base bits are set */
     GAMEBIT_LINKF_FuelCell_4E1 = 0x4E1,                  /* Rena's U0 dataset; table 2 */
+    GAMEBIT_TrickyPathRelated04E2 = 0x4E2,               /* table 3; pi_pathsearch reads it and throws the result away, immediately before checking a Tricky curve node's required and forbidden bits - so retail leaves no clue what it was for */
     GAMEBIT_TrickyTalk = 0x4E3,                          /* table 0; size 8; if < FF, can talk to Tricky, but he won't say anything */
     GAMEBIT_Tricky_Unlocked_Sidekick_Commands = 0x4E4,   /* table 2; DP names this Tricky_Unlocked_Sidekick_Commands; unlocks Tricky's sidekick command menu */
     GAMEBIT_Tricky_Spawns = 0x4E5,                       /* table 2; DP names this Tricky_Spawns; gates Tricky warp-helper/spawn placement */
@@ -775,6 +791,7 @@ enum GameBitId {
     GAMEBIT_CC_FuelCell_510 = 0x510,                     /* Rena's U0 dataset; table 2 */
     GAMEBIT_K1_ReturnPadGuard = 0x511,                   /* table 2; no traced setter */
     GAMEBIT_AnimTest_ObjGroups = 0x517,                  /* table 3; size 32 */
+    GAMEBIT_VFP_DragHeadSpawnBlocked = 0x522,            /* While set, VFPDragHead returns from its spawn path before doing anything at all */
     GAMEBIT_CC_FuelCell_52D = 0x52D,                     /* Rena's U0 dataset; table 2 */
     GAMEBIT_LINKF_FuelCell_52E = 0x52E,                  /* Rena's U0 dataset; table 2 */
     GAMEBIT_LINKF_FuelCell_52F = 0x52F,                  /* Rena's U0 dataset; table 2 */
@@ -792,6 +809,7 @@ enum GameBitId {
     GAMEBIT_DR_KTrexBranchState0 = 0x54A,                /* Galdon T-rex arena branch field 0, a 4-wide field rather than a flag; ktrexlevel_updatePathGameBits writes (2,2,1,1) across the four when GAMEBIT_DR_KTrexPathA is up and (1,1,2,2) for path B, and ktrexlevel_clearPathGameBits zeroes all four - there are as many of these as the arena has lanes, but nothing in the code pins a field to a lane */
     GAMEBIT_DR_KTrexBranchState1 = 0x54E,                /* Galdon T-rex arena branch field 1; takes the same value as field 0 in both path layouts */
     GAMEBIT_DR_KTrexBranchState2 = 0x552,                /* Galdon T-rex arena branch field 2; takes the value opposite fields 0 and 1 */
+    GAMEBIT_DR_KTrexFootfallShake = 0x554,               /* table 0; raised at each of the three points K-Rex's footfalls enable the camera shake */
     GAMEBIT_DR_KTrexBranchState3 = 0x556,                /* Galdon T-rex arena branch field 3; moves with field 2 */
     GAMEBIT_DR_KTrexPathA = 0x55A,                       /* Dragon Rock K-Trex (Galdon) arena - path A active; toggles with 0x55b when a floor plate is charged to max, selecting which branch-path bits ktrexlevel applies */
     GAMEBIT_DR_KTrexPathB = 0x55B,                       /* Alternate branch-path selector for the Galdon T-rex arena (Dragon Rock); mutually exclusive with 0x55a, set when a floor switch's charge cycle maxes out and polled by ktrexlevel_updatePathGameBits to choose the arena's second path-bit layout */
@@ -811,6 +829,7 @@ enum GameBitId {
     GAMEBIT_ITEM_AlpineRoot_Used = 0x578,                /* table 2; size 3 */
     GAMEBIT_LINKE_FuelCell_57E = 0x57E,                  /* Rena's U0 dataset; table 2 */
     GAMEBIT_VFP_FuelCell_588 = 0x588,                    /* Rena's U0 dataset; table 2 */
+    GAMEBIT_DFSH_ShrineIdle = 0x589,                     /* table 0; the Test of Combat shrine is idle and available - dropped the moment the player activates it, and put back at reset */
     GAMEBIT_NoMapData = 0x58D,                           /* table 0; Force No Map Data */
     GAMEBIT_ITEM_MapVFP_Got = 0x59D,                     /* table 2; Have Volcano Force Point Map */
     GAMEBIT_ITEM_MapDIM_Got = 0x59E,                     /* table 2; Have DarkIce Mines Map */
@@ -835,6 +854,7 @@ enum GameBitId {
     GAMEBIT_DR_Creator_Related05DD = 0x5DD,              /* set to 0 when DR_Creator spawns; Rena's U0 dataset; table 0 */
     GAMEBIT_OFP_SparkPrereqA05E0 = 0x5E0,                /* table 0; one of the two halves GAMEBIT_OFP_SparkLatch05E3 waits on */
     GAMEBIT_OFP_SparkPrereqB05E1 = 0x5E1,                /* table 0; the other half of GAMEBIT_OFP_SparkLatch05E3's pair */
+    GAMEBIT_OFP_TorchSequenceStage2 = 0x5E2,             /* Raised as the DFP torch sequence reaches its stage 2, when the second-colour torch's own placement bit comes up */
     GAMEBIT_OFP_SparkLatch05E3 = 0x5E3,                  /* Spark latch: DFP_LevelCo plays SFXTRIG_wp_espk2_c and latches it the first update both halves of its pair are up; the check runs in both the act 1 and act 2 paths */
     GAMEBIT_OFP_PuzzlePadShowSolution = 0x5E4,           /* Ocean Force Point electric-floor solution display is active while the puzzle pad is pressed */
     GAMEBIT_OFP_ZappedByFloorTiles = 0x5E5,              /* player stepped on an electrified Ocean Force Point floor tile */
@@ -881,6 +901,7 @@ enum GameBitId {
     GAMEBIT_SC_TotemRunCompleted = 0x63E,                /* A timed totem run carried through to its fade-out, as against GAMEBIT_SC_TimedRunExited for the exit path; with GAMEBIT_LV_ChiefTestDone0627 it is what raises GAMEBIT_LV_DoneTests, making it one of the chief's two tests */
     GAMEBIT_SC_TimedRunExited = 0x640,                   /* Raised when a timed totem run ends down the exit path instead of the fade-out - the run's other ending */
     GAMEBIT_TumbleweedRelated642 = 0x642,                /* table 0 */
+    GAMEBIT_PlayerTouchedSurface31 = 0x643,              /* Raised by the player's surface handler for surface type 31 and nothing else */
     GAMEBIT_ITEM_LVBlock2_Used = 0x647,                  /* table 2; ref swapcircle/SC_blockpla open */
     GAMEBIT_SH_Landed064B = 0x64B,                       /* table 0; set when Fox first steps foot on the planet; cleared after Pepper scene */
     GAMEBIT_SC_TotemBondRing0 = 0x64D,                   /* LightFoot Village totem-bond puzzle - ring slot 0 bonded, gTotemBondRingGameBits[0]; set to 1 when the ring is bonded and passed as the spawned orb's activeGameBit */
@@ -943,11 +964,15 @@ enum GameBitId {
     GAMEBIT_DR_ActNo = 0x76E,                            /* table 1; size 4 */
     GAMEBIT_DRBOT_ActNo = 0x76F,                         /* table 1; size 4 */
     GAMEBIT_ITEM_DeletedSpell777_Got = 0x777,            /* table 2; in spell bits table but does nothing */
+    GAMEBIT_TimeListPromptDeclined = 0x781,              /* The best-times prompt was answered with anything other than its first option - see GAMEBIT_TimeListPromptAccepted */
     GAMEBIT_DRBOT_HoverPadHalted = 0x788,                /* Raised at both points DLL 625 brings the hover pad to a halt: code 4 with the route closed, and code 15 with the pad's b40 flag down */
+    GAMEBIT_WallCrawlerSpeedLevel = 0x789,               /* table 1; a speed level, not a flag: the wall crawler reads it straight into its speed cap as 0.1 * level + 0.1 */
     GAMEBIT_OFP_SparkLatch0792 = 0x792,                  /* The same spark latch shape as GAMEBIT_OFP_SparkLatch05E3, but waiting on GAMEBIT_OFB_PinPonDeadB8C - which retail tests twice in the one condition */
     GAMEBIT_OFP_LoadBlockSlidePuzzle2 = 0x7A1,           /* loads Ocean Force Point object group 6, the lower block-slide puzzle */
     GAMEBIT_DR_HighTop_JumpingOn = 0x7A4,                /* Rena's kiosk dataset; table 1 */
     GAMEBIT_OFB_StaffBoostEnabled7A8 = 0x7A8,            /* Rena's U0 dataset; table 2 */
+    GAMEBIT_DR_CloudRunnerCurveSlot = 0x7A9,             /* table 1; a stored curve slot, not a flag: a spawning CloudRunner reads it and, if non-zero, places itself at curve action target slot + 0x13 */
+    GAMEBIT_DR_CloudRunnerAirTime = 0x7AA,               /* table 1; a stored value: DR_CloudRunner_free writes its remaining air time straight into it, and DLL 620 seeds it with 5 */
     GAMEBIT_DRBOT_HoverPadRelated07BA = 0x7BA,           /* The Drakor hover pad's curve carries event codes, and this is one of the bits DLL 625 writes as the pad runs them - raised by code 2 and read nowhere in the code */
     GAMEBIT_DR_EarthWarriorUnknown_2 = 0x7BC,            /* set by DR_EarthWar.c when mounted and cleared when dismounted */
     GAMEBIT_ITEM_SpellStone7BD_Got = 0x7BD,              /* table 2; unused? */
@@ -969,6 +994,7 @@ enum GameBitId {
     GAMEBIT_WC_LitBeacons = 0x7F8,                       /* table 2; hint 362; ref wallcity/HitAnimator target */
     GAMEBIT_WC_TimedPuzzleASolved = 0x7F9,               /* Walled City timed push-block puzzle A solved; ends the 0x3C countdown, and if puzzle B is also solved wclevelcont plays the confirm sfx and runs sequence 0 instead of sequence 1 */
     GAMEBIT_WC_TimedPuzzleBSolved = 0x7FA,               /* Walled City timed push-block puzzle B solved; ends the 0x50 countdown, and pairs with puzzle A to pick the confirm sfx and sequence 0 */
+    GAMEBIT_WC_EarthWalkerTalked = 0x7FB,                /* Raised the first time the player activates the Walled City EarthWalker; Rena has it as wallcity HitAnimator 0x4B707's target */
     GAMEBIT_WC_FoundKing = 0x7FC,                        /* table 2; hint 363 */
     GAMEBIT_WC_TimedPuzzleBComplete = 0x802,             /* Walled City timed push-block puzzle B fully complete; the puzzle-B mirror of 0x7F7, also saving a checkpoint */
     GAMEBIT_WC_PushBlockAFade = 0x808,                   /* Push-block puzzle A's fade flag, aliased locally in dll_0290_wcpushblock.h as WCPUSHBLOCK_GAMEBIT_A_FADE */
@@ -999,6 +1025,8 @@ enum GameBitId {
     GAMEBIT_SH_WarpStoneRelated0884 = 0x884,             /* table 2 */
     GAMEBIT_ITEM_RockCandyRelated0886 = 0x886,           /* table 2; related to rock candy */
     GAMEBIT_SH_SawWarpStoneIntro = 0x887,                /* table 2 */
+    GAMEBIT_MMP_AsteroidRelated088B = 0x88B,             /* Cleared by the Moon Mountain Pass asteroid once its own clear-timer runs out, with nothing in the code setting it */
+    GAMEBIT_MMP_AsteroidIntensity = 0x88C,               /* An intensity level, not a flag: the asteroid reads it straight into its intensity field, except while GAMEBIT_MMP_AsteroidForceIntensity overrides it to 1 */
     GAMEBIT_MMP_MovedMeteor = 0x89B,                     /* table 2; hint 310; ref moonpass/HitAnimator target */
     GAMEBIT_ITEM_Spirit3_Released = 0x8A0,               /* table 2; hint 357: "Released Third Krazoa Spirit" */
     GAMEBIT_WM_Warp1Enabled = 0x8A1,                     /* table 2; ref warlock/Transporter enabled */
@@ -1027,6 +1055,8 @@ enum GameBitId {
     GAMEBIT_LearnedToSpeak = 0x92A,                      /* table 2; Told how to speak to NPCs */
     GAMEBIT_SawCMenuExplanation = 0x930,                 /* table 2 */
     GAMEBIT_CC_Seq931 = 0x931,                           /* Rena's U0 dataset; table 2 */
+    GAMEBIT_CF_KytesMumRelated0933 = 0x933,              /* table 1; cleared as Kyte's mum enters either of her quest modes, beside GAMEBIT_CF_KytesMumRelated0934 */
+    GAMEBIT_CF_KytesMumRelated0934 = 0x934,              /* table 1; cleared as Kyte's mum enters either of her quest modes */
     GAMEBIT_CF_EscapedDungeon = 0x939,                   /* table 2; hint 327; Exploded dungeon ceiling to be able to get disguise */
     GAMEBIT_CF_RescuedBabies = 0x940,                    /* table 2; hint 330 */
     GAMEBIT_CF_BabyRelated941 = 0x941,                   /* Rena's U0 dataset; table 2 */
@@ -1059,6 +1089,7 @@ enum GameBitId {
     GAMEBIT_WM_KrystalTalkedToDinoAfterTest1 = 0x9AB,    /* table 2 */
     GAMEBIT_VFP_PodiumPrereq09B1 = 0x9B1,                /* One of the two bits VFP_LevelCo waits on before it raises GAMEBIT_VFP_PodiumsActivated */
     GAMEBIT_VFP_PodiumPrereq09B2 = 0x9B2,                /* The other bit GAMEBIT_VFP_PodiumsActivated waits on */
+    GAMEBIT_DR_GeneratorArmed09B9 = 0x9B9,               /* The Dragon Rock generator latches its own armed flag the first update it sees this set */
     GAMEBIT_DR_HighTopSwitch1 = 0x9C7,                   /* table 1 */
     GAMEBIT_DR_HighTopSwitch2 = 0x9C9,                   /* table 1 */
     GAMEBIT_DR_HighTopSwitch3 = 0x9CB,                   /* table 1 */
@@ -1165,9 +1196,13 @@ enum GameBitId {
     GAMEBIT_CF_SeqB63 = 0xB63,                           /* Rena's U0 dataset; table 2 */
     GAMEBIT_CF_SeqB64 = 0xB64,                           /* Rena's U0 dataset; table 2 */
     GAMEBIT_CFRelated0B6C = 0xB6C,                       /* table 1 */
+    GAMEBIT_DFSH_TestFailed = 0xB70,                     /* table 0; raised where the Test of Combat shrine reaches its post-finish state without success, on the way to reset */
+    GAMEBIT_DFSH_Related0B71 = 0xB71,                    /* table 0; the Test of Combat shrine only ever clears it, as part of its reset block */
+    GAMEBIT_DFSH_RewardAnimTarget0B76 = 0xB76,           /* Raised as the Test of Combat shrine opens and starts its 0xD2-tick countdown, and cleared on both ways out; Rena has it as dfshrine HitAnimator 0x482BF's target */
     GAMEBIT_DIM2_ClawDeadB77 = 0xB77,                    /* Rena's U0 dataset; table 2 */
     GAMEBIT_DIM2_ClawDeadB78 = 0xB78,                    /* Rena's U0 dataset; table 2 */
     GAMEBIT_DIM2_ClawDeadB79 = 0xB79,                    /* Rena's U0 dataset; table 2 */
+    GAMEBIT_SequenceLatch0B7D = 0xB7D,                   /* Read by DLL 604's sequence case 4, purely to raise that sequence's latch A */
     GAMEBIT_LINKA_ActNo = 0xB81,                         /* table 1; size 4 */
     GAMEBIT_WM_ClawDeadB83 = 0xB83,                      /* Rena's U0 dataset; table 2 */
     GAMEBIT_WM_ClawDeadB84 = 0xB84,                      /* Rena's U0 dataset; table 2 */
@@ -1247,6 +1282,7 @@ enum GameBitId {
     GAMEBIT_WC_RedEyeDeadC33 = 0xC33,                    /* Rena's U0 dataset; table 2 */
     GAMEBIT_WC_RedEyeDeadC34 = 0xC34,                    /* Rena's U0 dataset; table 2 */
     GAMEBIT_WC_RedEyeDeadC35 = 0xC35,                    /* Rena's U0 dataset; table 2 */
+    GAMEBIT_WC_EarthWalkerTopic0C36 = 0xC36,             /* One rung of the Walled City EarthWalker's topic chain, picked when the rung above it is clear; Rena has it as wallcity HitAnimator 0x49935's target */
     GAMEBIT_WC_FinalSequenceReward = 0xC37,              /* Walled City - set when the final sequence completes; Rena records it as the target of wallcity's HitAnimator */
     GAMEBIT_LV_ChallengeGate1Baby0Delivered = 0xC38,     /* LightFoot challenge gate 1 (ident 0x46A51) - first of the three baby-LightFoot 'delivered' flags it requires; the trio gated by GAMEBIT_LV_ChallengeGate1BabiesActive carries these (pairing is by elimination, gate 1's trio has no inline triple check) */
     GAMEBIT_LV_ChallengeGate1Baby1Delivered = 0xC39,     /* LightFoot challenge gate 1 - second baby-LightFoot delivered flag */
@@ -1260,6 +1296,7 @@ enum GameBitId {
     GAMEBIT_LV_ChallengeGate2BabiesActive = 0xC42,       /* Challenge gate 2's baby-LightFoot trio (idents 0x499AC/AE/AF) is in play; while clear, 437.c hides and un-hits each of those babies instead of tracking its delivered flag */
     GAMEBIT_LV_ChallengeGate1BabiesActive = 0xC44,       /* Challenge gate 1's baby-LightFoot trio (idents 0x4993F-0x49941) is in play; the gate-1 counterpart of GAMEBIT_LV_ChallengeGate2BabiesActive */
     GAMEBIT_SC_ChallengeGate3BabiesActive = 0xC46,       /* Challenge gate 3's baby-LightFoot trio (idents 0x499B0-0x499B2) is in play */
+    GAMEBIT_SH_QueenQuestComplete0C48 = 0xC48,           /* Top of the Queen EarthWalker's event-table chain: while set she uses the same completed table GAMEBIT_SH_RescuedEggs selects, ahead of every portal state */
     GAMEBIT_LV_ChallengeGate1TargetHit = 0xC49,          /* One-shot: challenge gate 1's reward sequence has been seen through to its target hit - Lightfoot_RecordCompletedChallengeTargetHit latches it once challengeCompletePending is up and the hit flag arrives */
     GAMEBIT_LV_ChallengeGate2TargetHit = 0xC4A,          /* One-shot: challenge gate 2's reward sequence reached its target hit */
     GAMEBIT_SC_ChallengeGate3TargetHit = 0xC4B,          /* One-shot: challenge gate 3's reward sequence reached its target hit */
@@ -1284,6 +1321,7 @@ enum GameBitId {
     GAMEBIT_ITEM_Spirit5_Got = 0xC85,                    /* table 2; hint 417 */
     GAMEBIT_LINKE_TunnelOpen = 0xC8B,                    /* table 2; broke open wind tunnel in LinkE */
     GAMEBIT_ITEM_PDA_Got = 0xC8D,                        /* table 2; Set when landing at TTH */
+    GAMEBIT_WC_EarthWalkerTopic0C90 = 0xC90,             /* The rung above GAMEBIT_WC_EarthWalkerTopic0C36 in the Walled City EarthWalker's topic chain */
     GAMEBIT_GPSH_TestKnowledgeCompleted = 0xC91,         /* set when the Test of Knowledge succeeds; GPSH free keeps the shrine music lock active until this bit is set */
     GAMEBIT_Tricky_SaidGoodBye = 0xC92,                  /* table 2; hint 418 */
     GAMEBIT_SHBOT_BombPlantedC99 = 0xC99,                /* Rena's U0 dataset; table 2 */
@@ -1366,6 +1404,7 @@ enum GameBitId {
     GAMEBIT_SH_BloopEventDone = 0xD39,                   /* table 2 */
     GAMEBIT_CFRestartPointRelated0D3D = 0xD3D,           /* table 1 */
     GAMEBIT_VFPLightRelated0D44 = 0xD44,                 /* table 3; ref temple/LGTDirectio 0x1E */
+    GAMEBIT_MMP_AsteroidForceIntensity = 0xD52,          /* Pins the Moon Mountain Pass asteroid's intensity at 1 regardless of GAMEBIT_MMP_AsteroidIntensity; Rena has it as moonpass HitAnimator 0x4B451's target */
     GAMEBIT_WarpPointRelatedD53 = 0xD53,                 /* table 1 */
     GAMEBIT_OFT_ClawAliveD56 = 0xD56,                    /* Rena's U0 dataset; table 2 */
     GAMEBIT_CF_SeqD65 = 0xD65,                           /* Rena's U0 dataset; table 0 */
@@ -1438,8 +1477,10 @@ enum GameBitId {
     GAMEBIT_DR_RobotGenerator2Destroyed = 0xE31,         /* Second Dragon Rock robot generator destroyed */
     GAMEBIT_DR_RobotGenerator3Destroyed = 0xE32,         /* Third Dragon Rock robot generator destroyed */
     GAMEBIT_DR_RobotGenerator4Destroyed = 0xE33,         /* Fourth Dragon Rock robot generator destroyed */
+    GAMEBIT_GPSH_TestKnowledgeFailed = 0xE37,            /* table 0; raised as the Test of Knowledge takes its fail transition, in the same breath as clearing GAMEBIT_GPSH_TestKnowledgeRunning, and cleared again by the reset block */
     GAMEBIT_DR_Robot1Destroyed = 0xE38,                  /* First of the four Dragon Rock robots taken down once their shields are off; drmusiccont_update chimes this quad exactly as it does the generators, and the four sit contiguously in save storage immediately before GAMEBIT_DR_DestroyedRobots - Rena records no map objref, so the per-robot pairing is from that adjacency and the shared chime logic */
     GAMEBIT_DR_RobotsDestroyedChimePlayed = 0xE39,       /* Latch stopping the all-four-robots jingle from replaying; drmusiccont only reads it, seeding its shadow copy at init and thereafter raising the shadow alone, so nothing in the DLL writes the bit back */
+    GAMEBIT_GPSH_Related0E3A = 0xE3A,                    /* table 0; the Test of Knowledge shrine only ever clears it, in its reset block */
     GAMEBIT_DR_Robot2Destroyed = 0xE3C,                  /* Second Dragon Rock robot destroyed */
     GAMEBIT_DR_Robot3Destroyed = 0xE3D,                  /* Third Dragon Rock robot destroyed */
     GAMEBIT_DR_Robot4Destroyed = 0xE3E,                  /* Fourth Dragon Rock robot destroyed */
@@ -1493,14 +1534,17 @@ enum GameBitId {
     GAMEBIT_NW_GateKeeperCommsPlayed = 0xEA7,            /* one-shot incoming-communication latch in the SnowHorn Gate Keeper post-rescue/default dialogue path */
     GAMEBIT_SH_Give200ScarabBag = 0xEA8,                 /* table 2; Triggers a respawn point save */
     GAMEBIT_SH_GiveMoonPassKey = 0xEA9,                  /* table 2; Triggers a respawn point save */
+    GAMEBIT_WM_SpiritPlaceShifted0EAF = 0xEAF,           /* One of three conditions - with GAMEBIT_WM_FoundKrystal and a map act above 2 - that shift the WM spirit placement 25 units along X */
     GAMEBIT_ITEM_BadGuyAlert_Got = 0xEB0,                /* table 2; unused shop item */
     GAMEBIT_ITEM_Magic_Got = 0xEB1,                      /* table 2 */
     GAMEBIT_ITEM_BafomdadHolder_Got = 0xEB2,             /* table 2 */
     GAMEBIT_SH_Related0EB3 = 0xEB3,                      /* table 2 */
     GAMEBIT_WM_SeqEB4 = 0xEB4,                           /* Rena's U0 dataset; table 2 */
     GAMEBIT_ITEM_Flute_Disabled = 0xEB5,                 /* table 2 */
+    GAMEBIT_CF_KytesMumQuestStage1 = 0xEB9,              /* Written as a boolean of Kyte's mum's quest count being exactly 1, so it tracks her first quest stage; Rena has it as fortress HitAnimator 0x4CD31's target */
     GAMEBIT_ECSH_CameraLookingAtDoor = 0xECA,            /* table 2; focuses camera on door */
     GAMEBIT_NW_EscapedFromSnowClearing = 0xECC,          /* table 0; hint 265 */
+    GAMEBIT_NW_WalkSequenceRunning = 0xECD,              /* table 0; raised as NW_levcontr starts its walk-table sequence off GAMEBIT_SnowHornArtifact19D, and cleared again by its cleanup mode */
     GAMEBIT_VFP_Entered = 0xECE,                         /* table 0; hint 301 */
     GAMEBIT_FoundSpellStoneWarpPad_0ECF = 0xECF,         /* table 0; hint 304 */
     GAMEBIT_OFP_FoundSpellStoneWarpPad = 0xED0,          /* table 0; hint 341 */
@@ -1514,6 +1558,7 @@ enum GameBitId {
     GAMEBIT_WC_FinalPuzzleRelated0EEC = 0xEEC,           /* Cleared alongside the stopwatch and animator bits as the Walled City final puzzle completes; nothing in the code sets it or reads it, and Rena records no objref */
     GAMEBIT_WC_TrexAnimTarget0EF1 = 0xEF1,               /* Wallcity HitAnimator 0x4CB88's target - raised while a T-rex run is being armed and cleared on both of the run's endings */
     GAMEBIT_VFP_EnvironmentRelated0EF6 = 0xEF6,           /* table 2; transporter-controlled VFP environment state */
+    GAMEBIT_OFP_SeqPointTriggered0EF7 = 0xEF7,           /* Raised by DFP_seqpoin the update its own pending flag comes up, which it then clears */
     GAMEBIT_IN_KRAZOA_SHRINE = 0xEFA,                    /* table 0; set while any Krazoa shrine test is active */
     GAMEBIT_MC_IsActive = 0xEFB,                         /* table 0; set while the Magic Cave interior is active; selects SFX global control 0xD */
     GAMEBIT_MAZEWELL_ACTIVE = 0xEFC,                     /* table 0; Music_Trigger(0x36) + Well active/hitbox state */
@@ -1523,6 +1568,7 @@ enum GameBitId {
     GAMEBIT_DR_FireCrawlerDeadF00 = 0xF00,               /* Rena's U0 dataset; table 2 */
     GAMEBIT_LV_LocatedKrazoaShrine = 0xF07,              /* table 0; hint 351 */
     GAMEBIT_NW_DidPadHornTest = 0xF08,                   /* table 0; hint 379 */
+    GAMEBIT_PlayerBoardedVehicle0F0A = 0xF0A,            /* table 0; raised where the player boards vehicle type 0x72, and only while standing in map cell 0x13 */
     GAMEBIT_DR_MusicLatch0F0E = 0xF0E,                   /* Dragon Rock - drmusiccont's GameBitLatch condition for music trigger 0xE5, cleared by 0x1A7 when set and by GAMEBIT_SH_Landed064B when clear */
     GAMEBIT_MapBits = 0xF10,                             /* table 2; up to F1C? */
     GAMEBIT_WorldMap_DragonRock = 0xF11,                 /* Rena's U0 dataset; table 2 */

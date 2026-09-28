@@ -8,6 +8,7 @@
 #include "dlls/object_descriptor.h"
 #include "main/frame_timing.h"
 #include "main/dll/player_api.h"
+#include "main/gamebit_ids.h"
 #include "main/gamebits.h"
 #include "main/objtype.h"
 #include "main/object_render.h"
@@ -374,7 +375,7 @@ int snowclaw_animEventCallback(GameObject* obj, int a2, ObjSeqState* seq)
             s->dropIndex = -1;
             break;
         case 4:
-            if (mainGetBit(0xb7d) != 0)
+            if (mainGetBit(GAMEBIT_SequenceLatch0B7D) != 0)
             {
                 seq->sequenceControlFlags |= OBJSEQ_CONTROL_SET_LATCH_A;
             }

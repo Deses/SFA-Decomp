@@ -250,7 +250,7 @@ void DR_CageWith_init(GameObject* obj, DrcagewithPlacement* placement)
         }
         else
         {
-            mainSetBits(0x7aa, 5);
+            mainSetBits(GAMEBIT_DR_CloudRunnerAirTime, 5);
         }
         obj->anim.rotX = (s16)(placement->initRotXByte << 8);
         state->unk8 = placement->unk1C;

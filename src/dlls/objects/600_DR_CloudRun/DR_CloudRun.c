@@ -27,6 +27,7 @@
 #include "sys/objects/lifecycle.h"
 #include "main/frame_timing.h"
 #include "MSL_C/PPCEABI/bare/H/math_api.h"
+#include "main/gamebit_ids.h"
 #include "main/gamebits.h"
 #include "main/game_ui_interface.h"
 #include "main/mapEventTypes.h"
@@ -912,7 +913,7 @@ int DR_CloudRunner_getObjectTypeId(void) {
 
 void DR_CloudRunner_free(GameObject* obj) {
     CloudRunnerState* inner = obj->extra;
-    mainSetBits(0x7aa, inner->airTimeRemaining);
+    mainSetBits(GAMEBIT_DR_CloudRunnerAirTime, inner->airTimeRemaining);
     objFreeObjectType(obj, VEHICLE_OBJECT_GROUP);
     objFreeObjectType(obj, PLAYER_VEHICLE_OBJGROUP);
     (*gGameUIInterface)->airMeterShutdown();
@@ -1086,7 +1087,7 @@ void DR_CloudRunner_init(GameObject* obj, DRCloudRunnerPlacement* def) {
     if (obj->anim.modelState != NULL) {
         obj->anim.modelState->flags |= 0xa10;
     }
-    savedSlot = mainGetBit(0x7a9);
+    savedSlot = mainGetBit(GAMEBIT_DR_CloudRunnerCurveSlot);
     if (savedSlot != 0) {
         dll_2E_getCurveActionTarget(savedSlot + 0x13, &target);
         obj->anim.localPosX = target.x;

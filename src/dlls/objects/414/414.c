@@ -271,7 +271,7 @@ void dll414_update(GameObject* obj) {
                     gDll19ESequenceStage = DLL19E_SEQUENCE_STAGE_NONE;
                 }
                 if ((gDll19ESequenceStage == DLL19E_SEQUENCE_STAGE_COMPLETE) && (state->sequenceIndex == 2) &&
-                    (mainGetBit(0x1d5) == 0)) {
+                    (mainGetBit(GAMEBIT_WM_KrazTest1KeepSolved01D5) == 0)) {
                     mainSetBits(GAMEBIT_WM_KrazTest1Solved, 0);
                     gDll19ESequenceStage = DLL19E_SEQUENCE_STAGE_NONE;
                 }

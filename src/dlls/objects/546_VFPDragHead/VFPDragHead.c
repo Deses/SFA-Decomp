@@ -4,6 +4,7 @@
 #include "main/dll/modgfx_interface.h"
 #include "main/dll/partfx_interface.h"
 #include "main/frame_timing.h"
+#include "main/gamebit_ids.h"
 #include "main/gamebits.h"
 #include "main/objhits.h"
 #include "main/resource.h"
@@ -110,7 +111,7 @@ void VFPDragHead_update(GameObject* obj)
     {
         self2 = obj->extra;
         gVfpDragHeadSpawnTimer -= (s16)timeDelta;
-        if (mainGetBit(0x522) != 0)
+        if (mainGetBit(GAMEBIT_VFP_DragHeadSpawnBlocked) != 0)
             return;
         if (gVfpDragHeadSpawnTimer > 0xc8)
             return;

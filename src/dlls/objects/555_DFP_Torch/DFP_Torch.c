@@ -11,6 +11,7 @@
 #include "main/dll_000A_expgfx.h"
 #include "main/dll/modgfx_interface.h"
 #include "main/resource.h"
+#include "main/gamebit_ids.h"
 #include "main/gamebits.h"
 #include "main/camera.h"
 #include "main/audio/sfx_trigger_ids.h"
@@ -173,7 +174,7 @@ void DFP_Torch_update(GameObject* obj) {
                     gDfpTorchSequenceState = 1;
                 }
                 if ((s8)gDfpTorchSequenceState == 1 && state->colorIdx == 1 && mainGetBit(state->gameBit) != 0) {
-                    mainSetBits(0x5e2, 1);
+                    mainSetBits(GAMEBIT_OFP_TorchSequenceStage2, 1);
                     gDfpTorchSequenceState = 2;
                 }
                 state->sfxPending = 1;
@@ -190,8 +191,9 @@ void DFP_Torch_update(GameObject* obj) {
                 if ((s8)gDfpTorchSequenceState == 1 && state->colorIdx == 0) {
                     gDfpTorchSequenceState = 0;
                 }
-                if ((s8)gDfpTorchSequenceState == 2 && state->colorIdx == 1 && mainGetBit(0x5e2) == 0) {
-                    mainSetBits(0x5e2, 0);
+                if ((s8)gDfpTorchSequenceState == 2 && state->colorIdx == 1 &&
+                    mainGetBit(GAMEBIT_OFP_TorchSequenceStage2) == 0) {
+                    mainSetBits(GAMEBIT_OFP_TorchSequenceStage2, 0);
                     gDfpTorchSequenceState = 0;
                 }
             }
