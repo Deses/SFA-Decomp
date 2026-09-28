@@ -438,7 +438,7 @@ void NW_mammoth_updateGatekeeper(GameObject* obj, NwMammothState* state, NwMammo
         break;
     case NW_MAMMOTH_STATE_GATEKEEPER_POST_RESCUE:
     default:
-        if (mainGetBit(GAMEBIT_NW_GateKeeperBit224) != 0) {
+        if (mainGetBit(GAMEBIT_MammothVariantZero0224) != 0) {
             state->triggerList = gNwMammothGatekeeperBit224TriggerList;
         } else {
             if (mainGetBit(GAMEBIT_NW_GateKeeperCommsPlayed) == 0) {

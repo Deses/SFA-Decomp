@@ -254,20 +254,20 @@ void WM_LevelControl_init(GameObject* obj) {
         (*gMapEventInterface)->setObjGroupStatus(WM_LEVEL_CONTROL_MAP_LIGHTFOOT, 0, 1);
         break;
     case 2:
-        mainSetBits(GAMEBIT_WMRelated0D1B, 1);
+        mainSetBits(GAMEBIT_WM_SeqPointSpirit1, 1);
         mainSetBits(GAMEBIT_SH_ReturnedToWarpStone, 1);
         mainSetBits(GAMEBIT_WM_Warp3Enabled, 1);
         mainSetBits(GAMEBIT_WM_Warp4Enabled, 0);
         break;
     case 3:
-        mainSetBits(GAMEBIT_WMRelated0D1B, 1);
+        mainSetBits(GAMEBIT_WM_SeqPointSpirit1, 1);
         mainSetBits(GAMEBIT_WMRelated0D1C, 1);
         mainSetBits(GAMEBIT_WMRelated0A7F, 1);
         mainSetBits(GAMEBIT_WM_Warp3Enabled, 0);
         mainSetBits(GAMEBIT_WM_Warp4Enabled, 1);
         break;
     case 4:
-        mainSetBits(GAMEBIT_WMRelated0D1B, 1);
+        mainSetBits(GAMEBIT_WM_SeqPointSpirit1, 1);
         mainSetBits(GAMEBIT_WMRelated0D1C, 1);
         mainSetBits(GAMEBIT_WMRelated0D1D, 1);
         mainSetBits(GAMEBIT_WMRelated0A7F, 1);
@@ -276,7 +276,7 @@ void WM_LevelControl_init(GameObject* obj) {
         state->mode4SpiritMarker = -1;
         break;
     case 5:
-        mainSetBits(GAMEBIT_WMRelated0D1B, 1);
+        mainSetBits(GAMEBIT_WM_SeqPointSpirit1, 1);
         mainSetBits(GAMEBIT_WMRelated0D1C, 1);
         mainSetBits(GAMEBIT_WMRelated0D1D, 1);
         mainSetBits(GAMEBIT_WMRelated0D1E, 1);
@@ -284,7 +284,7 @@ void WM_LevelControl_init(GameObject* obj) {
         mainSetBits(GAMEBIT_WM_Warp4Enabled, 1);
         break;
     case 6:
-        mainSetBits(GAMEBIT_WMRelated0D1B, 1);
+        mainSetBits(GAMEBIT_WM_SeqPointSpirit1, 1);
         mainSetBits(GAMEBIT_WMRelated0D1C, 1);
         mainSetBits(GAMEBIT_WMRelated0D1D, 1);
         mainSetBits(GAMEBIT_WMRelated0D1E, 1);

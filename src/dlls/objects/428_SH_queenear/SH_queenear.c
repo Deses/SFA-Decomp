@@ -311,7 +311,7 @@ void sh_queenearthwalker_update(GameObject* obj) {
             characterHeadLookCalm(obj, (s16*)&state->look, QUEEN_EARTH_WALKER_HEAD_LOOK_BLEND);
             break;
         case 7:
-            if (mainGetBit(GAMEBIT_TTH_SeqNeedBit199) != 0) {
+            if (mainGetBit(GAMEBIT_TTH_ThornTailTriggerAct7) != 0) {
                 state->eventTable = gQueenEarthWalkerEventTableComplete;
             } else {
                 state->eventTable = gQueenEarthWalkerEventTableBerry;

@@ -14648,7 +14648,7 @@ int player_SeqFn(int obj, int obj2, ObjSeqState* seq, int endFlag) {
                     case 0x72:
                     case SNOWBIKE_CR_BIKE_OBJ:
                         Music_Trigger(MUSICTRIG_drako_2, 1);
-                        mainSetBits(GAMEBIT_DIM_BossRelated0C1F, 0);
+                        mainSetBits(GAMEBIT_DIM_WarpActive0C1F, 0);
                         ((PlayerState*)inner)->moveSequence = (s16*)(tbl + 0x3f0);
                         ((PlayerState*)inner)->moveSequenceFlags = 3;
                         ObjAnim_SetCurrentMove((void*)obj, 0x17, 0.0f, 1);

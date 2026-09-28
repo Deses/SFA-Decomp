@@ -76,7 +76,7 @@ void SB_CageKyte_update(GameObject* obj) {
 
     if (state->chirpTimer <= 0) {
         (void)randomGetRange(0, 10);
-        if (mainGetBit(GAMEBIT_SBRelated0A71) == 0u) {
+        if (mainGetBit(GAMEBIT_SfxMute0A71) == 0u) {
             Sfx_PlayFromObject(obj, SFXTRIG_wp_ice_freeze_316);
         }
         state->chirpTimer = randomGetRange(SB_CAGE_KYTE_CHIRP_TIMER_MIN, SB_CAGE_KYTE_CHIRP_TIMER_MAX);

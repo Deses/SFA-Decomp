@@ -211,12 +211,12 @@ void DR_CageWith_hitDetect(GameObject* obj)
             }
             else
             {
-                mainSetBits(GAMEBIT_DR_Related0EA4, 1);
+                mainSetBits(GAMEBIT_DR_ChimneyReset0EA4, 1);
             }
         }
         else
         {
-            mainSetBits(GAMEBIT_DR_Related0EA4, 0);
+            mainSetBits(GAMEBIT_DR_ChimneyReset0EA4, 0);
         }
     }
 }

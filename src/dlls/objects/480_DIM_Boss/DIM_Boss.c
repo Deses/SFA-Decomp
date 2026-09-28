@@ -1516,10 +1516,10 @@ void DIMboss_free(GameObject* obj) {
 
     runtime = obj->extra;
     mainSetBits(GAMEBIT_SETPIECE_ACTIVE, 0);
-    mainSetBits(GAMEBIT_DIM_BossFightEnded, 1);
-    mainSetBits(GAMEBIT_DIM_BossRelated0C1F, 0);
-    mainSetBits(GAMEBIT_DIM_BossRelated0C20, 0);
-    mainSetBits(GAMEBIT_DIM_BossRelated0D8F, 0);
+    mainSetBits(GAMEBIT_DIM_MusicLatch0C1E, 1);
+    mainSetBits(GAMEBIT_DIM_WarpActive0C1F, 0);
+    mainSetBits(GAMEBIT_DIM_AmbientMusicLatch0C20, 0);
+    mainSetBits(GAMEBIT_DIM_MusicLatch0D8F, 0);
     mainSetBits(GAMEBIT_DIM_TriggerLostInBlizzard, 0);
     obj->anim.resetHitboxFlags &= ~DIMBOSS_OBJECT_FLAG_ACTIVE;
     CameraShake_Disable();

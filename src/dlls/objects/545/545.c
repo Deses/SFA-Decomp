@@ -66,7 +66,7 @@ int SeqPoint_SeqFn(GameObject* obj, int param2, ObjSeqState* ctx)
             {
             case 20:
                 mainSetBits(GAMEBIT_VFP_ObjGroups, 0);
-                mainSetBits(GAMEBIT_VFPRelated0D72, 1);
+                mainSetBits(GAMEBIT_VFP_SkyPending, 1);
                 mainSetBits(GAMEBIT_VFPLightRelated0D44, 1);
                 (*gMapEventInterface)->setObjGroupStatus(obj->anim.mapEventSlot, 1, 1);
                 (*gMapEventInterface)->setObjGroupStatus(obj->anim.mapEventSlot, 2, 1);
