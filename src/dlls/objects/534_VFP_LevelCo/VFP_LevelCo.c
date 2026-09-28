@@ -16,6 +16,7 @@
  */
 #include "main/audio/music_api.h"
 #include "main/frame_timing.h"
+#include "main/gamebit_ids.h"
 #include "main/gamebits.h"
 #include "main/lightmap_api.h"
 #include "main/mapEventTypes.h"
@@ -161,13 +162,15 @@ void VFP_LevelControl_update(GameObject* obj)
             }
         }
         Obj_GetPlayerObject();
-        if (mainGetBit(0x4ec) == 0u && mainGetBit(0x9b1) != 0u && mainGetBit(0x9b2) != 0u)
+        if (mainGetBit(GAMEBIT_VFP_PodiumsActivated) == 0u && mainGetBit(GAMEBIT_VFP_PodiumPrereq09B1) != 0u &&
+            mainGetBit(GAMEBIT_VFP_PodiumPrereq09B2) != 0u)
         {
-            mainSetBits(0x4ec, 1);
+            mainSetBits(GAMEBIT_VFP_PodiumsActivated, 1);
         }
-        if (mainGetBit(0xd6d) != 0u && mainGetBit(0xd6e) != 0u && mainGetBit(0xd6f) != 0u && mainGetBit(0xd70) != 0u)
+        if (mainGetBit(GAMEBIT_VFP_QuadPrereq0D6D) != 0u && mainGetBit(GAMEBIT_VFP_QuadPrereq0D6E) != 0u &&
+            mainGetBit(GAMEBIT_VFP_QuadPrereq0D6F) != 0u && mainGetBit(GAMEBIT_VFP_QuadPrereq0D70) != 0u)
         {
-            mainSetBits(0xcfb, 1);
+            mainSetBits(GAMEBIT_VFP_QuadLatch0CFB, 1);
         }
         break;
     case 2:

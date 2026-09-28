@@ -558,7 +558,12 @@ enum GameBitId {
     GAMEBIT_CF_FlewTo = 0x212,                           /* table 1; hint 324 */
     GAMEBIT_ITEM_DIMGoldKey_Used = 0x219,                /* table 2 */
     GAMEBIT_ITEM_DIMSilverKey_Used_2 = 0x21A,            /* table 2 */
+    GAMEBIT_WM_CrystalRiseStage1 = 0x21B,                /* One step of the Warlock Mountain crystal's rise: WM_Crystal walks the whole chain every update and keeps the highest target any set bit asks for, this one raising it to 100 - wmsun_init raises it the moment Krazoa Palace reaches map act 3 */
+    GAMEBIT_WM_CrystalRiseStage2 = 0x21C,                /* One step of the Warlock Mountain crystal's rise: WM_Crystal walks the whole chain every update and keeps the highest target any set bit asks for, this one raising it to 200 */
     GAMEBIT_WM_SpiritHead1Fired = 0x21D,                 /* table 1; when releasing spirit 1, head fired laser */
+    GAMEBIT_WM_CrystalRiseStage4 = 0x21F,                /* One step of the Warlock Mountain crystal's rise: WM_Crystal walks the whole chain every update and keeps the highest target any set bit asks for, this one raising it to 800; stage 3 is GAMEBIT_WM_SpiritHead1Fired */
+    GAMEBIT_WM_CrystalRiseStage5 = 0x221,                /* One step of the Warlock Mountain crystal's rise: WM_Crystal walks the whole chain every update and keeps the highest target any set bit asks for, this one raising it to 0x640 */
+    GAMEBIT_WM_CrystalRiseStage6 = 0x222,                /* One step of the Warlock Mountain crystal's rise: WM_Crystal walks the whole chain every update and keeps the highest target any set bit asks for, this one raising it to 0x1900, and alone among them it triples the rise rate; once the crystal tops out on this stage it sets GAMEBIT_WM_FinaleQuakeActive */
     GAMEBIT_DIM_FoundBelinaTe = 0x223,                   /* table 2; hint 290 */
     GAMEBIT_WC_TrexLever1Activated = 0x226,              /* One of the four wallcity staff levers the T-rex challenge runs on - wclevelcont raises all four at init and again when a run times out, and clears all four as a run starts; Rena has it as wallcity HitAnimator 0x47FED's target and StaffLeverO 0x4CB3D's activated param */
     GAMEBIT_CC_LeverActivated228 = 0x228,                /* Rena's U0 dataset; table 2 */
@@ -627,6 +632,7 @@ enum GameBitId {
     GAMEBIT_WC_TrexRetryBlocked034D = 0x34D,             /* Blocks the retry: when a T-rex run times out, wclevelcont only re-arms the four levers if this is clear */
     GAMEBIT_DIM_Bike_HitboxEnabled = 0x35F,              /* Rena's U0 dataset; table 2 */
     GAMEBIT_WC_ObjGroups = 0x36A,                        /* table 3; size 32 */
+    GAMEBIT_WM_CrystalRumbleActive = 0x370,              /* table 0; raised while the rising crystal is randomly shaking the camera, and dropped the moment the finale quake proper takes over */
     GAMEBIT_KrazTest1Related0372 = 0x372,                /* table 3; set when entering Krazoa test 1, cave beside WarpStone */
     GAMEBIT_DIM2_ObjGroups = 0x373,                      /* table 3; size 32 */
     GAMEBIT_IM_DoorOpen = 0x377,                         /* table 2; ref newicemount/HitAnimator target */
@@ -636,6 +642,7 @@ enum GameBitId {
     GAMEBIT_IMRelated037B = 0x37B,                       /* table 2 */
     GAMEBIT_IM_HutRelated0382 = 0x382,                   /* table 2; changed when near hut */
     GAMEBIT_WM_FinaleQuakeActive = 0x38D,                /* Krazoa Palace finale: set by WM_Crystal (dll_020E) once fully risen after the 6th spirit is returned, gating the WM_sun bank-0 quake/envfx countdown until it clears and 0x38F fires */
+    GAMEBIT_WM_FinaleQuakeDone = 0x38F,                  /* The Warlock Mountain finale quake has run its course - WM_sun raises it as the quake timer expires and clears GAMEBIT_WM_FinaleQuakeActive, and WM_Crystal frees itself on sight of it */
     GAMEBIT_KrazTest1Related0390 = 0x390,                /* table 3; set when entering Krazoa test 1, cleared when talking to WarpStone */
     GAMEBIT_WarpActive0393 = 0x393,                      /* A warp is in progress - NW_levcontr and SH_LevelCon both make it the GameBitLatch condition their level controllers attach to MUSICTRIG_Teleport (0x36, track 85 SNGTeleport) */
     GAMEBIT_DBAY_ObjGroups = 0x397,                      /* table 3; size 32 */
@@ -747,6 +754,7 @@ enum GameBitId {
     GAMEBIT_Tricky_Unlocked_Sidekick_Commands = 0x4E4,   /* table 2; DP names this Tricky_Unlocked_Sidekick_Commands; unlocks Tricky's sidekick command menu */
     GAMEBIT_Tricky_Spawns = 0x4E5,                       /* table 2; DP names this Tricky_Spawns; gates Tricky warp-helper/spawn placement */
     GAMEBIT_ITEM_SpellStone1_Used = 0x4E9,               /* table 2; hint 305 */
+    GAMEBIT_VFP_PodiumsActivated = 0x4EC,                /* Latched by VFP_LevelCo the first update both GAMEBIT_VFP_PodiumPrereq09B1 and ...09B2 are up; Rena has it driving param 0x22 on two temple VFP_PodiumP objects and a HitAnimator target */
     GAMEBIT_VFP_ClawDead4F4 = 0x4F4,                     /* Rena's U0 dataset; table 2 */
     GAMEBIT_VFP_ClawDead4F5 = 0x4F5,                     /* Rena's U0 dataset; table 2 */
     GAMEBIT_FoundSpellStoneWarpPad = 0x4FA,              /* table 2; hint 372; ref temple/HitAnimator target */
@@ -814,8 +822,14 @@ enum GameBitId {
     GAMEBIT_DR_ObjGroups = 0x5DB,                        /* table 3; size 32 */
     GAMEBIT_DRBOT_ObjGroups = 0x5DC,                     /* table 3; size 32 */
     GAMEBIT_DR_Creator_Related05DD = 0x5DD,              /* set to 0 when DR_Creator spawns; Rena's U0 dataset; table 0 */
+    GAMEBIT_OFP_SparkPrereqA05E0 = 0x5E0,                /* table 0; one of the two halves GAMEBIT_OFP_SparkLatch05E3 waits on */
+    GAMEBIT_OFP_SparkPrereqB05E1 = 0x5E1,                /* table 0; the other half of GAMEBIT_OFP_SparkLatch05E3's pair */
+    GAMEBIT_OFP_SparkLatch05E3 = 0x5E3,                  /* Spark latch: DFP_LevelCo plays SFXTRIG_wp_espk2_c and latches it the first update both halves of its pair are up; the check runs in both the act 1 and act 2 paths */
     GAMEBIT_OFP_PuzzlePadShowSolution = 0x5E4,           /* Ocean Force Point electric-floor solution display is active while the puzzle pad is pressed */
     GAMEBIT_OFP_ZappedByFloorTiles = 0x5E5,              /* player stepped on an electrified Ocean Force Point floor tile */
+    GAMEBIT_OFP_LeverLatch05E8 = 0x5E8,                  /* Latched once both GAMEBIT_OFP_LeverPrereqA05EE and ...B05EF are up; Rena has it as kraztest StaffLeverO 0x4C796's activated param and a HitAnimator target, so the lever reads as pulled from then on */
+    GAMEBIT_OFP_LeverPrereqA05EE = 0x5EE,                /* table 0; one of the two halves GAMEBIT_OFP_LeverLatch05E8 waits on */
+    GAMEBIT_OFP_LeverPrereqB05EF = 0x5EF,                /* table 0; the other half of GAMEBIT_OFP_LeverLatch05E8's pair */
     GAMEBIT_ITEM_SpellStone2_Used = 0x5F3,               /* table 2; hint 342 */
     GAMEBIT_ITEM_SpellStone4_Used = 0x5F4,               /* table 2; hint 405 */
     GAMEBIT_NW_FuelCell_5F7 = 0x5F7,                     /* Rena's U0 dataset; table 2 */
@@ -916,6 +930,7 @@ enum GameBitId {
     GAMEBIT_DRBOT_ActNo = 0x76F,                         /* table 1; size 4 */
     GAMEBIT_ITEM_DeletedSpell777_Got = 0x777,            /* table 2; in spell bits table but does nothing */
     GAMEBIT_DRBOT_HoverPadHalted = 0x788,                /* Raised at both points DLL 625 brings the hover pad to a halt: code 4 with the route closed, and code 15 with the pad's b40 flag down */
+    GAMEBIT_OFP_SparkLatch0792 = 0x792,                  /* The same spark latch shape as GAMEBIT_OFP_SparkLatch05E3, but waiting on GAMEBIT_OFB_PinPonDeadB8C - which retail tests twice in the one condition */
     GAMEBIT_OFP_LoadBlockSlidePuzzle2 = 0x7A1,           /* loads Ocean Force Point object group 6, the lower block-slide puzzle */
     GAMEBIT_DR_HighTop_JumpingOn = 0x7A4,                /* Rena's kiosk dataset; table 1 */
     GAMEBIT_OFB_StaffBoostEnabled7A8 = 0x7A8,            /* Rena's U0 dataset; table 2 */
@@ -1027,6 +1042,8 @@ enum GameBitId {
     GAMEBIT_CollectedFlag09A8 = 0x9A8,                   /* table 2; did collect something (moon seed?) */
     GAMEBIT_WM_KrystalLanded = 0x9AA,                    /* table 2; hint 246; Krystal encountered General Scales */
     GAMEBIT_WM_KrystalTalkedToDinoAfterTest1 = 0x9AB,    /* table 2 */
+    GAMEBIT_VFP_PodiumPrereq09B1 = 0x9B1,                /* One of the two bits VFP_LevelCo waits on before it raises GAMEBIT_VFP_PodiumsActivated */
+    GAMEBIT_VFP_PodiumPrereq09B2 = 0x9B2,                /* The other bit GAMEBIT_VFP_PodiumsActivated waits on */
     GAMEBIT_DR_HighTopSwitch1 = 0x9C7,                   /* table 1 */
     GAMEBIT_DR_HighTopSwitch2 = 0x9C9,                   /* table 1 */
     GAMEBIT_DR_HighTopSwitch3 = 0x9CB,                   /* table 1 */
@@ -1297,6 +1314,7 @@ enum GameBitId {
     GAMEBIT_VFP_ClawAliveCF8 = 0xCF8,                    /* Rena's U0 dataset; table 2 */
     GAMEBIT_VFP_ClawAliveCF9 = 0xCF9,                    /* Rena's U0 dataset; table 2 */
     GAMEBIT_VFP_ClawAliveCFA = 0xCFA,                    /* Rena's U0 dataset; table 2 */
+    GAMEBIT_VFP_QuadLatch0CFB = 0xCFB,                   /* Latched by VFP_LevelCo once all four of GAMEBIT_VFP_QuadPrereq0D6D through ...0D70 are up; Rena has it as temple HitAnimator 0x4C6F4's target */
     GAMEBIT_VFP_ClawDeadCFC = 0xCFC,                     /* Rena's U0 dataset; table 2 */
     GAMEBIT_VFP_ClawDeadCFD = 0xCFD,                     /* Rena's U0 dataset; table 2 */
     GAMEBIT_VFP_ClawDeadCFE = 0xCFE,                     /* Rena's U0 dataset; table 2 */
@@ -1335,6 +1353,10 @@ enum GameBitId {
     GAMEBIT_OFP_Entered = 0xD67,                         /* table 2; hint 339; ref dfptop/HitAnimator target */
     GAMEBIT_VFP_Opened = 0xD69,                          /* table 2; hint 303 */
     GAMEBIT_OFPTOP_WarpEnabled = 0xD6C,                  /* table 2; hint 340; ref dfptop/Transporter enabled */
+    GAMEBIT_VFP_QuadPrereq0D6D = 0xD6D,                  /* First of the four bits GAMEBIT_VFP_QuadLatch0CFB waits on */
+    GAMEBIT_VFP_QuadPrereq0D6E = 0xD6E,                  /* Second of GAMEBIT_VFP_QuadLatch0CFB's four */
+    GAMEBIT_VFP_QuadPrereq0D6F = 0xD6F,                  /* Third of GAMEBIT_VFP_QuadLatch0CFB's four */
+    GAMEBIT_VFP_QuadPrereq0D70 = 0xD70,                  /* Fourth of GAMEBIT_VFP_QuadLatch0CFB's four */
     GAMEBIT_VFPRelated0D72 = 0xD72,                      /* table 1 */
     GAMEBIT_CFRelated0D73 = 0xD73,                       /* table 2; Cleared when Arwing flies to CR Fort */
     GAMEBIT_LINKH_ObjGroups = 0xD75,                     /* table 3; size 32 */
