@@ -341,10 +341,13 @@ enum GameBitId {
     GAMEBIT_ITEM_Staff_Got = 0x75,                       /* table 1; clearing on Galleon restarts ship battle */
     GAMEBIT_WM_Galleon_despawn = 0x78,                   /* table 2 */
     GAMEBIT_IM_StartRace = 0x79,                         /* table 1; setting starts the race scene */
+    GAMEBIT_SC_TestPhaseOver007A = 0x7A,                 /* Swapcircle (the LightFoot totem circle) has left its test phase - while set, sc_levelcontrol raises GAMEBIT_SC_HitAnimTarget0085 at every opportunity; while clear it instead watches 0x627 and GAMEBIT_SC_TotemRunCompleted for GAMEBIT_LV_DoneTests */
     GAMEBIT_LV_Totem1_Activated = 0x81,                  /* needs verification; Rena's U0 dataset; table 2 */
     GAMEBIT_LV_Totem2_Activated = 0x82,                  /* Rena's U0 dataset; table 2 */
     GAMEBIT_LV_Totem3_Activated = 0x83,                  /* Rena's U0 dataset; table 2 */
     GAMEBIT_LV_Totem4_Activated = 0x84,                  /* Rena's U0 dataset; table 2 */
+    GAMEBIT_SC_HitAnimTarget0085 = 0x85,                 /* Rena has it as the target of swapcircle's HitAnimator 0x4C837; sc_levelcontrol raises it whenever GAMEBIT_SC_TestPhaseOver007A is up and clears it as a timed totem run starts */
+    GAMEBIT_SC_LVBlock2Related0087 = 0x87,               /* One of the three bits sc_levelcontrol raises the moment GAMEBIT_ITEM_LVBlock2_Used is set */
     GAMEBIT_SH_WarpStonePathOpen = 0x88,                 /* table 2; did blow up wall leading to WarpStone */
     GAMEBIT_SH_SouthCave_BombPlanted = 0x8A,             /* table 2; ref hollow/BombPlant exists */
     GAMEBIT_SH_WarpStoneBombPlanted = 0x8B,              /* table 2; ref hollow/BombPlant exists */
@@ -580,12 +583,15 @@ enum GameBitId {
     GAMEBIT_LV_CapturedByLightFoot = 0x2B5,              /* table 2; hint 346 */
     GAMEBIT_LV_TestStrengthBestTime1 = 0x2B6,            /* table 2; size 16 */
     GAMEBIT_LV_TestTrackingBestTime1 = 0x2B7,            /* table 2; size 16 */
+    GAMEBIT_SC_StaffLeversEnabled = 0x2B8,               /* Rena has it driving the enabled param of all four swapcircle StaffLeverO objects; sc_levelcontrol raises it as a timed totem run begins and drops it at init and on both ways out of the run */
     GAMEBIT_ENV_dayNo = 0x2BA,                           /* table 3; size 8; Counts from 0 to 27, increasing every morning in-game time. Used for environmental effects. */
     GAMEBIT_SH_FirstMagicCaveDoorOpen = 0x2C0,           /* table 2; ref hollow/HitAnimator target */
     GAMEBIT_IM_TrickyRelated02C1 = 0x2C1,                /* table 0; set when starting tricky landing scene */
     GAMEBIT_DIM_ReachedBottom = 0x2C3,                   /* table 2; hint 291 */
+    GAMEBIT_SC_LVBlock3Related02C6 = 0x2C6,              /* One of the three bits sc_levelcontrol raises the moment GAMEBIT_ITEM_LVBlock3_Used is set; Rena has this one as the target of swapcircle's HitAnimator 0x49329 */
     GAMEBIT_LV_TestTrackingBestTime2 = 0x2CB,            /* table 2; size 16 */
     GAMEBIT_LV_TestTrackingBestTime3 = 0x2CC,            /* table 2; size 16 */
+    GAMEBIT_SC_LVBlock3Related02CE = 0x2CE,              /* One of the three bits sc_levelcontrol raises the moment GAMEBIT_ITEM_LVBlock3_Used is set */
     GAMEBIT_LV_EscapedFromPole = 0x2D0,                  /* table 2; hint 347 */
     GAMEBIT_WC_TempleDiaAStage1 = 0x2D1,                 /* Walled City temple rotating-dial (bank A) - stage 1 complete, gWcTempleDiaGameBitsA[1]; ORed into WCTempleDiaState.stageMask, which picks the dial speed from gWcTempleDiaTargetSpeedTableA and drives part visibility */
     GAMEBIT_WC_TempleDiaAStage2 = 0x2D2,                 /* Walled City temple rotating-dial (bank A) - stage 2 complete, gWcTempleDiaGameBitsA[2]; ORed into WCTempleDiaState.stageMask, which picks the dial speed from gWcTempleDiaTargetSpeedTableA and drives part visibility */
@@ -711,6 +717,8 @@ enum GameBitId {
     GAMEBIT_AndrossRelated04B1 = 0x4B1,                  /* table 2; set when Andross's brain is defeated */
     GAMEBIT_MMP_FuelCell_4B2 = 0x4B2,                    /* Rena's U0 dataset; table 2 */
     GAMEBIT_TargetRelated04B7 = 0x4B7,                   /* table 1; related to object targeting */
+    GAMEBIT_SC_StaffLeversDisabled = 0x4BD,              /* The exact complement of GAMEBIT_SC_StaffLeversEnabled - written 1 at every point that one is written 0 and 0 where it is written 1, so it presumably enables the levers' idle-state counterparts */
+    GAMEBIT_SC_CaptureWarpDone = 0x4D0,                  /* One-shot: once GAMEBIT_LV_CapturedByLightFoot appears, sc_levelcontrol latches this, opens swapcircle objgroup 2, warps to map 0x50 and closes objgroup 1, so the capture warp fires only once */
     GAMEBIT_NW_FuelCell_4D2 = 0x4D2,                     /* Rena's U0 dataset; table 2 */
     GAMEBIT_IM_PushBlock_Placed = 0x4D3,                 /* table 2 */
     GAMEBIT_LV_FuelCell_4D4 = 0x4D4,                     /* Rena's U0 dataset; table 2 */
@@ -806,7 +814,10 @@ enum GameBitId {
     GAMEBIT_VFP_FuelCell_604 = 0x604,                    /* Rena's U0 dataset; table 2 */
     GAMEBIT_DR_RescuedCloudRunner = 0x609,               /* table 2; hint 393; ref dragrock/HitAnimator target */
     GAMEBIT_VFP_FuelCell_60D = 0x60D,                    /* Rena's U0 dataset; table 2 */
+    GAMEBIT_SC_TotemRunRequest060E = 0x60E,              /* Raised by the controller's anim event 3 and consumed on the next update: outside a run it opens the best-times list, and during a run it stops the timer, raises the hit-animator target and starts the exit fade */
+    GAMEBIT_SC_TotemCircleRelated060F = 0x60F,           /* Held at 1 through init and every update; the sole write of 0 is at the top of the anim-event callback, which restores it immediately when the controller is mid-run, so it is only ever clear for the frame after an event arrives out of run */
     GAMEBIT_ITEM_MMPKey_Got = 0x611,                     /* table 2; ref moonpass/MMP_padlock key */
+    GAMEBIT_SC_LVBlock2Related0612 = 0x612,              /* One of the three bits sc_levelcontrol raises the moment GAMEBIT_ITEM_LVBlock2_Used is set; Rena has this one as the target of swapcircle's HitAnimator 0x45D72 */
     GAMEBIT_LV_FuelCell_615 = 0x615,                     /* Rena's U0 dataset; table 2 */
     GAMEBIT_LV_FuelCell_616 = 0x616,                     /* Rena's U0 dataset; table 2 */
     GAMEBIT_SHOP_Unk0617 = 0x617,                        /* table 0; set when entering shop */
@@ -815,6 +826,7 @@ enum GameBitId {
     GAMEBIT_ShopRelated624 = 0x624,                      /* Rena's U0 dataset; table 0 */
     GAMEBIT_ShopRelated625 = 0x625,                      /* Rena's U0 dataset; table 0 */
     GAMEBIT_SHOP_ScarabGameRunning = 0x626,              /* table 0; ref swapstore/HitAnimator target */
+    GAMEBIT_LV_ChiefTestDone0627 = 0x627,                /* The half of GAMEBIT_LV_DoneTests' condition that sc_levelcontrol only reads - the LightFoot chief's other test, completed outside this DLL */
     GAMEBIT_DR_HighTop_RunSeq = 0x62A,                   /* table 1; name from Rena's kiosk-build data, confirmed by the code - hightop_stateHandler04 sets it the moment all four of GAMEBIT_DR_HighTopSwitch1-4 are hit */
     GAMEBIT_DR_HighTop_SeqDone = 0x62B,                  /* table 1; kiosk-build name - while set, HighTop sets GAMEBIT_DR_HighTop_SeqDone2, arms its curve-follow ride and starts the air meter */
     GAMEBIT_DR_HighTop_Riding62D = 0x62D,                /* Rena's kiosk dataset; table 1 */
@@ -824,6 +836,8 @@ enum GameBitId {
     GAMEBIT_OFP_PuzzlePadPressed = 0x635,                /* Ocean Force Point electric-floor puzzle pad is pressed */
     GAMEBIT_SC_totempuzzle_running = 0x639,              /* table 2 */
     GAMEBIT_ITEM_SpellStone3_Got = 0x63C,                /* table 2; hint 373 */
+    GAMEBIT_SC_TotemRunCompleted = 0x63E,                /* A timed totem run carried through to its fade-out, as against GAMEBIT_SC_TimedRunExited for the exit path; with GAMEBIT_LV_ChiefTestDone0627 it is what raises GAMEBIT_LV_DoneTests, making it one of the chief's two tests */
+    GAMEBIT_SC_TimedRunExited = 0x640,                   /* Raised when a timed totem run ends down the exit path instead of the fade-out - the run's other ending */
     GAMEBIT_TumbleweedRelated642 = 0x642,                /* table 0 */
     GAMEBIT_ITEM_LVBlock2_Used = 0x647,                  /* table 2; ref swapcircle/SC_blockpla open */
     GAMEBIT_SH_Landed064B = 0x64B,                       /* table 0; set when Fox first steps foot on the planet; cleared after Pepper scene */
@@ -889,6 +903,7 @@ enum GameBitId {
     GAMEBIT_ITEM_SpellStone7BF_Got = 0x7BF,              /* table 1 */
     GAMEBIT_OFP_Reopened = 0x7C2,                        /* table 2; hint 403; ref dfptop/HitAnimator target */
     GAMEBIT_HT_ObjStates = 0x7CE,                        /* table 3; size 32 */
+    GAMEBIT_SC_TotemRunRelated07CF = 0x7CF,              /* Raised beside GAMEBIT_SC_TotemRunCompleted on the fade-out path and nowhere else, with nothing in the code reading it back */
     GAMEBIT_DR_EarthWarriorUnknown_3 = 0x7D4,            /* cleared by DR_EarthWar.c when mounted and set when dismounted */
     GAMEBIT_ITEM_MapDR_Got = 0x7DD,                      /* table 2 */
     GAMEBIT_ITEM_MapWM_Got = 0x7E5,                      /* table 2 */
@@ -937,6 +952,7 @@ enum GameBitId {
     GAMEBIT_WM_Seq8F4 = 0x8F4,                           /* Rena's U0 dataset; table 2 */
     GAMEBIT_ITEM_WaterSpellStone1_902 = 0x902,           /* table 1 */
     GAMEBIT_WM_SwitchCamActive = 0x905,                  /* table 2; camera pointing at door opened by pressure switch */
+    GAMEBIT_SC_LVBlock2Related090B = 0x90B,              /* One of the three bits sc_levelcontrol raises the moment GAMEBIT_ITEM_LVBlock2_Used is set */
     GAMEBIT_SawMagic = 0x90D,                            /* table 2; Have collected a Staff Energy Gem (if 0, explain it when you collect one) */
     GAMEBIT_SawBigHealth = 0x90E,                        /* table 2 */
     GAMEBIT_SawApple = 0x90F,                            /* table 2; small health pickup */
@@ -1122,7 +1138,11 @@ enum GameBitId {
     GAMEBIT_TestCombatClawDeadBC1 = 0xBC1,               /* Rena's U0 dataset; table 0 */
     GAMEBIT_CR_SpellStoneRelatedBC3 = 0xBC3,             /* Rena's U0 dataset; table 1 */
     GAMEBIT_LINKI_ActNo = 0xBC7,                         /* table 0; This seems wrong... */
+    GAMEBIT_SC_LVBlock3Related0BDC = 0xBDC,              /* One of the three bits sc_levelcontrol raises the moment GAMEBIT_ITEM_LVBlock3_Used is set */
     GAMEBIT_ITEM_LVBlock3_Used = 0xBDE,                  /* table 2; ref swapcircle/SC_blockpla open */
+    GAMEBIT_SC_LVBlock1Related0BDF = 0xBDF,              /* One of the three bits sc_levelcontrol raises the moment GAMEBIT_ITEM_LVBlock1_Used is set; Rena has this one as the target of swapcircle's HitAnimator 0x49433 */
+    GAMEBIT_SC_LVBlock1Related0BE1 = 0xBE1,              /* One of the three bits sc_levelcontrol raises the moment GAMEBIT_ITEM_LVBlock1_Used is set */
+    GAMEBIT_SC_LVBlock1Related0BE3 = 0xBE3,              /* One of the three bits sc_levelcontrol raises the moment GAMEBIT_ITEM_LVBlock1_Used is set */
     GAMEBIT_ITEM_LVBlock1_Used = 0xBE5,                  /* table 2; ref swapcircle/SC_blockpla open */
     GAMEBIT_IM_Unk0BEB = 0xBEB,                          /* table 0; set when first entering */
     GAMEBIT_IM_Unk0BEC = 0xBEC,                          /* table 0; set when first entering */
@@ -1229,6 +1249,7 @@ enum GameBitId {
     GAMEBIT_MusicLatch0CD1 = 0xCD1,                      /* As GAMEBIT_MusicLatch0CCD: named for its band, on the strength of KT_RexLevel_free alone */
     GAMEBIT_SH_ThornTailRelated0CD5 = 0xCD5,             /* table 2; probably "talked to guy who tells you to get a lantern" */
     GAMEBIT_SH_ThornTailRelated0CD6 = 0xCD6,             /* table 2 */
+    GAMEBIT_SC_HelpTextEnabled = 0xCDC,                  /* While set, sc_levelcontrol shows game text 0x429 for the first 300 frames the player is in swapcircle */
     GAMEBIT_NW_ReturnedTo = 0xCE1,                       /* table 2; hint 277 */
     GAMEBIT_VFP_ClawDeadCE3 = 0xCE3,                     /* Rena's U0 dataset; table 2 */
     GAMEBIT_VFP_ClawDeadCE4 = 0xCE4,                     /* Rena's U0 dataset; table 2 */

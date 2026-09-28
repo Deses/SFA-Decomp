@@ -72,14 +72,14 @@ int sc_levelcontrol_processAnimEventsCallback(GameObject* obj, int unused, ObjSe
         }
     }
     state->animEventFlags |= SC_LEVEL_CONTROL_ANIM_EVENT_FLAG_PROCESSED;
-    mainSetBits(0x60f, 0);
+    mainSetBits(GAMEBIT_SC_TotemCircleRelated060F, 0);
     state = obj->extra;
     Obj_GetPlayerObject();
     if (state->animEventState == 5) {
-        mainSetBits(0x60f, 1);
+        mainSetBits(GAMEBIT_SC_TotemCircleRelated060F, 1);
         if (isGameTimerDisabled()) {
-            if (mainGetBit(0x7a) != 0) {
-                mainSetBits(0x85, 1);
+            if (mainGetBit(GAMEBIT_SC_TestPhaseOver007A) != 0) {
+                mainSetBits(GAMEBIT_SC_HitAnimTarget0085, 1);
             }
             state->exitTimer = 120.0f;
             state->animEventState = 0;
@@ -103,9 +103,9 @@ void sc_levelcontrol_applyAnimEventState(GameObject* obj, u8 animEventState) {
     if (mode == 2) {
         state->animEventState = 0;
     } else if (mode == 5) {
-        mainSetBits(0x2b8, 1);
-        mainSetBits(0x4bd, 0);
-        mainSetBits(0x85, 0);
+        mainSetBits(GAMEBIT_SC_StaffLeversEnabled, 1);
+        mainSetBits(GAMEBIT_SC_StaffLeversDisabled, 0);
+        mainSetBits(GAMEBIT_SC_HitAnimTarget0085, 0);
         gameTimerInit(GAME_TIMER_COUNT_DOWN | GAME_TIMER_LOOP_SOUND | GAME_TIMER_END_SOUND | GAME_TIMER_DISPLAY,
                       0x96);
         Music_Trigger(MUSICTRIG_CRF_Suspense, 1);
@@ -225,14 +225,14 @@ void sc_levelcontrol_update(GameObject* obj) {
         if (state->fadeTimer <= 0.0f) {
             state->fadeTimer = 0.0f;
             state->exitTimer = 0.0f;
-            mainSetBits(0x2b8, 0);
-            mainSetBits(0x4bd, 1);
+            mainSetBits(GAMEBIT_SC_StaffLeversEnabled, 0);
+            mainSetBits(GAMEBIT_SC_StaffLeversDisabled, 1);
             mainSetBits(SC_TOTEM_POLE_GAMEBIT_FRONT, 0);
             mainSetBits(SC_TOTEM_POLE_GAMEBIT_LEFT, 0);
             mainSetBits(SC_TOTEM_POLE_GAMEBIT_RIGHT, 0);
             mainSetBits(SC_TOTEM_POLE_GAMEBIT_REAR, 0);
-            mainSetBits(0x63e, 1);
-            mainSetBits(0x7cf, 1);
+            mainSetBits(GAMEBIT_SC_TotemRunCompleted, 1);
+            mainSetBits(GAMEBIT_SC_TotemRunRelated07CF, 1);
         }
     } else if (state->exitTimer && (player->objectFlags & OBJECT_OBJFLAG_PARENT_SLACK) == 0) {
         if (state->exitTimer == 120.0f) {
@@ -240,10 +240,10 @@ void sc_levelcontrol_update(GameObject* obj) {
         }
         state->exitTimer -= timeDelta;
         if (state->exitTimer <= 0.0f) {
-            mainSetBits(0x640, 1);
+            mainSetBits(GAMEBIT_SC_TimedRunExited, 1);
             state->exitTimer = 0.0f;
-            mainSetBits(0x2b8, 0);
-            mainSetBits(0x4bd, 1);
+            mainSetBits(GAMEBIT_SC_StaffLeversEnabled, 0);
+            mainSetBits(GAMEBIT_SC_StaffLeversDisabled, 1);
             mainSetBits(SC_TOTEM_POLE_GAMEBIT_FRONT, 0);
             mainSetBits(SC_TOTEM_POLE_GAMEBIT_LEFT, 0);
             mainSetBits(SC_TOTEM_POLE_GAMEBIT_RIGHT, 0);
@@ -251,7 +251,7 @@ void sc_levelcontrol_update(GameObject* obj) {
         }
     }
     state->playerMapCell = coordsToMapCell(player->anim.localPosX, player->anim.localPosZ);
-    if (mainGetBit(0xcdc) != 0) {
+    if (mainGetBit(GAMEBIT_SC_HelpTextEnabled) != 0) {
         if (state->helpTextTimer > 0.0f) {
             gameTextShow(0x429);
             state->helpTextTimer -= timeDelta;
@@ -317,26 +317,26 @@ void sc_levelcontrol_update(GameObject* obj) {
     }
     if ((state->animEventFlags & SC_LEVEL_CONTROL_ANIM_EVENT_FLAG_PROCESSED) != 0) {
         state->animEventFlags &= ~SC_LEVEL_CONTROL_ANIM_EVENT_FLAG_PROCESSED;
-        mainSetBits(0x60f, 1);
-        if (mainGetBit(0x7a) == 0) {
-            if (mainGetBit(0x627) != 0 && mainGetBit(0x63e) != 0) {
+        mainSetBits(GAMEBIT_SC_TotemCircleRelated060F, 1);
+        if (mainGetBit(GAMEBIT_SC_TestPhaseOver007A) == 0) {
+            if (mainGetBit(GAMEBIT_LV_ChiefTestDone0627) != 0 && mainGetBit(GAMEBIT_SC_TotemRunCompleted) != 0) {
                 mainSetBits(GAMEBIT_LV_DoneTests, 1);
             }
         } else if (mainGetBit(GAMEBIT_LV_DoneTests) != 0) {
-            mainSetBits(0x85, 1);
+            mainSetBits(GAMEBIT_SC_HitAnimTarget0085, 1);
         }
     }
     if (state->animEventState == 0) {
-        if (mainGetBit(0x60e) != 0) {
-            mainSetBits(0x60e, 0);
+        if (mainGetBit(GAMEBIT_SC_TotemRunRequest060E) != 0) {
+            mainSetBits(GAMEBIT_SC_TotemRunRequest060E, 0);
             timeListPromptOpen();
         }
     } else if (state->animEventState == 5) {
-        if (mainGetBit(0x60e) != 0) {
-            mainSetBits(0x60e, 0);
+        if (mainGetBit(GAMEBIT_SC_TotemRunRequest060E) != 0) {
+            mainSetBits(GAMEBIT_SC_TotemRunRequest060E, 0);
             gameTimerStop();
-            if (mainGetBit(0x7a) != 0) {
-                mainSetBits(0x85, 1);
+            if (mainGetBit(GAMEBIT_SC_TestPhaseOver007A) != 0) {
+                mainSetBits(GAMEBIT_SC_HitAnimTarget0085, 1);
             }
             state->exitTimer = 120.0f;
             (*gScreenTransitionInterface)->start(0x73, SCREEN_TRANSITION_BLACK);
@@ -345,28 +345,28 @@ void sc_levelcontrol_update(GameObject* obj) {
         }
     }
     if (mainGetBit(GAMEBIT_ITEM_LVBlock2_Used) != 0) {
-        mainSetBits(0x612, 1);
-        mainSetBits(0x90b, 1);
-        mainSetBits(0x87, 1);
+        mainSetBits(GAMEBIT_SC_LVBlock2Related0612, 1);
+        mainSetBits(GAMEBIT_SC_LVBlock2Related090B, 1);
+        mainSetBits(GAMEBIT_SC_LVBlock2Related0087, 1);
     }
     if (mainGetBit(GAMEBIT_ITEM_LVBlock3_Used) != 0) {
-        mainSetBits(0x2c6, 1);
-        mainSetBits(0x2ce, 1);
-        mainSetBits(0xbdc, 1);
+        mainSetBits(GAMEBIT_SC_LVBlock3Related02C6, 1);
+        mainSetBits(GAMEBIT_SC_LVBlock3Related02CE, 1);
+        mainSetBits(GAMEBIT_SC_LVBlock3Related0BDC, 1);
     }
     if (mainGetBit(GAMEBIT_ITEM_LVBlock1_Used) != 0) {
-        mainSetBits(0xbdf, 1);
-        mainSetBits(0xbe1, 1);
-        mainSetBits(0xbe3, 1);
+        mainSetBits(GAMEBIT_SC_LVBlock1Related0BDF, 1);
+        mainSetBits(GAMEBIT_SC_LVBlock1Related0BE1, 1);
+        mainSetBits(GAMEBIT_SC_LVBlock1Related0BE3, 1);
     }
     {
         ScLevelControlState* eventState = obj->extra;
         Obj_GetPlayerObject();
         if (eventState->animEventState == 5) {
-            mainSetBits(0x60f, 1);
+            mainSetBits(GAMEBIT_SC_TotemCircleRelated060F, 1);
             if (isGameTimerDisabled()) {
-                if (mainGetBit(0x7a) != 0) {
-                    mainSetBits(0x85, 1);
+                if (mainGetBit(GAMEBIT_SC_TestPhaseOver007A) != 0) {
+                    mainSetBits(GAMEBIT_SC_HitAnimTarget0085, 1);
                 }
                 eventState->exitTimer = 120.0f;
                 eventState->animEventState = 0;
@@ -375,9 +375,9 @@ void sc_levelcontrol_update(GameObject* obj) {
             }
         }
     }
-    if (mainGetBit(0x4d0) == 0) {
+    if (mainGetBit(GAMEBIT_SC_CaptureWarpDone) == 0) {
         if (mainGetBit(GAMEBIT_LV_CapturedByLightFoot) != 0) {
-            mainSetBits(0x4d0, 1);
+            mainSetBits(GAMEBIT_SC_CaptureWarpDone, 1);
             (*gMapEventInterface)->setObjGroupStatus(SC_LEVEL_CONTROL_MAP_SWAPCIRCLE, 2, 1);
             warpToMap(0x50, 0);
             (*gMapEventInterface)->setObjGroupStatus(SC_LEVEL_CONTROL_MAP_SWAPCIRCLE, 1, 0);
@@ -405,7 +405,7 @@ void sc_levelcontrol_update(GameObject* obj) {
     GameBitLatch_Update(&state->musicLatches, 1, -1, -1, GAMEBIT_WarpActive0E1E, MUSICTRIG_Teleport);
     GameBitLatch_Update(&state->musicLatches, 2, -1, -1, GAMEBIT_SHRINE_MUSIC_LOCK, MUSICTRIG_PU3_Adventure_c4);
     if ((state->animEventFlags & SC_LEVEL_CONTROL_ANIM_EVENT_FLAG_3_TRIGGERED) != 0) {
-        mainSetBits(0x60e, 1);
+        mainSetBits(GAMEBIT_SC_TotemRunRequest060E, 1);
         state->animEventFlags &= ~SC_LEVEL_CONTROL_ANIM_EVENT_FLAG_3_TRIGGERED;
     }
 }
@@ -418,9 +418,9 @@ void sc_levelcontrol_init(GameObject* obj) {
     state->playerMapCell = 0xff;
     state->animEventState = 0;
     obj->animEventCallback = sc_levelcontrol_processAnimEventsCallback;
-    mainSetBits(0x60f, 1);
-    mainSetBits(0x2b8, 0);
-    mainSetBits(0x4bd, 1);
+    mainSetBits(GAMEBIT_SC_TotemCircleRelated060F, 1);
+    mainSetBits(GAMEBIT_SC_StaffLeversEnabled, 0);
+    mainSetBits(GAMEBIT_SC_StaffLeversDisabled, 1);
     mainSetBits(SC_TOTEM_POLE_GAMEBIT_FRONT, 0);
     mainSetBits(SC_TOTEM_POLE_GAMEBIT_LEFT, 0);
     mainSetBits(SC_TOTEM_POLE_GAMEBIT_RIGHT, 0);
@@ -431,8 +431,8 @@ void sc_levelcontrol_init(GameObject* obj) {
     state->fogNearTarget = fogNear;
     state->fogNearStep = -0.35f;
     enableHeavyFog(50.0f + state->fogNear, state->fogNear, 1000.0f, 0.1f, 0.0005f, 0);
-    if (mainGetBit(0x7a) != 0) {
-        mainSetBits(0x85, 1);
+    if (mainGetBit(GAMEBIT_SC_TestPhaseOver007A) != 0) {
+        mainSetBits(GAMEBIT_SC_HitAnimTarget0085, 1);
     }
     unlockLevel(mapGetDirIdx(SC_LEVEL_CONTROL_MAP_SWAPCIRCLE), 0, 0);
     if (getSaveGameLoadStatus() != 0) {
