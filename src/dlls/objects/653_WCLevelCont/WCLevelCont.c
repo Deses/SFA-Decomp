@@ -244,10 +244,10 @@ void wclevelcont_updateAct1State(GameObject* obj, WcLevelControlState* state) {
         }
         break;
     case WCLEVELCTL_MODE_SEQUENCE:
-        if (mainGetBit(0xcac) != 0) {
+        if (mainGetBit(GAMEBIT_WC_FinalSequenceComplete) != 0) {
             GameObject* player;
-            mainSetBits(0xda9, 0);
-            mainSetBits(0xc37, 1);
+            mainSetBits(GAMEBIT_WC_StopwatchEnabled, 0);
+            mainSetBits(GAMEBIT_WC_FinalSequenceReward, 1);
             player = (GameObject*)Obj_GetPlayerObject();
             (*gMapEventInterface)->savePoint(&player->anim.localPosX, player->anim.rotX, 1, 0);
             state->mode = WCLEVELCTL_MODE_DONE;
@@ -285,7 +285,7 @@ int wclevelcont_seqFn(GameObject* obj, int unused, ObjSeqState* animUpdate) {
         state->eventTimer = t;
         if (t <= gWcLevelContZero[0]) {
             GameObject* player;
-            mainSetBits(0x7f7, 1);
+            mainSetBits(GAMEBIT_WC_TimedPuzzleAComplete, 1);
             player = (GameObject*)Obj_GetPlayerObject();
             (*gMapEventInterface)->savePoint(&player->anim.localPosX, player->anim.rotX, 1, 0);
         }
@@ -294,7 +294,7 @@ int wclevelcont_seqFn(GameObject* obj, int unused, ObjSeqState* animUpdate) {
         state->eventTimer = t;
         if (t <= gWcLevelContZero[0]) {
             GameObject* player;
-            mainSetBits(0x802, 1);
+            mainSetBits(GAMEBIT_WC_TimedPuzzleBComplete, 1);
             player = (GameObject*)Obj_GetPlayerObject();
             (*gMapEventInterface)->savePoint(&player->anim.localPosX, player->anim.rotX, 1, 0);
         }
@@ -681,7 +681,7 @@ void wclevelcont_syncProgressBits(WcLevelControlState* state) {
     GameBitLatch_Update(&state->gameBitLatch, 0x10, -1, -1, 0xcd0, 0xd4);
     GameBitLatch_Update(&state->gameBitLatch, 0x40, -1, -1, GAMEBIT_SHRINE_MUSIC_LOCK, MUSICTRIG_PU3_Adventure_c4);
     flag = 0;
-    if (mainGetBit(GAMEBIT_WC_PushBlockTimerActive) == 0 && (mainGetBit(0xda9) != 0 || gameTimerIsRunning() != 0)) {
+    if (mainGetBit(GAMEBIT_WC_PushBlockTimerActive) == 0 && (mainGetBit(GAMEBIT_WC_StopwatchEnabled) != 0 || gameTimerIsRunning() != 0)) {
         flag = 1;
     }
     mainSetBits(0xf31, flag);
@@ -771,7 +771,7 @@ void wclevelcont_init(GameObject* obj) {
     if (mainGetBit(0xbcf) != 0) {
         state->completionFlags |= WCLEVELCTL_FLAG_FINAL;
     }
-    if (mainGetBit(0xcac) != 0) {
+    if (mainGetBit(GAMEBIT_WC_FinalSequenceComplete) != 0) {
         state->completionFlags |= WCLEVELCTL_FLAG_EXTRA;
     }
     flags = state->completionFlags;

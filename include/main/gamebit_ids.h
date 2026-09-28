@@ -721,10 +721,12 @@ enum GameBitId {
     GAMEBIT_WC_TimedPuzzleBTrigger = 0x7EE,              /* Walled City timed push-block puzzle B - entry trigger; mirrors puzzle A, arming GAMEBIT_WC_TimedPuzzleBActive */
     GAMEBIT_WC_TimedPuzzleAActive = 0x7EF,               /* Walled City timed push-block puzzle A - armed/running; set by wclevelcont when the trigger fires and cleared on timeout or abort */
     GAMEBIT_WC_TimedPuzzleBActive = 0x7F0,               /* Walled City timed push-block puzzle B - armed/running; cleared on timeout or abort */
+    GAMEBIT_WC_TimedPuzzleAComplete = 0x7F7,             /* Walled City timed push-block puzzle A fully complete; wclevelcont_seqFn sets it once A's post-solve sequence timer runs out and saves a checkpoint at the player */
     GAMEBIT_WC_LitBeacons = 0x7F8,                       /* table 2; hint 362; ref wallcity/HitAnimator target */
     GAMEBIT_WC_TimedPuzzleASolved = 0x7F9,               /* Walled City timed push-block puzzle A solved; ends the 0x3C countdown, and if puzzle B is also solved wclevelcont plays the confirm sfx and runs sequence 0 instead of sequence 1 */
     GAMEBIT_WC_TimedPuzzleBSolved = 0x7FA,               /* Walled City timed push-block puzzle B solved; ends the 0x50 countdown, and pairs with puzzle A to pick the confirm sfx and sequence 0 */
     GAMEBIT_WC_FoundKing = 0x7FC,                        /* table 2; hint 363 */
+    GAMEBIT_WC_TimedPuzzleBComplete = 0x802,             /* Walled City timed push-block puzzle B fully complete; the puzzle-B mirror of 0x7F7, also saving a checkpoint */
     GAMEBIT_WC_OpenedSunMoonAreas = 0x817,               /* table 2; hint 410; ref wallcity/HitAnimator target */
     GAMEBIT_WC_FlewTo = 0x818,                           /* table 2; hint 360; ref wallcity/Landed_Arwi Visible */
     GAMEBIT_WC_OpenedBossDoor = 0x819,                   /* table 2; hint 365; ref wallcity/HitAnimator target */
@@ -903,6 +905,7 @@ enum GameBitId {
     GAMEBIT_CannonRelated0C2D = 0xC2D,                   /* table 2 */
     GAMEBIT_CannonRelated0C2E = 0xC2E,                   /* table 2 */
     GAMEBIT_PlayerIsDisguised = 0xC30,                   /* table 0 */
+    GAMEBIT_WC_FinalSequenceReward = 0xC37,              /* Walled City - set when the final sequence completes; Rena records it as the target of wallcity's HitAnimator */
     GAMEBIT_LV_ChallengeGate1Complete = 0xC52,           /* challenge-gate NPC 1 reward latch (ident 0x46A51) */
     GAMEBIT_LV_ChallengeGate2Complete = 0xC53,           /* One-shot reward latch for LightFoot Village challenge-gate NPC 2 (ident 0x46A55): fires once bits 0xc3b/0xc3c/0xc3d (the three baby-lightfoot-delivered flags) are all set, permanently disabling that NPC's interaction and unlocking swapcircle map objgroup 0xa */
     GAMEBIT_SC_ChallengeGate3Complete = 0xC54,           /* One-shot latch: Lightfoot Village's third target-hit challenge gate (encounterType 0x49928) has been completed and its reward sequence (7) already played */
@@ -927,6 +930,7 @@ enum GameBitId {
     GAMEBIT_ITEM_CCGoldBar2_NotReturned = 0xCA4,         /* table 2 */
     GAMEBIT_ITEM_CCGoldBar3_NotReturned = 0xCA5,         /* table 2 */
     GAMEBIT_ITEM_CCGoldBar4_NotReturned = 0xCA6,         /* table 2 */
+    GAMEBIT_WC_FinalSequenceComplete = 0xCAC,            /* Walled City final sequence finished; wclevelcont polls it in MODE_SEQUENCE to clear the stopwatch bit, set GAMEBIT_WC_FinalSequenceReward, save a checkpoint and move to MODE_DONE, and separately latches WCLEVELCTL_FLAG_EXTRA */
     GAMEBIT_IM_BombPlanted = 0xCB2,                      /* table 2; in front of cheat well cave */
     GAMEBIT_IM_OpenedCheatWell = 0xCB3,                  /* table 2; ref newicemount/HitAnimator target */
     GAMEBIT_IM_CheatWellCaveRelated0CB4 = 0xCB4,         /* table 2; ref newicemount/ExplodeWall onExplode */
@@ -977,6 +981,7 @@ enum GameBitId {
     GAMEBIT_WC_MagicCaveVisible = 0xD7D,                 /* table 2; ref wallcity/MagicCaveTo Visible */
     GAMEBIT_NW_GotPastBribeClaw = 0xD83,                 /* table 2; hint 266 */
     GAMEBIT_ITEM_FuelCell_ShowCount = 0xD97,             /* table 2; on HUD */
+    GAMEBIT_WC_StopwatchEnabled = 0xDA9,                 /* Walled City countdown stopwatch enabled - Rena has it driving wallcity's CNTstopwatc 'enabled' param; wclevelcont treats it, or gameTimerIsRunning, as 'a countdown is up' while the push-block timer is off, and clears it when the final sequence completes */
     GAMEBIT_CFRelated0DB8 = 0xDB8,                       /* table 3 */
     GAMEBIT_VFP_OpenedPathTo = 0xDBF,                    /* table 2; hint 300; ref moonpass/HitAnimator target */
     GAMEBIT_CFRelated0DCA = 0xDCA,                       /* table 0 */
