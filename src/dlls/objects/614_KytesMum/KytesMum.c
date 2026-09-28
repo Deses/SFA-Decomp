@@ -19,6 +19,7 @@
  * game bit.
  */
 #include "dlls/object_descriptor.h"
+#include "main/gamebit_ids.h"
 #include "main/dll/dll_0266_kytesmum.h"
 #include "sys/objects.h"
 #include "main/object_render.h"
@@ -61,7 +62,7 @@ s16 gKytesMumQuestEventSfxTable[4] = {0x336, 0x337, 0x337, 0};
 #define KYTESMUM_MODE_ROAMING    2
 #define KYTESMUM_MODE_QUEST_B    3
 
-const s32 gKytesMumQuestBits[3] = {0x43, 0x30A, -1};
+const s32 gKytesMumQuestBits[3] = {GAMEBIT_CF_SavedQueen, GAMEBIT_KytesMumQuestB, -1};
 const s32 gKytesMumTriggerIds[3] = {0, 2, -1};
 
 int kytesmum_updateInteractionRangeCallback(GameObject* obj, int unused, u8* arg)

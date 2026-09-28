@@ -2,6 +2,7 @@
 #include "dolphin/card.h"
 #include "MSL_C/PPCEABI/bare/H/math_api.h"
 #include "main/gamebits_api.h"
+#include "main/gamebit_ids.h"
 #include "main/rcp_dolphin_api.h"
 #include "dolphin/mtx.h"
 #include "track/intersect.h"
@@ -1439,7 +1440,7 @@ int moonFxRenderCallback(u8* obj, void** objB, int slot) {
     op = ObjModel_GetRenderOp((ModelFileHeader*)objB[0], slot);
     tex = (Texture*)textureIdxToPtr(*(int*)Shader_getLayer((void*)op, 0));
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
-    gMoonFxDayNo = mainGetBit(0x2ba);
+    gMoonFxDayNo = mainGetBit(GAMEBIT_ENV_dayNo);
     tx = renderTextureFrameOffset(gMoonFxDayNo, 30.0f);
     PSMTXTrans(mtx, tx, 0.0f, 0.0f);
     GXLoadTexMtxImm(mtx, GX_TEXMTX0, GX_MTX2x4);

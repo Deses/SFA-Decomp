@@ -105,8 +105,8 @@ void KT_RexLevel_init(GameObject* obj)
     setDrawCloudsAndLights(0);
     mainSetBits(GAMEBIT_DR_KTrexPhaseCounter, 0);
     mainSetBits(0x56e, 1);
-    mainSetBits(0x566, 1);
-    mainSetBits(0x569, 1);
+    mainSetBits(GAMEBIT_DR_KTrexLane0Enabled, 1);
+    mainSetBits(GAMEBIT_DR_KTrexLane3Enabled, 1);
     *(f32*)extra = 6e+02f;
     mainSetBits(GAMEBIT_DR_KTrexPathA, 1);
     mainSetBits(0x54a, 2);

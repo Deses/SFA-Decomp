@@ -63,7 +63,9 @@ const Vec3f gDRCloudRunnerVecTable[5] = {
     {0.0f, 0.0f, 15.0f}, {0.0f, 0.0f, 30.0f}, {0.0f, 0.35f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f},
 };
 
-const s16 gDRCloudRunnerGameBitIds[4] = {0xBF0, 0xBF1, 0xBF2, 0xBF3};
+const s16 gDRCloudRunnerGameBitIds[4] = {GAMEBIT_DR_CloudRunnerRoute0Active, GAMEBIT_DR_CloudRunnerRoute1Active,
+                                            GAMEBIT_DR_CloudRunnerRoute2Active,
+                                            GAMEBIT_DR_CloudRunnerRoute3Active};
 
 const int gDRCloudRunnerCurveIds[4] = {20, 21, 22, 23};
 

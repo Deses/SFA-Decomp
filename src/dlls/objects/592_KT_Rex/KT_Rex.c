@@ -63,8 +63,10 @@ u16 gKTRexWalkPhaseFlagsByLaneEvent2[4] = {2, 8, 0x20, 0};
 u16 gKTRexWalkEndPhaseFlagsByLaneAlt[4] = {0x4000, 0x4000, 0x4000, 0};
 u16 gKTRexWalkEndPhaseFlagsByLane[4] = {0x8000, 0x8000, 0x8000, 0};
 u16 gKTRexPhaseFlagsByVariantB04[4] = {0x40, 0x80, 0x100, 0};
-s16 gKTRexLaneEnabledGameBits[4] = {0x566, 0x567, 0x568, 0x569};
-s16 gKTRexLaneModeGameBits[4] = {0x560, 0x561, 0x562, 0x563};
+s16 gKTRexLaneEnabledGameBits[4] = {GAMEBIT_DR_KTrexLane0Enabled, GAMEBIT_DR_KTrexLane1Enabled, GAMEBIT_DR_KTrexLane2Enabled,
+                                    GAMEBIT_DR_KTrexLane3Enabled};
+s16 gKTRexLaneModeGameBits[4] = {GAMEBIT_DR_KTrexLane0Mode, GAMEBIT_DR_KTrexLane1Mode, GAMEBIT_DR_KTrexLane2Mode,
+                                 GAMEBIT_DR_KTrexLane3Mode};
 
 #define CAMMODE_DEFAULT 0x42 /* dll_0042 - default/release camera */
 

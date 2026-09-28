@@ -497,6 +497,7 @@ enum GameBitId {
     GAMEBIT_WM_FoundKrystal = 0x1FC,                     /* table 2; hint 315; Reached top of Krazoa Palace */
     GAMEBIT_ITEM_WCSunStone_Got = 0x201,                 /* table 2 */
     GAMEBIT_ITEM_WCSunStone_Used = 0x202,                /* table 2 */
+    GAMEBIT_WC_TempleDiaBStage0 = 0x203,                 /* Walled City temple rotating-dial (bank B) - stage 0 complete, gWcTempleDiaGameBitsB[0]; bank chosen by ObjAnim.bankIndex != 0, otherwise as bank A */
     GAMEBIT_ITEM_DIM2CellKey_Used = 0x207,               /* table 2; ref snowmines2/DIM2CellKey open */
     GAMEBIT_ITEM_DIMSilverKey_Used = 0x208,              /* table 2; ref snowmines2/DIM2CellKey open */
     GAMEBIT_CF_FlewTo = 0x212,                           /* table 1; hint 324 */
@@ -535,15 +536,21 @@ enum GameBitId {
     GAMEBIT_LV_TestTrackingBestTime2 = 0x2CB,            /* table 2; size 16 */
     GAMEBIT_LV_TestTrackingBestTime3 = 0x2CC,            /* table 2; size 16 */
     GAMEBIT_LV_EscapedFromPole = 0x2D0,                  /* table 2; hint 347 */
+    GAMEBIT_WC_TempleDiaAStage1 = 0x2D1,                 /* Walled City temple rotating-dial (bank A) - stage 1 complete, gWcTempleDiaGameBitsA[1]; ORed into WCTempleDiaState.stageMask, which picks the dial speed from gWcTempleDiaTargetSpeedTableA and drives part visibility */
+    GAMEBIT_WC_TempleDiaAStage2 = 0x2D2,                 /* Walled City temple rotating-dial (bank A) - stage 2 complete, gWcTempleDiaGameBitsA[2]; ORed into WCTempleDiaState.stageMask, which picks the dial speed from gWcTempleDiaTargetSpeedTableA and drives part visibility */
     GAMEBIT_ITEM_FireGem_Got = 0x2D6,                    /* table 1 */
     GAMEBIT_LV_TestStrengthBestTime2 = 0x2D7,            /* table 2; size 16 */
     GAMEBIT_LV_TestStrengthBestTime3 = 0x2D8,            /* table 2; size 16 */
     GAMEBIT_LV_ChiefStartedTest = 0x2E7,                 /* table 2; hint 348 */
     GAMEBIT_ITEM_WaterSpellStone1_Got = 0x2E8,           /* table 2; hint 336; ref dfptop/VFP_PodiumP key */
+    GAMEBIT_WC_TempleDiaBStage1 = 0x2EC,                 /* Walled City temple rotating-dial (bank B) - stage 1 complete, gWcTempleDiaGameBitsB[1]; bank chosen by ObjAnim.bankIndex != 0, otherwise as bank A */
+    GAMEBIT_WC_TempleDiaBStage2 = 0x2EF,                 /* Walled City temple rotating-dial (bank B) - stage 2 complete, gWcTempleDiaGameBitsB[2]; bank chosen by ObjAnim.bankIndex != 0, otherwise as bank A */
+    GAMEBIT_WC_TempleDiaAStage0 = 0x2F8,                 /* Walled City temple rotating-dial (bank A) - stage 0 complete, gWcTempleDiaGameBitsA[0]; ORed into WCTempleDiaState.stageMask, which picks the dial speed from gWcTempleDiaTargetSpeedTableA and drives part visibility */
     GAMEBIT_CFRelated02FC = 0x2FC,                       /* table 1 */
     GAMEBIT_CFRelated02FD = 0x2FD,                       /* table 1 */
     GAMEBIT_CFRelated02FE = 0x2FE,                       /* table 1 */
     GAMEBIT_CFRelated02FF = 0x2FF,                       /* table 1 */
+    GAMEBIT_KytesMumQuestB = 0x30A,                      /* Kyte's Mum second quest stage gate, gKytesMumQuestBits[1] (trigger id 2); the first stage is gated on GAMEBIT_CF_SavedQueen = 0x43 */
     GAMEBIT_ITEM_Key336_Got = 0x336,                     /* table 1; XXX where is this key from? */
     GAMEBIT_FinalBoss_ActNo = 0x349,                     /* table 1; size 4 */
     GAMEBIT_WC_ObjGroups = 0x36A,                        /* table 3; size 32 */
@@ -637,7 +644,15 @@ enum GameBitId {
     GAMEBIT_TREX_ObjGroups = 0x548,                      /* table 3; size 32 */
     GAMEBIT_DR_KTrexPathA = 0x55A,                       /* Dragon Rock K-Trex (Galdon) arena - path A active; toggles with 0x55b when a floor plate is charged to max, selecting which branch-path bits ktrexlevel applies */
     GAMEBIT_DR_KTrexPathB = 0x55B,                       /* Alternate branch-path selector for the Galdon T-rex arena (Dragon Rock); mutually exclusive with 0x55a, set when a floor switch's charge cycle maxes out and polled by ktrexlevel_updatePathGameBits to choose the arena's second path-bit layout */
+    GAMEBIT_DR_KTrexLane0Mode = 0x560,                   /* Dragon Rock K-Trex (Galdon) arena - lane 0 mode selector, gKTRexLaneModeGameBits[0]; ktrex_update ORs lane 0 into KTRexArenaState.laneMode only while the lane is in currentLaneMask and this bit is set */
+    GAMEBIT_DR_KTrexLane1Mode = 0x561,                   /* Dragon Rock K-Trex (Galdon) arena - lane 1 mode selector, gKTRexLaneModeGameBits[1]; ktrex_update ORs lane 1 into KTRexArenaState.laneMode only while the lane is in currentLaneMask and this bit is set */
+    GAMEBIT_DR_KTrexLane2Mode = 0x562,                   /* Dragon Rock K-Trex (Galdon) arena - lane 2 mode selector, gKTRexLaneModeGameBits[2]; ktrex_update ORs lane 2 into KTRexArenaState.laneMode only while the lane is in currentLaneMask and this bit is set */
+    GAMEBIT_DR_KTrexLane3Mode = 0x563,                   /* Dragon Rock K-Trex (Galdon) arena - lane 3 mode selector, gKTRexLaneModeGameBits[3]; ktrex_update ORs lane 3 into KTRexArenaState.laneMode only while the lane is in currentLaneMask and this bit is set */
     GAMEBIT_WC_Unk0564 = 0x564,                          /* table 2 */
+    GAMEBIT_DR_KTrexLane0Enabled = 0x566,                /* Dragon Rock K-Trex (Galdon) arena - lane 0 enabled, gKTRexLaneEnabledGameBits[0]; ktrex_update ORs lane 0 into KTRexArenaState.activeLaneMask when set; KT_RexLevel_init opens lanes 0 and 3 on arena entry */
+    GAMEBIT_DR_KTrexLane1Enabled = 0x567,                /* Dragon Rock K-Trex (Galdon) arena - lane 1 enabled, gKTRexLaneEnabledGameBits[1]; ktrex_update ORs lane 1 into KTRexArenaState.activeLaneMask when set */
+    GAMEBIT_DR_KTrexLane2Enabled = 0x568,                /* Dragon Rock K-Trex (Galdon) arena - lane 2 enabled, gKTRexLaneEnabledGameBits[2]; ktrex_update ORs lane 2 into KTRexArenaState.activeLaneMask when set */
+    GAMEBIT_DR_KTrexLane3Enabled = 0x569,                /* Dragon Rock K-Trex (Galdon) arena - lane 3 enabled, gKTRexLaneEnabledGameBits[3]; ktrex_update ORs lane 3 into KTRexArenaState.activeLaneMask when set; KT_RexLevel_init opens lanes 0 and 3 on arena entry */
     GAMEBIT_DR_KTrexPhaseCounter = 0x572,                /* Dragon Rock K.Rex (Galdon) boss-arena phase/stage counter, advanced by the fight's state machine and read by DR floor switches (shifted right 1) to pick their rise curve */
     GAMEBIT_ITEM_IMAlpineRoot_Count = 0x576,             /* table 2; size 3 */
     GAMEBIT_ITEM_AlpineRoot_Used = 0x578,                /* table 2; size 3 */
@@ -851,6 +866,10 @@ enum GameBitId {
     GAMEBIT_IM_Unk0BED = 0xBED,                          /* table 0; set when first entering */
     GAMEBIT_IM_Unk0BEE = 0xBEE,                          /* table 0; set when first entering */
     GAMEBIT_IM_Unk0BEF = 0xBEF,                          /* table 0; set when first entering */
+    GAMEBIT_DR_CloudRunnerRoute0Active = 0xBF0,          /* Dragon Rock CloudRunner mount - route 0 selector, gDRCloudRunnerGameBitIds[0]; dr_cloudRunner takes the FIRST set bit of the four and steers toward gDRCloudRunnerCurveIds[0] (curve 20) */
+    GAMEBIT_DR_CloudRunnerRoute1Active = 0xBF1,          /* Dragon Rock CloudRunner mount - route 1 selector, gDRCloudRunnerGameBitIds[1]; dr_cloudRunner takes the FIRST set bit of the four and steers toward gDRCloudRunnerCurveIds[1] (curve 21) */
+    GAMEBIT_DR_CloudRunnerRoute2Active = 0xBF2,          /* Dragon Rock CloudRunner mount - route 2 selector, gDRCloudRunnerGameBitIds[2]; dr_cloudRunner takes the FIRST set bit of the four and steers toward gDRCloudRunnerCurveIds[2] (curve 22) */
+    GAMEBIT_DR_CloudRunnerRoute3Active = 0xBF3,          /* Dragon Rock CloudRunner mount - route 3 selector, gDRCloudRunnerGameBitIds[3]; dr_cloudRunner takes the FIRST set bit of the four and steers toward gDRCloudRunnerCurveIds[3] (curve 23) */
     GAMEBIT_SH_initObjGroups = 0xBF8,                    /* table 0 */
     GAMEBIT_ITEM_TestCombatSpirit_Got = 0xBFD,           /* table 2; hint 312 */
     GAMEBIT_MaybeHaveTricky = 0xC11,                     /* table 2; maybe wrong */
