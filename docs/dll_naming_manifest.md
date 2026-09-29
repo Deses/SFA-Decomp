@@ -716,7 +716,7 @@ any of them is acted on.
 | 0x297 | WCTempleBri | RAW | dlls/objects/663_WCTempleBri/WCTempleBri.c | = (canonical) | Exact complete eleven-function TU with deformation helpers and its sole descriptor at the physical end |
 | 0x298 | WCFloorTile | RAW | dlls/objects/664_WCFloorTile/WCFloorTile.c | = (canonical) | Exact complete nine-function TU with its sole descriptor at the physical end |
 | 0x299 | — | NO-RETAIL-NAME | dlls/objects/665/665.c | = (canonical) | Exact complete nine-function TU with its resource slot and sole descriptor |
-| 0x29A | ARWArwing | RAW | dlls/objects/666_ARWArwing/ARWArwing.c | = (canonical) | DOL-confirmed exact 54-function TU; its early descriptor and complete data block remain with the function body |
+| 0x29A | ARWArwing | RAW | dlls/objects/666_ARWArwing/ARWArwing.c | = (canonical) | Exact 54-function TU with 852 data bytes in all versions; the 38 tuning floats follow its earlier anonymous literal pool in the same TU; early descriptor retained ([pool recovery](sdata2_pool_order.md#arwing-tuning-pool-2026-09-29)) |
 | 0x29B | — | NO-RETAIL-NAME | dlls/objects/667/667.c | = (canonical) | Exact complete twelve-function TU; `arwingandrossstuff` is an internal projectile-family alias, not a recovered DLL basename |
 | 0x29C | ARWArwingBo | RAW | dlls/objects/668_ARWArwingBo/ARWArwingBo.c | = (canonical) | Exact complete twelve-function TU; its source-only detonation helper and early descriptor remain with the body |
 | 0x29D | ARWArwingGu | RAW | dlls/objects/669_ARWArwingGu/ARWArwingGu.c | = (canonical) | DOL-confirmed twelve-function TU; now owns its previously unassigned `0x803E7058..0x803E7068` constants and alignment padding, with code still exact |

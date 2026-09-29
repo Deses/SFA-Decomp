@@ -63,12 +63,13 @@ interpreted as evidence that the definitions belonged to another TU. That
 conclusion was too strong: the qualifier affected the reconstructed expression,
 and the same-TU recovery below preserves both code and data.
 
-`WORLDAstero`'s trailing pair and `ARWArwing`'s tuning values
-still need ownership recovery. Neither an external declaration in reconstructed
+`WORLDAstero`'s trailing pair still needs ownership recovery.
+Neither an external declaration in reconstructed
 source nor a qualifier-induced register change establishes an original boundary.
 The former `650` gap is resolved by the independently aligned pools and handler
 ownership at the [650 / 651 boundary](dll_650_651_boundary.md).
 The push-block pool is resolved by the [652 / 656 boundary](dll_652_656_boundary.md).
+Arwing's tuning values belong to its existing TU, as recovered below.
 
 ## Bouncy-crate constant ownership (2026-09-29)
 
@@ -127,3 +128,37 @@ with the expanded pool linked from source. Each has nine exact functions and
 84 exact data bytes. Regional projection reproduces the expanded ranges, and
 the small-data operand audit confirms the scale's retail address and bytes in
 each secondary version. The source and canonical header pass clang-format.
+
+## Arwing tuning pool (2026-09-29)
+
+Arwing's 38 named tuning floats follow its 164-byte anonymous literal pool.
+Defining them immediately before `arwarwing_initAttachments`, their first
+consumer in source order, reproduces that layout. Earlier functions have
+already emitted all anonymous literals needed by the later functions. Address
+reads preserve the named constants without folding them into duplicate literals.
+Definitions at the head of the file put the named pool too early; definitions
+after their consumers let those references select writable small data first.
+Neither failed placement establishes a separate source file.
+
+The constants retain external linkage to preserve definition order, but no
+other TU consumes them. The old public `extern f32` declarations are removed.
+No code boundary, descriptor position, compiler setting, or generated path
+changes. The resulting `.sdata2` is 316 bytes; the following four zeros are
+natural alignment before DLL 667.
+
+| Version | Complete `.sdata2` range |
+| --- | --- |
+| GSAE01 | `803E6EC8..803E7004` |
+| GSAE01_rev1 | `803E7B60..803E7C9C` |
+| GSAJ01 | `803E6FE8..803E7124` |
+| GSAP01 | `803E86F8..803E8834` |
+| GSAP01_rev1 | `803E88C0..803E89FC` |
+
+All five versions retain 54 exact functions and now own 852 exact data bytes.
+Both `ninja all_source` and the native strict retail checksum pass. Regional
+projection reproduces the complete unit's ranges. The former 156-byte gap
+disappears, leaving 44 unscored data bytes per version: the asteroid pair and
+alignment, render/graphics small BSS, and the existing 24-byte metadata report
+limitations.
+The independent retail operand audit confirms all 38 constants, their bytes,
+and 62 paired r2-relative references in each secondary version.

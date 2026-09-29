@@ -4033,7 +4033,7 @@ dlls/objects/666_ARWArwing/ARWArwing.c:
 	.data       start:0x8032B408 end:0x8032B604
 	.sdata      start:0x803DC3C8 end:0x803DC3D0
 	.sbss       start:0x803DDD88 end:0x803DDD8C
-	.sdata2     start:0x803E6EC8 end:0x803E6F6C
+	.sdata2     start:0x803E6EC8 end:0x803E7004
 
 dlls/objects/667/667.c:
 	.text       start:0x8022E418 end:0x8022ECE0
