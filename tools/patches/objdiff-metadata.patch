@@ -1,0 +1,783 @@
+diff --git a/objdiff-core/src/arch/arm.rs b/objdiff-core/src/arch/arm.rs
+index 4838ed289401626674e6a17d7be8e0f0891c57ea..17f61f1ec1975df457f389e760255e866f0ac97c 100644
+--- a/objdiff-core/src/arch/arm.rs
++++ b/objdiff-core/src/arch/arm.rs
+@@ -162,7 +162,7 @@ impl ArchArm {
+ }
+ 
+ impl Arch for ArchArm {
+-    fn post_init(&mut self, sections: &[Section], symbols: &[Symbol], _symbol_indices: &[usize]) {
++    fn post_init(&mut self, sections: &[Section], symbols: &mut [Symbol], _symbol_indices: &[usize]) {
+         self.disasm_modes = Self::get_mapping_symbols(sections, symbols);
+     }
+ 
+diff --git a/objdiff-core/src/arch/mod.rs b/objdiff-core/src/arch/mod.rs
+index fa41a74492a382346d4a7e4cff8a33771c3dbabf..21d4f17a3408990256c6132006ca0dbeb5882c00 100644
+--- a/objdiff-core/src/arch/mod.rs
++++ b/objdiff-core/src/arch/mod.rs
+@@ -391,7 +391,12 @@ impl dyn Arch {
+ 
+ pub trait Arch: Any + Debug + Send + Sync {
+     /// Finishes arch-specific initialization that must be done after sections have been combined.
+-    fn post_init(&mut self, _sections: &[Section], _symbols: &[Symbol], _symbol_indices: &[usize]) {
++    fn post_init(
++        &mut self,
++        _sections: &[Section],
++        _symbols: &mut [Symbol],
++        _symbol_indices: &[usize],
++    ) {
+     }
+ 
+     /// Generate a list of instructions references (offset, size, opcode) from the given code.
+@@ -456,6 +461,9 @@ pub trait Arch: Any + Debug + Send + Sync {
+ 
+     fn data_reloc_size(&self, flags: RelocationFlags) -> usize;
+ 
++    /// Require relocation target identity where object-local offsets are not meaningful.
++    fn data_reloc_requires_symbol_identity(&self, _section: &Section) -> bool { false }
++
+     fn symbol_address(&self, address: u64, _kind: SymbolKind) -> u64 { address }
+ 
+     fn extra_symbol_flags(&self, _symbol: &object::Symbol) -> SymbolFlagSet {
+diff --git a/objdiff-core/src/arch/ppc/mod.rs b/objdiff-core/src/arch/ppc/mod.rs
+index e60731e4a4d14b854f5a73a507bf4d1ada4d4139..7da1e11e66697d61c55677b951bdc721683ee495 100644
+--- a/objdiff-core/src/arch/ppc/mod.rs
++++ b/objdiff-core/src/arch/ppc/mod.rs
+@@ -1,6 +1,7 @@
+ use alloc::{
+     boxed::Box,
+     collections::{BTreeMap, BTreeSet},
++    format,
+     string::{String, ToString},
+     vec,
+     vec::Vec,
+@@ -335,6 +336,12 @@ impl Arch for ArchPpc {
+         }
+     }
+ 
++    fn data_reloc_requires_symbol_identity(&self, section: &Section) -> bool {
++        // Dead stripping can shift both functions and their exception records.
++        // Equal object-local offsets do not establish the same exception owner.
++        section.name == "extabindex"
++    }
++
+     fn data_reloc_size(&self, flags: RelocationFlags) -> usize {
+         match flags {
+             RelocationFlags::Elf(r_type) => match r_type {
+@@ -483,9 +490,48 @@ impl Arch for ArchPpc {
+         Ok(next_address.saturating_sub(symbol.address))
+     }
+ 
+-    fn post_init(&mut self, _sections: &[Section], _symbols: &[Symbol], symbol_indices: &[usize]) {
++    fn post_init(
++        &mut self,
++        _sections: &[Section],
++        symbols: &mut [Symbol],
++        symbol_indices: &[usize],
++    ) {
+         // Change the indices used as keys from the original symbol indices to the new symbol array indices
+         self.extab = Self::convert_extab_map_indices(self, symbol_indices);
++        // Exception records belong to functions. Their compiler/extractor-generated
++        // names and offsets can differ when the base also contains dead helpers.
++        // Preserve ambiguous shared records instead of choosing an arbitrary owner.
++        let mut names: BTreeMap<usize, Option<String>> = BTreeMap::new();
++        if let Some(entries) = &self.extab {
++            for (&function_index, info) in entries {
++                let Some(function) = symbols.get(function_index) else { continue };
++                let name = function.normalized_name.as_deref().unwrap_or(&function.name);
++                for (role, reference) in
++                    [("extab", &info.etb_symbol), ("extabindex", &info.eti_symbol)]
++                {
++                    let Some(&index) = symbol_indices.get(reference.original_index + 1) else {
++                        continue;
++                    };
++                    if index >= symbols.len() {
++                        continue;
++                    }
++                    let normalized = format!("[{role}:{name}]");
++                    names
++                        .entry(index)
++                        .and_modify(|value| {
++                            if value.as_ref() != Some(&normalized) {
++                                *value = None;
++                            }
++                        })
++                        .or_insert(Some(normalized));
++                }
++            }
++        }
++        for (index, name) in names {
++            if let Some(name) = name {
++                symbols[index].normalized_name = Some(name);
++            }
++        }
+     }
+ }
+ 
+diff --git a/objdiff-core/src/diff/data.rs b/objdiff-core/src/diff/data.rs
+index 032cbf992696044ddea906b02a086ff1df0e4f12..edcfa3ed2bc4ea442ee06cd9c027cd5515b81f70 100644
+--- a/objdiff-core/src/diff/data.rs
++++ b/objdiff-core/src/diff/data.rs
+@@ -42,6 +42,7 @@ fn reloc_eq(
+     right_obj: &Object,
+     left_reloc: ResolvedRelocation,
+     right_reloc: ResolvedRelocation,
++    require_symbol_identity: bool,
+ ) -> bool {
+     if left_reloc.relocation.flags != right_reloc.relocation.flags {
+         return false;
+@@ -54,6 +55,9 @@ fn reloc_eq(
+             if !section_name_eq(left_obj, right_obj, sl, sr) {
+                 return false;
+             };
++            if require_symbol_identity {
++                return symbol_name_addend_matches;
++            }
+             let mut name_ok = false;
+             if left_reloc.symbol.flags.contains(SymbolFlag::CompilerGenerated)
+                 && right_reloc.symbol.flags.contains(SymbolFlag::CompilerGenerated)
+@@ -178,7 +182,14 @@ fn diff_data_relocs_for_range<'left, 'right>(
+             continue;
+         };
+         let right_reloc = resolve_relocation(&right_obj.symbols, right_reloc);
+-        if reloc_eq(left_obj, right_obj, left_reloc, right_reloc) {
++        if reloc_eq(
++            left_obj,
++            right_obj,
++            left_reloc,
++            right_reloc,
++            left_obj.arch.data_reloc_requires_symbol_identity(left_section)
++                || right_obj.arch.data_reloc_requires_symbol_identity(right_section),
++        ) {
+             diffs.push((DataDiffKind::None, Some(left_reloc), Some(right_reloc)));
+         } else {
+             diffs.push((DataDiffKind::Replace, Some(left_reloc), Some(right_reloc)));
+@@ -243,12 +254,30 @@ pub fn diff_data_section(
+     let left_max = symbols_matching_section(&left_obj.symbols, left_section_idx)
+         .filter_map(|(_, s)| s.address.checked_sub(left_section.address).map(|a| a + s.size))
+         .max()
+-        .unwrap_or(0)
++        .unwrap_or_else(|| {
++            // Preserve explicit exclusions, but include truly anonymous sections.
++            if left_obj.symbols.iter().any(|s| {
++                s.section == Some(left_section_idx) && s.kind != SymbolKind::Section && s.size > 0
++            }) {
++                0
++            } else {
++                left_section.size
++            }
++        })
+         .min(left_section.size);
+     let right_max = symbols_matching_section(&right_obj.symbols, right_section_idx)
+         .filter_map(|(_, s)| s.address.checked_sub(right_section.address).map(|a| a + s.size))
+         .max()
+-        .unwrap_or(0)
++        .unwrap_or_else(|| {
++            // Preserve explicit exclusions, but include truly anonymous sections.
++            if right_obj.symbols.iter().any(|s| {
++                s.section == Some(right_section_idx) && s.kind != SymbolKind::Section && s.size > 0
++            }) {
++                0
++            } else {
++                right_section.size
++            }
++        })
+         .min(right_section.size);
+     let left_data = &left_section.data[..left_max as usize];
+     let right_data = &right_section.data[..right_max as usize];
+@@ -295,16 +324,23 @@ pub fn diff_data_section(
+         left_section_idx,
+         right_section_idx,
+     )?;
+-    let all_left_relocs_match = left_reloc_diffs.iter().all(|d| d.kind == DataDiffKind::None);
++    // With no ordinary symbols, only the bytes and relocations can supply a score.
++    if symbols_matching_section(&left_obj.symbols, left_section_idx).next().is_none() {
++        left_section_diff.match_percent = Some(0.0);
++    }
++    let all_relocs_match = left_reloc_diffs
++        .iter()
++        .chain(right_reloc_diffs.iter())
++        .all(|d| d.kind == DataDiffKind::None);
+     left_section_diff.data_diff = left_data_diff;
+     right_section_diff.data_diff = right_data_diff;
+     left_section_diff.reloc_diff = left_reloc_diffs;
+     right_section_diff.reloc_diff = right_reloc_diffs;
+-    if all_left_relocs_match {
++    if all_relocs_match {
+         // Use the highest match percent between two options:
+         // - Left symbols matching right symbols by name
+         // - Diff of the data itself
+-        // We only do this when all relocations on the left side match.
++        // The raw-data fallback requires matching relocations on both sides.
+         if left_section_diff.match_percent.unwrap_or(-1.0) < match_percent {
+             left_section_diff.match_percent = Some(match_percent);
+         }
+diff --git a/objdiff-core/src/obj/read.rs b/objdiff-core/src/obj/read.rs
+index 3377709ce667aba89eeaafdf48f97f77e4dd9b20..ae54772cf8b7234e446b6ea158d048956092dab0 100644
+--- a/objdiff-core/src/obj/read.rs
++++ b/objdiff-core/src/obj/read.rs
+@@ -1107,7 +1107,7 @@ pub fn parse(data: &[u8], config: &DiffObjConfig, diff_side: DiffSide) -> Result
+         combine_sections(&mut sections, &mut symbols, config)?;
+     }
+     add_section_symbols(&sections, &mut symbols);
+-    arch.post_init(&sections, &symbols, &symbol_indices);
++    arch.post_init(&sections, &mut symbols, &symbol_indices);
+     let mut obj = Object {
+         arch,
+         endianness: obj_file.endianness(),
+diff --git a/objdiff-core/tests/data/ppc/metadata/README.md b/objdiff-core/tests/data/ppc/metadata/README.md
+new file mode 100644
+index 0000000000000000000000000000000000000000..bbe75ebb4d52fe2a59c33277793f5e8b66a70d50
+--- /dev/null
++++ b/objdiff-core/tests/data/ppc/metadata/README.md
+@@ -0,0 +1,15 @@
++Synthetic PowerPC exception metadata fixtures; no retail code is included.
++
++Regenerate each object with GNU binutils:
++
++    powerpc-eabi-as -mgekko -o target.o target.s
++    powerpc-eabi-as -mgekko -o source.o source.s
++    powerpc-eabi-as -mgekko -o shared.o shared.s
++    powerpc-eabi-as -mgekko -o wrong_owner.o wrong_owner.s
++
++The source contains two unused functions before fixtureMain; the target contains
++only fixtureMain. The exception record names and object offsets differ, but the
++function, unwind bytes, index length, and index relocations match. Metadata table
++symbols are global to preserve direct symbol relocations in GNU as output, as
++used by the CodeWarrior exception decoder. The shared fixture points two index
++entries at one table; wrong_owner associates the final entry with unusedA.
+diff --git a/objdiff-core/tests/data/ppc/metadata/shared.o b/objdiff-core/tests/data/ppc/metadata/shared.o
+new file mode 100644
+index 0000000000000000000000000000000000000000..6612ba7dfe9e07f18ecd7931bad39ba01797def3
+GIT binary patch
+literal 1012
+zcma)4O-sW-5S_%TZ7rhWLGThmum=gX2zsnVr3V$fc`_ts#bB+FY#@T5KhvM#Pw>rd
+zrdb8ifyul#`}Sip^LBP|?)e_g&7)0VC*h}N?a+Mt)TPeVI|bsw#P0kVZI)Vf<nSAI
+zBn@2n_68zwzgaaLsm4Iu^I5-$RjH!~z<d?nW3Tx(@Rq~-z-+AzyLZ6Y;m5#jho1to
+zwb!lgnz6%gf!F4|crNoh6)BxX19HfLONLa=%0i_lbsW=uR_QWVmvJ_0go%4Z5;;dC
+z(GWKp>qz~06PIiZ^>+oM*YiC7!;0hs{3?sX;^j%l35A8uZF~@<Ri!CRV;xhN6a|5@
+zFjv#qz-*SPs=oA}f&0PtF4cOTI_{U4^mqpe*2xTvL{LZjcA`CS?#ExceQ0=(%-9H+
+z=R!>GJwn3O-GJ|k2vKz00mdUZ%=^G+0$+yn9P%31<(>sfukcSezqtcv9nTMAsR7WN
+V;`0a>lX@|RuFem@$09;Bx-V<(P7(kB
+
+literal 0
+HcmV?d00001
+
+diff --git a/objdiff-core/tests/data/ppc/metadata/shared.s b/objdiff-core/tests/data/ppc/metadata/shared.s
+new file mode 100644
+index 0000000000000000000000000000000000000000..2735de1d48f7aa474be2402d5fad257ef30d8788
+--- /dev/null
++++ b/objdiff-core/tests/data/ppc/metadata/shared.s
+@@ -0,0 +1,48 @@
++.text
++.balign 4
++.global unusedA
++.type unusedA,@function
++unusedA:
++blr
++.size unusedA,.-unusedA
++.global unusedB
++.type unusedB,@function
++unusedB:
++blr
++.size unusedB,.-unusedB
++.global fixtureMain
++.type fixtureMain,@function
++fixtureMain:
++blr
++.size fixtureMain,.-fixtureMain
++.section extab,"a"
++.balign 4
++.global source_etb_0
++.type source_etb_0,@object
++source_etb_0:
++.long 0x20480000,0
++.size source_etb_0,.-source_etb_0
++.global source_etb_1
++.type source_etb_1,@object
++source_etb_1:
++.long 0x20480000,0
++.size source_etb_1,.-source_etb_1
++.global source_etb_2
++.type source_etb_2,@object
++source_etb_2:
++.long 0x20480000,0
++.size source_etb_2,.-source_etb_2
++.section extabindex,"a"
++.balign 4
++.type source_eti_0,@object
++source_eti_0:
++.long unusedA,4,source_etb_0
++.size source_eti_0,.-source_eti_0
++.type source_eti_1,@object
++source_eti_1:
++.long unusedB,4,source_etb_0
++.size source_eti_1,.-source_eti_1
++.type source_eti_2,@object
++source_eti_2:
++.long fixtureMain,4,source_etb_2
++.size source_eti_2,.-source_eti_2
+diff --git a/objdiff-core/tests/data/ppc/metadata/source.o b/objdiff-core/tests/data/ppc/metadata/source.o
+new file mode 100644
+index 0000000000000000000000000000000000000000..3fc7a84a5617623984cd7fbcc7d7b9850f00aee6
+GIT binary patch
+literal 1012
+zcma)4O-sW-5S_%TZLOl>LGThmum=gX6!ch&N)IY{^JGZOioseT*+2zBf2KdfpWvI_
+zOtT821GDqq?%R*qnYXixbI<o^ZXRs`I}?6t)&^$mQkz;=?-Ym!W4rTbw6oNxB8T6w
+zBdOuSw>J=h`}L~fn5qrLJ)iZ9Sd~0F0L<6m9rlXv0B<|I3(VHow0nDu9exblboePS
+zTXVzet{FT07I=Nmi{~=GQ<2hH)FX!+x};C#v@BG5QpFM7XER;q>N3uzwJ>pyNFwKm
+zB<kZvV=c)aZ{n1VA^)~u)OuAg{$WLMfUmMREMA^;oKRTk+{On%TFo?tX{=)klcFF{
+z7UpUa8<<T~HLEWDXW)A9y-SszyN>H6CN<v01nZ;+h9an<eLK-UIM?GZ-2pVbM|x}s
+z%zYsy_a0%w)!l&ai3m}2Tmi;IIL!ONForL~xes}b^K#DurC0bToZsAnvyS_RvE%^g
+WO)xyd#Ux*}p{w%)@R5iRjqVF=-%b+%
+
+literal 0
+HcmV?d00001
+
+diff --git a/objdiff-core/tests/data/ppc/metadata/source.s b/objdiff-core/tests/data/ppc/metadata/source.s
+new file mode 100644
+index 0000000000000000000000000000000000000000..8a412a6913b7f0dff34a2df5abd2f1ddbe7036cf
+--- /dev/null
++++ b/objdiff-core/tests/data/ppc/metadata/source.s
+@@ -0,0 +1,48 @@
++.text
++.balign 4
++.global unusedA
++.type unusedA,@function
++unusedA:
++blr
++.size unusedA,.-unusedA
++.global unusedB
++.type unusedB,@function
++unusedB:
++blr
++.size unusedB,.-unusedB
++.global fixtureMain
++.type fixtureMain,@function
++fixtureMain:
++blr
++.size fixtureMain,.-fixtureMain
++.section extab,"a"
++.balign 4
++.global source_etb_0
++.type source_etb_0,@object
++source_etb_0:
++.long 0x20480000,0
++.size source_etb_0,.-source_etb_0
++.global source_etb_1
++.type source_etb_1,@object
++source_etb_1:
++.long 0x20480000,0
++.size source_etb_1,.-source_etb_1
++.global source_etb_2
++.type source_etb_2,@object
++source_etb_2:
++.long 0x20480000,0
++.size source_etb_2,.-source_etb_2
++.section extabindex,"a"
++.balign 4
++.type source_eti_0,@object
++source_eti_0:
++.long unusedA,4,source_etb_0
++.size source_eti_0,.-source_eti_0
++.type source_eti_1,@object
++source_eti_1:
++.long unusedB,4,source_etb_1
++.size source_eti_1,.-source_eti_1
++.type source_eti_2,@object
++source_eti_2:
++.long fixtureMain,4,source_etb_2
++.size source_eti_2,.-source_eti_2
+diff --git a/objdiff-core/tests/data/ppc/metadata/target.o b/objdiff-core/tests/data/ppc/metadata/target.o
+new file mode 100644
+index 0000000000000000000000000000000000000000..9d50256f4746b25cb55b0668482120064698d956
+GIT binary patch
+literal 752
+zcma)3!Ab)$5S`R&w^BsKgQ$mk(t|7_f*y;Yc&PqD&C;j~+QV*y^`xKR2l_F-$>z1`
+zq2RESc`x&3vXgw>j_*vz$lQ$V0jC>JA$J+pQ`waM<F^cl_knZi60C}AOFc!vJE;~N
+z-@-tadV;Sb%l{exDBp?|-Q6~K5P7zv_1;!5&QF{#C+G59HvXe>54M~w5(N^`dhDHv
+zWG&9?&v$PN$!lM=@s-HC#!Ei6-b!B7wScOya&I=kayE4hTmLT}LZ;_#M7iF0dI!YE
+zQOEnbj(P^pae@uZGQZbVx-)3BhVP*|t)ubWD{Q2?5%_>2MCvXg9<@26`}^=7T;EK&
+p)}_5bWeop;>)EPR-8Q@r=d6J83)k6boEJ}?>dX=N4Mm7S_XoOaE#&|J
+
+literal 0
+HcmV?d00001
+
+diff --git a/objdiff-core/tests/data/ppc/metadata/target.s b/objdiff-core/tests/data/ppc/metadata/target.s
+new file mode 100644
+index 0000000000000000000000000000000000000000..d58cdc7d17f906d3937e62e84020d31628efb8c0
+--- /dev/null
++++ b/objdiff-core/tests/data/ppc/metadata/target.s
+@@ -0,0 +1,20 @@
++.text
++.balign 4
++.global fixtureMain
++.type fixtureMain,@function
++fixtureMain:
++blr
++.size fixtureMain,.-fixtureMain
++.section extab,"a"
++.balign 4
++.global target_etb_0
++.type target_etb_0,@object
++target_etb_0:
++.long 0x20480000,0
++.size target_etb_0,.-target_etb_0
++.section extabindex,"a"
++.balign 4
++.type target_eti_0,@object
++target_eti_0:
++.long fixtureMain,4,target_etb_0
++.size target_eti_0,.-target_eti_0
+diff --git a/objdiff-core/tests/data/ppc/metadata/wrong_owner.o b/objdiff-core/tests/data/ppc/metadata/wrong_owner.o
+new file mode 100644
+index 0000000000000000000000000000000000000000..0437a242fcc4108568e2645002edb0cb5e9872ce
+GIT binary patch
+literal 1012
+zcma)4O-sW-5S_%TZK<N-LGThmum=gX2zsnVr3V$fc`_ts#bB+FY#@T5KhvM#Pw>rd
+zrdb8ifyul#`}Sip^LBP|?)e_g&7)0VC*h}N?a+Mt)TPeVI|bsw#P0kVZI)Vf<nSAI
+zBn@2n_68zwzgaaLsm4Iu^I5-$RjH!~z<d?nW3Tx(@Rq~-z-+AzyLZ6Y;m5#jho1to
+zwb!lgnz6%gf!F4|crNoh6)BxX19HfLONLa=%0i_lbsW=uR_QWVmvJ_0go%4Z5;;dC
+z(GWKp>qz~06PIiZ^>+oM*DHeYALjZ1zslyr;^j%l35A8uZF~@<Ri!CRV;xhN6a|5@
+zFjv#qz-*SPs=oA}f&0PtF4cOTI_{U4^mqpe*2xTvL{LZjcA`CS?#ExceQ0=(%-9H+
+z=R!>GJwn3O-GJ|k2vKz00mdUZ%=^G+0$+yn9P%31<(>sfukcSezqtcv9nTMAsR7WN
+V;`0a>lX@|RuFem@$09;Bx-V)IP7weA
+
+literal 0
+HcmV?d00001
+
+diff --git a/objdiff-core/tests/data/ppc/metadata/wrong_owner.s b/objdiff-core/tests/data/ppc/metadata/wrong_owner.s
+new file mode 100644
+index 0000000000000000000000000000000000000000..5af43cd8219ec34e707030c4824c7a64fdb0f8a3
+--- /dev/null
++++ b/objdiff-core/tests/data/ppc/metadata/wrong_owner.s
+@@ -0,0 +1,48 @@
++.text
++.balign 4
++.global unusedA
++.type unusedA,@function
++unusedA:
++blr
++.size unusedA,.-unusedA
++.global unusedB
++.type unusedB,@function
++unusedB:
++blr
++.size unusedB,.-unusedB
++.global fixtureMain
++.type fixtureMain,@function
++fixtureMain:
++blr
++.size fixtureMain,.-fixtureMain
++.section extab,"a"
++.balign 4
++.global source_etb_0
++.type source_etb_0,@object
++source_etb_0:
++.long 0x20480000,0
++.size source_etb_0,.-source_etb_0
++.global source_etb_1
++.type source_etb_1,@object
++source_etb_1:
++.long 0x20480000,0
++.size source_etb_1,.-source_etb_1
++.global source_etb_2
++.type source_etb_2,@object
++source_etb_2:
++.long 0x20480000,0
++.size source_etb_2,.-source_etb_2
++.section extabindex,"a"
++.balign 4
++.type source_eti_0,@object
++source_eti_0:
++.long unusedA,4,source_etb_0
++.size source_eti_0,.-source_eti_0
++.type source_eti_1,@object
++source_eti_1:
++.long unusedB,4,source_etb_1
++.size source_eti_1,.-source_eti_1
++.type source_eti_2,@object
++source_eti_2:
++.long unusedA,4,source_etb_2
++.size source_eti_2,.-source_eti_2
+diff --git a/objdiff-core/tests/metadata_data.rs b/objdiff-core/tests/metadata_data.rs
+new file mode 100644
+index 0000000000000000000000000000000000000000..ffc30fa2f5ed994747bd673a1471c1fd2e61ff07
+--- /dev/null
++++ b/objdiff-core/tests/metadata_data.rs
+@@ -0,0 +1,205 @@
++#![cfg(feature = "ppc")]
++use objdiff_core::{
++    arch::ppc::ArchPpc,
++    diff::{self, DiffObjConfig, MappingConfig},
++    obj::{
++        Object, Relocation, RelocationFlags, Section, SectionData, SectionKind, Symbol, SymbolKind,
++    },
++};
++fn fixture(named: bool) -> Object {
++    let mut obj = Object {
++        arch: Box::new(ArchPpc { extensions: powerpc::Extensions::gekko_broadway(), extab: None }),
++        ..Default::default()
++    };
++    obj.symbols.push(Symbol { name: "constructor".into(), ..Default::default() });
++    obj.sections.push(Section {
++        name: ".ctors".into(),
++        id: ".ctors".into(),
++        kind: SectionKind::Data,
++        size: 4,
++        data: SectionData(vec![0; 4]),
++        relocations: vec![Relocation {
++            flags: RelocationFlags::Elf(1),
++            address: 0,
++            target_symbol: 0,
++            addend: 0,
++        }],
++        ..Default::default()
++    });
++    if named {
++        obj.symbols.push(Symbol {
++            name: "constructor_reference".into(),
++            kind: SymbolKind::Object,
++            section: Some(0),
++            size: 4,
++            ..Default::default()
++        });
++    }
++    obj
++}
++fn score(left: &Object, right: &Object) -> f32 {
++    let d = diff::diff_objs(
++        Some(left),
++        Some(right),
++        None,
++        &DiffObjConfig::default(),
++        &MappingConfig::default(),
++    )
++    .unwrap();
++    d.left.unwrap().sections[0].match_percent.unwrap()
++}
++#[test]
++fn named_and_anonymous_constructor_match() {
++    assert_eq!(score(&fixture(true), &fixture(false)), 100.0);
++}
++#[test]
++fn anonymous_constructor_bytes_are_compared() {
++    for named in [true, false] {
++        let left = fixture(named);
++        let mut right = fixture(false);
++        right.sections[0].data.0[0] = 0x80;
++        assert!(score(&left, &right) < 100.0);
++    }
++}
++#[test]
++fn anonymous_constructor_addend_is_compared() {
++    for named in [true, false] {
++        let left = fixture(named);
++        let mut right = fixture(false);
++        right.sections[0].relocations[0].addend = 4;
++        assert!(score(&left, &right) < 100.0);
++    }
++}
++#[test]
++fn anonymous_constructor_target_is_compared() {
++    for named in [true, false] {
++        let left = fixture(named);
++        let mut right = fixture(false);
++        right.symbols[0].name = "other_constructor".into();
++        assert!(score(&left, &right) < 100.0);
++    }
++}
++#[test]
++fn extra_source_relocation_is_not_ignored() {
++    for named in [true, false] {
++        let mut left = fixture(named);
++        left.sections[0].relocations.clear();
++        assert!(score(&left, &fixture(false)) < 100.0);
++    }
++}
++#[test]
++fn missing_source_relocation_is_not_ignored() {
++    for named in [true, false] {
++        let mut right = fixture(false);
++        right.sections[0].relocations.clear();
++        assert!(score(&fixture(named), &right) < 100.0);
++    }
++}
++
++#[allow(dead_code)]
++mod common;
++fn metadata_pair() -> (Object, Object) {
++    let config = DiffObjConfig::default();
++    let left = objdiff_core::obj::read::parse(
++        include_object!("data/ppc/metadata/target.o"),
++        &config,
++        diff::DiffSide::Target,
++    )
++    .unwrap();
++    let right = objdiff_core::obj::read::parse(
++        include_object!("data/ppc/metadata/source.o"),
++        &config,
++        diff::DiffSide::Base,
++    )
++    .unwrap();
++    (left, right)
++}
++fn section_score(left: &Object, right: &Object, section: &str) -> f32 {
++    let result = diff::diff_objs(
++        Some(left),
++        Some(right),
++        None,
++        &DiffObjConfig::default(),
++        &MappingConfig::default(),
++    )
++    .unwrap();
++    let idx = left.sections.iter().position(|s| s.name == section).unwrap();
++    result.left.unwrap().sections[idx].match_percent.unwrap()
++}
++#[test]
++fn exception_records_match_by_function_identity() {
++    let (left, right) = metadata_pair();
++    for section in ["extab", "extabindex"] {
++        assert_eq!(section_score(&left, &right, section), 100.0, "{section}");
++    }
++}
++#[test]
++fn exception_payload_is_compared() {
++    let (left, mut right) = metadata_pair();
++    let section = right.sections.iter_mut().find(|s| s.name == "extab").unwrap();
++    section.data.0[16] ^= 0x10;
++    assert!(section_score(&left, &right, "extab") < 100.0);
++}
++#[test]
++fn exception_index_length_is_compared() {
++    let (left, mut right) = metadata_pair();
++    let section = right.sections.iter_mut().find(|s| s.name == "extabindex").unwrap();
++    section.data.0[31] = 8;
++    assert!(section_score(&left, &right, "extabindex") < 100.0);
++}
++#[test]
++fn exception_index_function_is_compared() {
++    let (left, mut right) = metadata_pair();
++    let other = right.symbols.iter().position(|s| s.name == "unusedA").unwrap();
++    let section = right.sections.iter_mut().find(|s| s.name == "extabindex").unwrap();
++    section.relocations.iter_mut().find(|r| r.address == 24).unwrap().target_symbol = other;
++    assert!(section_score(&left, &right, "extabindex") < 100.0);
++}
++#[test]
++fn exception_index_table_is_compared() {
++    let (left, mut right) = metadata_pair();
++    let other = right.symbols.iter().position(|s| s.name == "source_etb_0").unwrap();
++    let section = right.sections.iter_mut().find(|s| s.name == "extabindex").unwrap();
++    section.relocations.iter_mut().find(|r| r.address == 32).unwrap().target_symbol = other;
++    assert!(section_score(&left, &right, "extabindex") < 100.0);
++}
++#[test]
++fn exception_index_addend_is_compared() {
++    let (left, mut right) = metadata_pair();
++    let section = right.sections.iter_mut().find(|s| s.name == "extabindex").unwrap();
++    section.relocations.iter_mut().find(|r| r.address == 32).unwrap().addend += 4;
++    assert!(section_score(&left, &right, "extabindex") < 100.0);
++}
++
++#[test]
++fn shared_exception_table_keeps_ambiguous_name() {
++    let config = DiffObjConfig::default();
++    let obj = objdiff_core::obj::read::parse(
++        include_object!("data/ppc/metadata/shared.o"),
++        &config,
++        diff::DiffSide::Base,
++    )
++    .unwrap();
++    let shared = obj.symbols.iter().find(|s| s.name == "source_etb_0").unwrap();
++    assert_eq!(shared.normalized_name, None);
++    let main = obj.symbols.iter().find(|s| s.name == "source_etb_2").unwrap();
++    assert_eq!(main.normalized_name.as_deref(), Some("[extab:fixtureMain]"));
++}
++#[test]
++fn incorrect_exception_owner_is_not_paired() {
++    let config = DiffObjConfig::default();
++    let (left, _) = metadata_pair();
++    let right = objdiff_core::obj::read::parse(
++        include_object!("data/ppc/metadata/wrong_owner.o"),
++        &config,
++        diff::DiffSide::Base,
++    )
++    .unwrap();
++    assert!(section_score(&left, &right, "extabindex") < 100.0);
++    assert!(
++        !right
++            .symbols
++            .iter()
++            .any(|s| s.normalized_name.as_deref() == Some("[extabindex:fixtureMain]"))
++    );
++}
+diff --git a/objdiff-core/tests/snapshots/arch_ppc__read_extab.snap b/objdiff-core/tests/snapshots/arch_ppc__read_extab.snap
+index 82c3d20271ecbfe5090ab42685a62810d185587d..44f7d588e1840bedce02de745d513d19c807c100 100644
+--- a/objdiff-core/tests/snapshots/arch_ppc__read_extab.snap
++++ b/objdiff-core/tests/snapshots/arch_ppc__read_extab.snap
+@@ -211,7 +211,9 @@ Object {
+         Symbol {
+             name: "@30",
+             demangled_name: None,
+-            normalized_name: None,
++            normalized_name: Some(
++                "[extab:__destroy_arr]",
++            ),
+             address: 0,
+             size: 8,
+             kind: Object,
+@@ -227,7 +229,9 @@ Object {
+         Symbol {
+             name: "@51",
+             demangled_name: None,
+-            normalized_name: None,
++            normalized_name: Some(
++                "[extab:__construct_array]",
++            ),
+             address: 8,
+             size: 24,
+             kind: Object,
+@@ -243,7 +247,9 @@ Object {
+         Symbol {
+             name: "@59",
+             demangled_name: None,
+-            normalized_name: None,
++            normalized_name: Some(
++                "[extab:__dt__26__partial_array_destructorFv]",
++            ),
+             address: 32,
+             size: 8,
+             kind: Object,
+@@ -275,7 +281,9 @@ Object {
+         Symbol {
+             name: "@31",
+             demangled_name: None,
+-            normalized_name: None,
++            normalized_name: Some(
++                "[extabindex:__destroy_arr]",
++            ),
+             address: 0,
+             size: 12,
+             kind: Object,
+@@ -291,7 +299,9 @@ Object {
+         Symbol {
+             name: "@52",
+             demangled_name: None,
+-            normalized_name: None,
++            normalized_name: Some(
++                "[extabindex:__construct_array]",
++            ),
+             address: 12,
+             size: 12,
+             kind: Object,
+@@ -307,7 +317,9 @@ Object {
+         Symbol {
+             name: "@60",
+             demangled_name: None,
+-            normalized_name: None,
++            normalized_name: Some(
++                "[extabindex:__dt__26__partial_array_destructorFv]",
++            ),
+             address: 24,
+             size: 12,
+             kind: Object,

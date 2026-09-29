@@ -96,6 +96,8 @@ Download the latest release from [encounter/objdiff](https://github.com/encounte
 
 Select an object from the left sidebar to begin diffing. Changes to the project will rebuild automatically: changes to source files, headers, `configure.py`, `splits.txt` or `symbols.txt`.
 
+For the optional CLI fix that compares anonymous constructors and exception records, see [compiler metadata comparison](docs/objdiff_metadata.md).
+
 ![](assets/objdiff.png)
 
 # Acknowledgements

@@ -8,6 +8,8 @@
 *.bat  text eol=crlf
 *.sh   text eol=lf
 *.sha1 text eol=lf
+# Unified diff context lines contain a required leading space, including blank lines.
+tools/patches/objdiff-metadata.patch text eol=lf whitespace=-blank-at-eol
 
 # decomp-toolkit writes files with LF
 config/**/*.txt  text eol=lf
