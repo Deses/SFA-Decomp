@@ -63,9 +63,9 @@ interpreted as evidence that the definitions belonged to another TU. That
 conclusion was too strong: the qualifier affected the reconstructed expression,
 and the same-TU recovery below preserves both code and data.
 
-`WORLDAstero`'s trailing pair still needs ownership recovery.
-Neither an external declaration in reconstructed
-source nor a qualifier-induced register change establishes an original boundary.
+Neither an external declaration in reconstructed source nor a qualifier-induced
+register change establishes an original boundary. The remaining asteroid pair
+is now recovered in its complete initialization pool below.
 The former `650` gap is resolved by the independently aligned pools and handler
 ownership at the [650 / 651 boundary](dll_650_651_boundary.md).
 The push-block pool is resolved by the [652 / 656 boundary](dll_652_656_boundary.md).
@@ -119,9 +119,9 @@ The preceding word at `0x803E65CC` remains outside this unit.
 The two trailing orbit constants are a different case. Replacing both with
 `80.0f` and `145.0f` moves the radius multiplication and integer conversion past
 the random-number calls, requires saving an additional floating-point register,
-and changes their pool order. That probe is not retained; those definitions
-still require recovery. No artificial data definitions or compiler changes are
-used for the render scale.
+and changes their pool order. That probe is not retained; the complete named
+initialization pool below resolves the pair. No artificial data definitions or
+compiler changes are used for the render scale.
 
 All five versions pass `ninja all_source` and the native strict retail checksum
 with the expanded pool linked from source. Each has nine exact functions and
@@ -162,3 +162,35 @@ alignment, render/graphics small BSS, and the existing 24-byte metadata report
 limitations.
 The independent retail operand audit confirms all 38 constants, their bytes,
 and 62 paired r2-relative references in each secondary version.
+
+## Asteroid initialization pool (2026-09-29)
+
+The five initialization values are now private `static const f32` definitions:
+zero, the discarded random call's limit scale and base (33 and 7), and the
+orbit-radius variation and base (80 and 145). Each read goes through its address.
+This preserves retail scheduling and avoids additional anonymous literals.
+The random call's result is deliberately discarded, as in retail; the call
+still advances the RNG.
+
+Static emission follows use processing: the pool stores 0, 7, 33, 80, 145 after
+the renderer's scale and the update function's conversion double. Non-static
+definitions in declaration order swap 7 and 33; defining only the last pair
+puts them ahead of the initialization literals. The complete private pool
+reproduces all bytes without changing the TU or forcing sections.
+
+| Version | Complete `.sdata2` range |
+| --- | --- |
+| GSAE01 | `803E65D0..803E65F4` |
+| GSAE01_rev1 | `803E7268..803E728C` |
+| GSAJ01 | `803E66F0..803E6714` |
+| GSAP01 | `803E7DF0..803E7E14` |
+| GSAP01_rev1 | `803E7FB8..803E7FDC` |
+
+All five versions retain nine exact functions and now own 92 exact data bytes.
+`ninja all_source` and the native strict retail checksum pass. The four zeros
+after the 36-byte pool are linker alignment before the following unit. This
+removes the last unassigned floating-point pool, leaving 32 unscored data bytes
+per version: eight bytes of render/graphics BSS and 24 bytes of metadata.
+Regional projection reproduces the complete unit. The retail operand audit
+confirms all five constants, their bytes, and six paired r2-relative references
+per secondary version. The generated source-path audit also passes.

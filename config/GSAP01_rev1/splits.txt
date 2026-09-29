@@ -3683,7 +3683,7 @@ dlls/objects/588_BossDrakor_/BossDrakor_.c:
 dlls/objects/468_WORLDAstero/WORLDAstero.c:
 	.text       start:0x8020CB58 end:0x8020CECC
 	.data       start:0x8032BAD8 end:0x8032BB10
-	.sdata2     start:0x803E7FB8 end:0x803E7FD4
+	.sdata2     start:0x803E7FB8 end:0x803E7FDC
 
 dlls/objects/466_WORLDplanet/WORLDplanet.c:
 	.text       start:0x8020CECC end:0x8020E2C4
