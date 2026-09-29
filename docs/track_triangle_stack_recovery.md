@@ -209,8 +209,8 @@ Temporary names depend on the current source and compiler. The tool fails
 if a requested name has no observed birth in the selected graphs. It joins
 factory results to graph nodes by object address and checks name/type identity;
 register numbers alone are not used as identity. The return address identifies
-one caller site, not an unwound stack. The new option is macOS-only; existing
-capture modes and cross-platform trace reading remain available. The factory's
+one caller site, not an unwound stack. The option supports macOS and native
+Windows; existing capture modes and cross-platform trace reading remain available. The factory's
 RET is emulated as a four-byte guest return, without changing its EAX result.
 Ordinary/instrumented object equality remains mandatory.
 

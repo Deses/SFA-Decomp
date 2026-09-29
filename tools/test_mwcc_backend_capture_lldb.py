@@ -14,6 +14,13 @@ import mwcc_backend_capture_lldb as capture
 
 
 class LldbCaptureTests(unittest.TestCase):
+    def setUp(self):
+        # Cleanup tests model a POSIX debugger even when run on Windows.
+        if not hasattr(signal, "SIGKILL"):
+            signal_patch = patch.object(signal, "SIGKILL", 9, create=True)
+            signal_patch.start()
+            self.addCleanup(signal_patch.stop)
+
     def test_ret_uses_four_byte_guest_stack(self):
         word, write = Mock(return_value=capture.BASE + 0x1234), Mock()
         self.assertEqual(capture.emulate_hook(capture.DUMP, 0x1000, 0, word, write),
@@ -85,7 +92,7 @@ class LldbCaptureTests(unittest.TestCase):
                 pid.write_text("4321")
                 process = Mock(pid=1234)
                 with patch.object(capture.subprocess, "run", return_value=SimpleNamespace(stdout=args)), \
-                        patch.object(capture.os, "kill") as kill, patch.object(capture.os, "killpg") as killpg:
+                        patch.object(capture.os, "kill") as kill, patch.object(capture.os, "killpg", create=True) as killpg:
                     capture._stop_timed_out_capture(process, pid, ["compiler", "-o", "/tmp/unique/traced"])
                     if expected:
                         kill.assert_called_once_with(4321, signal.SIGKILL)
@@ -100,7 +107,7 @@ class LldbCaptureTests(unittest.TestCase):
             pid.write_text("4321")
             process = Mock(pid=1234)
             with patch.object(capture.subprocess, "run", side_effect=subprocess.TimeoutExpired("ps", 2)), \
-                    patch.object(capture.os, "kill") as kill, patch.object(capture.os, "killpg") as killpg:
+                    patch.object(capture.os, "kill") as kill, patch.object(capture.os, "killpg", create=True) as killpg:
                 capture._stop_timed_out_capture(process, pid, ["compiler", "-o", "/tmp/unique/traced"])
                 kill.assert_not_called()
                 killpg.assert_called_once_with(1234, signal.SIGKILL)
@@ -120,7 +127,7 @@ class LldbCaptureTests(unittest.TestCase):
                     SimpleNamespace(stdout=snapshot),
                     SimpleNamespace(stdout="2200 /Library/Apple/usr/libexec/oah/debugserver\n")]), \
                     patch.object(capture.os, "kill", side_effect=lambda *args: calls.append(("pid", *args))), \
-                    patch.object(capture.os, "killpg", side_effect=lambda *args: calls.append(("group", *args))):
+                    patch.object(capture.os, "killpg", create=True, side_effect=lambda *args: calls.append(("group", *args))):
                 capture._stop_timed_out_capture(process, Path(directory) / "missing.pid",
                                                 ["compiler", "-o", "/tmp/unique/traced"])
             self.assertEqual(calls, [("pid", 2201, signal.SIGKILL), ("group", 1234, signal.SIGKILL)])

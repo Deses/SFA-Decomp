@@ -16,7 +16,7 @@ import tempfile
 import time
 
 from tricky_backend_ir import COMPILER_SHA256, capture_snapshot
-from tricky_backend_graph import capture_graph_snapshot, register_kind
+from tricky_backend_graph import capture_graph_snapshot, match_temporary_births, register_kind
 
 if sys.platform != "win32" or C.sizeof(C.c_void_p) != 8:
     raise RuntimeError("IR capture requires 64-bit Windows Python and an x86 compiler")
@@ -98,8 +98,13 @@ def require(ok):
     if not ok:
         raise C.WinError(C.get_last_error())
 
-def capture(command, cwd, wanted, timeout=60, graph=False, register_class=4):
+def capture(command, cwd, wanted, timeout=60, graph=False, register_class=4, temporary_names=()):
     register_kind(register_class)
+    if temporary_names and not graph:
+        raise ValueError("temporary birth capture requires --graph")
+    temporary_names = set(temporary_names)
+    temporary_births = {}
+    temporary_return = None
     executable = (Path(cwd) / command[0]).resolve()
     digest = hashlib.sha256(executable.read_bytes()).hexdigest()
     if digest != COMPILER_SHA256:
@@ -177,6 +182,14 @@ def capture(command, cwd, wanted, timeout=60, graph=False, register_class=4):
                     if count.value != 1:
                         raise ValueError("short breakpoint write")
                     require(flush(pi.process, breakpoint, 1))
+                    if temporary_names:
+                        temporary_return = base + 0xF4275
+                        if memory(temporary_return, 1) != b"\xc3":
+                            raise ValueError("temporary factory hook is not the expected return")
+                        require(write(pi.process, temporary_return, b"\xcc", 1, C.byref(count)))
+                        if count.value != 1:
+                            raise ValueError("short temporary factory breakpoint write")
+                        require(flush(pi.process, temporary_return, 1))
                     if graph:
                         graph_breakpoints = {base + 0x107070: "BEFORE GPR SIMPLIFICATION",
                                              base + 0x106E20: "BEFORE GPR REWRITE"}
@@ -198,7 +211,28 @@ def capture(command, cwd, wanted, timeout=60, graph=False, register_class=4):
                     exit_code = event.info.exitCode
                 elif event.code == 1:
                     exception = event.info.exception.record
-                    if (exception.address in graph_breakpoints
+                    if (temporary_return is not None and exception.address == temporary_return
+                            and exception.code in (0x80000003, 0x4000001F)):
+                        context = Context(flags=0x10007)
+                        require(getcontext(threads[event.tid], C.byref(context)))
+                        if context.eip != temporary_return + 1:
+                            raise ValueError("unexpected instruction pointer at temporary factory return")
+                        destination = word(context.esp)
+                        if not base <= destination < base + 0x20B000:
+                            raise ValueError("temporary factory return is outside the compiler image")
+                        address = context.eax
+                        temporary_births.pop(address, None)  # The compiler reuses its arena.
+                        name = string(word(address + 10) + 10)
+                        if name in temporary_names:
+                            temporary_births[address] = {
+                                "object": address, "name": name, "type": word(address + 14),
+                                "factory": base + 0xF4200, "return_address": destination,
+                            }
+                        # Execute the verified RET, preserving EAX and the flags.
+                        context.eip = destination
+                        context.esp += 4
+                        require(setcontext(threads[event.tid], C.byref(context)))
+                    elif (exception.address in graph_breakpoints
                             and exception.code in (0x80000003, 0x4000001F)):
                         context = Context(flags=0x10007)
                         require(getcontext(threads[event.tid], C.byref(context)))
@@ -208,6 +242,10 @@ def capture(command, cwd, wanted, timeout=60, graph=False, register_class=4):
                             snapshot = capture_graph_snapshot(memory, base, current_name,
                                                               exception.address == base + 0x106E20,
                                                               register_class)
+                            if temporary_names:
+                                snapshot["temporary_births"] = match_temporary_births(
+                                    snapshot["coloring_graph"], temporary_births,
+                                    lambda address: (string(word(address + 10) + 10), word(address + 14)))
                             snapshots.append(snapshot)
                         # Execute the verified PUSH EBX's exact stack effect. At
                         # this point the graph is live, unlike post-pass dumps.

@@ -11,6 +11,17 @@ from fractions import Fraction
 from tricky_backend_ir import capture_snapshot, decode
 
 
+def match_temporary_births(graph, births, identity):
+    """Join observed factory results to graph objects, not to register numbers."""
+    matched = {}
+    for register, node in enumerate(graph):
+        address = node["prefix"][1]
+        if address in births and identity(address) == (births[address]["name"], births[address]["type"]):
+            entry = matched.setdefault(address, dict(births[address], registers=[]))
+            entry["registers"].append(register)
+    return list(matched.values())
+
+
 def register_kind(register_class):
     if register_class not in (3, 4):
         raise ValueError("only GC/1.3 FPR and GPR graphs are supported")
