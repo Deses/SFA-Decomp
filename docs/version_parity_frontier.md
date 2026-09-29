@@ -1,5 +1,11 @@
 # The version-parity frontier — seven units, one function each
 
+> **2026-09-29 maze-well correction:** Slot 611 is also exact in all five
+> versions. An inline activation helper and complete packed-table views recover
+> the retail register lifetimes and address materialization. No reserved
+> registers or flag changes are needed. See [maze-well matching](maze_well_matching.md).
+> Only PAL's `askProgressiveScanMode` remains a code holdout.
+>
 > **2026-09-29 correction:** Boss Drakor is exact in all five versions. Two
 > named curve-walker argument values change fixed-color alias counts in the
 > compiler graph, resolving the saved-register rotation without a reservation.

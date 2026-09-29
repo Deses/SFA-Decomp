@@ -2,7 +2,7 @@
  * GM_MazeWell (DLL 611) - the wishing/quest well in the maze area.
  *
  * The well watches a fixed set of nine quest/event game bits (the
- * gQuestBitTable rows below). While the well's hitbox is being touched
+ * quest-table rows below). While the well's hitbox is being touched
  * (INTERACT_FLAG_ACTIVATED) it scans those bits for a ready event: when
  * one fires it grants that row's reward bits, optionally unlocks a cheat
  * (rows 0-2), records the row's dialogue id as a pending trigger, and
@@ -29,22 +29,16 @@
 #include "dolphin/pad.h"
 #include "main/shader_api.h"
 
-/* Quest-bit table layout (gQuestBitTable, 44 s16 entries):
- *   [0..8]   watched quest/event bits
- *   [10..18] reward bits granted when the matching event fires
- *   [20..28] follow-up bits
- *   [28..]   dialogue ids, viewed as s32 via gQuestBitTable32[14..21] */
-#define QUEST_BIT_COUNT       9
-#define QUEST_REWARD_BASE     10
-#define QUEST_FOLLOWUP_BASE   20
-#define QUEST_DIALOGUE_BASE32 14
+/* The packed tables contain nine watched/reward bits but only eight follow-up
+ * bits and dialogue IDs. Keep their retail offsets and the unchecked ninth row. */
+#define QUEST_BIT_COUNT 9
 
 /* music track toggled while the well is active (game bit is GAMEBIT_MAZEWELL_ACTIVE) */
 #define MUSIC_MAZEWELL 0x36
 
 #define MAZEWELL_DEFAULT_DIALOGUE 1316
 
-/* Row indices into gQuestBitTable[]; rows 0-3 map 1:1 to enum CheatId, rows 4-7
+/* Row indices into gGmMazeWellQuestBits.watched; rows 0-3 map 1:1 to enum CheatId, rows 4-7
  * grant no cheat, row 8 is the unused/dead 9th token. */
 enum QuestWellRow {
     QUESTWELL_CREDITS = 0,       /* ThornTail Shop      -> CHEAT_SHOW_CREDITS */
@@ -83,10 +77,81 @@ void GM_MazeWell_render(void* obj, int p2, int p3, int p4, int p5, s8 visible) {
     objRenderModelAndHitVolumes(obj, p2, p3, p4, p5, (double)1.0f);
 }
 
+/* The unused ninth row would read the first dialogue halfword as its follow-up
+ * bit and the following descriptor's first word as its dialogue ID. Retain the
+ * unchecked retail accesses through byte-derived pointers without widening the
+ * allocation-backed tables. */
+static inline int mazeWellActivate(GameObject* obj, s16* questBits) {
+GmMazeWellQuestTables* tables = (GmMazeWellQuestTables*)questBits; GmmazewellState* state;
+        int found;
+        int itemIndex;
+        s16* followup;
+        s32* dialogue;
+        for (itemIndex = 0;;) {
+            if ((*gGameUIInterface)->isItemBeingUsed(questBits[itemIndex]) != 0) {
+#if defined(VERSION_GSAP01) || defined(VERSION_GSAP01_rev1)
+                state = obj->extra;
+                switch (itemIndex) {
+                case 0:
+                case 1:
+                case 2:
+                    mainSetBits(tables->reward[itemIndex], 1);
+                    saveFileStruct_unlockCheat((u8)itemIndex);
+                    break;
+                }
+                dialogue = (s32*)((u8*)tables + offsetof(GmMazeWellQuestTables, dialogue));
+                state->pendingDialogue = dialogue[itemIndex];
+                followup = (s16*)((u8*)tables + offsetof(GmMazeWellQuestTables, followup));
+                mainSetBits(followup[itemIndex], 1);
+#else
+                if (gGameTextFontIsSjis != 0) {
+                    state = obj->extra;
+                    switch (itemIndex) {
+                    case 0:
+                    case 1:
+                    case 2:
+                        mainSetBits(tables->reward[itemIndex], 1);
+                        saveFileStruct_unlockCheat((u8)itemIndex);
+                        break;
+                    }
+                    dialogue = (s32*)((u8*)tables + offsetof(GmMazeWellQuestTables, dialogue));
+                    state->pendingDialogue = dialogue[itemIndex];
+                    followup = (s16*)((u8*)tables + offsetof(GmMazeWellQuestTables, followup));
+                    mainSetBits(followup[itemIndex], 1);
+                } else {
+                    state = obj->extra;
+                    dialogue = (s32*)((u8*)tables + offsetof(GmMazeWellQuestTables, dialogue));
+                    state->pendingDialogue = dialogue[itemIndex];
+                    switch (itemIndex) {
+                    case 3:
+                        state->pendingDialogue = MAZEWELL_DEFAULT_DIALOGUE;
+                    case 0:
+                    case 1:
+                    case 2:
+                        mainSetBits(tables->reward[itemIndex], 1);
+                        saveFileStruct_unlockCheat((u8)itemIndex);
+                        break;
+                    }
+                    followup = (s16*)((u8*)tables + offsetof(GmMazeWellQuestTables, followup));
+                    mainSetBits(followup[itemIndex], 1);
+                }
+#endif
+                found = 1;
+                break;
+            }
+            itemIndex++;
+            if ((u32)itemIndex >= QUEST_BIT_COUNT) {
+                found = 0;
+                break;
+            }
+        }
+
+return found;
+}
 void GM_MazeWell_update(GameObject* obj) {
     GameObject* objId;
-    s16* questBits = gGmMazeWellQuestBits;
-    s32* questBits32 = (s32*)questBits;
+    s16* questBits = gGmMazeWellQuestBits.watched;
+    GmMazeWellQuestTables* tables = (GmMazeWellQuestTables*)questBits;
     GmmazewellState* state = obj->extra;
     GameObject* player;
     int matchedBit;
@@ -105,7 +170,7 @@ void GM_MazeWell_update(GameObject* obj) {
 
     for (i = 0, questBitPtr = questBits;;) {
         if (mainGetBit(*questBitPtr) != 0) {
-            matchedBit = questBits[i];
+            matchedBit = tables->watched[i];
             break;
         }
         questBitPtr++;
@@ -122,70 +187,16 @@ void GM_MazeWell_update(GameObject* obj) {
         obj->anim.resetHitboxFlags |= INTERACT_FLAG_PROMPT_SUPPRESSED;
     }
 
-    objId = (GameObject*)((int)obj);
+    objId = obj;
     if ((objId->anim.resetHitboxFlags & INTERACT_FLAG_ACTIVATED) != 0) {
-        int found;
-        int itemIndex;
-        for (itemIndex = 0;;) {
-            if ((*gGameUIInterface)->isItemBeingUsed(questBits[itemIndex]) != 0) {
-#if defined(VERSION_GSAP01) || defined(VERSION_GSAP01_rev1)
-                state = obj->extra;
-                switch (itemIndex) {
-                case 0:
-                case 1:
-                case 2:
-                    mainSetBits(questBits[itemIndex + QUEST_REWARD_BASE], 1);
-                    saveFileStruct_unlockCheat((u8)itemIndex);
-                    break;
-                }
-                state->pendingDialogue = questBits32[itemIndex + QUEST_DIALOGUE_BASE32];
-                mainSetBits(questBits[itemIndex + QUEST_FOLLOWUP_BASE], 1);
-#else
-                if (gGameTextFontIsSjis != 0) {
-                    state = obj->extra;
-                    switch (itemIndex) {
-                    case 0:
-                    case 1:
-                    case 2:
-                        mainSetBits(questBits[itemIndex + QUEST_REWARD_BASE], 1);
-                        saveFileStruct_unlockCheat((u8)itemIndex);
-                        break;
-                    }
-                    state->pendingDialogue = questBits32[itemIndex + QUEST_DIALOGUE_BASE32];
-                    mainSetBits(questBits[itemIndex + QUEST_FOLLOWUP_BASE], 1);
-                } else {
-                    state = obj->extra;
-                    state->pendingDialogue = questBits32[itemIndex + QUEST_DIALOGUE_BASE32];
-                    switch (itemIndex) {
-                    case 3:
-                        state->pendingDialogue = MAZEWELL_DEFAULT_DIALOGUE;
-                    case 0:
-                    case 1:
-                    case 2:
-                        mainSetBits(questBits[itemIndex + QUEST_REWARD_BASE], 1);
-                        saveFileStruct_unlockCheat((u8)itemIndex);
-                        break;
-                    }
-                    mainSetBits(questBits[itemIndex + QUEST_FOLLOWUP_BASE], 1);
-                }
-#endif
-                found = 1;
-                break;
-            }
-            itemIndex++;
-            if ((u32)itemIndex >= QUEST_BIT_COUNT) {
-                found = 0;
-                break;
-            }
-        }
-
+        int found = mazeWellActivate(obj, questBits);
         if (found != 0) {
             (*gObjectTriggerInterface)->runSequence(0, (void*)obj, -1);
             buttonDisable(0, PAD_BUTTON_A);
         }
     }
 
-    objUpdateHitVolumeTransforms((GameObject*)(int)obj);
+    objUpdateHitVolumeTransforms(obj);
 }
 
 void GM_MazeWell_init(GameObject* obj) {
@@ -196,10 +207,12 @@ void GM_MazeWell_init(GameObject* obj) {
     obj->animEventCallback = GM_MazeWell_SeqFn;
 }
 
-s16 gGmMazeWellQuestBits[44] = {0x0ddc, 0x0de2, 0x0dde, 0x0ddd, 0x0de0, 0x0de3, 0x0ddf, 0x0de1, 0x0de4, 0x0000, 0x0de5,
-                                0x0deb, 0x0de7, 0x0de6, 0x0de9, 0x0dec, 0x0de8, 0x0dea, 0x0ded, 0x0000, 0x0f34, 0x0f3a,
-                                0x0f36, 0x0f35, 0x0f38, 0x0f3b, 0x0f37, 0x0f39, 0x0000, 0x0524, 0x0000, 0x0524, 0x0000,
-                                0x0524, 0x0000, 0x0571, 0x0000, 0x056e, 0x0000, 0x056f, 0x0000, 0x0570, 0x0000, 0x0572};
+GmMazeWellQuestTables gGmMazeWellQuestBits = {
+{0xddc, 0xde2, 0xdde, 0xddd, 0xde0, 0xde3, 0xddf, 0xde1, 0xde4}, {0},
+{0xde5, 0xdeb, 0xde7, 0xde6, 0xde9, 0xdec, 0xde8, 0xdea, 0xded}, {0},
+{0xf34, 0xf3a, 0xf36, 0xf35, 0xf38, 0xf3b, 0xf37, 0xf39},
+{1316, 1316, 1316, 1393, 1390, 1391, 1392, 1394}
+};
 ObjectDescriptor gGmMazeWellObjDescriptor = {
     0,
     0,
