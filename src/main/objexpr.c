@@ -1222,4 +1222,3 @@ void characterHeadLookCalm(GameObject* obj, s16* state, f32 value) {
         ((CharacterEyeAnimState*)state)->headTrackMode = (s16)(u16)(u8)((CharacterEyeAnimState*)state)->headTrackMode;
     }
 }
-

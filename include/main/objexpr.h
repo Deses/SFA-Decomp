@@ -3,8 +3,7 @@
 
 #include "global.h"
 
-typedef struct ObjLookAtControlFlags
-{
+typedef struct ObjLookAtControlFlags {
     u8 flip : 1;
     u8 rest : 7;
 } ObjLookAtControlFlags;
