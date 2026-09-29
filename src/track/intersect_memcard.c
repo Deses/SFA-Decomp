@@ -556,7 +556,8 @@ void showMemCardError(u8 err) {
                                               &measureBottom);
                 lineHeight = gGameTextFontMetrics[sLanguageNameTable[getCurLanguage()].fontId].lineHeight;
                 textHeight = measureBottom - measureTop;
-                rowHeight = (textHeight > lineHeight) ? textHeight
+                rowHeight = (textHeight > lineHeight)
+                                ? textHeight
                                 : gGameTextFontMetrics[sLanguageNameTable[getCurLanguage()].fontId].lineHeight;
                 yy = rowHeight + yy;
                 yy += 5;
@@ -725,7 +726,6 @@ int saveGameReadGlobalsCb(int saveId, int size, void* dst) {
     memcpy(dst, gSaveCardIoBuffer + 0x1F14, 0xE4);
     return 0;
 }
-
 
 static inline u64 saveGame_checksum(u64* p, int count) {
     u64 x;
@@ -1049,8 +1049,7 @@ void loadMemCardImages(void) {
     DCFlushRange(gSaveCardImageBuffer, 0x4000);
 }
 #if !defined(VERSION_GSAE01) && !defined(VERSION_GSAJ01)
-static void saveCardBuildComment(void)
-{
+static void saveCardBuildComment(void) {
 #if defined(VERSION_GSAE01_rev1)
     int language = getCurLanguage();
     if (language == OS_LANGUAGE_ITALIAN) {
@@ -1117,7 +1116,6 @@ static void saveCardBuildComment(void)
 #endif
 }
 #endif
-
 
 /* Mounts the memory card, validates its serial number, opens or creates the
  * save file (writing the card image buffer for a fresh file), and maps any
