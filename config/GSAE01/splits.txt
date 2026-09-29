@@ -200,12 +200,16 @@ main/objlib.c:
 	.sbss       start:0x803DCBF8 end:0x803DCBFC
 	.sdata2     start:0x803DE970 end:0x803DE998
 
-main/objprint.c:
-	.text       start:0x80038988 end:0x8003BB84
-	.data       start:0x802CAE88 end:0x802CAED0
+main/objexpr.c:
+	.text       start:0x80038988 end:0x8003B5E0
+	.data       start:0x802CAE88 end:0x802CAECC
 	.sdata      start:0x803DB460 end:0x803DB468
-	.sbss       start:0x803DCC08 end:0x803DCC20
+	.sbss       start:0x803DCC00 end:0x803DCC01
 	.sdata2     start:0x803DE998 end:0x803DE9F0
+
+main/objprint.c:
+	.text       start:0x8003B5E0 end:0x8003BB84
+	.sbss       start:0x803DCC08 end:0x803DCC1A
 
 main/objprint_dolphin.c:
 	.text       start:0x8003BB84 end:0x80041D30

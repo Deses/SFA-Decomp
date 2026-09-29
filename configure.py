@@ -1639,6 +1639,7 @@ config.libs = [
             Object(MatchingFor("GSAE01"), "main/objhits.c", cflags=cflags_dll_noopt_noautoinline),
             Object(Matching, "main/objtype.c"),
             Object(Matching, "main/objlib.c"),
+            Object(MatchingFor("GSAE01"), "main/objexpr.c", cflags=cflags_dll_noopt_noautoinline),
             Object(MatchingFor("GSAE01"), "main/objprint.c", cflags=cflags_dll_noopt_noautoinline),
             Object(MatchingFor("GSAE01"), "main/objprint_dolphin.c", cflags=cflags_dll_noopt_noautoinline),
             Object(MatchingFor("GSAE01"), "main/pi_dolphin.c", cflags=cflags_dll_noopt_noautoinline),

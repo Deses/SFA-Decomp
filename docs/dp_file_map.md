@@ -205,7 +205,12 @@ dll.c             (12) main/modelEngine.c (the load/free API only) [BODY] SETTLE
     0x42-0x44 in sResourceFileNameTable (pi_dolphin.c) but NO call site in the tree passes any
     of them - mapLoadDataFile serves only the per-map ids >= 0x45, and every other
     fileLoad/DVDOpen path is reached with different constants.
-objexpr.c         (28) dlls/engine/10_expgfx/expgfx.c            [STR: retail says "expgfx.c:"]
+objexpr.c         (28) main/objexpr.c                           [BODY, TABLE, FLAG]
+    Corrected 2026-09-29: the former expgfx mapping confused unrelated names.
+    The shared joint-key table, look-at flag, and expression helpers correspond
+    to the first 31 functions formerly merged into main/objprint.c. Retail
+    section ownership supports their recovered boundary; all five links match.
+    See docs/objexpr_boundary_recovery.md. No retail objexpr filename is proven.
 objlib.c          (14) main/obj_movelib.c + main/objhits.c       [BODY] SETTLED, split two ways.
     The space-transform half is obj_movelib.c; the TOUCH-CALLBACK half is objhits.c (which
     already holds DP objmsg.c), statement for statement:

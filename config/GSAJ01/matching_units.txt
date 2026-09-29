@@ -904,6 +904,7 @@ main/newshadows.c
 main/obj_movelib.c
 main/objanim.c
 main/object.c
+main/objexpr.c
 main/objhits.c
 main/objlib.c
 main/objprint.c
