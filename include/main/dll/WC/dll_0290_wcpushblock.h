@@ -6,7 +6,6 @@
 #include "game/objects/object_setup.h"
 #include "main/dll/WC/wc_block_state.h"
 
-
 typedef struct PushBlockFlags {
     u8 phase : 3;
     u8 sfxActive : 1;
@@ -46,7 +45,6 @@ STATIC_ASSERT(sizeof(WCPushBlockSetup) == 0x24);
 STATIC_ASSERT(offsetof(WCPushBlockSetup, base.posY) == 0x0C);
 STATIC_ASSERT(offsetof(WCPushBlockSetup, modelIndex) == 0x19);
 STATIC_ASSERT(offsetof(WCPushBlockSetup, initialTile) == 0x1A);
-
 
 int wcblock_isPlayerAwayFromStoredCell(GameObject* obj, WCBlockState* state, GameObject* player);
 
