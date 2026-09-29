@@ -82,14 +82,30 @@ void GM_MazeWell_render(void* obj, int p2, int p3, int p4, int p5, s8 visible) {
  * unchecked retail accesses through byte-derived pointers without widening the
  * allocation-backed tables. */
 static inline int mazeWellActivate(GameObject* obj, s16* questBits) {
-GmMazeWellQuestTables* tables = (GmMazeWellQuestTables*)questBits; GmmazewellState* state;
-        int found;
-        int itemIndex;
-        s16* followup;
-        s32* dialogue;
-        for (itemIndex = 0;;) {
-            if ((*gGameUIInterface)->isItemBeingUsed(questBits[itemIndex]) != 0) {
+    GmMazeWellQuestTables* tables = (GmMazeWellQuestTables*)questBits;
+    GmmazewellState* state;
+    int found;
+    int itemIndex;
+    s16* followup;
+    s32* dialogue;
+    for (itemIndex = 0;;) {
+        if ((*gGameUIInterface)->isItemBeingUsed(questBits[itemIndex]) != 0) {
 #if defined(VERSION_GSAP01) || defined(VERSION_GSAP01_rev1)
+            state = obj->extra;
+            switch (itemIndex) {
+            case 0:
+            case 1:
+            case 2:
+                mainSetBits(tables->reward[itemIndex], 1);
+                saveFileStruct_unlockCheat((u8)itemIndex);
+                break;
+            }
+            dialogue = (s32*)((u8*)tables + offsetof(GmMazeWellQuestTables, dialogue));
+            state->pendingDialogue = dialogue[itemIndex];
+            followup = (s16*)((u8*)tables + offsetof(GmMazeWellQuestTables, followup));
+            mainSetBits(followup[itemIndex], 1);
+#else
+            if (gGameTextFontIsSjis != 0) {
                 state = obj->extra;
                 switch (itemIndex) {
                 case 0:
@@ -103,50 +119,35 @@ GmMazeWellQuestTables* tables = (GmMazeWellQuestTables*)questBits; GmmazewellSta
                 state->pendingDialogue = dialogue[itemIndex];
                 followup = (s16*)((u8*)tables + offsetof(GmMazeWellQuestTables, followup));
                 mainSetBits(followup[itemIndex], 1);
-#else
-                if (gGameTextFontIsSjis != 0) {
-                    state = obj->extra;
-                    switch (itemIndex) {
-                    case 0:
-                    case 1:
-                    case 2:
-                        mainSetBits(tables->reward[itemIndex], 1);
-                        saveFileStruct_unlockCheat((u8)itemIndex);
-                        break;
-                    }
-                    dialogue = (s32*)((u8*)tables + offsetof(GmMazeWellQuestTables, dialogue));
-                    state->pendingDialogue = dialogue[itemIndex];
-                    followup = (s16*)((u8*)tables + offsetof(GmMazeWellQuestTables, followup));
-                    mainSetBits(followup[itemIndex], 1);
-                } else {
-                    state = obj->extra;
-                    dialogue = (s32*)((u8*)tables + offsetof(GmMazeWellQuestTables, dialogue));
-                    state->pendingDialogue = dialogue[itemIndex];
-                    switch (itemIndex) {
-                    case 3:
-                        state->pendingDialogue = MAZEWELL_DEFAULT_DIALOGUE;
-                    case 0:
-                    case 1:
-                    case 2:
-                        mainSetBits(tables->reward[itemIndex], 1);
-                        saveFileStruct_unlockCheat((u8)itemIndex);
-                        break;
-                    }
-                    followup = (s16*)((u8*)tables + offsetof(GmMazeWellQuestTables, followup));
-                    mainSetBits(followup[itemIndex], 1);
+            } else {
+                state = obj->extra;
+                dialogue = (s32*)((u8*)tables + offsetof(GmMazeWellQuestTables, dialogue));
+                state->pendingDialogue = dialogue[itemIndex];
+                switch (itemIndex) {
+                case 3:
+                    state->pendingDialogue = MAZEWELL_DEFAULT_DIALOGUE;
+                case 0:
+                case 1:
+                case 2:
+                    mainSetBits(tables->reward[itemIndex], 1);
+                    saveFileStruct_unlockCheat((u8)itemIndex);
+                    break;
                 }
+                followup = (s16*)((u8*)tables + offsetof(GmMazeWellQuestTables, followup));
+                mainSetBits(followup[itemIndex], 1);
+            }
 #endif
-                found = 1;
-                break;
-            }
-            itemIndex++;
-            if ((u32)itemIndex >= QUEST_BIT_COUNT) {
-                found = 0;
-                break;
-            }
+            found = 1;
+            break;
         }
+        itemIndex++;
+        if ((u32)itemIndex >= QUEST_BIT_COUNT) {
+            found = 0;
+            break;
+        }
+    }
 
-return found;
+    return found;
 }
 void GM_MazeWell_update(GameObject* obj) {
     GameObject* objId;
@@ -208,11 +209,9 @@ void GM_MazeWell_init(GameObject* obj) {
 }
 
 GmMazeWellQuestTables gGmMazeWellQuestBits = {
-{0xddc, 0xde2, 0xdde, 0xddd, 0xde0, 0xde3, 0xddf, 0xde1, 0xde4}, {0},
-{0xde5, 0xdeb, 0xde7, 0xde6, 0xde9, 0xdec, 0xde8, 0xdea, 0xded}, {0},
-{0xf34, 0xf3a, 0xf36, 0xf35, 0xf38, 0xf3b, 0xf37, 0xf39},
-{1316, 1316, 1316, 1393, 1390, 1391, 1392, 1394}
-};
+    {0xddc, 0xde2, 0xdde, 0xddd, 0xde0, 0xde3, 0xddf, 0xde1, 0xde4}, {0},
+    {0xde5, 0xdeb, 0xde7, 0xde6, 0xde9, 0xdec, 0xde8, 0xdea, 0xded}, {0},
+    {0xf34, 0xf3a, 0xf36, 0xf35, 0xf38, 0xf3b, 0xf37, 0xf39},        {1316, 1316, 1316, 1393, 1390, 1391, 1392, 1394}};
 ObjectDescriptor gGmMazeWellObjDescriptor = {
     0,
     0,
