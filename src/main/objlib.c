@@ -61,7 +61,7 @@
 #include "main/objprint_internal.h"
 
 #define OBJLIB_PRIMARY_ROM_PAGE_COUNT 0x50
-#define OBJHITREGION_ROM_ENTRY_TYPE 0x130
+#define OBJHITREGION_ROM_ENTRY_TYPE   0x130
 
 typedef struct ObjContactCallbackEntry {
     GameObject* objA;
@@ -101,13 +101,13 @@ int gObjContactCallbackCount;
 #define OBJTRIGGER_PLAYER_STATE_NONE    -1
 #define OBJTRIGGER_PLAYER_STATE_CLEAR   0x40
 
-#define OBJLINK_CHILD_LIST_OFFSET  0xc8
-#define OBJLINK_FLAGS_MODE_MASK    0x0007
-#define OBJLINK_FLAGS_DEAD         0x0040
+#define OBJLINK_CHILD_LIST_OFFSET 0xc8
+#define OBJLINK_FLAGS_MODE_MASK   0x0007
+#define OBJLINK_FLAGS_DEAD        0x0040
 
 /* hit-object romDefNo that triggers the staff-impact sfx (retail OBJECTS.bin). */
-#define OBJLIB_HITOBJ_SEQID_STAFF  0x69 /* "staff" (DLL 0xE2) */
-#define OBJPATH_ROOT_JOINT_INDEX   -1
+#define OBJLIB_HITOBJ_SEQID_STAFF 0x69 /* "staff" (DLL 0xE2) */
+#define OBJPATH_ROOT_JOINT_INDEX  -1
 typedef struct ObjMsgEntry {
     u32 message;
     u32 sender;
@@ -133,7 +133,6 @@ typedef struct ObjMsgQueueCursor {
 STATIC_ASSERT(offsetof(ObjMsgQueueCursor, entry) == 0x8);
 STATIC_ASSERT(offsetof(ObjMsgQueueCursor, nextEntry) == 0x14);
 STATIC_ASSERT(sizeof(ObjMsgQueueCursor) == 0x20);
-
 
 int ObjMsg_Peek(GameObject* obj, u32* outMessage, u32* outSender, u32* outParam) {
     ObjMsgQueue* queue;

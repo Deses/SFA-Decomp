@@ -6,9 +6,9 @@
 #include "MSL_C/PPCEABI/bare/H/math_api.h"
 #include <string.h>
 
-#define OBJTYPE_COUNT 0x54
+#define OBJTYPE_COUNT       0x54
 #define OBJTYPE_INDEX_COUNT (OBJTYPE_COUNT + 1)
-#define OBJTYPE_LIST_MAX 0x100
+#define OBJTYPE_LIST_MAX    0x100
 
 typedef struct ObjectTypeIndexTable {
     u8 offsets[OBJTYPE_INDEX_COUNT];
@@ -150,7 +150,6 @@ GameObject* objGetNearestTypeTo(int group, GameObject* obj, float* maxDistance) 
     return nearest;
 }
 
-
 GameObject** objGetAllOfType(int group, int* countOut) {
     if (group < 0 || group >= OBJTYPE_COUNT) {
         *countOut = 0;
@@ -267,6 +266,5 @@ void objTypeInit(void) {
     gObjectTypeListCount = 0;
     return;
 }
-
 
 ObjectTypeIndexTable gObjectTypeIndices;
