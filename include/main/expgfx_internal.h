@@ -351,7 +351,6 @@ extern u32 gExpgfxSlotPoolBases[EXPGFX_POOL_COUNT];
 extern int gExpgfxTextureFreeInProgress;
 extern s16 gExpgfxSequenceCounter;
 extern u8 gExpgfxFrameParityBit;
-extern u8 gExpgfxUpdatingActivePools;
 extern u8 gExpgfxRenderResetPending;
 extern int gExpgfxLastAddedSlot;
 

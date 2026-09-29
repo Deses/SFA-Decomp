@@ -14,13 +14,20 @@ Sections:
 	.sbss2      type:bss align:32
 
 main/render.c:
-	.text       start:0x800066E0 end:0x80008DF4
+	.text       start:0x800066E0 end:0x80008B4C
 	.rodata     start:0x802C19C0 end:0x802C1B68
 	.data       start:0x802C2E60 end:0x802C5008
 	.bss        start:0x80335960 end:0x80335A60
 	.sdata      start:0x803DB300 end:0x803DB308
-	.sbss       start:0x803DC8C0 end:0x803DC8D0
+	.sbss       start:0x803DC8C0 end:0x803DC8CA
 	.sdata2     start:0x803DE620 end:0x803DE668
+
+main/effects_state.c:
+	.text       start:0x80008B4C end:0x80008B74
+	.sbss       start:0x803DC8D0 end:0x803DC8D8
+
+main/envfx.c:
+	.text       start:0x80008B74 end:0x80008DF4
 
 main/audio.c:
 	.text       start:0x80008DF4 end:0x8000B4D0

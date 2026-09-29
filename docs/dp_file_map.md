@@ -289,15 +289,20 @@ menu.c            (27) main/modelEngine.c (the UI-DLL switcher)  [BODY] SETTLED 
       gActiveMenuDLL/gCurrentMenuID/gNextMenuID/gPreviousMenuID/gMenuDLLIDs
         == gModelEngineCurUiDllRes / curUiDll / gModelEnginePendingUiDll /
            gModelEnginePrevUiDll / gModelEngineUiDllResourceIds
-lfx.c / envfx.c    (3) main/skystars.c / render.c(getEnvfxAct)   [?] SFA render.c literally has
-    getEnvfxAct / getEnvfxActImmediately - DP's envfx.c is 2 functions.  Weak but suggestive.
+lfx.c             (2) main/render.c(getLActions)              [BODY] Same LACTIONS loader;
+    SFA retains only allocation/load/free, without the older effect dispatch.
+envfx.c           (2) main/envfx.c                            [BODY] Same two action dispatchers,
+    kind routing and immediate-action field clearing; SFA uses aligned stack storage.
+segment_13D0.c    (4) main/effects_state.c                    [BODY] Same mode getter/setter,
+    default sequence callback and expgfx pool-update marker. Two older no-ops are absent.
+    Retail BSS alignment independently supports the state boundary; see render_state_boundary.md.
 scheduler.c       (20) (none)                                    N64 OS scheduler; GC uses OS/VI.
 boot.c / reset.c   (9) main/boot_logo.c / gameloop checkReset  [?]
 audio.c / mp3 /   (16) main/audio*.c                             NOT a correspondence: DP is the
   segment_BED0.c                                                 N64 audio driver, SFA is MusyX.
 libultra/*             src/dolphin/*                             platform SDK, unrelated bodies.
 bitstream.c / linked_list.c / generic_* / assert.c / mpeg.c / developer_names.c / rsp_segment.c /
-segment_11EF0.c / segment_11F70.c / segment_13D0.c               no located SFA counterpart.
+segment_11EF0.c / segment_11F70.c                                no located SFA counterpart.
 
 SFA UNITS WITH NO DP COUNTERPART (GameCube-only work)
 -----------------------------------------------------

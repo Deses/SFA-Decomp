@@ -1612,6 +1612,8 @@ config.libs = [
             Object(MatchingFor("GSAE01"), "dlls/objects/704/704.c"),
 
             Object(MatchingFor("GSAE01"), "main/render.c"),
+            Object(MatchingFor("GSAE01"), "main/effects_state.c"),
+            Object(MatchingFor("GSAE01"), "main/envfx.c"),
             Object(Matching, "main/audio.c", cflags=cflags_dll_noopt_noautoinline),
             Object(MatchingFor("GSAE01"), "main/audio_sfx.c", cflags=cflags_dll_noopt_noautoinline),
             Object(MatchingFor("GSAE01"), "main/audio_stream.c"),

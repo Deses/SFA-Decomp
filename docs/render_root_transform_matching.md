@@ -1,5 +1,9 @@
 # `modelRenderInterpolateRootTransform` matching
 
+The later [effects-state boundary recovery](render_state_boundary.md) moves the
+four unrelated tail functions into their owning units. The interpolation
+routine and its private packed-data helpers remain together in `main/render.c`.
+
 `main/render.c` is 100% code and data (10/10 functions) as of 2026-09-25. The last function,
 `modelRenderInterpolateRootTransform` (2 212 B), went from 96.682 to 100 in five source changes.
 Each was found by reading GC/1.3 backend captures (`tools/tricky_backend_trace.py`) and LLDB hooks
