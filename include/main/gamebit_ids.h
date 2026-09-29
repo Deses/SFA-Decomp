@@ -322,6 +322,7 @@ enum GameBitId {
     GAMEBIT_AndrossRelated0004 = 0x4,                    /* table 0; polled before Andross's post-fight warp */
     GAMEBIT_SH_KilledBloop1 = 0x5,                       /* table 1 */
     GAMEBIT_WBCounter0006 = 0x6,                         /* Read out of the retail placement data: snowmines2/WB counterGameBit x1; dfshrine/Firebat counterGameBit x1. The field is called a counter but BITTABLE gives the id a width of 1, so it holds a flag - most likely "this one has been killed" rather than a tally */
+    GAMEBIT_CF_CurveRequired0007 = 0x7,                  /* A curve-node gate read from the retail romlist: fortress requiredBit x4. RomCurveDef puts requiredBit at 0x30 and forbiddenBit at 0x32, and the path search only walks a node when its required bit is set and its forbidden bit is clear. Only curve variants whose layout is corroborated were read - the 0x34/type-36 nodes are 88% ids already named from other evidence with nothing out of range, whereas the 0x44/type-38 variant is 63% out of range there and was left alone */
     GAMEBIT_SH_KilledBloop2 = 0x8,                       /* table 1 */
     GAMEBIT_CC_LightFootEncounterTriggered = 0x9,        /* The DLL names this one itself: CC_LIGHTFOOT_ENCOUNTER_TRIGGERED_GAMEBIT in CClightfoot.c */
     GAMEBIT_NW_GeyserDisable = 0xA,                      /* The DLL names this one itself: NW_GEYSER_DISABLE_GAMEBIT in NW_geyser.c */
@@ -515,6 +516,7 @@ enum GameBitId {
     GAMEBIT_WGSH_warpEnabled0FD = 0xFD,                  /* table 0; Rena's U0 name, annotated there as belonging to an unused map - the Krazoa Test 1 controller latches it once in its COMPLETE phase */
     GAMEBIT_ITEM_SpiritTestFear_Got = 0xFF,              /* table 2; hint 355; have the Krazoa Spirit from Test of Fear (and haven't released it) */
     GAMEBIT_OFB_DFPObjCreaGameBitA0100 = 0x100,          /* Read out of the retail placement data: kraztest/DFP_ObjCrea gameBitA x2 */
+    GAMEBIT_DR_CurveForbidden0101 = 0x101,               /* A curve-node gate read from the retail romlist: trexboss forbiddenBit x25. RomCurveDef puts requiredBit at 0x30 and forbiddenBit at 0x32, and the path search only walks a node when its required bit is set and its forbidden bit is clear. Only curve variants whose layout is corroborated were read - the 0x34/type-36 nodes are 88% ids already named from other evidence with nothing out of range, whereas the 0x44/type-38 variant is 63% out of range there and was left alone */
     GAMEBIT_NW_RescuedSnowHornGateKeeper = 0x102,        /* table 2; hint 279 */
     GAMEBIT_PushableSequence = 0x103,                    /* The DLL names this one itself: PUSHABLE_SEQUENCE_GAME_BIT in 239.c */
     GAMEBIT_SH_KilledBloop17 = 0x104,                    /* table 1 */
@@ -695,6 +697,7 @@ enum GameBitId {
     GAMEBIT_DIM_ReachedBoss = 0x1DF,                     /* table 1; hint 292 */
     GAMEBIT_DIM_HitAnimTarget01E0 = 0x1E0,               /* Named from map data alone - nothing in the code or in any name list mentions it: snowmines/HitAnimator objId= param=target; table 2 */
     GAMEBIT_DIM_HitAnimTarget01E1 = 0x1E1,               /* Named from map data alone - nothing in the code or in any name list mentions it: snowmines/HitAnimator objId= param=target; table 2 */
+    GAMEBIT_DIM_CurveRequired01E2 = 0x1E2,               /* A curve-node gate read from the retail romlist: snowmines requiredBit x2. RomCurveDef puts requiredBit at 0x30 and forbiddenBit at 0x32, and the path search only walks a node when its required bit is set and its forbidden bit is clear. Only curve variants whose layout is corroborated were read - the 0x34/type-36 nodes are 88% ids already named from other evidence with nothing out of range, whereas the 0x44/type-38 variant is 63% out of range there and was left alone */
     GAMEBIT_DIM_Open01E3 = 0x1E3,                        /* Named from map data alone - nothing in the code or in any name list mentions it: snowmines/DIMLever objId= param=open; table 2 */
     GAMEBIT_DIM_BridgeRelated1E4 = 0x1E4,                /* Rena's U0 dataset; table 2 */
     GAMEBIT_DIM_LocatedCogs = 0x1E5,                     /* table 2; hint 287; ref snowmines/HitAnimator target */
@@ -1485,6 +1488,7 @@ enum GameBitId {
     GAMEBIT_KP_ObjGroups = 0x8ED,                        /* table 3; size 32 */
     GAMEBIT_OFB_DFPseqpoinDisable08EE = 0x8EE,           /* A DFP sequence point's disable bit, from its placement's field at 0x20. Two of the ids that slot holds - 0xCB1 and 0xEE0 - were already named from other evidence, which is what vindicates the slot; DfpSeqPointPlacement overruns the 0x24 record at its tail, but this field is inside it */
     GAMEBIT_WM_Seq8F4 = 0x8F4,                           /* Rena's U0 dataset; table 2 */
+    GAMEBIT_VFP_CurveRequired08F5 = 0x8F5,               /* A curve-node gate read from the retail romlist: temple requiredBit x2. RomCurveDef puts requiredBit at 0x30 and forbiddenBit at 0x32, and the path search only walks a node when its required bit is set and its forbidden bit is clear. Only curve variants whose layout is corroborated were read - the 0x34/type-36 nodes are 88% ids already named from other evidence with nothing out of range, whereas the 0x44/type-38 variant is 63% out of range there and was left alone */
     GAMEBIT_CF_Open08FC = 0x8FC,                         /* Named from map data alone - nothing in the code or in any name list mentions it: fortress/SH_Portcull objId= param=open; table 2 */
     GAMEBIT_CF_SHPortcullOpen08FD = 0x8FD,               /* Read out of the retail placement data: fortress/SH_Portcull open x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_BabyCloudRunnerCaptureCount = 0x901,         /* The DLL names this one itself: BABYCLOUDRUNNER_CAPTURE_COUNT_GAME_BIT in 332.c */
