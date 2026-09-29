@@ -18,7 +18,6 @@
 #define WORLD_ASTEROIDS_ROTATION_SPEED_MIN -300
 #define WORLD_ASTEROIDS_ROTATION_SPEED_MAX 300
 
-
 static inline f32 worldasteroids_s32AsFloat(s32 value) {
     return (f32)value;
 }
@@ -100,7 +99,8 @@ void worldasteroids_init(GameObject* obj) {
         orbitShape = fsin16Approx(baseAngle);
     }
     /* Retail advances the RNG here and discards the result. */
-    randomGetRange(0, (int)((*(const f32*)&gWorldAsteroidsRandomLimitScale) * orbitShape + (*(const f32*)&gWorldAsteroidsRandomLimitBase)));
+    randomGetRange(0, (int)((*(const f32*)&gWorldAsteroidsRandomLimitScale) * orbitShape +
+                            (*(const f32*)&gWorldAsteroidsRandomLimitBase)));
     orbitShape = fsin16Approx(baseAngle);
     if (orbitShape < (*(const f32*)&gWorldAsteroidsZero)) {
         orbitShape = -fsin16Approx(baseAngle);
@@ -116,8 +116,8 @@ void worldasteroids_init(GameObject* obj) {
     state->rotStepX = randomValue;
     randomValue = randomGetRange(-0x7fff, 0x7fff);
     state->orbitAngle = randomValue;
-    state->orbitRadius =
-        worldasteroids_s32AsFloat(radiusVariation) * fsin16Approx(baseAngle) + (*(const f32*)&gWorldAsteroidsOrbitRadiusBase);
+    state->orbitRadius = worldasteroids_s32AsFloat(radiusVariation) * fsin16Approx(baseAngle) +
+                         (*(const f32*)&gWorldAsteroidsOrbitRadiusBase);
     state->heightOffset = worldasteroids_s32AsFloat(radiusVariation) * fcos16Approx(baseAngle);
 }
 
