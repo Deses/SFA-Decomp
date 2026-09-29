@@ -631,6 +631,7 @@ dlls/objects/585/585.c
 dlls/objects/586/586.c
 dlls/objects/587/587.c
 dlls/objects/588_BossDrakor_/BossDrakor_.c
+dlls/objects/589_BossDrakor/BossDrakor.c
 dlls/objects/590/590.c
 dlls/objects/591_KT_RexLevel/KT_RexLevel.c
 dlls/objects/592_KT_Rex/KT_Rex.c

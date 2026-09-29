@@ -1,5 +1,13 @@
 # The version-parity frontier — seven units, one function each
 
+> **2026-09-29 correction:** Boss Drakor is exact in all five versions. Two
+> named curve-walker argument values change fixed-color alias counts in the
+> compiler graph, resolving the saved-register rotation without a reservation.
+> A shared raw-speed/curve-step pair also fixes v1.1's floating-point copies.
+> EN v1.1 now has 100% matched and linked code. See
+> [Boss Drakor matching](BossDrakor_matching.md); the impossibility claims
+> below are historical experiments, not constraints on recoverable source.
+>
 > **2026-09-28 correction:** The v1.1 memory-card holdout is solved by recovering
 > its shared compiler-generated string pool and correcting the boundary with
 > the preceding card code. Both resulting units match code and data in all five
