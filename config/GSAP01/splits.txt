@@ -229,7 +229,7 @@ main/pi_dolphin.c:
 	.sbss       start:0x803DE468 end:0x803DE510
 
 main/boot_logo.c:
-	.data       start:0x802CDD40 end:0x8030DEF8
+	.data       start:0x802CDD40 end:0x8030DEF8 align:32
 
 main/pi_videoinit.c:
 	.text       start:0x80049D44 end:0x8004AC08
@@ -4526,7 +4526,7 @@ dolphin/card/CARDBios.c:
 
 dolphin/card/CARDUnlock.c:
 	.text       start:0x8025F804 end:0x80260A64
-	.data       start:0x80330380 end:0x803304E0
+	.data       start:0x80330380 end:0x803304E0 align:32
 	.sdata      start:0x803DDE00 end:0x803DDE08
 
 dolphin/card/CARDRdwr.c:
