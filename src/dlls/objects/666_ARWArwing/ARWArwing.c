@@ -1161,7 +1161,8 @@ void arwarwing_initAttachments(GameObject* obj, ArwingState* state) {
             state->light = (void*)objCreateLight(obj, 1);
             if (state->light != 0) {
                 modelLightStruct_setLightKind(state->light, MODEL_LIGHT_KIND_POINT);
-                modelLightStruct_setPosition(state->light, 0.0f, (*(const f32*)&gArwingLightOffsetY), (*(const f32*)&gArwingLightOffsetZ));
+                modelLightStruct_setPosition(state->light, 0.0f, (*(const f32*)&gArwingLightOffsetY),
+                                             (*(const f32*)&gArwingLightOffsetZ));
                 modelLightStruct_setFieldBC(state->light, 1);
                 modelLightStruct_setDiffuseColor(state->light, 0x28, 0x7d, 0xff, 0);
                 modelLightStruct_setDistanceAttenuation(state->light, (*(const f32*)&gArwingLightNearDistance),
@@ -1488,7 +1489,8 @@ void arwarwing_render(GameObject* obj, int p2, int p3, int p4, int p5) {
     int dx, dy;
 
     if (state->hitShake != 0) {
-        dx = (int)((*(const f32*)&gArwingHitShakeAmplitude) * mathSinf(3.1415927f * (f32) * (u16*)&state->shakePitch / 32768.0f));
+        dx = (int)((*(const f32*)&gArwingHitShakeAmplitude) *
+                   mathSinf(3.1415927f * (f32) * (u16*)&state->shakePitch / 32768.0f));
         dy = (int)(1024.0f * mathSinf(3.1415927f * (f32) * (u16*)&state->shakeYaw / 32768.0f));
         obj->anim.rotY = (s16)(obj->anim.rotY + dx);
         obj->anim.rotZ = (s16)(obj->anim.rotZ + dy);
@@ -1510,9 +1512,9 @@ void arwarwing_hitDetect(GameObject* obj) {
         PSMTXMultVec((MtxP)mtx, (const Vec*)&state->aimOffsetX, &pos);
         pos.x += playerMapOffsetX;
         pos.z += playerMapOffsetZ;
-        ObjSeq_SetCameraTransformOverride(pos.x, pos.y, (s16)(0x8000 - obj->anim.rotX + state->aimYaw),
-                                          (s16)(obj->anim.rotY + state->aimPitch),
-                                          (s16)(obj->anim.rotZ + state->aimRoll), pos.z, (*(const f32*)&gArwingAimCameraParameter));
+        ObjSeq_SetCameraTransformOverride(
+            pos.x, pos.y, (s16)(0x8000 - obj->anim.rotX + state->aimYaw), (s16)(obj->anim.rotY + state->aimPitch),
+            (s16)(obj->anim.rotZ + state->aimRoll), pos.z, (*(const f32*)&gArwingAimCameraParameter));
     }
 }
 
