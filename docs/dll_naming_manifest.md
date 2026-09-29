@@ -700,8 +700,8 @@ any of them is acted on.
 | 0x287 | SPScarab | RAW | dlls/objects/647_SPScarab/SPScarab.c | = (canonical) | Exact complete TU with descriptor at the physical end |
 | 0x288 | SPDrape | RAW | dlls/objects/648_SPDrape/SPDrape.c | = (canonical) | Exact complete TU; descriptor placement preserves the following jump table, and the non-emitted helper contributes to `.sdata2` literal order |
 | 0x289 | SPitembeam | RAW | dlls/objects/649_SPitembeam/SPitembeam.c | = (canonical) | Exact complete TU; descriptor is followed by a DOL-proven 76-byte SnowBike table |
-| 0x28A | — | NO-RETAIL-NAME | dlls/objects/650/650.c | = (canonical) | Exact complete TU containing the EarthWalker object and the following eight DLL 651 state handlers; internal object aliases are not DLL basenames |
-| 0x28B | — | NO-RETAIL-NAME | dlls/objects/651/651.c | = (canonical) | Exact complete descriptor/lifecycle TU; its eight state handlers are DOL-confirmed in DLL 650's TU |
+| 0x28A | — | NO-RETAIL-NAME | dlls/objects/650/650.c | = (canonical) | Exact ten-function EarthWalker TU with its recovered 20-byte constant pool; [corrected boundary](dll_650_651_boundary.md) preserves the numbered slot |
+| 0x28B | — | NO-RETAIL-NAME | dlls/objects/651/651.c | = (canonical) | Exact seventeen-function TU including its eight state handlers and complete 48-byte constant pool; the former assignment of those handlers to 650 is superseded by [pool and ownership evidence](dll_650_651_boundary.md) |
 | 0x28C | WCBouncyCra | RAW | dlls/objects/652_WCBouncyCra/WCBouncyCra.c | = (canonical) | Exact complete TU containing the trailing shared `wcblock_*` helper and descriptor at the physical end |
 | 0x28D | WCLevelCont | RAW | dlls/objects/653_WCLevelCont/WCLevelCont.c | = (canonical) | Exact complete 27-function TU with descriptor at the physical end |
 | 0x28E | WCBeacon | RAW | dlls/objects/654_WCBeacon/WCBeacon.c | = (canonical) | Exact complete six-function TU with descriptor at the physical end |
@@ -1225,6 +1225,13 @@ They are now one GC/1.3 TU; regressions from removing fragment-specific
 optimization flags do not invalidate the retail boundary evidence. The older
 `MWTrace` entry was not a separate unit in the active EN split at recovery time.
 Historical measurements below are retained as experiments, not provenance.
+
+The 650 / 651 verdict is superseded by the
+[corrected state-handler boundary](dll_650_651_boundary.md). The eight handlers
+and the old 651 callbacks form one unit with a naturally emitted 48-byte pool;
+650 retains its ten EarthWalker callbacks and separate 20-byte pool. The fix
+moves the misplaced boundary instead of merging both numbered slots. Both
+existing compiler profiles remain unchanged, and all five retail links match.
 
 The shader/lightmap verdict is likewise superseded by
 [map-rendering pool recovery](map_render_pool_recovery.md). The five fragments

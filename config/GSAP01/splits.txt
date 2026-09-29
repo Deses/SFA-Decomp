@@ -3937,16 +3937,16 @@ dlls/objects/643_DR_BarrelGr/DR_BarrelGr.c:
 	.sdata2     start:0x803E84D0 end:0x803E8504
 
 dlls/objects/650/650.c:
-	.text       start:0x80223764 end:0x80224478
-	.data       start:0x8032C698 end:0x8032C718
-	.sdata2     start:0x803E8530 end:0x803E8548
+	.text       start:0x80223764 end:0x80224104
+	.data       start:0x8032C698 end:0x8032C714
+	.sdata2     start:0x803E8508 end:0x803E851C
 
 dlls/objects/651/651.c:
-	.text       start:0x80224478 end:0x802247EC
+	.text       start:0x80224104 end:0x802247EC
 	.rodata     start:0x802C2DF8 end:0x802C2E18
 	.data       start:0x8032C718 end:0x8032C750
 	.bss        start:0x803AEA18 end:0x803AEA38
-	.sdata2     start:0x803E8548 end:0x803E8550
+	.sdata2     start:0x803E8520 end:0x803E8550
 
 dlls/objects/652_WCBouncyCra/WCBouncyCra.c:
 	.text       start:0x802247EC end:0x80224B54

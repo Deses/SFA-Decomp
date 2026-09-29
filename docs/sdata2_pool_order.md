@@ -63,9 +63,11 @@ interpreted as evidence that the definitions belonged to another TU. That
 conclusion was too strong: the qualifier affected the reconstructed expression,
 and the same-TU recovery below preserves both code and data.
 
-`WCPushBlock`, `650`, `WORLDAstero`'s trailing pair and `ARWArwing`'s tuning values
+`WCPushBlock`, `WORLDAstero`'s trailing pair and `ARWArwing`'s tuning values
 still need ownership recovery. Neither an external declaration in reconstructed
 source nor a qualifier-induced register change establishes an original boundary.
+The former `650` gap is resolved by the independently aligned pools and handler
+ownership at the [650 / 651 boundary](dll_650_651_boundary.md).
 
 ## Bouncy-crate constant ownership (2026-09-29)
 

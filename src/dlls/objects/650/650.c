@@ -20,17 +20,10 @@
  * (0x9ad) - that sequence is the dialogue that unlocks the Krazoa Shrine door
  * (lastTriggeredState observed -1 -> 4).
  *
- * The dll_28B_stateHandlerN / dll_28B_substateHandlerN functions below are
- * compiled into this TU but belong to DLL 651's state machine (a separate
- * player-following NPC): dll_028B.c installs them into gDll28BStateHandlers /
- * gDll28BSubstateHandlers and drives them via gPlayerInterface->update().
- * They operate on Dll28BAiState (earthwalker_state.h), NOT EarthWalkerState.
- * The gWcEarthWalker{Far,Near,Approach}PlayerDistance / {Chase,Walk}MoveSpeed
- * and gWcEarthWalker{IdleTimerThreshold,CurveAdvanceStep} constants are read
- * only by those 0x28B handlers (the follower AI), not by earthwalker_update.
  * Exact game-bit meanings and several encounter sub-states are inferred
  * from use, not confirmed.
  */
+#include "main/dll/WC/dll_028A_wcearthwalker.h"
 #include "MSL_C/PPCEABI/bare/H/math_api.h"
 #include "main/curve.h"
 #include "main/frame_timing.h"
@@ -40,8 +33,6 @@
 #include "main/mapEventTypes.h"
 #include "main/dll/rom_curve_interface.h"
 #include "main/objprint_character_api.h"
-#include "main/dll/WC/dll_028A_wcearthwalker.h"
-#include "main/dll/dll_028B.h"
 #include "main/render_envfx_api.h"
 #include "game/objects/object.h"
 #include "main/dll/baddie_state.h"
@@ -58,6 +49,12 @@
 #include "main/objseq.h"
 #include "main/dll/dll_002E_moveLib.h"
 
+/* Address reads retain the named read-only pool without duplicate literals. */
+const int gEarthWalkerMoveBlendData = 8;
+const f32 gEarthWalkerAnimAdvanceRate = 0.005f;
+const f32 gEarthWalkerRenderScale = 1.0f;
+const f32 gEarthWalkerMoveStartProgress = 0.0f;
+const f32 gEarthWalkerLookAtMaxDistance = 150.0f;
 int earthwalker_SeqFn(GameObject* ewObj, int unused, ObjSeqState* animUpdate, int shouldAdvanceMove) {
     EarthWalkerState* ewState = ewObj->extra;
     int i;
@@ -68,7 +65,7 @@ int earthwalker_SeqFn(GameObject* ewObj, int unused, ObjSeqState* animUpdate, in
         return 0;
     }
     if ((s8)shouldAdvanceMove != 0) {
-        ObjAnim_AdvanceCurrentMove(ewObj, gEarthWalkerAnimAdvanceRate, timeDelta, 0);
+        ObjAnim_AdvanceCurrentMove(ewObj, (*(const f32*)&gEarthWalkerAnimAdvanceRate), timeDelta, 0);
     }
     for (i = 0; i < animUpdate->eventCount; i++) {
         switch (animUpdate->eventIds[i]) {
@@ -98,7 +95,7 @@ void earthwalker_render(GameObject* obj, int p2, int p3, int p4, int p5, s8 visi
     EarthWalkerState* state = obj->extra;
 
     if (visible != 0) {
-        objRenderModelAndHitVolumes(obj, p2, p3, p4, p5, gEarthWalkerRenderScale);
+        objRenderModelAndHitVolumes(obj, p2, p3, p4, p5, (*(const f32*)&gEarthWalkerRenderScale));
         dll_2E_setTargetFromPathPoint(obj, (MoveLibState*)state, 0);
     }
 }
@@ -140,11 +137,11 @@ void earthwalker_update(GameObject* obj) {
 
     if (ewState->encounterType >= 4 && ewState->encounterType <= 8) {
         if (ewObj->anim.currentMove != 0x203) {
-            ObjAnim_SetCurrentMove(obj, 0x203, gEarthWalkerMoveStartProgress, 0);
+            ObjAnim_SetCurrentMove(obj, 0x203, (*(const f32*)&gEarthWalkerMoveStartProgress), 0);
         }
     } else {
         if (ewObj->anim.currentMove != 2) {
-            ObjAnim_SetCurrentMove(obj, 2, gEarthWalkerMoveStartProgress, 0);
+            ObjAnim_SetCurrentMove(obj, 2, (*(const f32*)&gEarthWalkerMoveStartProgress), 0);
         }
     }
 
@@ -325,20 +322,20 @@ void earthwalker_update(GameObject* obj) {
         break;
     }
 
-    ObjAnim_AdvanceCurrentMove(obj, gEarthWalkerAnimAdvanceRate, timeDelta, 0);
+    ObjAnim_AdvanceCurrentMove(obj, (*(const f32*)&gEarthWalkerAnimAdvanceRate), timeDelta, 0);
 }
 void earthwalker_init(GameObject* obj, EarthWalkerPlacement* setup) {
     EarthWalkerState* ewState = obj->extra;
     int local;
 
-    local = gEarthWalkerMoveBlendData;
+    local = (*(const int*)&gEarthWalkerMoveBlendData);
     obj->animEventCallback = earthwalker_SeqFn;
     dll_2E_initState(obj, (MoveLibState*)ewState, -8192, 12743, 2);
     dll_2E_setMoveTables((MoveLibState*)ewState, 0, &local, 2);
     /* moveLib state+0x614: head look-at only engages while the target is
      * within this distance (live-verified in Dolphin - drop it below the
      * player distance and the head snaps back to neutral). */
-    dll_2E_setLookAtMaxDistance((MoveLibState*)ewState, gEarthWalkerLookAtMaxDistance);
+    dll_2E_setLookAtMaxDistance((MoveLibState*)ewState, (*(const f32*)&gEarthWalkerLookAtMaxDistance));
     ewState->moveLibFlags611 |= 2;
     obj->anim.rotX = (s16)(setup->spawnRot << 8);
     ewState->encounterType = setup->encounterType;
@@ -359,115 +356,4 @@ void earthwalker_release(void) {
 }
 
 void earthwalker_initialise(void) {
-}
-
-int dll_28B_substateHandler3(GameObject* obj, BaddieState* ai) {
-    Dll28BAiState* state = *(Dll28BAiState**)&obj->extra;
-
-    if (ai->moveJustStartedB != 0) {
-        state->flagsAC0 &= ~1;
-        (*gPlayerInterface)->setState((void*)obj, (void*)ai, 3);
-    } else if (ai->moveDone != 0) {
-        return 3;
-    }
-    return 0;
-}
-
-int dll_28B_substateHandler2(GameObject* obj, BaddieState* ai) {
-    Dll28BAiState* state = *(Dll28BAiState**)&obj->extra;
-    f32 dist;
-
-    if (ai->moveJustStartedB != 0) {
-        state->flagsAC0 |= 1;
-        (*gPlayerInterface)->setState((void*)obj, (void*)ai, 1);
-    }
-    state->randomTimer -= timeDelta;
-    dist = state->playerDistance;
-    if (dist > gWcEarthWalkerFarPlayerDistance) {
-        return 2;
-    }
-    if (dist < gWcEarthWalkerNearPlayerDistance) {
-        if (state->randomTimer <= gWcEarthWalkerIdleTimerThreshold) {
-            state->randomTimer = randomGetRange(0x78, 0xfa);
-            return 4;
-        }
-    }
-    return 0;
-}
-
-#define WC_EARTHWALKER_CURVE_ADVANCE_STEP   0.5f
-#define WC_EARTHWALKER_APPROACH_PLAYER_DIST 200.0f
-#define WC_EARTHWALKER_CHASE_MOVE_SPEED     0.012f
-#define WC_EARTHWALKER_WALK_MOVE_SPEED      0.005f
-
-int dll_28B_substateHandler1(GameObject* obj, BaddieState* ai) {
-    Dll28BAiState* state = *(Dll28BAiState**)&obj->extra;
-    RomCurveWalker* route = &state->route;
-
-    if (ai->moveJustStartedB != 0) {
-        state->flagsAC0 &= ~1;
-        (*gPlayerInterface)->setState((void*)obj, (void*)ai, 2);
-    }
-    if (Curve_AdvanceAlongPath(&route->curve, WC_EARTHWALKER_CURVE_ADVANCE_STEP) != 0 || route->atSegmentEnd != 0) {
-        (*gRomCurveInterface)->goNextPoint(route);
-    }
-    if (state->playerDistance < WC_EARTHWALKER_APPROACH_PLAYER_DIST) {
-        return 3;
-    }
-    return 0;
-}
-
-/*
- * DLL 0x28B state-machine handlers (installed by dll_028B_initialise into
- * gDll28BStateHandlers / gDll28BSubstateHandlers; driven each frame by
- * gPlayerInterface->update). Each returns the next state index (0 = stay).
- * `ai` is the BaddieState at obj->extra (== the local `state` pointer); the
- * The slot at 0x14 is setState().
- *
- *   stateHandler:    0 -> next state 2; 1/3 set moveSpeed on (re)entry,
- *                    3 also faces the player; 2 = locomotion: drives the
- *                    object along the ROM-curve route and samples root motion.
- *   substateHandler: 0 -> next state 2; 1 = follow curve, advancing points,
- *                    -> 3 when the player is within range; 2 = idle/watch,
- *                    -> 2 when player far, -> 4 (after a random 120..250
- *                    frame timer) when near; 3 requests setState 3 and
- *                    -> 3 when the move finishes.
- */
-int dll_28B_substateHandler0(void) {
-    return 0x2;
-}
-
-int dll_28B_stateHandler3(GameObject* obj, BaddieState* ai) {
-    GameObject* player = (GameObject*)Obj_GetPlayerObject();
-
-    if (ai->moveJustStartedA != 0) {
-        ai->moveSpeed = WC_EARTHWALKER_CHASE_MOVE_SPEED;
-        getAngle(obj->anim.localPosX - player->anim.localPosX, obj->anim.localPosZ - player->anim.localPosZ);
-    }
-    return 0;
-}
-
-int dll_28B_stateHandler2(GameObject* obj, BaddieState* ai) {
-    Dll28BAiState* state = *(Dll28BAiState**)&obj->extra;
-
-    obj->anim.velocityX = oneOverTimeDelta * (state->route.posX - obj->anim.localPosX);
-    obj->anim.velocityZ = oneOverTimeDelta * (state->route.posZ - obj->anim.localPosZ);
-    obj->anim.localPosX = state->route.posX;
-    obj->anim.localPosZ = state->route.posZ;
-    obj->anim.rotX = getAngle(-state->route.tangentX, -state->route.tangentZ);
-    ObjAnim_SampleRootCurvePhase(
-        &obj->anim, sqrtf(obj->anim.velocityX * obj->anim.velocityX + obj->anim.velocityZ * obj->anim.velocityZ),
-        &ai->moveSpeed);
-    return 0;
-}
-
-int dll_28B_stateHandler1(GameObject* obj, BaddieState* ai) {
-    if (ai->moveJustStartedA != 0) {
-        ai->moveSpeed = WC_EARTHWALKER_WALK_MOVE_SPEED;
-    }
-    return 0;
-}
-
-int dll_28B_stateHandler0(void) {
-    return 0x2;
 }
