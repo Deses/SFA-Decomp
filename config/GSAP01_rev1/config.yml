@@ -289,8 +289,6 @@ force_active:
   - sGpuHangIllegalInstructionLog
   - sGpuHangWaitingLog
   - sGpuHangUnknownLog
-  # main/objlib.c: retain the zero before the hit-cooldown constant pool.
-  - gObjLibZero
   # main/shader_dolphin.c
   # These constants are read through offsets from sEnvMapBumpIndMtx.
   - sWarpedRingRotAxes

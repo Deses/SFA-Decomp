@@ -307,10 +307,6 @@ force_active:
   # atom; dropping it would shorten the pool and shift the mikaladon SDA2
   # references that follow it.
   - gGcRobotPatrolZero
-  # objlib.c: the retail link retained this unreferenced .sdata2 zero atom
-  # between the nearest-object search and the hit-cooldown pool run; dropping
-  # it would shorten the pool and shift every later SDA2 reference.
-  - gObjLibZero
   # WispBaddie.c: the seq-driver TUs reach these per-family scalar tables
   # only through the gBaddieMoveProgressTable base (+0x152C/+0x1538), so no
   # relocation references them by name; dropping them would shorten .data and

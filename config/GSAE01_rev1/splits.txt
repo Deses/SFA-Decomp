@@ -186,11 +186,19 @@ main/objhits.c:
 	.sbss       start:0x803DD848 end:0x803DD870
 	.sdata2     start:0x803DF590 end:0x803DF5E8
 
+main/objtype.c:
+	.text       start:0x80036D04 end:0x8003757C
+	.data       start:0x802CB9F8 end:0x802CBA1E
+	.bss        start:0x80343558 end:0x803439B0
+	.sbss       start:0x803DD870 end:0x803DD871
+	.sdata2     start:0x803DF5E8 end:0x803DF5EC
+
 main/objlib.c:
-	.text       start:0x80036D04 end:0x80038A80
-	.data       start:0x802CB9F8 end:0x802CBA60
-	.bss        start:0x80343558 end:0x80343A70
-	.sdata2     start:0x803DF5E8 end:0x803DF618
+	.text       start:0x8003757C end:0x80038A80
+	.data       start:0x802CBA20 end:0x802CBA60
+	.bss        start:0x803439B0 end:0x80343A70
+	.sbss       start:0x803DD878 end:0x803DD87C
+	.sdata2     start:0x803DF5F0 end:0x803DF618
 
 main/objprint.c:
 	.text       start:0x80038A80 end:0x8003BC7C
