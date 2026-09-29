@@ -66,6 +66,7 @@ class SplitRange:
     section: str
     start: int
     end: int
+    alignment: int | None = None
 
 
 @dataclass(frozen=True)
@@ -158,12 +159,17 @@ def load_splits(path: Path) -> tuple[list[str], list[SplitRange]]:
         if match is None:
             continue
         section = match.group(1).removeprefix(".")
+        align_match = re.search(r"\balign:(0x[0-9A-Fa-f]+|[0-9]+)\b", line[match.end():])
+        alignment = int(align_match.group(1), 0) if align_match else None
+        if alignment is not None and (alignment <= 0 or alignment & (alignment - 1)):
+            raise ValueError(f"Invalid split alignment in {path}: {line}")
         ranges.append(
             SplitRange(
                 unit=unit.replace("\\", "/"),
                 section=section,
                 start=int(match.group(2), 16),
                 end=int(match.group(3), 16),
+                alignment=alignment,
             )
         )
     while header_end > 0 and not lines[header_end - 1].strip():
@@ -1603,11 +1609,15 @@ def render_splits(header: list[str], ported: list[PortedRange]) -> str:
         lines.append(f"{unit}:")
         for split in ranges:
             section = split.source.section
+            alignment = split.source.alignment
+            if alignment is not None and split.target_start % alignment:
+                raise ValueError(f"Projected {unit} .{section} start violates alignment {alignment}")
+            suffix = f" align:{alignment}" if alignment is not None else ""
             if section not in {"extab", "extabindex"}:
                 section = f".{section}"
             lines.append(
                 f"\t{section:<11} "
-                f"start:0x{split.target_start:08X} end:0x{split.target_end:08X}"
+                f"start:0x{split.target_start:08X} end:0x{split.target_end:08X}{suffix}"
             )
         lines.append("")
     return "\n".join(lines).rstrip() + "\n"

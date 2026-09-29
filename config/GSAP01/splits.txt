@@ -4293,7 +4293,7 @@ dolphin/os/OSMutex.c:
 
 dolphin/os/OSReboot.c:
 	.text       start:0x80244D5C end:0x80244F74
-	.bss        start:0x803AEB60 end:0x803AEB80
+	.bss        start:0x803AEB60 end:0x803AEB80 align:32
 	.sbss       start:0x803DF650 end:0x803DF660
 
 dolphin/os/OSReset.c:
@@ -4367,7 +4367,7 @@ dolphin/dvd/dvdFatal.c:
 dolphin/dvd/dvd.c:
 	.text       start:0x80249A68 end:0x8024C1E4
 	.data       start:0x8032F3F8 end:0x8032F510
-	.bss        start:0x803AF6A0 end:0x803AF778
+	.bss        start:0x803AF6A0 end:0x803AF778 align:32
 	.sdata      start:0x803DDD68 end:0x803DDD70
 	.sbss       start:0x803DF708 end:0x803DF750
 
