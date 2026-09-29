@@ -1061,6 +1061,46 @@ int arwarwing_SeqFn(GameObject* obj, int unused, ObjSeqState* animUpdate) {
     return 0;
 }
 
+/* Named tuning follows the earlier literal pool; address reads avoid duplicate literals. */
+const f32 gArwingDeathSpinRate = 1500.0f;
+const f32 gArwingMaxLateralSpeed = 13.0f;
+const f32 gArwingLateralResponse = 0.04f;
+const f32 gArwingMaxVerticalSpeed = 9.0f;
+const f32 gArwingVerticalResponse = 0.05f;
+const f32 gArwingMaxForwardAccel = 0.2f;
+const f32 gArwingMinForwardAccel = -0.1f;
+const f32 gArwingYawRange = 7800.0f;
+const f32 gArwingPitchRange = 7500.0f;
+const f32 gArwingRollRange = 8000.0f;
+const f32 gArwingRollGain = 0.11f;
+const f32 gArwingRollTrimRange = 16383.0f;
+const f32 gArwingRollTrimGain = 0.07f;
+const f32 gArwingRollBlendThreshold = 7000.0f;
+const f32 gArwingBlendRate = 0.01f;
+const f32 gArwingBarrelRollSpeed = 3000.0f;
+const f32 gArwingBarrelRollDecelRange = 1000.0f;
+const f32 gArwingRootMotionScale = 0.75f;
+const f32 gArwingBarrelRollMaxSpeedScale = 1.5f;
+const f32 gArwingBarrelRollAccelScale = 1.6f;
+const f32 gArwingLeftRollSpeedScale = 2.0f;
+const f32 gArwingEscortSearchRadius = 10000.0f;
+const f32 gArwingLightOffsetY = -15.0f;
+const f32 gArwingLightOffsetZ = -70.0f;
+const f32 gArwingLightNearDistance = 60.0f;
+const f32 gArwingLightFarDistance = 110.0f;
+const f32 gArwingLeftRollAccel = 0.15f;
+const f32 gArwingNeutralForwardAccel = 0.02f;
+const f32 gArwingRollCooldown = 180.0f;
+const f32 gArwingRollEnergyMax = 90.0f;
+const f32 gArwingBobRollAmplitude = 600.0f;
+const f32 gArwingBobYRate = 350.0f;
+const f32 gArwingFlightHalfWidth = 750.0f;
+const f32 gArwingFlightUpperHeight = 300.0f;
+const f32 gArwingHitShakeAmplitude = 768.0f;
+const f32 gArwingAimCameraParameter = 35.0f;
+const f32 gArwingThrusterFadeInRate = 4.0f;
+const f32 gArwingThrusterAlphaMax = 255.0f;
+
 void arwarwing_initAttachments(GameObject* obj, ArwingState* state) {
     int allAttached;
     PlayerStatus* charState;
@@ -1072,7 +1112,7 @@ void arwarwing_initAttachments(GameObject* obj, ArwingState* state) {
     f32 c6F5C;
     f32 c6EF0;
 
-    radius = gArwingEscortSearchRadius;
+    radius = (*(const f32*)&gArwingEscortSearchRadius);
     charState = (*gMapEventInterface)->getCurCharacterState();
 
     if (state->escortObj == NULL) {
@@ -1121,11 +1161,12 @@ void arwarwing_initAttachments(GameObject* obj, ArwingState* state) {
             state->light = (void*)objCreateLight(obj, 1);
             if (state->light != 0) {
                 modelLightStruct_setLightKind(state->light, MODEL_LIGHT_KIND_POINT);
-                modelLightStruct_setPosition(state->light, 0.0f, gArwingLightOffsetY, gArwingLightOffsetZ);
+                modelLightStruct_setPosition(state->light, 0.0f, (*(const f32*)&gArwingLightOffsetY),
+                                             (*(const f32*)&gArwingLightOffsetZ));
                 modelLightStruct_setFieldBC(state->light, 1);
                 modelLightStruct_setDiffuseColor(state->light, 0x28, 0x7d, 0xff, 0);
-                modelLightStruct_setDistanceAttenuation(state->light, gArwingLightNearDistance,
-                                                        gArwingLightFarDistance);
+                modelLightStruct_setDistanceAttenuation(state->light, (*(const f32*)&gArwingLightNearDistance),
+                                                        (*(const f32*)&gArwingLightFarDistance));
                 modelLightStruct_startColorFade(state->light, 1, 1);
                 modelLightStruct_setDiffuseTargetColor(state->light, 0x14, 0x64, 0xc8, 0);
             }
@@ -1142,39 +1183,39 @@ void arwarwing_initAttachments(GameObject* obj, ArwingState* state) {
     if (allAttached != 0) {
         (*gCameraInterface)->setFocus((void*)obj, 0);
         state->flags477 |= ARWING_FLAG_ACTIVE;
-        state->maxSpeedX = gArwingMaxLateralSpeed;
-        state->accelX = (lateralResponse = gArwingLateralResponse);
-        state->maxSpeedY = (cruiseSpeed = gArwingMaxVerticalSpeed);
-        state->accelY = (verticalResponse = gArwingVerticalResponse);
+        state->maxSpeedX = (*(const f32*)&gArwingMaxLateralSpeed);
+        state->accelX = (lateralResponse = (*(const f32*)&gArwingLateralResponse));
+        state->maxSpeedY = (cruiseSpeed = (*(const f32*)&gArwingMaxVerticalSpeed));
+        state->accelY = (verticalResponse = (*(const f32*)&gArwingVerticalResponse));
         state->maxSpeedZ = cruiseSpeed;
         state->accelZ = verticalResponse;
-        state->maxAccelZ = gArwingMaxForwardAccel;
-        state->minAccelZ = gArwingMinForwardAccel;
+        state->maxAccelZ = (*(const f32*)&gArwingMaxForwardAccel);
+        state->minAccelZ = (*(const f32*)&gArwingMinForwardAccel);
         state->speedScaleZ = 1.0f;
-        state->rotXRange = gArwingYawRange;
+        state->rotXRange = (*(const f32*)&gArwingYawRange);
         state->rotXGain = lateralResponse;
-        state->rotYRange = gArwingPitchRange;
+        state->rotYRange = (*(const f32*)&gArwingPitchRange);
         state->rotYGain = verticalResponse;
-        state->rotZRange = gArwingRollRange;
-        state->rotZGain = gArwingRollGain;
-        state->rotZTrimRange = gArwingRollTrimRange;
-        state->rotZTrimGain = gArwingRollTrimGain;
-        state->rotZBlendThreshold = gArwingRollBlendThreshold;
-        state->rotZBlendRate = gArwingBlendRate;
-        state->barrelRollSpeed = gArwingBarrelRollSpeed;
+        state->rotZRange = (*(const f32*)&gArwingRollRange);
+        state->rotZGain = (*(const f32*)&gArwingRollGain);
+        state->rotZTrimRange = (*(const f32*)&gArwingRollTrimRange);
+        state->rotZTrimGain = (*(const f32*)&gArwingRollTrimGain);
+        state->rotZBlendThreshold = (*(const f32*)&gArwingRollBlendThreshold);
+        state->rotZBlendRate = (*(const f32*)&gArwingBlendRate);
+        state->barrelRollSpeed = (*(const f32*)&gArwingBarrelRollSpeed);
         state->unk3FA = 0x19;
-        state->barrelRollDecelRange = gArwingBarrelRollDecelRange;
-        state->rootMotionScale = (rootMotionScale = gArwingRootMotionScale);
+        state->barrelRollDecelRange = (*(const f32*)&gArwingBarrelRollDecelRange);
+        state->rootMotionScale = (rootMotionScale = (*(const f32*)&gArwingRootMotionScale));
         obj->anim.rootMotionScale = rootMotionScale;
-        state->barrelRollMaxSpeedScale = gArwingBarrelRollMaxSpeedScale;
-        state->barrelRollAccelScale = gArwingBarrelRollAccelScale;
-        state->speedScaleRollL = gArwingLeftRollSpeedScale;
+        state->barrelRollMaxSpeedScale = (*(const f32*)&gArwingBarrelRollMaxSpeedScale);
+        state->barrelRollAccelScale = (*(const f32*)&gArwingBarrelRollAccelScale);
+        state->speedScaleRollL = (*(const f32*)&gArwingLeftRollSpeedScale);
         state->speedScaleRollR = 0.5f;
-        state->accelZRollL = gArwingLeftRollAccel;
+        state->accelZRollL = (*(const f32*)&gArwingLeftRollAccel);
         state->accelZRollR = lateralResponse;
-        state->accelZNeutral = gArwingNeutralForwardAccel;
-        state->rollCooldownInit = gArwingRollCooldown;
-        state->rollEnergyMax = gArwingRollEnergyMax;
+        state->accelZNeutral = (*(const f32*)&gArwingNeutralForwardAccel);
+        state->rollCooldownInit = (*(const f32*)&gArwingRollCooldown);
+        state->rollEnergyMax = (*(const f32*)&gArwingRollEnergyMax);
         state->altRollEnergyMax = 10.0f;
         state->rollEnergy = state->rollEnergyMax;
         state->altRollEnergy = state->altRollEnergyMax;
@@ -1186,7 +1227,7 @@ void arwarwing_initAttachments(GameObject* obj, ArwingState* state) {
             state->velZ = cruiseSpeed;
         }
         state->projLifetime = 0x28;
-        state->projSpeed = gArwingRollEnergyMax;
+        state->projSpeed = (*(const f32*)&gArwingRollEnergyMax);
         state->fireDelay = 0x6;
         state->bombProjectileParam = 0x5a;
         state->bombProjectileLifetime = 25.0f;
@@ -1202,17 +1243,17 @@ void arwarwing_initAttachments(GameObject* obj, ArwingState* state) {
         state->health = state->maxHealth;
         state->bobSpeedThreshold = 0.1f;
         state->bobRotZRate = (c6EF0 = 250.0f);
-        state->bobRotZAmp = gArwingBobRollAmplitude;
+        state->bobRotZAmp = (*(const f32*)&gArwingBobRollAmplitude);
         state->bobXRate = 500.0f;
-        state->bobXAmp = gArwingLeftRollAccel;
-        state->bobYRate = gArwingBobYRate;
-        state->bobYAmp = gArwingMaxForwardAccel;
-        state->bobBlendRate = gArwingBlendRate;
+        state->bobXAmp = (*(const f32*)&gArwingLeftRollAccel);
+        state->bobYRate = (*(const f32*)&gArwingBobYRate);
+        state->bobYAmp = (*(const f32*)&gArwingMaxForwardAccel);
+        state->bobBlendRate = (*(const f32*)&gArwingBlendRate);
         state->homeX = obj->anim.localPosX;
         state->homeY = obj->anim.localPosY;
         state->homeZ = obj->anim.localPosZ;
-        state->flightHalfWidth = gArwingFlightHalfWidth;
-        state->flightUpperHeight = gArwingFlightUpperHeight;
+        state->flightHalfWidth = (*(const f32*)&gArwingFlightHalfWidth);
+        state->flightUpperHeight = (*(const f32*)&gArwingFlightUpperHeight);
         state->flightLowerHeight = c6EF0;
     }
 }
@@ -1223,32 +1264,32 @@ void arwarwing_resetFlightState(GameObject* obj) {
     f32 lateralResponse;
     f32 cruiseSpeed;
 
-    state->maxSpeedX = gArwingMaxLateralSpeed;
-    state->accelX = lateralResponse = gArwingLateralResponse;
-    state->maxSpeedY = cruiseSpeed = gArwingMaxVerticalSpeed;
-    state->accelY = verticalResponse = gArwingVerticalResponse;
+    state->maxSpeedX = (*(const f32*)&gArwingMaxLateralSpeed);
+    state->accelX = lateralResponse = (*(const f32*)&gArwingLateralResponse);
+    state->maxSpeedY = cruiseSpeed = (*(const f32*)&gArwingMaxVerticalSpeed);
+    state->accelY = verticalResponse = (*(const f32*)&gArwingVerticalResponse);
     state->maxSpeedZ = cruiseSpeed;
     state->accelZ = verticalResponse;
-    state->maxAccelZ = gArwingMaxForwardAccel;
-    state->minAccelZ = gArwingMinForwardAccel;
+    state->maxAccelZ = (*(const f32*)&gArwingMaxForwardAccel);
+    state->minAccelZ = (*(const f32*)&gArwingMinForwardAccel);
     state->speedScaleZ = 1.0f;
-    state->rotXRange = gArwingYawRange;
+    state->rotXRange = (*(const f32*)&gArwingYawRange);
     state->rotXGain = lateralResponse;
-    state->rotYRange = gArwingPitchRange;
+    state->rotYRange = (*(const f32*)&gArwingPitchRange);
     state->rotYGain = verticalResponse;
-    state->rotZRange = gArwingRollRange;
-    state->rotZGain = gArwingRollGain;
-    state->rotZTrimRange = gArwingRollTrimRange;
-    state->rotZTrimGain = gArwingRollTrimGain;
-    state->rotZBlendThreshold = gArwingRollBlendThreshold;
-    state->rotZBlendRate = gArwingBlendRate;
-    state->barrelRollSpeed = gArwingBarrelRollSpeed;
+    state->rotZRange = (*(const f32*)&gArwingRollRange);
+    state->rotZGain = (*(const f32*)&gArwingRollGain);
+    state->rotZTrimRange = (*(const f32*)&gArwingRollTrimRange);
+    state->rotZTrimGain = (*(const f32*)&gArwingRollTrimGain);
+    state->rotZBlendThreshold = (*(const f32*)&gArwingRollBlendThreshold);
+    state->rotZBlendRate = (*(const f32*)&gArwingBlendRate);
+    state->barrelRollSpeed = (*(const f32*)&gArwingBarrelRollSpeed);
     state->unk3FA = 0x19;
-    state->barrelRollDecelRange = gArwingBarrelRollDecelRange;
-    state->rootMotionScale = gArwingRootMotionScale;
-    state->barrelRollMaxSpeedScale = gArwingBarrelRollMaxSpeedScale;
-    state->barrelRollAccelScale = gArwingBarrelRollAccelScale;
-    state->speedScaleRollL = gArwingLeftRollSpeedScale;
+    state->barrelRollDecelRange = (*(const f32*)&gArwingBarrelRollDecelRange);
+    state->rootMotionScale = (*(const f32*)&gArwingRootMotionScale);
+    state->barrelRollMaxSpeedScale = (*(const f32*)&gArwingBarrelRollMaxSpeedScale);
+    state->barrelRollAccelScale = (*(const f32*)&gArwingBarrelRollAccelScale);
+    state->speedScaleRollL = (*(const f32*)&gArwingLeftRollSpeedScale);
     state->speedScaleRollR = 0.5f;
     state->rollEnergy = state->rollEnergyMax;
     state->altRollEnergy = state->altRollEnergyMax;
@@ -1448,7 +1489,8 @@ void arwarwing_render(GameObject* obj, int p2, int p3, int p4, int p5) {
     int dx, dy;
 
     if (state->hitShake != 0) {
-        dx = (int)(gArwingHitShakeAmplitude * mathSinf(3.1415927f * (f32) * (u16*)&state->shakePitch / 32768.0f));
+        dx = (int)((*(const f32*)&gArwingHitShakeAmplitude) *
+                   mathSinf(3.1415927f * (f32) * (u16*)&state->shakePitch / 32768.0f));
         dy = (int)(1024.0f * mathSinf(3.1415927f * (f32) * (u16*)&state->shakeYaw / 32768.0f));
         obj->anim.rotY = (s16)(obj->anim.rotY + dx);
         obj->anim.rotZ = (s16)(obj->anim.rotZ + dy);
@@ -1470,9 +1512,9 @@ void arwarwing_hitDetect(GameObject* obj) {
         PSMTXMultVec((MtxP)mtx, (const Vec*)&state->aimOffsetX, &pos);
         pos.x += playerMapOffsetX;
         pos.z += playerMapOffsetZ;
-        ObjSeq_SetCameraTransformOverride(pos.x, pos.y, (s16)(0x8000 - obj->anim.rotX + state->aimYaw),
-                                          (s16)(obj->anim.rotY + state->aimPitch),
-                                          (s16)(obj->anim.rotZ + state->aimRoll), pos.z, gArwingAimCameraParameter);
+        ObjSeq_SetCameraTransformOverride(
+            pos.x, pos.y, (s16)(0x8000 - obj->anim.rotX + state->aimYaw), (s16)(obj->anim.rotY + state->aimPitch),
+            (s16)(obj->anim.rotZ + state->aimRoll), pos.z, (*(const f32*)&gArwingAimCameraParameter));
     }
 }
 
@@ -1525,7 +1567,7 @@ void arwarwing_update(GameObject* obj) {
             obj->anim.flags = (s16)(obj->anim.flags | OBJANIM_FLAG_HIDDEN);
             spawnExplosion(obj, 100.0f, 1, 0, 1, 1, 0, 1, 0);
         }
-        state->rotZCur = gArwingDeathSpinRate * timeDelta + (f32)state->rotZCur;
+        state->rotZCur = (*(const f32*)&gArwingDeathSpinRate) * timeDelta + (f32)state->rotZCur;
         obj->anim.rotZ = (s16)state->rotZCur;
         state->velY = state->velY - 0.1f * timeDelta;
         objMove(obj, state->velX * timeDelta, state->velY * timeDelta, state->velZ * timeDelta);
@@ -1541,9 +1583,9 @@ void arwarwing_update(GameObject* obj) {
             state->thrusterR->anim.flags |= OBJANIM_FLAG_HIDDEN;
         } else {
             state->thrusterL->anim.flags &= ~OBJANIM_FLAG_HIDDEN;
-            throttle = gArwingThrusterFadeInRate * timeDelta + (f32)(u32)state->thrusterL->anim.alpha;
-            if (throttle > gArwingThrusterAlphaMax) {
-                throttle = gArwingThrusterAlphaMax;
+            throttle = (*(const f32*)&gArwingThrusterFadeInRate) * timeDelta + (f32)(u32)state->thrusterL->anim.alpha;
+            if (throttle > (*(const f32*)&gArwingThrusterAlphaMax)) {
+                throttle = (*(const f32*)&gArwingThrusterAlphaMax);
             }
             state->thrusterL->anim.alpha = throttle;
             state->thrusterR->anim.flags &= ~OBJANIM_FLAG_HIDDEN;

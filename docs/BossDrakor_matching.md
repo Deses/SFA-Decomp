@@ -1,4 +1,59 @@
-# DLL 589: inline helper recovery
+# Boss Drakor version parity
+
+`bossdrakor_update` and its complete unit match code and assigned data in all
+five retail versions with the existing GC/1.3 compiler profile.
+
+Two source changes close the remaining regional differences:
+
+- Name the curve-walker pointer separately at each of the two `initCurve`
+  calls. Keep the ordinary expression at the later curve-advance call.
+- Preserve the raw speed for logging separately from the curve step in all
+  versions that log it. PAL additionally scales the curve step for its
+  non-EURGB60 mode; EN v1.1 retains the unscaled copy.
+
+The pointer assignments change the compiler's interference graph without
+adding instructions. A GC/1.3 trace of PAL v1.1 grows from 184 to 186 GPR
+nodes. The two pointer values become distinct fixed-color aliases of `r3`.
+The simplifier counts those aliases separately even though they have the same
+physical color. At the second low-degree sweep, `obj` now has degree 29
+instead of 27, so it survives the threshold of 29 until the next sweep.
+It is consequently colored first: `obj=r31`, `state=r30`, `moveResult=r29`.
+The resulting stream has zero retail differences, with no reserved register
+or compiler setting change. EN and JP retain their different, exact allocation.
+
+This supersedes the claims in `version_parity_frontier.md` that the register
+rotation requires a reservation or that the graph is fixed by the emitted
+instruction stream. Distinct source values can remain separate fixed-color
+graph nodes while emitting the same instructions.
+
+EN v1.1 also requires loading the raw speed into `f1` and copying it into
+`f30` before the diagnostic call. Sharing the two-value PAL spelling recovers
+that sequence and removes the separate v1.1 source arm.
+
+## Validation
+
+All 13 functions and every assigned data section are exact in each version:
+
+| Version | Code bytes | Data bytes |
+| --- | ---: | ---: |
+| EN v1.0 | 6,380 | 472 |
+| EN v1.1 | 6,444 | 496 |
+| JP | 6,380 | 472 |
+| PAL v1.0 | 6,480 | 504 |
+| PAL v1.1 | 6,480 | 504 |
+
+`ninja all_source` and the native `--matching` strict checksum target pass
+for all five versions. Promoting the three previously incomplete manifests
+therefore verifies the actual linked addresses, beyond normalized objdiff.
+The generated DLL path audit also passes for slot 589.
+
+EN v1.1 now has 100% matched and linked code. The remaining code holdouts
+are PAL's `askProgressiveScanMode` and `GM_MazeWell_update`.
+
+## Earlier EN helper recovery (2026-09-06)
+
+The following records the earlier partial recovery; its remaining mismatches
+were resolved by subsequent work and the version-parity fix above.
 
 The September 6, 2026 follow-up starts at `8b8a2ec4ce`. EN GSAE01
 BossDrakor improves from **99.91536% to 99.95298%** with the common game

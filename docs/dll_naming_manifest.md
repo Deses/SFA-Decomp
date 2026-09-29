@@ -518,7 +518,7 @@ any of them is acted on.
 | 0x1D1 | DIMTruthHor | COMPLETE | dlls/objects/465_DIMTruthHor/DIMTruthHor.c | = (canonical) | Exact complete four-function TU with its terminal descriptor, allocation-backed 0x08-byte state, active-EN-retail-backed fixed 0x30-byte placement, canonical unit header, canonical hidden-object flag, and exact 80-byte data image; the generated source path remains unchanged |
 | 0x1D2 | WORLDplanet | COMPLETE | dlls/objects/466_WORLDplanet/WORLDplanet.c | = (canonical) | Exact complete 11-function TU (5,112 code bytes) with an allocation-backed 0x18-byte state, a separate allocation-backed 0x20-byte Fox-spawn setup, canonical unit header, terminal descriptor, and exact 344-byte data image. Links from source with the strict retail checksum; see [matching evidence](WORLDplanet_matching.md). The generated source path remains unchanged |
 | 0x1D3 | worldobj (+WORLDcloudr, WORLDdragro, WORLDwalled, WORLDdarkic, WORLDcloudl, WORLDpath1, WORLDpath2, WORLDpath3, WORLDpath4, WORLDpath5, WORLDpath6, WORLDpath7, WORLDpath8, WORLDarwing, WORLDgreatf, WORLDsun, WORLDsunray, WORLDpepper, WORLDsunfla, WORLDComet, WORLDastGen, WORLDhalo, WORLDhalobr, WORLDarrow) | COMPLETE | dlls/objects/467/467.c | = (canonical) | Exact complete 11-function TU with its terminal descriptor, allocation-backed 0x284-byte state, active-EN-retail-backed fixed 0x20-byte placement family, canonical unit header, and exact 444-byte data image; no single retail basename is claimed and the generated numeric source path remains unchanged |
-| 0x1D4 | WORLDAstero | COMPLETE | dlls/objects/468_WORLDAstero/WORLDAstero.c | = (canonical) | Exact complete nine-function TU with its terminal descriptor, allocation-backed 0x0C-byte state, canonical unit header, and exact 76-byte data image; active EN has no observed placements for its sole object definition, no placement width is claimed, and the generated source path remains unchanged |
+| 0x1D4 | WORLDAstero | COMPLETE | dlls/objects/468_WORLDAstero/WORLDAstero.c | = (canonical) | Exact complete nine-function TU with its terminal descriptor, allocation-backed 0x0C-byte state, canonical unit header, and exact 92-byte data image including the complete initialization pool; active EN has no observed placements for its sole object definition, no placement width is claimed, and the generated source path remains unchanged |
 | 0x1D5 | DIM2Conveyo | COMPLETE | dlls/objects/469_DIM2Conveyo/DIM2Conveyo.c | = (canonical) | Exact complete ten-function TU with its terminal 0x40-byte descriptor-plus-tail, allocation-backed 0x14-byte state, active-EN-retail-backed fixed 0x24-byte placement, canonical unit header and shared object-group contract, and exact 96-byte data image; the generated source path remains unchanged |
 | 0x1D6 | — | COMPLETE | dlls/objects/470/470.c | = (canonical) | Exact complete nine-function TU with its terminal numbered descriptor, allocation-backed 0x20-byte state, fully asserted callback-visible placement prefix, canonical unit header, and exact 112-byte data image; active EN has no object definitions for this DLL, no basename or placement width is claimed, and the generated numeric source path remains unchanged |
 | 0x1D7 | DIM2SnowBal | COMPLETE | dlls/objects/471_DIM2SnowBal/DIM2SnowBal.c | = (canonical) | Exact complete nine-function TU with its terminal descriptor, allocation-backed 0xB0-byte state, paired-generator-backed 0x24-byte placement/setup, canonical unit header and shared child-setup contract, and exact 108-byte data image; the generated source path remains unchanged |
@@ -700,13 +700,13 @@ any of them is acted on.
 | 0x287 | SPScarab | RAW | dlls/objects/647_SPScarab/SPScarab.c | = (canonical) | Exact complete TU with descriptor at the physical end |
 | 0x288 | SPDrape | RAW | dlls/objects/648_SPDrape/SPDrape.c | = (canonical) | Exact complete TU; descriptor placement preserves the following jump table, and the non-emitted helper contributes to `.sdata2` literal order |
 | 0x289 | SPitembeam | RAW | dlls/objects/649_SPitembeam/SPitembeam.c | = (canonical) | Exact complete TU; descriptor is followed by a DOL-proven 76-byte SnowBike table |
-| 0x28A | — | NO-RETAIL-NAME | dlls/objects/650/650.c | = (canonical) | Exact complete TU containing the EarthWalker object and the following eight DLL 651 state handlers; internal object aliases are not DLL basenames |
-| 0x28B | — | NO-RETAIL-NAME | dlls/objects/651/651.c | = (canonical) | Exact complete descriptor/lifecycle TU; its eight state handlers are DOL-confirmed in DLL 650's TU |
-| 0x28C | WCBouncyCra | RAW | dlls/objects/652_WCBouncyCra/WCBouncyCra.c | = (canonical) | Exact complete TU containing the trailing shared `wcblock_*` helper and descriptor at the physical end |
+| 0x28A | — | NO-RETAIL-NAME | dlls/objects/650/650.c | = (canonical) | Exact ten-function EarthWalker TU with its recovered 20-byte constant pool; [corrected boundary](dll_650_651_boundary.md) preserves the numbered slot |
+| 0x28B | — | NO-RETAIL-NAME | dlls/objects/651/651.c | = (canonical) | Exact seventeen-function TU including its eight state handlers and complete 48-byte constant pool; the former assignment of those handlers to 650 is superseded by [pool and ownership evidence](dll_650_651_boundary.md) |
+| 0x28C | WCBouncyCra | RAW | dlls/objects/652_WCBouncyCra/WCBouncyCra.c | = (canonical) | Nine exact callbacks with descriptor last and a complete 48-byte constant pool; the former trailing cell test belongs to 656 ([boundary audit](dll_652_656_boundary.md)) |
 | 0x28D | WCLevelCont | RAW | dlls/objects/653_WCLevelCont/WCLevelCont.c | = (canonical) | Exact complete 27-function TU with descriptor at the physical end |
 | 0x28E | WCBeacon | RAW | dlls/objects/654_WCBeacon/WCBeacon.c | = (canonical) | Exact complete six-function TU with descriptor at the physical end |
 | 0x28F | WCPressureS | RAW | dlls/objects/655_WCPressureS/WCPressureS.c | = (canonical) | DOL-confirmed ten-function TU; descriptor is followed by its trailing activation-format string |
-| 0x290 | WCPushBlock | RAW | dlls/objects/656_WCPushBlock/WCPushBlock.c | = (canonical) | Exact complete TU; descriptor placement precedes the function bodies and four trailing tile-grid tables remain in the same DOL object |
+| 0x290 | WCPushBlock | RAW | dlls/objects/656_WCPushBlock/WCPushBlock.c | = (canonical) | Ten exact functions including the leading stored-cell test, complete 84-byte constant pool; descriptor retains its early position and four trailing tile-grid tables remain in the same DOL object ([boundary audit](dll_652_656_boundary.md)) |
 | 0x291 | WCTile | RAW | dlls/objects/657_WCTile/WCTile.c | = (canonical) | Exact complete nine-function TU with its sole descriptor at the physical end |
 | 0x292 | WCTrexStatu | RAW | dlls/objects/658_WCTrexStatu/WCTrexStatu.c | = (canonical) | Exact complete ten-function TU with its sole descriptor at the physical end |
 | 0x293 | — | NO-RETAIL-NAME | dlls/objects/659/659.c | = (canonical) | Exact complete ten-function TU; `SunTemple` is an internal object alias, not a recovered DLL basename |
@@ -716,7 +716,7 @@ any of them is acted on.
 | 0x297 | WCTempleBri | RAW | dlls/objects/663_WCTempleBri/WCTempleBri.c | = (canonical) | Exact complete eleven-function TU with deformation helpers and its sole descriptor at the physical end |
 | 0x298 | WCFloorTile | RAW | dlls/objects/664_WCFloorTile/WCFloorTile.c | = (canonical) | Exact complete nine-function TU with its sole descriptor at the physical end |
 | 0x299 | — | NO-RETAIL-NAME | dlls/objects/665/665.c | = (canonical) | Exact complete nine-function TU with its resource slot and sole descriptor |
-| 0x29A | ARWArwing | RAW | dlls/objects/666_ARWArwing/ARWArwing.c | = (canonical) | DOL-confirmed exact 54-function TU; its early descriptor and complete data block remain with the function body |
+| 0x29A | ARWArwing | RAW | dlls/objects/666_ARWArwing/ARWArwing.c | = (canonical) | Exact 54-function TU with 852 data bytes in all versions; the 38 tuning floats follow its earlier anonymous literal pool in the same TU; early descriptor retained ([pool recovery](sdata2_pool_order.md#arwing-tuning-pool-2026-09-29)) |
 | 0x29B | — | NO-RETAIL-NAME | dlls/objects/667/667.c | = (canonical) | Exact complete twelve-function TU; `arwingandrossstuff` is an internal projectile-family alias, not a recovered DLL basename |
 | 0x29C | ARWArwingBo | RAW | dlls/objects/668_ARWArwingBo/ARWArwingBo.c | = (canonical) | Exact complete twelve-function TU; its source-only detonation helper and early descriptor remain with the body |
 | 0x29D | ARWArwingGu | RAW | dlls/objects/669_ARWArwingGu/ARWArwingGu.c | = (canonical) | DOL-confirmed twelve-function TU; now owns its previously unassigned `0x803E7058..0x803E7068` constants and alignment padding, with code still exact |
@@ -1225,6 +1225,13 @@ They are now one GC/1.3 TU; regressions from removing fragment-specific
 optimization flags do not invalidate the retail boundary evidence. The older
 `MWTrace` entry was not a separate unit in the active EN split at recovery time.
 Historical measurements below are retained as experiments, not provenance.
+
+The 650 / 651 verdict is superseded by the
+[corrected state-handler boundary](dll_650_651_boundary.md). The eight handlers
+and the old 651 callbacks form one unit with a naturally emitted 48-byte pool;
+650 retains its ten EarthWalker callbacks and separate 20-byte pool. The fix
+moves the misplaced boundary instead of merging both numbered slots. Both
+existing compiler profiles remain unchanged, and all five retail links match.
 
 The shader/lightmap verdict is likewise superseded by
 [map-rendering pool recovery](map_render_pool_recovery.md). The five fragments

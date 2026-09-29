@@ -205,7 +205,12 @@ dll.c             (12) main/modelEngine.c (the load/free API only) [BODY] SETTLE
     0x42-0x44 in sResourceFileNameTable (pi_dolphin.c) but NO call site in the tree passes any
     of them - mapLoadDataFile serves only the per-map ids >= 0x45, and every other
     fileLoad/DVDOpen path is reached with different constants.
-objexpr.c         (28) dlls/engine/10_expgfx/expgfx.c            [STR: retail says "expgfx.c:"]
+objexpr.c         (28) main/objexpr.c                           [BODY, TABLE, FLAG]
+    Corrected 2026-09-29: the former expgfx mapping confused unrelated names.
+    The shared joint-key table, look-at flag, and expression helpers correspond
+    to the first 31 functions formerly merged into main/objprint.c. Retail
+    section ownership supports their recovered boundary; all five links match.
+    See docs/objexpr_boundary_recovery.md. No retail objexpr filename is proven.
 objlib.c          (14) main/obj_movelib.c + main/objhits.c       [BODY] SETTLED, split two ways.
     The space-transform half is obj_movelib.c; the TOUCH-CALLBACK half is objhits.c (which
     already holds DP objmsg.c), statement for statement:
@@ -284,15 +289,20 @@ menu.c            (27) main/modelEngine.c (the UI-DLL switcher)  [BODY] SETTLED 
       gActiveMenuDLL/gCurrentMenuID/gNextMenuID/gPreviousMenuID/gMenuDLLIDs
         == gModelEngineCurUiDllRes / curUiDll / gModelEnginePendingUiDll /
            gModelEnginePrevUiDll / gModelEngineUiDllResourceIds
-lfx.c / envfx.c    (3) main/skystars.c / render.c(getEnvfxAct)   [?] SFA render.c literally has
-    getEnvfxAct / getEnvfxActImmediately - DP's envfx.c is 2 functions.  Weak but suggestive.
+lfx.c             (2) main/render.c(getLActions)              [BODY] Same LACTIONS loader;
+    SFA retains only allocation/load/free, without the older effect dispatch.
+envfx.c           (2) main/envfx.c                            [BODY] Same two action dispatchers,
+    kind routing and immediate-action field clearing; SFA uses aligned stack storage.
+segment_13D0.c    (4) main/effects_state.c                    [BODY] Same mode getter/setter,
+    default sequence callback and expgfx pool-update marker. Two older no-ops are absent.
+    Retail BSS alignment independently supports the state boundary; see render_state_boundary.md.
 scheduler.c       (20) (none)                                    N64 OS scheduler; GC uses OS/VI.
 boot.c / reset.c   (9) main/boot_logo.c / gameloop checkReset  [?]
 audio.c / mp3 /   (16) main/audio*.c                             NOT a correspondence: DP is the
   segment_BED0.c                                                 N64 audio driver, SFA is MusyX.
 libultra/*             src/dolphin/*                             platform SDK, unrelated bodies.
 bitstream.c / linked_list.c / generic_* / assert.c / mpeg.c / developer_names.c / rsp_segment.c /
-segment_11EF0.c / segment_11F70.c / segment_13D0.c               no located SFA counterpart.
+segment_11EF0.c / segment_11F70.c                                no located SFA counterpart.
 
 SFA UNITS WITH NO DP COUNTERPART (GameCube-only work)
 -----------------------------------------------------

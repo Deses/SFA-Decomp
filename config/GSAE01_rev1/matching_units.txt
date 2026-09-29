@@ -60,6 +60,7 @@ dlls/engine/18/18.c
 dlls/engine/19/19.c
 dlls/engine/1_camcontrol/camcontrol.c
 dlls/engine/2/2.c
+dlls/engine/2/maketex.c
 dlls/engine/20_Hcurves/Hcurves.c
 dlls/engine/20_Hcurves/Hcurves_romcurve.c
 dlls/engine/21/21.c
@@ -630,6 +631,7 @@ dlls/objects/585/585.c
 dlls/objects/586/586.c
 dlls/objects/587/587.c
 dlls/objects/588_BossDrakor_/BossDrakor_.c
+dlls/objects/589_BossDrakor/BossDrakor.c
 dlls/objects/590/590.c
 dlls/objects/591_KT_RexLevel/KT_RexLevel.c
 dlls/objects/592_KT_Rex/KT_Rex.c
@@ -890,6 +892,8 @@ main/boot_logo.c
 main/camera.c
 main/curves.c
 main/debug_display.c
+main/effects_state.c
+main/envfx.c
 main/fileio.c
 main/gameloop.c
 main/gametext.c
@@ -902,10 +906,12 @@ main/newshadows.c
 main/obj_movelib.c
 main/objanim.c
 main/object.c
+main/objexpr.c
 main/objhits.c
 main/objlib.c
 main/objprint.c
 main/objprint_dolphin.c
+main/objtype.c
 main/pad.c
 main/pi_dolphin.c
 main/pi_pathsearch.c

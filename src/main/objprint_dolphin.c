@@ -8,7 +8,6 @@
 #include "main/model.h"
 #include "main/objHitReact_types.h"
 #include "sys/objects.h"
-#include "main/objlib_api.h"
 #include "main/shader_api.h"
 #include "main/pi_dolphin_api.h"
 #include "main/curve_eval.h"

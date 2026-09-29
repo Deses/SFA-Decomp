@@ -32,7 +32,6 @@
 #include "main/objtype.h"
 #include "main/obj_hit_region.h"
 #include "main/obj_link.h"
-#include "main/objlib_api.h"
 #include "main/obj_message.h"
 #include "main/obj_path.h"
 #include "main/obj_query.h"

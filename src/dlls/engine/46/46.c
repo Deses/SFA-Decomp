@@ -2,6 +2,7 @@
 #include "string.h"
 #include "sys/objects.h"
 #include "MSL_C/PPCEABI/bare/H/math_api.h"
+#include "main/objexpr.h"
 #include "main/objprint_api.h"
 #include "dlls/object_descriptor.h"
 #include "main/dll/rom_curve_interface.h"
@@ -16,7 +17,6 @@
 #include "main/vecmath.h"
 #include "track/intersect_api.h"
 #include "main/curve.h"
-#include "main/objlib_api.h"
 #include "main/objseq.h"
 #include "main/track_dolphin_api.h"
 #define MOVELIB_TARGET_OBJGROUP 8

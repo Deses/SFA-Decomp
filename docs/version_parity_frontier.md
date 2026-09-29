@@ -1,5 +1,25 @@
 # The version-parity frontier — seven units, one function each
 
+> **2026-09-29 maze-well correction:** Slot 611 is also exact in all five
+> versions. An inline activation helper and complete packed-table views recover
+> the retail register lifetimes and address materialization. No reserved
+> registers or flag changes are needed. See [maze-well matching](maze_well_matching.md).
+> Only PAL's `askProgressiveScanMode` remains a code holdout.
+>
+> **2026-09-29 correction:** Boss Drakor is exact in all five versions. Two
+> named curve-walker argument values change fixed-color alias counts in the
+> compiler graph, resolving the saved-register rotation without a reservation.
+> A shared raw-speed/curve-step pair also fixes v1.1's floating-point copies.
+> EN v1.1 now has 100% matched and linked code. See
+> [Boss Drakor matching](BossDrakor_matching.md); the impossibility claims
+> below are historical experiments, not constraints on recoverable source.
+>
+> **2026-09-28 correction:** The v1.1 memory-card holdout is solved by recovering
+> its shared compiler-generated string pool and correcting the boundary with
+> the preceding card code. Both resulting units match code and data in all five
+> versions. The claims below that `saveCardBuildComment` requires a different
+> compiler are superseded; see [the recovery](memory_card_pool_recovery.md).
+
 `complete_code_percent` for the non-EN versions is gated by exactly seven shared units, and in every
 one of them a **single function** is unmatched. Closing all seven closes the whole gap:
 `tools/version_progress.py GSAP01` plus the per-unit rows give **+3.883 pts**, and the measured gap is

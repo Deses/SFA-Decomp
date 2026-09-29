@@ -104,6 +104,73 @@
 #define WCPUSHBLOCK_MOVE_RESULT(state)  (((WCPushBlockRuntimeState*)(state))->moveResult)
 #define WCPUSHBLOCK_FLAGS(state)        (((WCPushBlockRuntimeState*)(state))->flags)
 
+/* Address reads preserve the named read-only pool without duplicate literals. */
+const f32 WCBLOCK_PLAYER_CELL_MARGIN = 56.0f;
+
+int wcblock_isPlayerAwayFromStoredCell(GameObject* obj, WCBlockState* state, GameObject* player) {
+    ObjAnimComponent* objAnim;
+    GameObject* playerObj;
+    f32 cellX;
+    f32 cellZ;
+    f32 pos;
+    f32 min;
+    f32 max;
+    WCLevelContInterface* iface;
+
+    objAnim = &obj->anim;
+    if (objAnim->bankIndex == WCPUSHBLOCK_VARIANT_A) {
+        iface->getInitialTileXYA(state->tileIndex, &state->cellX, &state->cellZ,
+                                 (iface = WC_LEVEL_CONT_INTERFACE(state->controller)));
+        iface->tileAToWorldPos(obj, state->cellX, state->cellZ, &cellX, &cellZ,
+                               (iface = WC_LEVEL_CONT_INTERFACE(state->controller)));
+    } else {
+        iface->getInitialTileXYB(state->tileIndex, &state->cellX, &state->cellZ,
+                                 (iface = WC_LEVEL_CONT_INTERFACE(state->controller)));
+        iface->tileBToWorldPos(obj, state->cellX, state->cellZ, &cellX, &cellZ,
+                               (iface = WC_LEVEL_CONT_INTERFACE(state->controller)));
+    }
+
+    min = cellX - (*(const f32*)&WCBLOCK_PLAYER_CELL_MARGIN);
+    playerObj = player;
+    pos = playerObj->anim.localPosX;
+    max = (*(const f32*)&WCBLOCK_PLAYER_CELL_MARGIN) + cellX;
+    if (pos > max || pos < min) {
+        return 1;
+    }
+
+    {
+        f32 posZ;
+        f32 minZ;
+        f32 maxZ;
+
+        minZ = cellZ - (*(const f32*)&WCBLOCK_PLAYER_CELL_MARGIN);
+        posZ = playerObj->anim.localPosZ;
+        maxZ = (*(const f32*)&WCBLOCK_PLAYER_CELL_MARGIN) + cellZ;
+        if (posZ > maxZ || posZ < minZ) {
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+const f32 gWcPushBlockOne = 1.0f;
+const f32 gWcPushBlockControllerSearchRange = 100000.0f;
+const f32 gWcPushBlockBurstScale = 2.0f;
+const f32 gWcPushBlockBurstHorizontalExtent = 65.0f;
+const f32 gWcPushBlockZero = 0.0f;
+const f32 gWcPushBlockSlideSfxSpeedThreshold = 0.25f;
+const f32 gWcPushBlockSlideSfxVolumeRange = 126.0f;
+const f32 gWcPushBlockSlideSfxMaxSpeed = 1.25f;
+const f32 gWcPushBlockSlideSfxMaxVolume = 127.0f;
+const f32 gWcPushBlockSlideSfxVolumeScale = 0.5f;
+const f32 gWcPushBlockMaxSlideSpeed = 1.5f;
+const f32 gWcPushBlockSlideAccel = 0.05f;
+const f32 gWcPushBlockMinSlideSpeed = -1.5f;
+const f32 gWcPushBlockBobAngleSpeed = 250.0f;
+const f32 gWcPushBlockBobAmplitude = 3.0f;
+const f32 gWcPushBlockPi = 3.1415927f;
+const f32 gWcPushBlockAngleScale = 32768.0f;
 int wcpushblock_getExtraSize(void) {
     return sizeof(WCPushBlockRuntimeState);
 }
@@ -124,7 +191,7 @@ void wcpushblock_free(void) {
 
 void wcpushblock_render(GameObject* obj, int p2, int p3, int p4, int p5, s8 visible) {
     if (visible != 0) {
-        objRenderModelAndHitVolumes(obj, p2, p3, p4, p5, gWcPushBlockOne);
+        objRenderModelAndHitVolumes(obj, p2, p3, p4, p5, (*(const f32*)&gWcPushBlockOne));
     }
 }
 
@@ -154,7 +221,7 @@ void wcpushblock_update(GameObject* obj) {
     ObjAnimComponent* objAnim = &obj->anim;
     WCPushBlockRuntimeState* state = obj->extra;
     GameObject* player = (GameObject*)Obj_GetPlayerObject();
-    f32 range = gWcPushBlockControllerSearchRange;
+    f32 range = (*(const f32*)&gWcPushBlockControllerSearchRange);
     f32 sfxVolume;
     ObjTextureRuntimeSlot* tex;
     int reachedTarget;
@@ -198,13 +265,15 @@ void wcpushblock_update(GameObject* obj) {
         u32 phase = WCPUSHBLOCK_FLAGS(state).phase;
         if (phase != WCPUSHBLOCK_PHASE_FADE_OUT && phase != WCPUSHBLOCK_PHASE_FADE_IN) {
             if (objAnim->bankIndex == WCPUSHBLOCK_VARIANT_A) {
-                objfx_spawnBoxBurst(obj, 1, gWcPushBlockBurstScale, WCPUSHBLOCK_BOX_BURST_VARIANT_A, 1, 50,
-                                    gWcPushBlockBurstHorizontalExtent, gWcPushBlockBurstScale,
-                                    gWcPushBlockBurstHorizontalExtent, NULL, 0);
+                objfx_spawnBoxBurst(obj, 1, (*(const f32*)&gWcPushBlockBurstScale), WCPUSHBLOCK_BOX_BURST_VARIANT_A, 1,
+                                    50, (*(const f32*)&gWcPushBlockBurstHorizontalExtent),
+                                    (*(const f32*)&gWcPushBlockBurstScale),
+                                    (*(const f32*)&gWcPushBlockBurstHorizontalExtent), NULL, 0);
             } else {
-                objfx_spawnBoxBurst(obj, 1, gWcPushBlockBurstScale, WCPUSHBLOCK_BOX_BURST_VARIANT_B, 1, 50,
-                                    gWcPushBlockBurstHorizontalExtent, gWcPushBlockBurstScale,
-                                    gWcPushBlockBurstHorizontalExtent, NULL, 0);
+                objfx_spawnBoxBurst(obj, 1, (*(const f32*)&gWcPushBlockBurstScale), WCPUSHBLOCK_BOX_BURST_VARIANT_B, 1,
+                                    50, (*(const f32*)&gWcPushBlockBurstHorizontalExtent),
+                                    (*(const f32*)&gWcPushBlockBurstScale),
+                                    (*(const f32*)&gWcPushBlockBurstHorizontalExtent), NULL, 0);
             }
         }
     }
@@ -232,7 +301,7 @@ void wcpushblock_update(GameObject* obj) {
         objAnim->alpha = a;
     }
         {
-            f32 zero = gWcPushBlockZero;
+            f32 zero = (*(const f32*)&gWcPushBlockZero);
             obj->anim.velocityX = zero;
             obj->anim.velocityZ = zero;
         }
@@ -283,29 +352,32 @@ void wcpushblock_update(GameObject* obj) {
         }
         break;
     case WCPUSHBLOCK_PHASE_SLIDING: {
-        f32 zero = gWcPushBlockZero;
+        f32 zero = (*(const f32*)&gWcPushBlockZero);
         f32 vx = obj->anim.velocityX;
         if (zero != vx || zero != obj->anim.velocityZ) {
-            f32 speed = sqrtf(vx * vx + obj->anim.velocityZ * obj->anim.velocityZ) - gWcPushBlockSlideSfxSpeedThreshold;
-            if (speed < gWcPushBlockZero) {
-                speed = gWcPushBlockZero;
+            f32 speed = sqrtf(vx * vx + obj->anim.velocityZ * obj->anim.velocityZ) -
+                        (*(const f32*)&gWcPushBlockSlideSfxSpeedThreshold);
+            if (speed < (*(const f32*)&gWcPushBlockZero)) {
+                speed = (*(const f32*)&gWcPushBlockZero);
             }
-            sfxVolume = gWcPushBlockOne + gWcPushBlockSlideSfxVolumeRange * speed / gWcPushBlockSlideSfxMaxSpeed;
-            if (sfxVolume > gWcPushBlockSlideSfxMaxVolume) {
-                sfxVolume = gWcPushBlockSlideSfxMaxVolume;
+            sfxVolume = (*(const f32*)&gWcPushBlockOne) + (*(const f32*)&gWcPushBlockSlideSfxVolumeRange) * speed /
+                                                              (*(const f32*)&gWcPushBlockSlideSfxMaxSpeed);
+            if (sfxVolume > (*(const f32*)&gWcPushBlockSlideSfxMaxVolume)) {
+                sfxVolume = (*(const f32*)&gWcPushBlockSlideSfxMaxVolume);
             }
             Sfx_KeepAliveLoopedObjectSound(obj, SFXTRIG_en_treedrum16_c8);
-            Sfx_SetObjectSfxVolume(obj, SFXTRIG_en_treedrum16_c8, sfxVolume, gWcPushBlockSlideSfxVolumeScale);
+            Sfx_SetObjectSfxVolume(obj, SFXTRIG_en_treedrum16_c8, sfxVolume,
+                                   (*(const f32*)&gWcPushBlockSlideSfxVolumeScale));
             WCPUSHBLOCK_FLAGS(state).sfxActive = 1;
         }
     }
         dt = timeDelta;
-        objMove(obj, obj->anim.velocityX * dt, gWcPushBlockZero, obj->anim.velocityZ * dt);
+        objMove(obj, obj->anim.velocityX * dt, (*(const f32*)&gWcPushBlockZero), obj->anim.velocityZ * dt);
         reachedTarget = 0;
         {
             if (WCPUSHBLOCK_PUSH_DIR(state) == WCPUSHBLOCK_DIR_POS_X) {
-                if (obj->anim.velocityX < gWcPushBlockMaxSlideSpeed) {
-                    obj->anim.velocityX = gWcPushBlockSlideAccel * timeDelta + obj->anim.velocityX;
+                if (obj->anim.velocityX < (*(const f32*)&gWcPushBlockMaxSlideSpeed)) {
+                    obj->anim.velocityX = (*(const f32*)&gWcPushBlockSlideAccel) * timeDelta + obj->anim.velocityX;
                 }
                 {
                     f32 tx;
@@ -315,8 +387,8 @@ void wcpushblock_update(GameObject* obj) {
                     }
                 }
             } else if (WCPUSHBLOCK_PUSH_DIR(state) == WCPUSHBLOCK_DIR_NEG_X) {
-                if (obj->anim.velocityX > gWcPushBlockMinSlideSpeed) {
-                    obj->anim.velocityX = obj->anim.velocityX - gWcPushBlockSlideAccel * timeDelta;
+                if (obj->anim.velocityX > (*(const f32*)&gWcPushBlockMinSlideSpeed)) {
+                    obj->anim.velocityX = obj->anim.velocityX - (*(const f32*)&gWcPushBlockSlideAccel) * timeDelta;
                 }
                 {
                     f32 tx;
@@ -326,8 +398,8 @@ void wcpushblock_update(GameObject* obj) {
                     }
                 }
             } else if (WCPUSHBLOCK_PUSH_DIR(state) == WCPUSHBLOCK_DIR_POS_Z) {
-                if (obj->anim.velocityZ < gWcPushBlockMaxSlideSpeed) {
-                    obj->anim.velocityZ = gWcPushBlockSlideAccel * timeDelta + obj->anim.velocityZ;
+                if (obj->anim.velocityZ < (*(const f32*)&gWcPushBlockMaxSlideSpeed)) {
+                    obj->anim.velocityZ = (*(const f32*)&gWcPushBlockSlideAccel) * timeDelta + obj->anim.velocityZ;
                 }
                 {
                     f32 tz;
@@ -337,8 +409,8 @@ void wcpushblock_update(GameObject* obj) {
                     }
                 }
             } else if (WCPUSHBLOCK_PUSH_DIR(state) == WCPUSHBLOCK_DIR_NEG_Z) {
-                if (obj->anim.velocityZ > gWcPushBlockMinSlideSpeed) {
-                    obj->anim.velocityZ = obj->anim.velocityZ - gWcPushBlockSlideAccel * timeDelta;
+                if (obj->anim.velocityZ > (*(const f32*)&gWcPushBlockMinSlideSpeed)) {
+                    obj->anim.velocityZ = obj->anim.velocityZ - (*(const f32*)&gWcPushBlockSlideAccel) * timeDelta;
                 }
                 {
                     f32 tz;
@@ -349,23 +421,23 @@ void wcpushblock_update(GameObject* obj) {
                 }
             }
         }
-        if (obj->anim.velocityX > gWcPushBlockMaxSlideSpeed) {
-            obj->anim.velocityX = gWcPushBlockMaxSlideSpeed;
+        if (obj->anim.velocityX > (*(const f32*)&gWcPushBlockMaxSlideSpeed)) {
+            obj->anim.velocityX = (*(const f32*)&gWcPushBlockMaxSlideSpeed);
         }
-        if (obj->anim.velocityX < gWcPushBlockMinSlideSpeed) {
-            obj->anim.velocityX = gWcPushBlockMinSlideSpeed;
+        if (obj->anim.velocityX < (*(const f32*)&gWcPushBlockMinSlideSpeed)) {
+            obj->anim.velocityX = (*(const f32*)&gWcPushBlockMinSlideSpeed);
         }
-        if (obj->anim.velocityZ > gWcPushBlockMaxSlideSpeed) {
-            obj->anim.velocityZ = gWcPushBlockMaxSlideSpeed;
+        if (obj->anim.velocityZ > (*(const f32*)&gWcPushBlockMaxSlideSpeed)) {
+            obj->anim.velocityZ = (*(const f32*)&gWcPushBlockMaxSlideSpeed);
         }
-        if (obj->anim.velocityZ < gWcPushBlockMinSlideSpeed) {
-            obj->anim.velocityZ = gWcPushBlockMinSlideSpeed;
+        if (obj->anim.velocityZ < (*(const f32*)&gWcPushBlockMinSlideSpeed)) {
+            obj->anim.velocityZ = (*(const f32*)&gWcPushBlockMinSlideSpeed);
         }
         if (reachedTarget == 0) {
             break;
         }
         {
-            f32 zero = gWcPushBlockZero;
+            f32 zero = (*(const f32*)&gWcPushBlockZero);
             obj->anim.velocityX = zero;
             obj->anim.velocityZ = zero;
         }
@@ -468,10 +540,11 @@ void wcpushblock_update(GameObject* obj) {
         break;
     }
 
-    WCPUSHBLOCK_BOB_ANGLE(state) = gWcPushBlockBobAngleSpeed * timeDelta + (f32)(u32)WCPUSHBLOCK_BOB_ANGLE(state);
-    WCPUSHBLOCK_BOB_Y(state) =
-        gWcPushBlockBobAmplitude *
-        mathSinf(gWcPushBlockPi * (f32)(u32)WCPUSHBLOCK_BOB_ANGLE(state) / gWcPushBlockAngleScale);
+    WCPUSHBLOCK_BOB_ANGLE(state) =
+        (*(const f32*)&gWcPushBlockBobAngleSpeed) * timeDelta + (f32)(u32)WCPUSHBLOCK_BOB_ANGLE(state);
+    WCPUSHBLOCK_BOB_Y(state) = (*(const f32*)&gWcPushBlockBobAmplitude) *
+                               mathSinf((*(const f32*)&gWcPushBlockPi) * (f32)(u32)WCPUSHBLOCK_BOB_ANGLE(state) /
+                                        (*(const f32*)&gWcPushBlockAngleScale));
     obj->anim.localPosY = WCPUSHBLOCK_BASE_Y(state) + WCPUSHBLOCK_BOB_Y(state);
 }
 

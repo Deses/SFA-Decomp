@@ -255,7 +255,6 @@ force_active:
   # gameloop.c: retain the memory-card dialog and its status-helper references.
   - cardShowMessage
   # maketex.c: JP shares EN's complete 168-byte memory-card banner string block.
-  - gMemoryCardBannerAssetNames
   # aram_data.c: retain the same unreferenced 24-byte .bss block as EN.
   - lbl_803D4868
   # dlls/engine/5/5.c
@@ -298,8 +297,6 @@ force_active:
   - sGpuHangIllegalInstructionLog
   - sGpuHangWaitingLog
   - sGpuHangUnknownLog
-  # main/objlib.c: retain the zero before the hit-cooldown constant pool.
-  - gObjLibZero
   # main/shader_dolphin.c
   # These constants are read through offsets from sEnvMapBumpIndMtx.
   - sWarpedRingRotAxes

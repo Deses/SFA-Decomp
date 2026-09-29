@@ -660,10 +660,8 @@ static inline void bossdrakor_updateEffects(GameObject* obj, BossDrakorState* dr
     }
 }
 void bossdrakor_update(GameObject* obj) {
-#if defined(VERSION_GSAP01) || defined(VERSION_GSAP01_rev1)
+#if !defined(VERSION_GSAE01) && !defined(VERSION_GSAJ01)
     f32 curveStep;
-    f32 advanceStep;
-#elif defined(VERSION_GSAE01_rev1)
     f32 advanceStep;
 #endif
     BossDrakorState* state;
@@ -680,6 +678,7 @@ void bossdrakor_update(GameObject* obj) {
     f32 hy;
     f32 hx;
     int curveArg;
+    RomCurveWalker* walker;
 
     state = obj->extra;
     curveArg = 0x29;
@@ -689,8 +688,10 @@ void bossdrakor_update(GameObject* obj) {
         getEnvfxActImmediately(obj, obj, BOSSDRAKOR_ENVFX_C, 0);
         skySetLightIndex(1, 0.0f);
         Rcp_EnableHeatEffect();
-        if ((*gRomCurveInterface)->initCurve(&state->curveWalker, (void*)obj, 500.0f, &curveArg, 0xd) != 0) {
-            (*gRomCurveInterface)->initCurve(&state->curveWalker, (void*)obj, 500.0f, &curveArg, 0);
+        walker = &state->curveWalker;
+        if ((*gRomCurveInterface)->initCurve(walker, (void*)obj, 500.0f, &curveArg, 0xd) != 0) {
+            walker = &state->curveWalker;
+            (*gRomCurveInterface)->initCurve(walker, (void*)obj, 500.0f, &curveArg, 0);
         }
         obj->anim.localPosX = state->curveWalker.posX;
         obj->anim.localPosZ = state->curveWalker.posZ;
@@ -715,19 +716,16 @@ void bossdrakor_update(GameObject* obj) {
             modelLightStruct_setGlowProjectionRadius((ModelLightStruct*)state->lightObj, 50.0f);
         }
     }
-#if defined(VERSION_GSAP01) || defined(VERSION_GSAP01_rev1)
+#if !defined(VERSION_GSAE01) && !defined(VERSION_GSAJ01)
     advanceStep = state->curveAdvanceStep;
     curveStep = advanceStep;
+#if defined(VERSION_GSAP01) || defined(VERSION_GSAP01_rev1)
     if (gRenderModeObj != &GXEurgb60Hz480IntDf) {
         curveStep = advanceStep * (0.764f * timeDelta);
     }
+#endif
     logPrintf(" DRAKOR SPEED %f ", advanceStep);
     moveResult = Obj_UpdateRomCurveFollowVelocityIndexed(obj, &state->curveWalker, curveStep, 200.0f, 10.0f, 1,
-                                                         &state->curveFollowState);
-#elif defined(VERSION_GSAE01_rev1)
-    advanceStep = state->curveAdvanceStep;
-    logPrintf(" DRAKOR SPEED %f ", advanceStep);
-    moveResult = Obj_UpdateRomCurveFollowVelocityIndexed(obj, &state->curveWalker, advanceStep, 200.0f, 10.0f, 1,
                                                          &state->curveFollowState);
 #else
     moveResult = Obj_UpdateRomCurveFollowVelocityIndexed(obj, &state->curveWalker, state->curveAdvanceStep, 200.0f,

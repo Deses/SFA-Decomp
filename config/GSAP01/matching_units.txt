@@ -631,6 +631,7 @@ dlls/objects/585/585.c
 dlls/objects/586/586.c
 dlls/objects/587/587.c
 dlls/objects/588_BossDrakor_/BossDrakor_.c
+dlls/objects/589_BossDrakor/BossDrakor.c
 dlls/objects/590/590.c
 dlls/objects/591_KT_RexLevel/KT_RexLevel.c
 dlls/objects/592_KT_Rex/KT_Rex.c
@@ -652,6 +653,7 @@ dlls/objects/607_CRFuelTank/CRFuelTank.c
 dlls/objects/608/608.c
 dlls/objects/609_DR_LaserCan/DR_LaserCan.c
 dlls/objects/610/610.c
+dlls/objects/611_GM_MazeWell/GM_MazeWell.c
 dlls/objects/612/612.c
 dlls/objects/613_DR_Creator/DR_Creator.c
 dlls/objects/614_KytesMum/KytesMum.c
@@ -890,6 +892,8 @@ main/boot_logo.c
 main/camera.c
 main/curves.c
 main/debug_display.c
+main/effects_state.c
+main/envfx.c
 main/fileio.c
 main/gametext.c
 main/gametext_data.c
@@ -901,10 +905,12 @@ main/newshadows.c
 main/obj_movelib.c
 main/objanim.c
 main/object.c
+main/objexpr.c
 main/objhits.c
 main/objlib.c
 main/objprint.c
 main/objprint_dolphin.c
+main/objtype.c
 main/pad.c
 main/pi_dolphin.c
 main/pi_pathsearch.c

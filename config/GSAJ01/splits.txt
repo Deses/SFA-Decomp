@@ -14,13 +14,20 @@ Sections:
 	.sbss2      type:bss align:32
 
 main/render.c:
-	.text       start:0x800066E0 end:0x80008DF4
+	.text       start:0x800066E0 end:0x80008B4C
 	.rodata     start:0x802C19C0 end:0x802C1B68
 	.data       start:0x802C2E60 end:0x802C5008
 	.bss        start:0x80335960 end:0x80335A60
 	.sdata      start:0x803DB300 end:0x803DB308
-	.sbss       start:0x803DC8C0 end:0x803DC8D0
+	.sbss       start:0x803DC8C0 end:0x803DC8CA
 	.sdata2     start:0x803DE620 end:0x803DE668
+
+main/effects_state.c:
+	.text       start:0x80008B4C end:0x80008B74
+	.sbss       start:0x803DC8D0 end:0x803DC8D8
+
+main/envfx.c:
+	.text       start:0x80008B74 end:0x80008DF4
 
 main/audio.c:
 	.text       start:0x80008DF4 end:0x8000B4D0
@@ -186,18 +193,30 @@ main/objhits.c:
 	.sbss       start:0x803DCCE8 end:0x803DCD10
 	.sdata2     start:0x803DEA30 end:0x803DEA88
 
+main/objtype.c:
+	.text       start:0x80036C2C end:0x800374A4
+	.data       start:0x802CAF38 end:0x802CAF5E
+	.bss        start:0x80342A18 end:0x80342E70
+	.sbss       start:0x803DCD10 end:0x803DCD11
+	.sdata2     start:0x803DEA88 end:0x803DEA8C
+
 main/objlib.c:
-	.text       start:0x80036C2C end:0x800389A8
-	.data       start:0x802CAF38 end:0x802CAFA0
-	.bss        start:0x80342A18 end:0x80342F30
-	.sdata2     start:0x803DEA88 end:0x803DEAB8
+	.text       start:0x800374A4 end:0x800389A8
+	.data       start:0x802CAF60 end:0x802CAFA0
+	.bss        start:0x80342E70 end:0x80342F30
+	.sbss       start:0x803DCD18 end:0x803DCD1C
+	.sdata2     start:0x803DEA90 end:0x803DEAB8
+
+main/objexpr.c:
+	.text       start:0x800389A8 end:0x8003B600
+	.data       start:0x802CAFA0 end:0x802CAFE4
+	.sdata      start:0x803DB580 end:0x803DB588
+	.sbss       start:0x803DCD20 end:0x803DCD21
+	.sdata2     start:0x803DEAB8 end:0x803DEB10
 
 main/objprint.c:
-	.text       start:0x800389A8 end:0x8003BBA4
-	.data       start:0x802CAFA0 end:0x802CAFE8
-	.sdata      start:0x803DB580 end:0x803DB588
-	.sbss       start:0x803DCD28 end:0x803DCD40
-	.sdata2     start:0x803DEAB8 end:0x803DEB10
+	.text       start:0x8003B600 end:0x8003BBA4
+	.sbss       start:0x803DCD28 end:0x803DCD3A
 
 main/objprint_dolphin.c:
 	.text       start:0x8003BBA4 end:0x80041D50
@@ -217,7 +236,7 @@ main/pi_dolphin.c:
 	.sbss       start:0x803DCD90 end:0x803DCE38
 
 main/boot_logo.c:
-	.data       start:0x802CC7C0 end:0x8030C978
+	.data       start:0x802CC7C0 end:0x8030C978 align:32
 
 main/pi_videoinit.c:
 	.text       start:0x80049B4C end:0x8004AA44
@@ -265,7 +284,7 @@ main/shader.c:
 	.rodata     start:0x802C1F58 end:0x802C1FA8
 	.data       start:0x8030E5D0 end:0x8030E984
 	.bss        start:0x8037E1E0 end:0x80387AD0
-	.sdata      start:0x803DB740 end:0x803DB76C
+	.sdata      start:0x803DB730 end:0x803DB76C
 	.sbss       start:0x803DCEE8 end:0x803DCFF4
 	.sdata2     start:0x803DECD0 end:0x803DED78
 	.sbss2      start:0x803E8560 end:0x803E856C
@@ -317,15 +336,14 @@ track/intersect_render.c:
 	.sbss2      start:0x803E8570 end:0x803E8578
 
 track/intersect_memcard.c:
-	.text       start:0x8007D690 end:0x8007E79C
-	.data       start:0x8030EBD8 end:0x8030EC78
+	.text       start:0x8007D690 end:0x8007FE24
+	.data       start:0x8030EBD8 end:0x8030ED1E
+	.sdata      start:0x803DB820 end:0x803DB830
 	.sbss       start:0x803DD160 end:0x803DD180
 	.sdata2     start:0x803DF0B0 end:0x803DF0C0
 
 dlls/engine/2/maketex.c:
-	.text       start:0x8007E79C end:0x80080208
-	.data       start:0x8030EC78 end:0x8030ED20
-	.sdata      start:0x803DB820 end:0x803DB830
+	.text       start:0x8007FE24 end:0x80080208
 	.sdata2     start:0x803DF0C0 end:0x803DF0D0
 
 dlls/engine/2/2.c:
@@ -3672,7 +3690,7 @@ dlls/objects/588_BossDrakor_/BossDrakor_.c:
 dlls/objects/468_WORLDAstero/WORLDAstero.c:
 	.text       start:0x8020C368 end:0x8020C6DC
 	.data       start:0x8032A260 end:0x8032A298
-	.sdata2     start:0x803E66F8 end:0x803E670C
+	.sdata2     start:0x803E66F0 end:0x803E6714
 
 dlls/objects/466_WORLDplanet/WORLDplanet.c:
 	.text       start:0x8020C6DC end:0x8020DAD4
@@ -3926,26 +3944,26 @@ dlls/objects/643_DR_BarrelGr/DR_BarrelGr.c:
 	.sdata2     start:0x803E6DC0 end:0x803E6DF4
 
 dlls/objects/650/650.c:
-	.text       start:0x802230F4 end:0x80223E08
-	.data       start:0x8032AFE0 end:0x8032B060
-	.sdata2     start:0x803E6E20 end:0x803E6E38
+	.text       start:0x802230F4 end:0x80223A94
+	.data       start:0x8032AFE0 end:0x8032B05C
+	.sdata2     start:0x803E6DF8 end:0x803E6E0C
 
 dlls/objects/651/651.c:
-	.text       start:0x80223E08 end:0x8022417C
+	.text       start:0x80223A94 end:0x8022417C
 	.rodata     start:0x802C26B8 end:0x802C26D8
 	.data       start:0x8032B060 end:0x8032B098
 	.bss        start:0x803AD398 end:0x803AD3B8
-	.sdata2     start:0x803E6E38 end:0x803E6E40
+	.sdata2     start:0x803E6E10 end:0x803E6E40
 
 dlls/objects/652_WCBouncyCra/WCBouncyCra.c:
-	.text       start:0x8022417C end:0x802244E4
+	.text       start:0x8022417C end:0x80224398
 	.data       start:0x8032B098 end:0x8032B0D0
-	.sdata2     start:0x803E6E68 end:0x803E6E70
+	.sdata2     start:0x803E6E40 end:0x803E6E70
 
 dlls/objects/656_WCPushBlock/WCPushBlock.c:
-	.text       start:0x802244E4 end:0x802252A4
-	.data       start:0x8032B0D0 end:0x8032B128
-	.sdata2     start:0x803E6EB8 end:0x803E6EC4
+	.text       start:0x80224398 end:0x802252A4
+	.data       start:0x8032B0D0 end:0x8032B124
+	.sdata2     start:0x803E6E70 end:0x803E6EC4
 
 dlls/objects/653_WCLevelCont/WCLevelCont.c:
 	.text       start:0x802252A4 end:0x802273B8
@@ -4016,7 +4034,7 @@ dlls/objects/666_ARWArwing/ARWArwing.c:
 	.data       start:0x8032B528 end:0x8032B724
 	.sdata      start:0x803DC4E8 end:0x803DC4F0
 	.sbss       start:0x803DDEA8 end:0x803DDEAC
-	.sdata2     start:0x803E6FE8 end:0x803E708C
+	.sdata2     start:0x803E6FE8 end:0x803E7124
 
 dlls/objects/667/667.c:
 	.text       start:0x8022E508 end:0x8022EDD0
@@ -4282,7 +4300,7 @@ dolphin/os/OSMutex.c:
 
 dolphin/os/OSReboot.c:
 	.text       start:0x80244644 end:0x8024485C
-	.bss        start:0x803AD4E0 end:0x803AD500
+	.bss        start:0x803AD4E0 end:0x803AD500 align:32
 	.sbss       start:0x803DDF70 end:0x803DDF80
 
 dolphin/os/OSReset.c:
@@ -4356,7 +4374,7 @@ dolphin/dvd/dvdFatal.c:
 dolphin/dvd/dvd.c:
 	.text       start:0x802492E4 end:0x8024BA60
 	.data       start:0x8032DD40 end:0x8032DE58
-	.bss        start:0x803AE020 end:0x803AE0F8
+	.bss        start:0x803AE020 end:0x803AE0F8 align:32
 	.sdata      start:0x803DC688 end:0x803DC690
 	.sbss       start:0x803DE028 end:0x803DE070
 
@@ -4515,7 +4533,7 @@ dolphin/card/CARDBios.c:
 
 dolphin/card/CARDUnlock.c:
 	.text       start:0x8025F0BC end:0x8026031C
-	.data       start:0x8032ED00 end:0x8032EE60
+	.data       start:0x8032ED00 end:0x8032EE60 align:32
 	.sdata      start:0x803DC720 end:0x803DC728
 
 dolphin/card/CARDRdwr.c:

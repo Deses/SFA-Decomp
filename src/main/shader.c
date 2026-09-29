@@ -144,6 +144,9 @@ typedef struct MapInfoRecord {
 } MapInfoRecord;
 extern WarpVec gCameraPosByTransformSpace[];
 
+int gSky2EnvfxActIndices[2] = {0, 0};
+int gCloudActionEnvfxActIndices[2] = {0, 0};
+
 int lbl_803DB620 = -1;
 s8 gMapLayerOffsets[8] = {0, -2, -1, 1, 2, 0, 0, 0};
 f32 gMotionBlurAmount = 0.5f;
@@ -473,7 +476,6 @@ const PlayerFrustumPlaneDirections sPlayerFrustumPlaneDirs = {
 const PlayerFrustumPlaneScales sPlayerFrustumPlaneScales = {{0.0f, -25.0f, -25.0f, -25.0f, -25.0f}};
 extern char sTrackPiLockedFormat[];
 
-
 static inline int mapFindLoadedRomList(int id) {
     int index;
 
@@ -486,7 +488,6 @@ static inline int mapFindLoadedRomList(int id) {
 }
 
 MapRomListPage* mapGetRomListAndOffsets(int p1, int b);
-
 
 char sShaderUnusedWordTable[172] = {
     0, 0, 0, 52, 0, 0, 0, 52, 0, 0, 0, 52, 0, 0, 0, 52, 0, 0, 0, 52, 0, 0, 0, 52, 0, 0, 0, 56, 0, 0, 0, 52, 0, 0, 0, 60,
@@ -807,9 +808,9 @@ u8 gCloudLayerTexMatrix[0x30];
 MapRenderQueueStorage gLightmapDrawQueue;
 
 static void mapBlockRender_setupShaderTextures(Shader* shader, int mode);
-static u8 mapBlockBounds_ComputeAndTestPlanes(MapBlockBoundsRec* bounds, struct MapBlockData* block, FrustumPlane* planes,
-                                             int planeCount, f32* minX, f32* minY, f32* minZ, f32* maxX, f32* maxY,
-                                             f32* maxZ);
+static u8 mapBlockBounds_ComputeAndTestPlanes(MapBlockBoundsRec* bounds, struct MapBlockData* block,
+                                              FrustumPlane* planes, int planeCount, f32* minX, f32* minY, f32* minZ,
+                                              f32* maxX, f32* maxY, f32* maxZ);
 static u8 mapBlockBounds_HasCornerPastDepthThreshold(MapBlockBoundsRec* bounds, float* xform);
 static void renderObjects(s8* opacity);
 static void updateVisibleGeometry(void);
@@ -2435,7 +2436,7 @@ void mapBlockRenderMain(MapBlockBoundsRec* bounds, MapBlockData* block, float* v
         *(int*)&state.bit = state.bit + 8;
     }
     state.bit += 4;
-    mapBlockRender_drawLightmapIndirectPasses(block, shader, &state, (float (*)[4])viewMtx);
+    mapBlockRender_drawLightmapIndirectPasses(block, shader, &state, (float(*)[4])viewMtx);
 }
 
 void lightmapQueueShadowRow(MapBlockBoundsRec* bounds, MapBlockData* block, s32 selector) {
@@ -4376,8 +4377,8 @@ void doPendingMapLoads(void) {
                 mapLoadDataFile(mapDir, MLDF_FILEID_ANIMCURV_TAB_A);
                 loadModelAndAnimTabs();
                 for (layer = 0; layer < 5; layer++) {
-                    mapGetBlockGridRects(gMapBlockOriginX + 7, gMapBlockOriginZ + 7, rectA, rectB, rectC, rectD,
-                                         layer, 0, slot);
+                    mapGetBlockGridRects(gMapBlockOriginX + 7, gMapBlockOriginZ + 7, rectA, rectB, rectC, rectD, layer,
+                                         0, slot);
                     cellGrid = (char*)gMapBlockLayerTables[layer];
                     gMapLayerCellStates = gMapBlockCellStateTables[layer];
                     for (row = rectA[2]; row <= rectA[3]; row++) {

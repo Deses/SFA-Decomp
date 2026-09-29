@@ -17,7 +17,25 @@ from version_progress import (SymbolSpan, SplitRange, VersionProjection, build_b
 from version_progress import source_data_identifiers
 from version_progress import port_coherent_units, SECTION_INDEX
 from version_progress import build_all_boundary_maps, sbss2_bounds, snap_symbol_boundaries
-from version_progress import report_unit_is_exact
+from version_progress import report_unit_is_exact, load_splits, render_splits
+
+
+class SplitAlignmentTests(unittest.TestCase):
+    def test_projection_preserves_explicit_bss_alignment(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'splits.txt'
+            path.write_text('Sections:\n\t.bss type:bss align:4\n\nsdk.c:\n'
+                            '\t.bss start:0x80000100 end:0x80000124 align:32\n')
+            header, splits = load_splits(path)
+            projected = PortedRange(splits[0], 0x80000200, 0x80000224, (), ())
+            path.write_text(render_splits(header, [projected]))
+            _, result = load_splits(path)
+            self.assertEqual(result, [SplitRange('sdk.c', 'bss', 0x80000200, 0x80000224, 32)])
+
+    def test_projection_does_not_silently_drop_incompatible_alignment(self):
+        split = SplitRange('sdk.c', 'bss', 0x80000100, 0x80000124, 32)
+        with self.assertRaisesRegex(ValueError, 'violates alignment 32'):
+            render_splits([], [PortedRange(split, 0x80000204, 0x80000228, (), ())])
 
 
 class ExactReportTests(unittest.TestCase):

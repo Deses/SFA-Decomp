@@ -1,17 +1,11 @@
 #include "main/asset_load.h"
-#include "main/dll/cloudaction_interface.h"
 #include "main/mldf_fileid.h"
 #include "main/model_engine.h"
 #include "main/mm.h"
-#include "main/newclouds.h"
 #include "main/objanim_internal.h"
 #include "main/pi_dolphin.h"
-#include "main/render_envfx_api.h"
 #include "main/render_internal.h"
 #include "main/render_lactions_api.h"
-#include "main/render_mode_api.h"
-#include "main/render_sequence_api.h"
-#include "main/sky_interface.h"
 #include "MSL_C/PPCEABI/bare/H/math_api.h"
 #include "MSL_C/PPCEABI/bare/H/math_float_helpers.h"
 #include "MSL_C/PPCEABI/bare/H/floorf.h"
@@ -98,14 +92,6 @@ f32 gRenderSinTable[513] = {
     1.0f};
 // clang-format on
 u8 lbl_802C3564[0x1964] = {0};
-
-typedef struct EnvfxActEntry {
-    u8 pad0[0x2a];
-    u16 fadeDurationA;
-    u8 pad1[0x30];
-    u8 kind;
-    u8 pad2[3];
-} EnvfxActEntry;
 
 int getLActions(void* source, void* target, u16 index, s8 arg3, int arg4, int arg5) {
     void* buf = mmAlloc(0x28, -1, 0);
@@ -1895,57 +1881,4 @@ static void render_copyPackedU64Head(u64* dst, u32 packed) {
         *dst = (*dst & 0xffffffffffffffULL) | (src << 56);
         break;
     }
-}
-
-s16 renderModeSetOrGet(int mode) {
-    if (mode != -1) {
-        gRenderMode = mode;
-        return mode;
-    }
-    return gRenderMode;
-}
-
-int ObjSeq_defaultActionCallback(int unused0, int unused1, int unused2, int unused3, int unused4, int unused5,
-                                 int unused6) {
-    return -0x1;
-}
-
-int getEnvfxActImmediately(void* a, void* b, u16 idx, int d) {
-    u8 raw[0x80];
-    EnvfxActEntry* e = (EnvfxActEntry*)(((u32)raw + 0x1f) & ~0x1f);
-
-    getTabEntry(e, MLDF_FILEID_ENVFXACT_BIN, idx * 0x60, 0x60);
-    if (e != NULL) {
-        if (e->kind <= 2 || e->kind == 4) {
-            (*gNewCloudsInterface)->updateEnvfxAct(a, b, e, d);
-        } else if (e->kind == 3) {
-            e->fadeDurationA = 0;
-            (*gSky2Interface)->updateEnvfxAct(a, b, e, d, idx);
-        } else if (e->kind == 5) {
-            e->fadeDurationA = 0;
-            (*gSkyInterface)->updateEnvfxAct(a, b, e, d);
-        } else if (e->kind == 6) {
-            (*gCloudActionInterface)->updateEnvfxAct(a, b, e, d, idx);
-        }
-    }
-    return 0;
-}
-
-int getEnvfxAct(void* a, void* b, u16 idx, int d) {
-    u8 raw[0x80];
-    EnvfxActEntry* e = (EnvfxActEntry*)(((u32)raw + 0x1f) & ~0x1f);
-
-    getTabEntry(e, MLDF_FILEID_ENVFXACT_BIN, idx * 0x60, 0x60);
-    if (e != NULL) {
-        if (e->kind <= 2 || e->kind == 4) {
-            (*gNewCloudsInterface)->updateEnvfxAct(a, b, e, d);
-        } else if (e->kind == 3) {
-            (*gSky2Interface)->updateEnvfxAct(a, b, e, d, idx);
-        } else if (e->kind == 5) {
-            (*gSkyInterface)->updateEnvfxAct(a, b, e, d);
-        } else if (e->kind == 6) {
-            (*gCloudActionInterface)->updateEnvfxAct(a, b, e, d, idx);
-        }
-    }
-    return 0;
 }

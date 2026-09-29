@@ -6,7 +6,6 @@
 #include "game/objects/object_setup.h"
 #include "main/dll/WC/wc_block_state.h"
 
-
 typedef struct PushBlockFlags {
     u8 phase : 3;
     u8 sfxActive : 1;
@@ -47,23 +46,7 @@ STATIC_ASSERT(offsetof(WCPushBlockSetup, base.posY) == 0x0C);
 STATIC_ASSERT(offsetof(WCPushBlockSetup, modelIndex) == 0x19);
 STATIC_ASSERT(offsetof(WCPushBlockSetup, initialTile) == 0x1A);
 
-extern f32 gWcPushBlockControllerSearchRange;
-extern f32 gWcPushBlockBurstScale;
-extern f32 gWcPushBlockBurstHorizontalExtent;
-extern f32 gWcPushBlockZero;
-extern f32 gWcPushBlockSlideSfxSpeedThreshold;
-extern f32 gWcPushBlockSlideSfxVolumeRange;
-extern f32 gWcPushBlockSlideSfxMaxSpeed;
-extern f32 gWcPushBlockSlideSfxMaxVolume;
-extern f32 gWcPushBlockSlideSfxVolumeScale;
-extern f32 gWcPushBlockMaxSlideSpeed;
-extern f32 gWcPushBlockSlideAccel;
-extern f32 gWcPushBlockMinSlideSpeed;
-extern f32 gWcPushBlockBobAngleSpeed;
-extern f32 gWcPushBlockBobAmplitude;
-extern f32 gWcPushBlockPi;
-extern f32 gWcPushBlockAngleScale;
-extern f32 gWcPushBlockOne;
+int wcblock_isPlayerAwayFromStoredCell(GameObject* obj, WCBlockState* state, GameObject* player);
 
 int wcpushblock_getExtraSize(void);
 int wcpushblock_getObjectTypeId(GameObject* obj);

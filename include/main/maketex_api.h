@@ -36,7 +36,6 @@ int ObjSeq_SetCoordinateSpace(int unused, int space);
 int ObjSeq_TurnToFacePlayer(GameObject* obj, struct ObjSeqState* state, s16 turnDegrees, s16 yawThreshold,
                             s16 maxAngle, s16 animRight, s16 animLeft);
 
-extern char sMemoryCardFileNameString[];
 extern u32 gSaveCardChecksumHi;
 extern u32 gSaveCardChecksumLo;
 extern u8* gSaveCardImageBuffer;
