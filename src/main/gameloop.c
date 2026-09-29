@@ -298,6 +298,132 @@ int cacheAllocAndCopy(u8* srcAddress, u32 size, u32* cacheCursor, u32* outEnd, u
     *cacheCursor = (u32)srcAddress;
     return 0;
 }
+/* PAL confirms 50/60 Hz with DVD-error-aware positioning; EN/JP select progressive scan. */
+#if defined(VERSION_GSAP01) || defined(VERSION_GSAP01_rev1)
+void askProgressiveScanMode(void) {
+    int value;
+    int sel;
+    s32 textId;
+    int i;
+    u32 j;
+    GameTextBox* box;
+    u8 savedAlignment;
+    int messageY;
+    int shadeReduction;
+    int confirmationShade;
+
+    value = 0;
+    sel = 1;
+    box = gameTextGetBox(0);
+    savedAlignment = (u8)box->alignH;
+    box->alignH = 0;
+    do {
+        value++;
+        padUpdate();
+        checkReset();
+        mmFreeTick(0);
+        waitNextFrame();
+        if (dvdCheckError()) {
+            messageY = 190;
+            shadeReduction = 64;
+        } else {
+            messageY = 110;
+            shadeReduction = 0;
+        }
+        gameTextSetColor((u8)(0xc0 - shadeReduction), (u8)(0xc0 - shadeReduction), (u8)(0xc0 - shadeReduction), 0xff);
+        gameTextShowAt(0x33f, 0, messageY);
+        if ((u8)sel == 1) {
+            gameTextSetColor((u8)(0xff - shadeReduction), (u8)(0xff - shadeReduction), (u8)(0xff - shadeReduction),
+                             0xff);
+        } else {
+            gameTextSetColor((u8)(0x80 - shadeReduction), (u8)(0x80 - shadeReduction), (u8)(0x80 - shadeReduction),
+                             0x80);
+        }
+        gameTextShowAt(0x3cd, 0, 246);
+        if ((u8)sel == 1) {
+            gameTextSetColor((u8)(0x80 - shadeReduction), (u8)(0x80 - shadeReduction), (u8)(0x80 - shadeReduction),
+                             0x80);
+        } else {
+            gameTextSetColor((u8)(0xff - shadeReduction), (u8)(0xff - shadeReduction), (u8)(0xff - shadeReduction),
+                             0xff);
+        }
+        gameTextShowAt(0x3cc, 0, 246);
+        gameTextRun();
+        doNothing_endOfFrame();
+        GXFlush_(0, 0);
+        if (padGetStickX(0) < 0 || padGetCX(0) < 0) {
+            sel = 1;
+        } else if (padGetStickX(0) > 0 || padGetCX(0) > 0) {
+            sel = 0;
+        }
+    } while ((getButtonsJustPressed(0) & PAD_BUTTON_A) == 0 && value < 600u);
+    box->alignH = savedAlignment;
+    waitNextFrame();
+    GXFlush_(0, 0);
+    waitNextFrame();
+    GXFlush_(0, 0);
+    VISetBlack(1);
+    VIFlush();
+    VIWaitForRetrace();
+    VIWaitForRetrace();
+    VIWaitForRetrace();
+    VIWaitForRetrace();
+    if ((u8)sel != 0) {
+        gRenderModeObj = &GXEurgb60Hz480IntDf;
+        OSSetEuRgb60Mode(1);
+        GXSetDispCopyYScale((f32)gRenderModeObj->xfbHeight / gRenderModeObj->efbHeight);
+        VIConfigure(gRenderModeObj);
+        VISetBlack(1);
+        VIFlush();
+        textId = 0x340;
+    } else {
+        gRenderModeObj = &gGameLoopPalRenderMode;
+        OSSetEuRgb60Mode(0);
+        GXSetDispCopyYScale((f32)gRenderModeObj->xfbHeight / gRenderModeObj->efbHeight);
+        VIConfigure(gRenderModeObj);
+        VISetBlack(1);
+        VIFlush();
+        textId = 0x341;
+    }
+    i = 0;
+    do {
+        VIWaitForRetrace();
+        i++;
+    } while (i < 100u);
+    VISetBlack(0);
+    VIFlush();
+    VIWaitForRetrace();
+    VIWaitForRetrace();
+    j = 0;
+    i = textId;
+    do {
+        j++;
+        padUpdate();
+        checkReset();
+        mmFreeTick(0);
+        waitNextFrame();
+        if (dvdCheckError()) {
+            value = 190;
+            confirmationShade = 64;
+        } else {
+            value = 110;
+            confirmationShade = 0;
+        }
+        if (j < 0xff) {
+            gameTextSetColor((u8)(0xff - confirmationShade), (u8)(0xff - confirmationShade),
+                             (u8)(0xff - confirmationShade), 0xff);
+        } else {
+            gameTextSetColor((u8)(0xff - confirmationShade), (u8)(0xff - confirmationShade),
+                             (u8)(0xff - confirmationShade), 0xff);
+        }
+        gameTextShowAt(i, 0, value);
+        gameTextRun();
+        doNothing_endOfFrame();
+        GXFlush_(0, 0);
+    } while (j < 0xf0);
+}
+
+#else
 void askProgressiveScanMode(void) {
     int showId;
     u32 counter;
@@ -307,12 +433,7 @@ void askProgressiveScanMode(void) {
     u32 j;
     GameTextBox* box;
     u8 savedAlignment;
-#if defined(VERSION_GSAP01) || defined(VERSION_GSAP01_rev1)
-    int messageY;
-    int shadeReduction;
-#else
     const int shadeReduction = 0;
-#endif
 
     counter = 0;
     sel = 1;
@@ -325,21 +446,8 @@ void askProgressiveScanMode(void) {
         checkReset();
         mmFreeTick(0);
         waitNextFrame();
-#if defined(VERSION_GSAP01) || defined(VERSION_GSAP01_rev1)
-        if (dvdCheckError()) {
-            messageY = 190;
-            shadeReduction = 64;
-        } else {
-            messageY = 110;
-            shadeReduction = 0;
-        }
-#endif
         gameTextSetColor((u8)(0xc0 - shadeReduction), (u8)(0xc0 - shadeReduction), (u8)(0xc0 - shadeReduction), 0xff);
-#if defined(VERSION_GSAP01) || defined(VERSION_GSAP01_rev1)
-        gameTextShowAt(0x33f, 0, messageY);
-#else
         gameTextShow(0x33f);
-#endif
         if ((u8)sel == 1) {
             gameTextSetColor((u8)(0xff - shadeReduction), (u8)(0xff - shadeReduction), (u8)(0xff - shadeReduction),
                              0xff);
@@ -347,11 +455,7 @@ void askProgressiveScanMode(void) {
             gameTextSetColor((u8)(0x80 - shadeReduction), (u8)(0x80 - shadeReduction), (u8)(0x80 - shadeReduction),
                              0x80);
         }
-#if defined(VERSION_GSAP01) || defined(VERSION_GSAP01_rev1)
-        gameTextShowAt(0x3cd, 0, 246);
-#else
         gameTextShowStr(gameTextGetStr(0x3cd), 0, gAskProgressiveScanYesX, 0x64);
-#endif
         if ((u8)sel == 1) {
             gameTextSetColor((u8)(0x80 - shadeReduction), (u8)(0x80 - shadeReduction), (u8)(0x80 - shadeReduction),
                              0x80);
@@ -359,15 +463,9 @@ void askProgressiveScanMode(void) {
             gameTextSetColor((u8)(0xff - shadeReduction), (u8)(0xff - shadeReduction), (u8)(0xff - shadeReduction),
                              0xff);
         }
-#if defined(VERSION_GSAP01) || defined(VERSION_GSAP01_rev1)
-        gameTextShowAt(0x3cc, 0, 246);
-#else
         gameTextShowStr(gameTextGetStr(0x3cc), 0, gAskProgressiveScanNoX, 0x64);
-#endif
         gameTextRun();
-#if !defined(VERSION_GSAP01) && !defined(VERSION_GSAP01_rev1)
         dvdCheckError();
-#endif
         doNothing_endOfFrame();
         GXFlush_(0, 0);
         if (padGetStickX(0) < 0 || padGetCX(0) < 0) {
@@ -388,29 +486,17 @@ void askProgressiveScanMode(void) {
     VIWaitForRetrace();
     VIWaitForRetrace();
     if ((u8)sel != 0) {
-#if defined(VERSION_GSAP01) || defined(VERSION_GSAP01_rev1)
-        gRenderModeObj = &GXEurgb60Hz480IntDf;
-        OSSetEuRgb60Mode(1);
-        GXSetDispCopyYScale((f32)gRenderModeObj->xfbHeight / gRenderModeObj->efbHeight);
-#else
         gRenderModeObj = &GXNtsc480Prog;
         OSSetProgressiveMode(1);
         GXSetCopyFilter(gRenderModeObj->aa, gRenderModeObj->sample_pattern, GX_FALSE, gRenderModeObj->vfilter);
-#endif
         VIConfigure(gRenderModeObj);
         VISetBlack(1);
         VIFlush();
         textId = 0x340;
     } else {
-#if defined(VERSION_GSAP01) || defined(VERSION_GSAP01_rev1)
-        gRenderModeObj = &gGameLoopPalRenderMode;
-        OSSetEuRgb60Mode(0);
-        GXSetDispCopyYScale((f32)gRenderModeObj->xfbHeight / gRenderModeObj->efbHeight);
-#else
         gRenderModeObj = &GXNtsc480IntDf;
         OSSetProgressiveMode(0);
         GXSetCopyFilter(gRenderModeObj->aa, gRenderModeObj->sample_pattern, GX_TRUE, gRenderModeObj->vfilter);
-#endif
         VIConfigure(gRenderModeObj);
         VISetBlack(1);
         VIFlush();
@@ -433,15 +519,6 @@ void askProgressiveScanMode(void) {
         checkReset();
         mmFreeTick(0);
         waitNextFrame();
-#if defined(VERSION_GSAP01) || defined(VERSION_GSAP01_rev1)
-        if (dvdCheckError()) {
-            messageY = 190;
-            shadeReduction = 64;
-        } else {
-            messageY = 110;
-            shadeReduction = 0;
-        }
-#endif
         if (j < 0xff) {
             gameTextSetColor((u8)(0xff - shadeReduction), (u8)(0xff - shadeReduction), (u8)(0xff - shadeReduction),
                              0xff);
@@ -449,19 +526,15 @@ void askProgressiveScanMode(void) {
             gameTextSetColor((u8)(0xff - shadeReduction), (u8)(0xff - shadeReduction), (u8)(0xff - shadeReduction),
                              0xff);
         }
-#if defined(VERSION_GSAP01) || defined(VERSION_GSAP01_rev1)
-        gameTextShowAt(showId, 0, messageY);
-#else
         gameTextShow(showId);
-#endif
         gameTextRun();
-#if !defined(VERSION_GSAP01) && !defined(VERSION_GSAP01_rev1)
         dvdCheckError();
-#endif
         doNothing_endOfFrame();
         GXFlush_(0, 0);
     } while (j < 0xf0);
 }
+
+#endif
 
 int getButtonObjects(GameObject*** p) {
     *p = gGameLoopButtonObjects;

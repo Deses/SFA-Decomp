@@ -1,8 +1,48 @@
-# PAL prompt register investigation
+# PAL prompt matching
 
-`askProgressiveScanMode` remains nonmatching on PAL. Its 242 instructions have
-the retail opcode sequence, but 25 instructions use different registers. This
-note records compiler observations, not recovered original source structure.
+`askProgressiveScanMode` now matches both PAL revisions. All 34 functions and
+all data in `gameloop.c` match in all five versions. The original investigation
+below describes the previous 25-instruction register mismatch.
+
+## Resolution
+
+The whole TU uses its existing GC/1.3 compiler and optimization profile with
+`-opt nolifetimes` added. This disables the earlier lifetime-splitting pass
+identified below. It is one common profile for all five versions, with no
+function pragmas or artificial TU splits. The other 33 functions remain exact.
+
+The PAL prompt reuses two integer locals across phases: its initial frame
+counter later holds the confirmation Y coordinate, and its retrace counter
+later holds the displayed message ID. The confirmation shade has a separate
+local. With lifetime splitting enabled, the reused values become fresh
+temporaries and get different registers. Disabling splitting while retaining
+one shade local also fails: it leaves the confirmation shade in r26 where
+retail uses r0. The combination of source lifetimes and the TU profile is
+necessary for this reconstruction.
+
+PAL and EN/JP now have separate implementations within the same TU. Retail
+establishes different behavior: PAL selects 50/60 Hz, positions text around
+DVD errors, and scales the display copy; EN/JP select interlaced/progressive
+scan and use the corresponding copy filter. The existing EN/JP implementation
+is retained. The explicit byte conversion when PAL saves text alignment also
+preserves its retail allocation. There is no change to the public text API.
+
+This is a verified matching reconstruction, not proof of the original source
+spelling or original build command. The flag alone does not match PAL, and a
+source-only variable-renaming sweep cannot reproduce the required lifetimes.
+
+Validation covers all five versions: `ninja all_source`, the strict DOL
+checksum target, and independent links of all retail objects followed by a
+link substituting `gameloop.c` from source. All ten independent links reproduce
+their verified originals byte for byte. Formatting preserves all five raw
+source-object hashes. Both PAL matching manifests now include `main/gameloop.c`.
+After promotion, all five complete source builds also reproduce retail DOLs.
+Reports made with the corrected metadata comparison from
+[the objdiff tooling](objdiff_metadata.md) show 100% matched and completed code
+and data: 9,498 functions in EN and JP, 9,501 in EN rev1, and 9,506 in each PAL
+revision. No expected checksum or report denominator changed.
+
+## Previous investigation
 
 ## Find the pass that creates a temporary
 

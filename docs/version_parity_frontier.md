@@ -1,10 +1,17 @@
 # The version-parity frontier — seven units, one function each
 
+> **2026-09-29 completion:** All five versions now have 100% matched and linked
+> code and data. PAL's final prompt matches with reconstructed phase-local
+> lifetimes and one common whole-TU profile disabling lifetime splitting.
+> Every version passes `all_source` and reproduces its retail DOL checksum.
+> See [PAL prompt matching](pal_prompt_registers.md). The investigations below
+> are historical; their impossibility claims do not describe the final source.
+>
 > **2026-09-29 maze-well correction:** Slot 611 is also exact in all five
 > versions. An inline activation helper and complete packed-table views recover
 > the retail register lifetimes and address materialization. No reserved
 > registers or flag changes are needed. See [maze-well matching](maze_well_matching.md).
-> Only PAL's `askProgressiveScanMode` remains a code holdout.
+> At that point, only PAL's `askProgressiveScanMode` remained a code holdout.
 >
 > **2026-09-29 correction:** Boss Drakor is exact in all five versions. Two
 > named curve-walker argument values change fixed-color alias counts in the

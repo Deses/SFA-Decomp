@@ -895,6 +895,7 @@ main/debug_display.c
 main/effects_state.c
 main/envfx.c
 main/fileio.c
+main/gameloop.c
 main/gametext.c
 main/gametext_data.c
 main/mm.c
