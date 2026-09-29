@@ -63,3 +63,26 @@ register allocation. Its named block therefore was defined in another TU. The
 same shape (a named block between one DLL's literals and the next DLL's) covers
 `WCPushBlock`, `650`, `WORLDAstero`'s trailing pair and `ARWArwing`'s 39 tuning values.
 Assigning those definitions is a TU-boundary decision and is not made here.
+
+## Asteroid render-scale recovery (2026-09-29)
+
+The renderer's separate `gWorldAsteroidsRenderScale` reference does not need an
+external definition. Replacing it with the `1.0f` render argument preserves all
+nine functions and emits the exact eight-byte prefix at EN
+`0x803E65D0..0x803E65D8`: the scale literal followed by natural alignment for the
+existing conversion double. The claimed pool now spans
+`0x803E65D0..0x803E65EC` (28 bytes), and the complete unit owns 84 exact data bytes.
+The preceding word at `0x803E65CC` remains outside this unit.
+
+The two trailing orbit constants are a different case. Replacing both with
+`80.0f` and `145.0f` moves the radius multiplication and integer conversion past
+the random-number calls, requires saving an additional floating-point register,
+and changes their pool order. That probe is not retained; those definitions
+still require recovery. No artificial data definitions or compiler changes are
+used for the render scale.
+
+All five versions pass `ninja all_source` and the native strict retail checksum
+with the expanded pool linked from source. Each has nine exact functions and
+84 exact data bytes. Regional projection reproduces the expanded ranges, and
+the small-data operand audit confirms the scale's retail address and bytes in
+each secondary version. The source and canonical header pass clang-format.

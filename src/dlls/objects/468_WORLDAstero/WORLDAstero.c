@@ -11,13 +11,13 @@
 #include "main/vecmath.h"
 #include "sys/objects.h"
 
+#define WORLD_ASTEROIDS_RENDER_SCALE       1.0f
 #define WORLD_ASTEROIDS_CENTER_OBJECT_ID   0x42FE7
 #define WORLD_ASTEROIDS_ORBIT_TILT_ANGLE   3000
 #define WORLD_ASTEROIDS_ORBIT_STEP_SCALE   0x9C4
 #define WORLD_ASTEROIDS_ROTATION_SPEED_MIN -300
 #define WORLD_ASTEROIDS_ROTATION_SPEED_MAX 300
 
-extern f32 gWorldAsteroidsRenderScale;
 extern f32 gWorldAsteroidsOrbitRadiusVariation;
 extern f32 gWorldAsteroidsOrbitRadiusBase;
 
@@ -41,7 +41,7 @@ void worldasteroids_render(GameObject* obj, u32 renderArg2, u32 renderArg3, u32 
     s32 isVisible = visible;
 
     if (isVisible != 0) {
-        objRenderModelAndHitVolumes(obj, renderArg2, renderArg3, renderArg4, renderArg5, gWorldAsteroidsRenderScale);
+        objRenderModelAndHitVolumes(obj, renderArg2, renderArg3, renderArg4, renderArg5, WORLD_ASTEROIDS_RENDER_SCALE);
     }
 }
 
