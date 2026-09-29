@@ -345,6 +345,7 @@ enum GameBitId {
     GAMEBIT_SH_SouthCave_Opening = 0x23,                 /* table 2; ref hollow/HitAnimator target */
     GAMEBIT_CC_LevelControlMusicEA0024 = 0x24,           /* Two Cape Claw DLLs name it and differently: CClightfoot despawns its LightFoot encounter while it is set, and CClevcontro makes it the GameBitLatch condition for music 0xEA - one area state, read for two purposes */
     GAMEBIT_ITEM_TrickyBall_Bought = 0x25,               /* table 2 */
+    GAMEBIT_NW_TreebridBit0026 = 0x26,                   /* Read out of the retail placement data: wastes/NW_treebrid gameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_DIM_FoundInjuredSnowHorn = 0x27,             /* table 2; hint 284 */
     GAMEBIT_ITEM_AlpineRoot_028 = 0x28,                  /* table 2 */
     GAMEBIT_DIM_ReleasedSnowHorn = 0x2A,                 /* table 2; hint 283; ref snowmines/DIMSnowHornShackle open. Backs the collectable item C-menu entry the game labels "Use Shackle Key" (its used bit) */
@@ -356,10 +357,14 @@ enum GameBitId {
     GAMEBIT_DIM_SeqBit1A0031 = 0x31,                     /* Named from map data alone - nothing in the code or in any name list mentions it: snowmines/DIMSeqObjec objId= param=bit1A; table 0 */
     GAMEBIT_DIM_SeqBit180032 = 0x32,                     /* Named from map data alone - nothing in the code or in any name list mentions it: snowmines/DIMSeqObjec objId= param=bit18; table 2 */
     GAMEBIT_DIM_HitAnimTarget0033 = 0x33,                /* Named from map data alone - nothing in the code or in any name list mentions it: snowmines/HitAnimator objId= param=target; snowmines/HitAnimator objId= param=target; table 2 */
+    GAMEBIT_DIM_LavaBallTrigger0036 = 0x36,              /* Read out of the retail placement data: snowmines/DIMLavaBall triggerGameBit x1; snowmines/DIMLavaSmas gateGameBit x1; 2 placements. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_DIM_SeqBit1A0037 = 0x37,                     /* Named from map data alone - nothing in the code or in any name list mentions it: snowmines/DIMSeqObjec objId= param=bit1A; table 0 */
     GAMEBIT_DIM_SeqBit180038 = 0x38,                     /* Named from map data alone - nothing in the code or in any name list mentions it: snowmines/DIMSeqObjec objId= param=bit18; table 2 */
     GAMEBIT_DIM2_SeqBit180039 = 0x39,                    /* Named from map data alone - nothing in the code or in any name list mentions it: snowmines2/DIM2SeqObje objId= param=bit18; table 2 */
     GAMEBIT_DIMRelated003A = 0x3A,                       /* table 2 */
+    GAMEBIT_DIM_LavaBallTriggeredLaunch003B = 0x3B,      /* Read out of the retail placement data: snowmines/DIMLavaBall triggeredLaunchGameBit x1; snowmines/DIMLavaSmas triggerGameBit x1; 2 placements. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_DIM_LavaBallTrigger003C = 0x3C,              /* Read out of the retail placement data: snowmines/DIMLavaBall triggerGameBit x1; snowmines/DIMLavaSmas gateGameBit x1; 2 placements. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_DIMLavaBallTrigger003D = 0x3D,               /* Read out of the retail placement data: snowmines/DIMLavaBall triggerGameBit x1; snowmines/DIMLavaSmas gateGameBit x1; swapcircle/TrigCyl activate x1; 3 placements. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_CF_HitAnimTarget003E = 0x3E,                 /* Named from map data alone - nothing in the code or in any name list mentions it: fortress/HitAnimator objId= param=target; table 1 */
     GAMEBIT_CF_EnteredFort = 0x41,                       /* table 1; hint 326 */
     GAMEBIT_CF_SeqBit1A0042 = 0x42,                      /* Named from map data alone - nothing in the code or in any name list mentions it: fortress/CFseqobject objId= param=bit1A; table 0 */
@@ -381,6 +386,9 @@ enum GameBitId {
     GAMEBIT_CF_GreenPowerBasePowered = 0x55,             /* table 2; set when the green power gem is installed */
     GAMEBIT_CF_BluePowerBasePowered = 0x56,              /* table 2; set when the blue power gem is installed */
     GAMEBIT_CF_PowerOn = 0x57,                           /* table 2; hint 328; ref clouddungeon/StaffLeverT enabled */
+    GAMEBIT_CF_WindLiftActivation0058 = 0x58,            /* Read out of the retail placement data: fortress/CFWindLift activationGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_CF_WindLiftActivation0059 = 0x59,            /* Read out of the retail placement data: fortress/CFWindLift activationGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_CF_WindLiftActivation005A = 0x5A,            /* Read out of the retail placement data: fortress/CFWindLift activationGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_CF_LeverActivated005B = 0x5B,                /* Named from map data alone - nothing in the code or in any name list mentions it: clouddungeon/StaffLeverT objId= param=activated; table 2 */
     GAMEBIT_CF_LeverActivated005C = 0x5C,                /* Named from map data alone - nothing in the code or in any name list mentions it: fortress/StaffLeverT objId= param=activated; fortress/StaffLeverT objId= param=activated; fortress/StaffLeverT objId= param=activated; table 2 */
     GAMEBIT_CF_LeverActivated005D = 0x5D,                /* Named from map data alone - nothing in the code or in any name list mentions it: fortress/StaffLeverT objId= param=activated; fortress/StaffLeverT objId= param=activated; fortress/StaffLeverT objId= param=activated; table 2 */
@@ -388,6 +396,7 @@ enum GameBitId {
     GAMEBIT_ITEM_CFPowerKey_Got = 0x60,                  /* table 2; ref fortress/CFPowerLock key. Backs the collectable item C-menu entry the game labels "Use Power Key" (its owned bit) */
     GAMEBIT_DRBOT_Param1A0064 = 0x64,                    /* Named from map data alone - nothing in the code or in any name list mentions it: dragbot/DR_LightBea objId= param=_1A; table 1 */
     GAMEBIT_BabyCloudRunnerAirMeter = 0x66,              /* The DLL names this one itself: BABYCLOUDRUNNER_AIR_METER_GAME_BIT in 332.c */
+    GAMEBIT_CF_FXEmitDisable0068 = 0x68,                 /* Read out of the retail placement data: fortress/FXEmit disableGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_IM_SeqBit1A006D = 0x6D,                      /* Named from map data alone - nothing in the code or in any name list mentions it: newicemount/IMSeqObject objId= param=bit1A; table 2 */
     GAMEBIT_IM_TrickyRelated006E = 0x6E,                 /* table 2; set after Tricky landing scene */
     GAMEBIT_IM_TrickyRelated006F = 0x6F,                 /* table 2; set when entering hut */
@@ -398,6 +407,7 @@ enum GameBitId {
     GAMEBIT_IM_StartRace = 0x79,                         /* table 1; setting starts the race scene */
     GAMEBIT_SC_TestPhaseOver007A = 0x7A,                 /* Swapcircle (the LightFoot totem circle) has left its test phase - while set, sc_levelcontrol raises GAMEBIT_SC_HitAnimTarget0085 at every opportunity; while clear it instead watches 0x627 and GAMEBIT_SC_TotemRunCompleted for GAMEBIT_LV_DoneTests */
     GAMEBIT_SC_Open007B = 0x7B,                          /* Named from map data alone - nothing in the code or in any name list mentions it: swapcircle/SC_settelme objId= param=open; table 2 */
+    GAMEBIT_SC_SettelmeClosedLatch007C = 0x7C,           /* Read out of the retail placement data: swapcircle/SC_settelme closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_SC_LevelControlTotemCombo1 = 0x7D,           /* The DLL names this one itself: SC_LEVEL_CONTROL_GAMEBIT_TOTEM_COMBO_1 in 438_SC_levelcon.h */
     GAMEBIT_SC_LevelControlTotemCombo2 = 0x7E,           /* The DLL names this one itself: SC_LEVEL_CONTROL_GAMEBIT_TOTEM_COMBO_2 in 438_SC_levelcon.h */
     GAMEBIT_SC_LevelControlTotemCombo3 = 0x7F,           /* The DLL names this one itself: SC_LEVEL_CONTROL_GAMEBIT_TOTEM_COMBO_3 in 438_SC_levelcon.h */
@@ -407,14 +417,18 @@ enum GameBitId {
     GAMEBIT_LV_Totem3_Activated = 0x83,                  /* Rena's U0 dataset; table 2, corroborated by SC_totempol naming the same bit the totem pole's RIGHT face */
     GAMEBIT_LV_Totem4_Activated = 0x84,                  /* Rena's U0 dataset; table 2, corroborated by SC_totempol naming the same bit the totem pole's REAR face */
     GAMEBIT_SC_HitAnimTarget0085 = 0x85,                 /* Rena has it as the target of swapcircle's HitAnimator 0x4C837; sc_levelcontrol raises it whenever GAMEBIT_SC_TestPhaseOver007A is up and clears it as a timed totem run starts */
+    GAMEBIT_SC_MounddooClosedLatch0086 = 0x86,           /* Read out of the retail placement data: swapcircle/SC_mounddoo closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_SC_LVBlock2Related0087 = 0x87,               /* One of the three bits sc_levelcontrol raises the moment GAMEBIT_ITEM_LVBlock2_Used is set */
     GAMEBIT_SH_WarpStonePathOpen = 0x88,                 /* table 2; did blow up wall leading to WarpStone */
+    GAMEBIT_SC_SteppingClosedLatch0089 = 0x89,           /* Read out of the retail placement data: swapcircle/SC_stepping closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_SH_SouthCave_BombPlanted = 0x8A,             /* table 2; ref hollow/BombPlant exists */
     GAMEBIT_SH_WarpStoneBombPlanted = 0x8B,              /* table 2; ref hollow/BombPlant exists */
     GAMEBIT_CampFireRelated008C = 0x8C,                  /* table 0; read once by CampFire at setup, purely to latch its own CAMPFIRE_STATE_FLAG_GAME_BIT_8C_SET */
     GAMEBIT_SH_HitAnimTarget008D = 0x8D,                 /* Named from map data alone - nothing in the code or in any name list mentions it: hollow/HitAnimator objId= param=target; hollow/SH_BombWall objId= param=exploded; table 2 */
+    GAMEBIT_NW_AlpineroHide008E = 0x8E,                  /* Read out of the retail placement data: wastes/NW_alpinero hideGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_TTH_BombPlanted08F = 0x8F,                   /* Rena's U0 dataset; table 2 */
     GAMEBIT_SH_Related0090 = 0x90,                       /* table 2; ref hollow/HitAnimator target */
+    GAMEBIT_DIM2_SideloadArming0091 = 0x91,              /* Read out of the retail placement data: snowmines2/sideload armingGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_SH_KilledBloop5 = 0x92,                      /* table 1 */
     GAMEBIT_SH_KilledBloop6 = 0x93,                      /* table 1 */
     GAMEBIT_SH_TrickyTrigger = 0x94,                     /* The DLL names this one itself: SH_TRICKY_TRIGGER_GAMEBIT in SH_tricky.c */
@@ -434,6 +448,7 @@ enum GameBitId {
     GAMEBIT_NW_HitAnimTarget00A8 = 0xA8,                 /* Named from map data alone - nothing in the code or in any name list mentions it: wastes/HitAnimator objId= param=target; table 2 */
     GAMEBIT_ITEM_FireGem_Count = 0xA9,                   /* table 2; size 2. Backs the collectable item C-menu entry the game labels "Place Fire Gem" (its owned bit) */
     GAMEBIT_CC_PedestalSourceActivated = 0xAA,           /* The DLL names this one itself: CC_PEDESTAL_SOURCE_ACTIVATED_GAMEBIT in CCpedstal.c */
+    GAMEBIT_CC_FireCrystHide00AC = 0xAC,                 /* Read out of the retail placement data: capeclaw/CCfireCryst hideGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_CC_SeqUsed0AD = 0xAD,                        /* Rena's U0 dataset; table 2 */
     GAMEBIT_SH_KilledBloop8 = 0xAE,                      /* table 1 */
     GAMEBIT_SH_KilledBloop9 = 0xAF,                      /* table 1 */
@@ -486,6 +501,7 @@ enum GameBitId {
     GAMEBIT_AnimTest_ActNo = 0xF0,                       /* table 1; size 4 */
     GAMEBIT_CC_SeqNeedBit0F1 = 0xF1,                     /* Rena's U0 dataset; table 2 */
     GAMEBIT_DIM_SnowHornSeqPending00F3 = 0xF3,           /* The DarkIce SnowHorn latches its sequence-triggered flag on sight of this in its idle state */
+    GAMEBIT_SHBOT_SHwhitemusBit00F4 = 0xF4,              /* Read out of the retail placement data: hollow2/SH_whitemus gameBitId x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_SH_KilledBloop16 = 0xF5,                     /* table 1 */
     GAMEBIT_TestCombatClawAlive0F6 = 0xF6,               /* Rena's U0 dataset; table 0 */
     GAMEBIT_TestCombatClawAlive0F7 = 0xF7,               /* Rena's U0 dataset; table 0 */
@@ -506,8 +522,12 @@ enum GameBitId {
     GAMEBIT_AndrossRelated010B = 0x10B,                  /* table 0; random Andross hit-cue bit */
     GAMEBIT_AndrossRelated010C = 0x10C,                  /* table 0; random Andross hit-cue bit */
     GAMEBIT_AndrossRelated010D = 0x10D,                  /* table 0; random Andross hit-cue bit */
+    GAMEBIT_NW_EnergyEggVisibility0111 = 0x111,          /* Read out of the retail placement data: wastes/EnergyEgg visibilityGameBit x1; wastes/GroundAnima sunkGameBit x1; 2 placements. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_NW_GroundAnimaSunk0112 = 0x112,              /* Read out of the retail placement data: wastes/GroundAnima sunkGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_NW_MagicCaveVisible = 0x113,                 /* table 2; ref wastes/MagicCaveTo Visible */
+    GAMEBIT_NW_GroundAnimaSunk0114 = 0x114,              /* Read out of the retail placement data: wastes/GroundAnima sunkGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_SH_KilledBloop18 = 0x115,                    /* table 1 */
+    GAMEBIT_NW_AlpineroHide0116 = 0x116,                 /* Read out of the retail placement data: wastes/NW_alpinero hideGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_NW_FreedSnowHorn = 0x11A,                    /* Rena's U0 dataset; table 2 */
     GAMEBIT_NW_ClawDead120 = 0x120,                      /* table 2; Rena's U0 name - NW_mammoth tests it alongside GAMEBIT_NW_ClawDead121 */
     GAMEBIT_NW_ClawDead121 = 0x121,                      /* table 2; Rena's U0 name - the second SharpClaw NW_mammoth checks */
@@ -535,9 +555,11 @@ enum GameBitId {
     GAMEBIT_ITEM_FireflyLantern_Got = 0x13E,             /* table 2; hint 273. Backs the collectable item C-menu entry the game labels "Use Lantern" (its owned bit) */
     GAMEBIT_ITEM_BigScarabBag_Got = 0x13F,               /* table 1; hint 375; From rescuing ThornTails from Bloops */
     GAMEBIT_SH_FirstMagicCaveFound = 0x140,              /* table 2; whether entrance is active (glowing, can enter) */
+    GAMEBIT_CC_DIMCannonHold0142 = 0x142,                /* Read out of the retail placement data: capeclaw/DIMCannon holdGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_WM_Spirit1Related_0143 = 0x143,              /* table 0; set when collecting first spirit; cleared when it enters krazoa head */
     GAMEBIT_MC_ActNo = 0x144,                            /* table 1; size 4; Magic Cave */
     GAMEBIT_MC_ObjGroups = 0x145,                        /* table 3; size 32 */
+    GAMEBIT_DIM_LavaBallTriggeredLaunch0147 = 0x147,     /* Read out of the retail placement data: snowmines/DIMLavaBall triggeredLaunchGameBit x1; snowmines/DIMLavaSmas triggerGameBit x1; 2 placements. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_GPSH_SpawnKnowledgeSymbols = 0x148,          /* Test of Knowledge symbol creator latch; GPSH_Shrine sets it when the puzzle starts and GPSH_ObjCre consumes it to spawn the six pickup symbols */
     GAMEBIT_GPSH_KnowledgeSymbol1Solved = 0x149,         /* Test of Knowledge symbol-solved bit; one of the six GPSH pickup symbols has been collected */
     GAMEBIT_GPSH_KnowledgeSymbol2Solved = 0x14A,         /* Test of Knowledge symbol-solved bit; one of the six GPSH pickup symbols has been collected */
@@ -545,6 +567,8 @@ enum GameBitId {
     GAMEBIT_GPSH_KnowledgeSymbol4Solved = 0x14C,         /* Test of Knowledge symbol-solved bit; one of the six GPSH pickup symbols has been collected */
     GAMEBIT_GPSH_KnowledgeSymbol5Solved = 0x14D,         /* Test of Knowledge symbol-solved bit; one of the six GPSH pickup symbols has been collected */
     GAMEBIT_GPSH_KnowledgeSymbol6Solved = 0x14E,         /* Test of Knowledge symbol-solved bit; one of the six GPSH pickup symbols has been collected */
+    GAMEBIT_DIM_LavaBallState014F = 0x14F,               /* Read out of the retail placement data: snowmines/DIMLavaBall stateGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_DIM_LavaBallState0150 = 0x150,               /* Read out of the retail placement data: snowmines/DIMLavaBall stateGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_DIM_SeqBit180156 = 0x156,                    /* Named from map data alone - nothing in the code or in any name list mentions it: snowmines/DIMSeqObjec objId= param=bit18; table 2 */
     GAMEBIT_NW_HitAnimTarget0159 = 0x159,                /* Named from map data alone - nothing in the code or in any name list mentions it: wastes/HitAnimator objId= param=target; wastes/NW_seqobjec objId= param=needBit; wastes/HitAnimator objId= param=target; table 2 */
     GAMEBIT_SH_WarpStoneRelated015A = 0x15A,             /* table 2; set during intro speech */
@@ -556,13 +580,17 @@ enum GameBitId {
     GAMEBIT_OFP_Opened = 0x162,                          /* table 2; hint 338; ref capeclaw/HitAnimator target */
     GAMEBIT_CC_HitAnimTarget0163 = 0x163,                /* Named from map data alone - nothing in the code or in any name list mentions it: capeclaw/CCskullDoor objId= param=open; capeclaw/HitAnimator objId= param=target; capeclaw/CCseqobj objId= param=usedBit (+1 more); table 2 */
     GAMEBIT_WMRelated0164 = 0x164,                       /* table 2; ref capeclaw/HitAnimator target */
+    GAMEBIT_CC_XYZAnimatorCompletion0165 = 0x165,        /* Read out of the retail placement data: capeclaw/XYZAnimator completionGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_SH_ThornTailRelated0168 = 0x168,             /* table 2 */
     GAMEBIT_DBSH_SymbolRiseComplete = 0x16A,             /* The DLL names this one itself: DBSH_GAMEBIT_SYMBOL_RISE_COMPLETE in 405_DBSH_Shrine.h */
     GAMEBIT_DBSH_SymbolSpinSucceeded = 0x16B,            /* The DLL names this one itself: DBSH_GAMEBIT_SYMBOL_SPIN_SUCCEEDED in 405_DBSH_Shrine.h */
     GAMEBIT_DBSH_SymbolSpinFailed = 0x16C,               /* The DLL names this one itself: DBSH_GAMEBIT_SYMBOL_SPIN_FAILED in 405_DBSH_Shrine.h */
+    GAMEBIT_DIM_AlpineRoHide016D = 0x16D,                /* Read out of the retail placement data: snowmines/DIMAlpineRo hideGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_DIM_AlpineRoHide016E = 0x16E,                /* Read out of the retail placement data: snowmines/DIMAlpineRo hideGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_ITEM_DIMAlpineRoot_16F = 0x16F,              /* table 2; ref snowmines/CNTColideOb 0x1E */
     GAMEBIT_ITEM_DIMAlpineRoot_Count = 0x170,            /* table 2; size 2. Backs the collectable item C-menu entry the game labels "Alpine Root" (its owned bit) */
     GAMEBIT_DIM_ClawDead172 = 0x172,                     /* Rena's U0 dataset; table 2 */
+    GAMEBIT_CC_XYZAnimatorCompletion0173 = 0x173,        /* Read out of the retail placement data: capeclaw/XYZAnimator completionGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_ITEM_Spirit6_Got = 0x174,                    /* table 2; hint 422 */
     GAMEBIT_NWSH_SeqBit1A0175 = 0x175,                   /* Named from map data alone - nothing in the code or in any name list mentions it: nwshrine/NWSH_Seqobj objId= param=bit1A; table 0 */
     GAMEBIT_NWSH_SeqBit180176 = 0x176,                   /* Named from map data alone - nothing in the code or in any name list mentions it: nwshrine/NWSH_Seqobj objId= param=bit18; table 0 */
@@ -617,6 +645,7 @@ enum GameBitId {
     GAMEBIT_SH_MagicCaveCollected = 0x1AE,               /* table 2; ref hollow/MagicCaveTo Collected */
     GAMEBIT_TTH_WallExploded1AF = 0x1AF,                 /* possibly triggers explosion; Rena's U0 dataset; table 2 */
     GAMEBIT_TTH_WallExploded1B0 = 0x1B0,                 /* Rena's U0 dataset; table 2 */
+    GAMEBIT_SHBOT_XYZAnimatorCompletion01B1 = 0x1B1,     /* Read out of the retail placement data: hollow2/XYZAnimator completionGameBit x2; 2 placements. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_TTH_WallExploded1B2 = 0x1B2,                 /* Rena's U0 dataset; table 2 */
     GAMEBIT_CC_HitAnimTarget01B3 = 0x1B3,                /* Named from map data alone - nothing in the code or in any name list mentions it: capeclaw/HitAnimator objId= param=target; table 0 */
     GAMEBIT_SH_BombPlantedBesideWarpStone = 0x1B4,       /* table 2; ref hollow/BombPlant exists */
@@ -642,6 +671,7 @@ enum GameBitId {
     GAMEBIT_BaddieRelated1C8 = 0x1C8,                    /* table 0 */
     GAMEBIT_PushableMagicGemNear = 0x1C9,                /* The DLL names this one itself: PUSHABLE_MAGIC_GEM_NEAR_GAME_BIT in 239.c */
     GAMEBIT_NWSH_Open01CA = 0x1CA,                       /* Named from map data alone - nothing in the code or in any name list mentions it: nwshrine/SC_settelme objId= param=open; table 0 */
+    GAMEBIT_NWSH_SpiritDoorLDone01CB = 0x1CB,            /* Read out of the retail placement data: nwshrine/SpiritDoorL doneGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_Dll199Related01CD = 0x1CD,                   /* The DLL names this one itself: DLL199_GAMEBIT_01CD in 409.c */
     GAMEBIT_Dll19ADroppedItem = 0x1CE,                   /* DLL 0x19A calls it its dropped-item bit while DLL 0x199 only has a placeholder for it, so the name follows the DLL that knows what it is */
     GAMEBIT_Dll199Related01CF = 0x1CF,                   /* The DLL names this one itself: DLL199_GAMEBIT_01CF in 409.c */
@@ -669,6 +699,7 @@ enum GameBitId {
     GAMEBIT_DIM_MagicBridgeIgnited = 0x1E9,              /* The DLL names this one itself: DIM_MAGIC_BRIDGE_GAMEBIT_IGNITED in DIMMagicBri.c */
     GAMEBIT_CC_ClawDead1EA = 0x1EA,                      /* Rena's U0 dataset; table 2 */
     GAMEBIT_CC_ClawDead1EB = 0x1EB,                      /* Rena's U0 dataset; table 2 */
+    GAMEBIT_CC_DIMCannonReset01EC = 0x1EC,               /* Read out of the retail placement data: capeclaw/DIMCannon resetGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_IM_TrickyRelated01ED = 0x1ED,                /* table 3; set when warping to Ice Mountain, cleared when starting Tricky landing scene */
     GAMEBIT_ITEM_DinoHorn_Got = 0x1EE,                   /* table 2; hint 288; ref snowmines/DIMUseObjec key. Backs the collectable item C-menu entry the game labels "Blow Horn" (its owned bit) */
     GAMEBIT_DIM_MagicBridgeTrigger = 0x1EF,              /* The DLL names this one itself: DIM_MAGIC_BRIDGE_GAMEBIT_TRIGGER in DIMMagicBri.c */
@@ -690,6 +721,7 @@ enum GameBitId {
     GAMEBIT_WC_TrexLever3Activated = 0x206,              /* One of the four wallcity staff levers the T-rex challenge runs on - wclevelcont raises all four at init and again when a run times out, and clears all four as a run starts; Rena records only a HitAnimator target (0x47FEF) for this one and no StaffLeverO, though the code writes it in lockstep with the other three everywhere */
     GAMEBIT_ITEM_DIM2CellKey_Used = 0x207,               /* table 2; ref snowmines2/DIM2CellKey open */
     GAMEBIT_ITEM_DIMSilverKey_Used = 0x208,              /* table 2; ref snowmines2/DIM2CellKey open */
+    GAMEBIT_CF_MainDoorAClosedLatch0209 = 0x209,         /* Read out of the retail placement data: fortress/CFMainDoorA closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_DIM2_IciclePhase1Win = 0x20B,                /* The DLL names this one itself: GAMEBIT_DIM2_ICICLE_PHASE1_WIN in DIM_Boss.c */
     GAMEBIT_DIM_BossTonsilHit = 0x20C,                   /* The DLL names this one itself: DIMBOSSTONSIL_HIT_GAMEBIT in 482_DIM_BossTon.h */
     GAMEBIT_DIM_BossIcicleDefeated = 0x20E,              /* The DLL names this one itself: DIMBOSS_GAMEBIT_ICICLE_DEFEATED in 480_DIM_Boss.h */
@@ -697,6 +729,8 @@ enum GameBitId {
     GAMEBIT_CF_FlewTo = 0x212,                           /* table 1; hint 324 */
     GAMEBIT_CF_SeqBit180213 = 0x213,                     /* Named from map data alone - nothing in the code or in any name list mentions it: fortress/CFseqobject objId= param=bit18; fortress/CFseqobject objId= param=bit1A; table 2 */
     GAMEBIT_CF_SeqBit180214 = 0x214,                     /* Named from map data alone - nothing in the code or in any name list mentions it: fortress/CFseqobject objId= param=bit18; table 1 */
+    GAMEBIT_DIM2_CellDooClosedLatch0215 = 0x215,         /* Read out of the retail placement data: snowmines2/DIM2CellDoo closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_DIM2_CellDooClosedLatch0216 = 0x216,         /* Read out of the retail placement data: snowmines2/DIM2CellDoo closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_DIM2_HitAnimTarget0218 = 0x218,              /* Named from map data alone - nothing in the code or in any name list mentions it: snowmines2/HitAnimator objId= param=target; snowmines2/HitAnimator objId= param=target; table 2 */
     GAMEBIT_ITEM_DIMGoldKey_Used = 0x219,                /* table 2. Backs the collectable item C-menu entry the game labels "Use Gold Key" (its used bit) */
     GAMEBIT_ITEM_DIMSilverKey_Used_2 = 0x21A,            /* table 2. Backs the collectable item C-menu entry the game labels "Use Silver Key" (its used bit) */
@@ -714,9 +748,11 @@ enum GameBitId {
     GAMEBIT_DIM3_ActNo = 0x229,                          /* table 1; size 4; snowmines3 (unused?) */
     GAMEBIT_CC_LevelControlCameraReady = 0x22A,          /* The DLL names this one itself: CC_LEVEL_CONTROL_CAMERA_READY_GAMEBIT in CClevcontro.c */
     GAMEBIT_ITEM_FireSpellStone1_Used = 0x22B,           /* table 2. Backs the collectable item C-menu entry the game labels "Use SpellStone" (its used bit); and the collectable item C-menu entry the game labels "Use SpellStone" (its owned bit) */
+    GAMEBIT_LINKB_LINKSnowPrEnable022C = 0x22C,          /* Read out of the retail placement data: linkb/LINK_SnowPr enableGameBit x1; linkb/GroundAnima sunkGameBit x1; 2 placements. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_CC_LevelControlCameraStop = 0x22D,           /* The DLL names this one itself: CC_LEVEL_CONTROL_CAMERA_STOP_GAMEBIT in CClevcontro.c */
     GAMEBIT_CC_LevelControlCameraGate = 0x22E,           /* The DLL names this one itself: CC_LEVEL_CONTROL_CAMERA_GATE_GAMEBIT in CClevcontro.c */
     GAMEBIT_DIM2_HitAnimTarget022F = 0x22F,              /* Named from map data alone - nothing in the code or in any name list mentions it: snowmines2/HitAnimator objId= param=target; table 2 */
+    GAMEBIT_DIM2_ExplodeActivate0230 = 0x230,            /* Read out of the retail placement data: snowmines2/DIM2Explode activateGameBit x12; snowmines2/ExplodeAnim resultGameBit x1; 13 placements. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_DIM2_HitAnimTarget0233 = 0x233,              /* Named from map data alone - nothing in the code or in any name list mentions it: snowmines2/HitAnimator objId= param=target; table 2 */
     GAMEBIT_WC_PlacedSunMoonStones = 0x235,              /* table 2; hint 411 */
     GAMEBIT_CC_Open0236 = 0x236,                         /* Named from map data alone - nothing in the code or in any name list mentions it: capeclaw/CCwaterShut objId= param=open; capeclaw/CCwaterShut objId= param=open; capeclaw/HitAnimator objId= param=target; table 2 */
@@ -731,6 +767,7 @@ enum GameBitId {
     GAMEBIT_ITEM_WCMoonStone_Used = 0x243,               /* table 2. the sun temple DLL checks it as its Walled City inventory bit D. Backs the collectable item C-menu entry the game labels "Use Moon Stone" (its used bit) */
     GAMEBIT_WC_SeqBit180244 = 0x244,                     /* Named from map data alone - nothing in the code or in any name list mentions it: wallcity/WCSeqObject objId= param=bit18; table 2 */
     GAMEBIT_ITEM_TrickyFlame_Got = 0x245,                /* table 2 */
+    GAMEBIT_WM_LaserTarToggle024C = 0x24C,               /* Read out of the retail placement data: warlock/WM_LaserTar toggleGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_WM_DoorToKrazTest1Opened = 0x24E,            /* table 2; ref warlock/HitAnimator target */
     GAMEBIT_CF_SeqBit1A024F = 0x24F,                     /* Named from map data alone - nothing in the code or in any name list mentions it: fortress/CFGoldenPer objId= param=bit1A; table 1 */
     GAMEBIT_CF_SeqBit1A0250 = 0x250,                     /* Named from map data alone - nothing in the code or in any name list mentions it: fortress/CFGoldenPer objId= param=bit1A; table 1 */
@@ -739,6 +776,8 @@ enum GameBitId {
     GAMEBIT_DIM2_Open0254 = 0x254,                       /* Named from map data alone - nothing in the code or in any name list mentions it: snowmines2/DIM2IcePlat objId= param=open; table 2 */
     GAMEBIT_DIM2_Open0255 = 0x255,                       /* Named from map data alone - nothing in the code or in any name list mentions it: snowmines2/DIM2IcePlat objId= param=open; table 2 */
     GAMEBIT_LINKB_TrickyStateB = 0x256,                  /* LINKB_levco's second Tricky state bit, paired with GAMEBIT_LINKB_TrickyStateA */
+    GAMEBIT_CF_PrisonDooClosedLatch0258 = 0x258,         /* Read out of the retail placement data: clouddungeon/CFPrisonDoo closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_CF_PrisonDooClosedLatch0259 = 0x259,         /* Read out of the retail placement data: clouddungeon/CFPrisonDoo closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_ITEM_WCGoldTooth_Used = 0x25A,               /* table 2. the sun temple DLL checks it as its Walled City inventory bit A. Backs the collectable item C-menu entry the game labels "Use Gold Tooth" (its used bit) */
     GAMEBIT_ITEM_WCSilverTooth_Used = 0x25B,             /* table 2. the sun temple DLL checks it as its Walled City inventory bit B. Backs the collectable item C-menu entry the game labels "Use Silver Tooth" (its used bit) */
     GAMEBIT_WC_SeqBit18025C = 0x25C,                     /* Named from map data alone - nothing in the code or in any name list mentions it: wallcity/WCSeqObject objId= param=bit18; table 2 */
@@ -751,11 +790,16 @@ enum GameBitId {
     GAMEBIT_DIM_BossTonsilRouteLow = 0x268,              /* The DLL names this one itself: DIMBOSSTONSIL_GAMEBIT_ROUTE_LOW in DIM_BossTon.c */
     GAMEBIT_DIM_BossFootstepShake = 0x26B,               /* Raised on every DarkIce Mines boss footstep, in the same breath as the dampened camera shake and the rumble - the boss counterpart to GAMEBIT_DR_KTrexFootfallShake. MAGICMaker reads the same bit as its spawn bit, so the boss's footfalls are what spawn its magic */
     GAMEBIT_DIM2_Open026C = 0x26C,                       /* Named from map data alone - nothing in the code or in any name list mentions it: snowmines2/DIM2IcePlat objId= param=open; table 2 */
+    GAMEBIT_DIM2_FXEmitDisable026D = 0x26D,              /* Read out of the retail placement data: snowmines2/FXEmit disableGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_DIM2_IcePlatClosedLatch026E = 0x26E,         /* Read out of the retail placement data: snowmines2/DIM2IcePlat closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_DIM2_IcePlatClosedLatch026F = 0x26F,         /* Read out of the retail placement data: snowmines2/DIM2IcePlat closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_DIM2_IcePlatClosedLatch0270 = 0x270,         /* Read out of the retail placement data: snowmines2/DIM2IcePlat closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_PushableRelated0272 = 0x272,                 /* table 2; ref snowmines2/HitAnimator target */
     GAMEBIT_WC_TrexAnimTarget0274 = 0x274,               /* Wallcity HitAnimator 0x4CB89's target - wclevelcont raises it both as a T-rex run starts and when one is beaten, and drops it when a run times out */
     GAMEBIT_ITEM_Spirit1_Used = 0x277,                   /* table 1 */
     GAMEBIT_DIM2_SeqBit1A0278 = 0x278,                   /* Named from map data alone - nothing in the code or in any name list mentions it: snowmines2/DIM2SeqObje objId= param=bit1A; snowmines2/StaffLeverO objId= param=activated; table 2 */
     GAMEBIT_DIM2_SeqBit180279 = 0x279,                   /* Named from map data alone - nothing in the code or in any name list mentions it: snowmines2/DIM2SeqObje objId= param=bit18; snowmines2/DIM2IceGrat objId= param=open; table 2 */
+    GAMEBIT_DIM2_IceGratClosedLatch027A = 0x27A,         /* Read out of the retail placement data: snowmines2/DIM2IceGrat closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_ITEM_SilverKey282_Got = 0x282,               /* table 2. Backs the collectable item C-menu entry the game labels "Use Silver Key" (its owned bit) */
     GAMEBIT_ITEM_SilverKey282_Used = 0x283,              /* table 2. Backs the collectable item C-menu entry the game labels "Use Silver Key" (its used bit) */
     GAMEBIT_DIM2_SnowballLaunch = 0x288,                 /* The DLL names this one itself: DIM2_SNOWBALL_LAUNCH_GAME_BIT in DIM2SnowBal.c */
@@ -788,6 +832,7 @@ enum GameBitId {
     GAMEBIT_SC_SeqBit1802CA = 0x2CA,                     /* Named from map data alone - nothing in the code or in any name list mentions it: swapcircle/SC_sequence objId= param=bit18; table 2 */
     GAMEBIT_LV_TestTrackingBestTime2 = 0x2CB,            /* table 2; size 16 */
     GAMEBIT_LV_TestTrackingBestTime3 = 0x2CC,            /* table 2; size 16 */
+    GAMEBIT_SC_SteppingClosedLatch02CD = 0x2CD,          /* Read out of the retail placement data: swapcircle/SC_stepping closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_SC_LVBlock3Related02CE = 0x2CE,              /* One of the three bits sc_levelcontrol raises the moment GAMEBIT_ITEM_LVBlock3_Used is set */
     GAMEBIT_LV_EscapedFromPole = 0x2D0,                  /* table 2; hint 347 */
     GAMEBIT_WC_TempleDiaAStage1 = 0x2D1,                 /* Walled City temple rotating-dial (bank A) - stage 1 complete, gWcTempleDiaGameBitsA[1]; ORed into WCTempleDiaState.stageMask, which picks the dial speed from gWcTempleDiaTargetSpeedTableA and drives part visibility */
@@ -801,6 +846,7 @@ enum GameBitId {
     GAMEBIT_SC_Open02DC = 0x2DC,                         /* Named from map data alone - nothing in the code or in any name list mentions it: swapcircle/SC_Shrine_d objId= param=open; table 2 */
     GAMEBIT_BlastedDamageBase = 0x2DE,                   /* The DLL names this one itself: BLASTED_GAMEBIT_DAMAGE_BASE in 345.c */
     GAMEBIT_CF_HitAnimTarget02E1 = 0x2E1,                /* Named from map data alone - nothing in the code or in any name list mentions it: fortress/HitAnimator objId= param=target; fortress/CFExplodeFl objId= param=exploded; fortress/CFseqobject objId= param=bit1A; table 2 */
+    GAMEBIT_SC_ShrinedClosedLatch02E6 = 0x2E6,           /* Read out of the retail placement data: swapcircle/SC_Shrine_d closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_LV_ChiefStartedTest = 0x2E7,                 /* table 2; hint 348 */
     GAMEBIT_ITEM_WaterSpellStone1_Got = 0x2E8,           /* table 2; hint 336; ref dfptop/VFP_PodiumP key. CAUTION: CRCloudRace names the same bit its abort trigger, which is not obviously the same thing as holding the stone. Backs the collectable item C-menu entry the game labels "Use SpellStone" (its owned bit) */
     GAMEBIT_WC_SeqBit1802EB = 0x2EB,                     /* Named from map data alone - nothing in the code or in any name list mentions it: wallcity/WCSeqObject objId= param=bit18; table 2 */
@@ -817,12 +863,15 @@ enum GameBitId {
     GAMEBIT_CF_Open0302 = 0x302,                         /* Named from map data alone - nothing in the code or in any name list mentions it: fortress/SC_Shrine_d objId= param=open; fortress/SC_Shrine_d objId= param=open; table 1 */
     GAMEBIT_CF_Open0303 = 0x303,                         /* Named from map data alone - nothing in the code or in any name list mentions it: fortress/SC_Shrine_d objId= param=open; table 2 */
     GAMEBIT_WC_SeqBit1A0304 = 0x304,                     /* Named from map data alone - nothing in the code or in any name list mentions it: wallcity/WCSeqObject objId= param=bit1A; table 2 */
+    GAMEBIT_CF_SCShrinedClosedLatch0305 = 0x305,         /* Read out of the retail placement data: fortress/SC_Shrine_d closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_KytesMumQuestB = 0x30A,                      /* Kyte's Mum second quest stage gate, gKytesMumQuestBits[1] (trigger id 2); the first stage is gated on GAMEBIT_CF_SavedQueen = 0x43 */
+    GAMEBIT_CF_WindLiftActivation030D = 0x30D,           /* Read out of the retail placement data: fortress/CFWindLift activationGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_WM_NpcItemUsed0310 = 0x310,                  /* Raised the instant the player uses one of DLL 0x200's accepted items on that NPC - only reachable once GAMEBIT_WM_FoundKrystal is set - together with GAMEBIT_WM_NpcItemUsed04D1 and a bump to the NPC's interaction count */
     GAMEBIT_DIM_BossTonsilRouteHigh = 0x311,             /* The DLL names this one itself: DIMBOSSTONSIL_GAMEBIT_ROUTE_HIGH in DIM_BossTon.c */
     GAMEBIT_DIM3_WarpEnable312 = 0x312,                  /* Rena's U0 dataset; table 0 */
     GAMEBIT_DIM3_WarpEnable313 = 0x313,                  /* Rena's U0 dataset; table 0 */
     GAMEBIT_WM_NpcSecondItemUsed = 0x314,                /* Raised from the DLL 0x200 NPC's anim event 1 once its interaction count reaches 2, so the second item has landed */
+    GAMEBIT_WC_XYZAnimatorTrigger0335 = 0x335,           /* Read out of the retail placement data: wallcity/XYZAnimator triggerGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_ITEM_Key336_Got = 0x336,                     /* table 1; XXX where is this key from?. Backs the collectable item C-menu entry the game labels "Use Key" (its owned bit) */
     GAMEBIT_WC_FloorTilesReset = 0x338,                  /* Puts a Walled City floor tile back: on sight of it the tile snaps to its placement Y and enters its restore phase. Spelled 824 in retail */
     GAMEBIT_CF_SeqBit1A033D = 0x33D,                     /* Named from map data alone - nothing in the code or in any name list mentions it: fortress/CFseqobject objId= param=bit1A; table 1 */
@@ -882,11 +931,13 @@ enum GameBitId {
     GAMEBIT_IM_BikeRelated03BA = 0x3BA,                  /* table 2; set at some point during race */
     GAMEBIT_DBEggCarried = 0x3C4,                        /* An egg is already in hand - DB_egg raises it at both points an egg is taken, and refuses a fresh pickup while it is up, so it works as the carry lock */
     GAMEBIT_DIM_CapturedCannon = 0x3CF,                  /* table 2; hint 286 */
+    GAMEBIT_DIM_CannonHold03D0 = 0x3D0,                  /* Read out of the retail placement data: snowmines/DIMCannon holdGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_MoonSeedSpot9Harvested = 0x3D2,              /* One of the eleven moon-seed planting spots MSPlantingS maps from its placement ident: spot 9, ident 0x476AE, whose map Rena does not record. This is its harvested bit, raised once the grown plant is cut and taken */
     GAMEBIT_MoonSeedSpot9Planted = 0x3D5,                /* One of the eleven moon-seed planting spots MSPlantingS maps from its placement ident: spot 9, ident 0x476AE, whose map Rena does not record. This is its planted bit; planting also decrements the shared GAMEBIT_ITEM_MoonSeed_Count */
     GAMEBIT_CC_LevelControlGroup1FDisabled = 0x3D6,      /* The DLL names this one itself: CC_LEVEL_CONTROL_GROUP_1F_DISABLED_GAMEBIT in CClevcontro.c */
     GAMEBIT_CC_LevelControlGroup1DEnabled = 0x3D7,       /* The DLL names this one itself: CC_LEVEL_CONTROL_GROUP_1D_ENABLED_GAMEBIT in CClevcontro.c */
     GAMEBIT_ITEM_DinoHorn_3D8 = 0x3D8,                   /* table 0 */
+    GAMEBIT_CC_XYZAnimatorCompletion03DD = 0x3DD,        /* Read out of the retail placement data: capeclaw/XYZAnimator completionGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_SB_ObjGroups = 0x3E0,                        /* table 3; size 32; frontend, galleonship, Ship Battle */
     GAMEBIT_DIM_TriggerLostInBlizzard = 0x3E2,           /* table 0; Trigger scene where Fox walks off into blizzard and comes back */
     GAMEBIT_NW_SnowHorn03E3 = 0x3E3,                     /* table 0; related to riding SnowHorn */
@@ -925,6 +976,8 @@ enum GameBitId {
     GAMEBIT_DBEggsSunkCount = 0x428,                     /* How many eggs have sunk - a counter, incremented by read-add-write rather than set as a flag */
     GAMEBIT_WM_GalleonRelated429 = 0x429,                /* table 2; related to savegame/obj groups/galleon */
     GAMEBIT_DBEggRespawn = 0x42A,                        /* Waiting to respawn, an egg rebuilds itself from its placement def the moment this is set; while it is clear the egg just puffs particles */
+    GAMEBIT_DIM_XYZAnimatorTrigger042B = 0x42B,          /* Read out of the retail placement data: snowmines/XYZAnimator triggerGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_DIM_XYZAnimatorCompletion042C = 0x42C,       /* Read out of the retail placement data: snowmines/XYZAnimator completionGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_MMP_ObjGroups = 0x42E,                       /* table 3; size 32 */
     GAMEBIT_DIM2_LeverActivated0430 = 0x430,             /* Named from map data alone - nothing in the code or in any name list mentions it: snowmines2/StaffLeverO objId= param=activated; snowmines2/DIM2TrapDoo objId= param=open; snowmines2/DIM2SeqObje objId= param=bit1A; table 0 */
     GAMEBIT_DIM3_ObjGroups = 0x443,                      /* table 3; size 32 */
@@ -941,6 +994,11 @@ enum GameBitId {
     GAMEBIT_NW_FuelCell_45D = 0x45D,                     /* Rena's U0 dataset; table 2 */
     GAMEBIT_NW_FuelCell_45E = 0x45E,                     /* accidentally assigned to two fuel cells; Rena's U0 dataset; table 2 */
     GAMEBIT_NW_FuelCell_45F = 0x45F,                     /* Rena's U0 dataset; table 2 */
+    GAMEBIT_SHBOT_SHwhitemusBit0460 = 0x460,             /* Read out of the retail placement data: hollow2/SH_whitemus gameBitId x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_SHBOT_SHwhitemusBit0461 = 0x461,             /* Read out of the retail placement data: hollow2/SH_whitemus gameBitId x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_SHBOT_SHwhitemusBit0462 = 0x462,             /* Read out of the retail placement data: hollow2/SH_whitemus gameBitId x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_SHBOT_SHwhitemusBit0463 = 0x463,             /* Read out of the retail placement data: hollow2/SH_whitemus gameBitId x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_SHBOT_SHwhitemusBit0464 = 0x464,             /* Read out of the retail placement data: hollow2/SH_whitemus gameBitId x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_IM_FuelCell_465 = 0x465,                     /* Rena's U0 dataset; table 2 */
     GAMEBIT_TRICKYCURVE_PLAYER_HIT = 0x468,              /* Hard-coded, area-agnostic "TrickyCurve" hazard-trigger hit-while-sliding signal: set by DFP_ForceAw/DFSH_LaserB/the generic laserbeam when the player enters the trigger box in the sliding anim state (0x1d7) instead of taking a normal hit; polled and cleared by the generic bone-particle-effect module, which arms a particle timer and plays an SFXsc_mumble01 reaction. DFP_ForceAw names the same bit TRICKY_CURVE_GAMEBIT_HIT */
     GAMEBIT_Dll1CEContentsGate = 0x46D,                  /* The DLL names this one itself: DLL1CE_CONTENTS_GATE_GAMEBIT in 462.c */
@@ -995,6 +1053,7 @@ enum GameBitId {
     GAMEBIT_SC_StaffLeversDisabled = 0x4BD,              /* The exact complement of GAMEBIT_SC_StaffLeversEnabled - written 1 at every point that one is written 0 and 0 where it is written 1, so it presumably enables the levers' idle-state counterparts */
     GAMEBIT_CF_GuardianTalk2Complete = 0x4BE,            /* The DLL names this one itself: GAMEBIT_CFGUARDIAN_TALK_2_COMPLETE in CFGuardian.c */
     GAMEBIT_CF_Open04C0 = 0x4C0,                         /* Named from map data alone - nothing in the code or in any name list mentions it: fortress/CFTreasureD objId= param=open; table 2 */
+    GAMEBIT_CF_TreasureDClosedLatch04C1 = 0x4C1,         /* Read out of the retail placement data: fortress/CFTreasureD closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_SC_CaptureWarpDone = 0x4D0,                  /* One-shot: once GAMEBIT_LV_CapturedByLightFoot appears, sc_levelcontrol latches this, opens swapcircle objgroup 2, warps to map 0x50 and closes objgroup 1, so the capture warp fires only once */
     GAMEBIT_WM_NpcItemUsed04D1 = 0x4D1,                  /* table 0; written in the same breath as GAMEBIT_WM_NpcItemUsed0310 when an item is used on the DLL 0x200 NPC */
     GAMEBIT_NW_FuelCell_4D2 = 0x4D2,                     /* Rena's U0 dataset; table 2 */
@@ -1016,6 +1075,8 @@ enum GameBitId {
     GAMEBIT_VFP_PodiumsActivated = 0x4EC,                /* Latched by VFP_LevelCo the first update both GAMEBIT_VFP_PodiumPrereq09B1 and ...09B2 are up; Rena has it driving param 0x22 on two temple VFP_PodiumP objects and a HitAnimator target. DLL 0x21B reads the same bit as its reached bit */
     GAMEBIT_Dll21BMoving = 0x4ED,                        /* The DLL names this one itself: DLL_21B_MOVING_BIT in 539.c */
     GAMEBIT_VFP_Lift1Ready = 0x4EE,                      /* The DLL names this one itself: VFPLIFT1_READY_GAMEBIT in 541.c */
+    GAMEBIT_VFP_Lift1Toggle04F0 = 0x4F0,                 /* Read out of the retail placement data: temple/VFPLift1 toggleGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_VFP_Lift2Toggle04F3 = 0x4F3,                 /* Read out of the retail placement data: temple/VFPLift2 toggleGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_VFP_ClawDead4F4 = 0x4F4,                     /* Rena's U0 dataset; table 2 */
     GAMEBIT_VFP_ClawDead4F5 = 0x4F5,                     /* Rena's U0 dataset; table 2 */
     GAMEBIT_VFP_HitAnimTarget04F6 = 0x4F6,               /* Named from map data alone - nothing in the code or in any name list mentions it: temple/HitAnimator objId= param=target; table 2 */
@@ -1036,7 +1097,9 @@ enum GameBitId {
     GAMEBIT_VFP_Activated0512 = 0x512,                   /* Named from map data alone - nothing in the code or in any name list mentions it: temple/VFP_flamepo objId= param=activated; temple/VFP_seqpoin objId= param=_1E; table 2 */
     GAMEBIT_VFP_Activated0513 = 0x513,                   /* Named from map data alone - nothing in the code or in any name list mentions it: temple/VFP_flamepo objId= param=activated; temple/VFP_seqpoin objId= param=_1E; table 2 */
     GAMEBIT_VFP_HitAnimTarget0514 = 0x514,               /* Named from map data alone - nothing in the code or in any name list mentions it: temple/HitAnimator objId= param=target; table 2 */
+    GAMEBIT_VFP_RoundDoOpen0516 = 0x516,                 /* Read out of the retail placement data: temple/VFP_RoundDo openGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_AnimTest_ObjGroups = 0x517,                  /* table 3; size 32 */
+    GAMEBIT_VFP_Lift2Toggle051E = 0x51E,                 /* Read out of the retail placement data: temple/VFPLift2 toggleGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_VFP_SeqBit180521 = 0x521,                    /* Named from map data alone - nothing in the code or in any name list mentions it: temple/CAMERAseqob objId= param=bit18; table 2 */
     GAMEBIT_VFP_DragHeadSpawnBlocked = 0x522,            /* While set, VFPDragHead returns from its spawn path before doing anything at all */
     GAMEBIT_CF_HitAnimTarget0526 = 0x526,                /* Named from map data alone - nothing in the code or in any name list mentions it: fortress/HitAnimator objId= param=target; fortress/CFseqobject objId= param=bit1A; table 1 */
@@ -1078,13 +1141,16 @@ enum GameBitId {
     GAMEBIT_DR_KTrexLane2Enabled = 0x568,                /* Dragon Rock K-Trex (Galdon) arena - lane 2 enabled, gKTRexLaneEnabledGameBits[2]; ktrex_update ORs lane 2 into KTRexArenaState.activeLaneMask when set */
     GAMEBIT_DR_KTrexLane3Enabled = 0x569,                /* Dragon Rock K-Trex (Galdon) arena - lane 3 enabled, gKTRexLaneEnabledGameBits[3]; ktrex_update ORs lane 3 into KTRexArenaState.activeLaneMask when set; KT_RexLevel_init opens lanes 0 and 3 on arena entry */
     GAMEBIT_DR_KTrexArenaEntered = 0x56E,                /* table 1; KT_RexLevel_init raises it while zeroing the phase counter, opening lanes 0 and 3 and selecting path A, and nothing clears it */
+    GAMEBIT_DR_KTRexDoorPClosedLatch056F = 0x56F,        /* Read out of the retail placement data: trexboss/KT_RexDoorP closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_DR_Open0570 = 0x570,                         /* Named from map data alone - nothing in the code or in any name list mentions it: trexboss/KT_RexDoorT objId= param=open; table 1 */
+    GAMEBIT_DR_KTRexDoorTClosedLatch0571 = 0x571,        /* Read out of the retail placement data: trexboss/KT_RexDoorT closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_DR_KTrexPhaseCounter = 0x572,                /* Dragon Rock K.Rex (Galdon) boss-arena phase/stage counter, advanced by the fight's state machine and read by DR floor switches (shifted right 1) to pick their rise curve */
     GAMEBIT_CF_SeqBit1A0574 = 0x574,                     /* Named from map data alone - nothing in the code or in any name list mentions it: clouddungeon/CFseqobject objId= param=bit1A; table 1 */
     GAMEBIT_ITEM_IMAlpineRoot_Count = 0x576,             /* table 2; size 3. Backs the collectable item C-menu entry the game labels "Alpine Root" (its owned bit) */
     GAMEBIT_ITEM_AlpineRoot_Used = 0x578,                /* table 2; size 3 */
     GAMEBIT_LINKE_FuelCell_57E = 0x57E,                  /* Rena's U0 dataset; table 2 */
     GAMEBIT_SC_SeqBit1A057F = 0x57F,                     /* Named from map data alone - nothing in the code or in any name list mentions it: swapcircle/SC_sequence objId= param=bit1A; table 0 */
+    GAMEBIT_NW_AlpineroCollect0587 = 0x587,              /* Read out of the retail placement data: wastes/NW_alpinero collectGameBit x2; 2 placements. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_VFP_FuelCell_588 = 0x588,                    /* Rena's U0 dataset; table 2 */
     GAMEBIT_DFSH_ShrineIdle = 0x589,                     /* table 0; the Test of Combat shrine is idle and available - dropped the moment the player activates it, and put back at reset. DFSH_ObjCre reads it as its disable bit, which follows - the creator is off while the shrine is idle */
     GAMEBIT_NoMapData = 0x58D,                           /* table 0; Force No Map Data */
@@ -1107,6 +1173,8 @@ enum GameBitId {
     GAMEBIT_ITEM_OpenPortal_Got = 0x5BD,                 /* table 2; ref hollow/MagicCaveTo Collected. Backs the staff ability C-menu entry the game labels "Open Portal" (its owned bit) */
     GAMEBIT_DR_HitAnimTarget05BF = 0x5BF,                /* Named from map data alone - nothing in the code or in any name list mentions it: dragrock/HitAnimator objId= param=target; table 0 */
     GAMEBIT_DR_HitAnimTarget05C0 = 0x5C0,                /* Named from map data alone - nothing in the code or in any name list mentions it: dragrock/HitAnimator objId= param=target; table 0 */
+    GAMEBIT_DR_CreatorSpawn05C7 = 0x5C7,                 /* Read out of the retail placement data: dragrock/DR_Creator spawnGameBit x2; 2 placements. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_DR_CreatorSpawn05C8 = 0x5C8,                 /* Read out of the retail placement data: dragrock/DR_Creator spawnGameBit x2; 2 placements. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_DR_HitAnimTarget05C9 = 0x5C9,                /* Named from map data alone - nothing in the code or in any name list mentions it: dragrock/HitAnimator objId= param=target; table 0 */
     GAMEBIT_ITEM_IceBlast_Got = 0x5CE,                   /* table 2; hint 302; ref temple/MagicCaveTo Collected. Backs the staff ability C-menu entry the game labels "Freeze Blast" (its owned bit) */
     GAMEBIT_KrazTest_ActNo = 0x5D0,                      /* table 1; size 4; also dfptop */
@@ -1128,6 +1196,7 @@ enum GameBitId {
     GAMEBIT_OFP_LeverPrereqA05EE = 0x5EE,                /* table 0; one of the two halves GAMEBIT_OFP_LeverLatch05E8 waits on */
     GAMEBIT_OFP_LeverPrereqB05EF = 0x5EF,                /* table 0; the other half of GAMEBIT_OFP_LeverLatch05E8's pair */
     GAMEBIT_OFB_Open05F0 = 0x5F0,                        /* Named from map data alone - nothing in the code or in any name list mentions it: kraztest/DFP_Bridge objId= param=open; table 2 */
+    GAMEBIT_OFB_SfxPlayerBit05F1 = 0x5F1,                /* Read out of the retail placement data: kraztest/sfxPlayer gameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_ITEM_SpellStone2_Used = 0x5F3,               /* table 2; hint 342 */
     GAMEBIT_ITEM_SpellStone4_Used = 0x5F4,               /* table 2; hint 405 */
     GAMEBIT_NW_FuelCell_5F7 = 0x5F7,                     /* Rena's U0 dataset; table 2 */
@@ -1146,6 +1215,7 @@ enum GameBitId {
     GAMEBIT_SC_TotemCircleRelated060F = 0x60F,           /* Held at 1 through init and every update; the sole write of 0 is at the top of the anim-event callback, which restores it immediately when the controller is mid-run, so it is only ever clear for the frame after an event arrives out of run */
     GAMEBIT_ITEM_MMPKey_Got = 0x611,                     /* table 2; ref moonpass/MMP_padlock key. Backs the collectable item C-menu entry the game labels "Use Key" (its owned bit) */
     GAMEBIT_SC_LVBlock2Related0612 = 0x612,              /* One of the three bits sc_levelcontrol raises the moment GAMEBIT_ITEM_LVBlock2_Used is set; Rena has this one as the target of swapcircle's HitAnimator 0x45D72 */
+    GAMEBIT_SC_SteppingClosedLatch0613 = 0x613,          /* Read out of the retail placement data: swapcircle/SC_stepping closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_LV_FuelCell_615 = 0x615,                     /* Rena's U0 dataset; table 2 */
     GAMEBIT_LV_FuelCell_616 = 0x616,                     /* Rena's U0 dataset; table 2 */
     GAMEBIT_SHOP_Unk0617 = 0x617,                        /* table 0; set when entering shop */
@@ -1223,6 +1293,7 @@ enum GameBitId {
     GAMEBIT_WC_BafomDad_6D7 = 0x6D7,                     /* Rena's U0 dataset; table 2 */
     GAMEBIT_WC_BafomDad_6D8 = 0x6D8,                     /* Rena's U0 dataset; table 2 */
     GAMEBIT_WC_BafomDad_6D9 = 0x6D9,                     /* Rena's U0 dataset; table 2 */
+    GAMEBIT_SH_LargeCrateBroken06DB = 0x6DB,             /* Read out of the retail placement data: hollow/LargeCrate brokenGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_OFB_BafomDad_6E9 = 0x6E9,                    /* Rena's U0 dataset; table 2 */
     GAMEBIT_OFB_BafomDad_6EA = 0x6EA,                    /* Rena's U0 dataset; table 2 */
     GAMEBIT_TTH_BafomDad_6FF = 0x6FF,                    /* Rena's U0 dataset; table 2 */
@@ -1271,6 +1342,7 @@ enum GameBitId {
     GAMEBIT_ITEM_SpellStone7BD_Got = 0x7BD,              /* table 2; unused?. Backs the collectable item C-menu entry the game labels "Use SpellStone" (its owned bit) */
     GAMEBIT_OFB_Open07BE = 0x7BE,                        /* Named from map data alone - nothing in the code or in any name list mentions it: kraztest/DFP_RoundDo objId= param=open; kraztest/StaffLeverO objId= param=activated; kraztest/CAMERAseqob objId= param=bit1A (+1 more); table 2 */
     GAMEBIT_ITEM_SpellStone7BF_Got = 0x7BF,              /* table 1. Backs the collectable item C-menu entry the game labels "Use SpellStone" (its owned bit) */
+    GAMEBIT_OFB_DFPseqpoinDisable07C1 = 0x7C1,           /* Read out of the retail placement data: kraztest/DFP_seqpoin disableGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_OFP_Reopened = 0x7C2,                        /* table 2; hint 403; ref dfptop/HitAnimator target */
     GAMEBIT_HT_ObjStates = 0x7CE,                        /* table 3; size 32 */
     GAMEBIT_SC_TotemRunRelated07CF = 0x7CF,              /* Raised beside GAMEBIT_SC_TotemRunCompleted on the fade-out path and nowhere else, with nothing in the code reading it back */
@@ -1283,7 +1355,9 @@ enum GameBitId {
     GAMEBIT_WC_TimedPuzzleAActive = 0x7EF,               /* Walled City timed push-block puzzle A - armed/running; set by wclevelcont when the trigger fires and cleared on timeout or abort */
     GAMEBIT_WC_TimedPuzzleBActive = 0x7F0,               /* Walled City timed push-block puzzle B - armed/running; cleared on timeout or abort */
     GAMEBIT_WC_IsNight = 0x7F1,                          /* Walled City is in its night state - wclevelcont writes it and GAMEBIT_WC_IsDay as a complementary pair off the sky interface's sun position every update */
+    GAMEBIT_WC_TempleDooClosedLatch07F2 = 0x7F2,         /* Read out of the retail placement data: wallcity/WCTempleDoo closedLatchGameBit x2; 2 placements. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_WC_IsDay = 0x7F3,                            /* Walled City is in its day state; the complement of GAMEBIT_WC_IsNight */
+    GAMEBIT_WC_TempleDooClosedLatch07F4 = 0x7F4,         /* Read out of the retail placement data: wallcity/WCTempleDoo closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_WC_TimedPuzzleAComplete = 0x7F7,             /* Walled City timed push-block puzzle A fully complete; wclevelcont_seqFn sets it once A's post-solve sequence timer runs out and saves a checkpoint at the player */
     GAMEBIT_WC_LitBeacons = 0x7F8,                       /* table 2; hint 362; ref wallcity/HitAnimator target */
     GAMEBIT_WC_TimedPuzzleASolved = 0x7F9,               /* Walled City timed push-block puzzle A solved; ends the 0x3C countdown, and if puzzle B is also solved wclevelcont plays the confirm sfx and runs sequence 0 instead of sequence 1 */
@@ -1321,6 +1395,18 @@ enum GameBitId {
     GAMEBIT_ITEM_SpellStone83A_Got = 0x83A,              /* table 2; unused?. Backs the collectable item C-menu entry the game labels "Use SpellStone" (its owned bit) */
     GAMEBIT_ITEM_FireSpellStone2_Got = 0x83B,            /* table 2; hint 369; ref temple/VFP_PodiumP key. Backs the collectable item C-menu entry the game labels "Use SpellStone" (its owned bit) */
     GAMEBIT_ITEM_WaterSpellStone2_Got = 0x83C,           /* table 2; hint 401; ref dfptop/VFP_PodiumP key. Backs the collectable item C-menu entry the game labels "Use SpellStone" (its owned bit) */
+    GAMEBIT_MMP_MSBushPlanted0849 = 0x849,               /* Read out of the retail placement data: moonpass/MSBush plantedGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_MMP_MSBushGrowthTrigger084A = 0x84A,         /* Read out of the retail placement data: moonpass/MSBush growthTriggerGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_MMP_MSVinePlanted084B = 0x84B,               /* Read out of the retail placement data: moonpass/MSVine plantedGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_MMP_MSVineGrowthTrigger084C = 0x84C,         /* Read out of the retail placement data: moonpass/MSVine growthTriggerGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_MMP_MSBushPlanted084D = 0x84D,               /* Read out of the retail placement data: moonpass/MSBush plantedGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_MMP_MSBushGrowthTrigger084E = 0x84E,         /* Read out of the retail placement data: moonpass/MSBush growthTriggerGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_MMP_MSVinePlanted0850 = 0x850,               /* Read out of the retail placement data: moonpass/MSVine plantedGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_MMP_MSVineGrowthTrigger0851 = 0x851,         /* Read out of the retail placement data: moonpass/MSVine growthTriggerGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_MMP_MSBushPlanted0852 = 0x852,               /* Read out of the retail placement data: moonpass/MSBush plantedGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_MMP_MSBushGrowthTrigger0853 = 0x853,         /* Read out of the retail placement data: moonpass/MSBush growthTriggerGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_MMP_MSVinePlanted0854 = 0x854,               /* Read out of the retail placement data: moonpass/MSVine plantedGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_MMP_MSVineGrowthTrigger0855 = 0x855,         /* Read out of the retail placement data: moonpass/MSVine growthTriggerGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_MoonSeedSpot1Harvested = 0x856,              /* One of the eleven moon-seed planting spots MSPlantingS maps from its placement ident: spot 1, ident 0x41A5B, which Rena places in moonpass. This is its harvested bit, raised once the grown plant is cut and taken */
     GAMEBIT_ITEM_MoonSeed_Used = 0x857,                  /* table 2; hint 309; ref moonpass/HitAnimator target */
     GAMEBIT_MoonSeedSpot2Harvested = 0x858,              /* One of the eleven moon-seed planting spots MSPlantingS maps from its placement ident: spot 2, ident 0x41A59, which Rena places in moonpass. This is its harvested bit, raised once the grown plant is cut and taken */
@@ -1328,6 +1414,10 @@ enum GameBitId {
     GAMEBIT_MoonSeedSpot3Harvested = 0x85A,              /* One of the eleven moon-seed planting spots MSPlantingS maps from its placement ident: spot 3, ident 0x41A5C, which Rena places in moonpass. This is its harvested bit, raised once the grown plant is cut and taken */
     GAMEBIT_MMP_SeqBit18085B = 0x85B,                    /* Named from map data alone - nothing in the code or in any name list mentions it: moonpass/MMP_seqobje objId= param=bit18; moonpass/HitAnimator objId= param=target; table 2 */
     GAMEBIT_DIM2_CannonRelated085E = 0x85E,              /* table 2; ref snowmines2/HitAnimator target */
+    GAMEBIT_MMP_MSBushPlanted0860 = 0x860,               /* Read out of the retail placement data: moonpass/MSBush plantedGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_MMP_MSBushGrowthTrigger0861 = 0x861,         /* Read out of the retail placement data: moonpass/MSBush growthTriggerGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_MMP_MSVinePlanted0862 = 0x862,               /* Read out of the retail placement data: moonpass/MSVine plantedGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_MMP_MSVineGrowthTrigger0863 = 0x863,         /* Read out of the retail placement data: moonpass/MSVine growthTriggerGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_MoonSeedSpot4Harvested = 0x864,              /* One of the eleven moon-seed planting spots MSPlantingS maps from its placement ident: spot 4, ident 0x41A5D, which Rena places in moonpass. This is its harvested bit, raised once the grown plant is cut and taken */
     GAMEBIT_MMP_SeqBit180865 = 0x865,                    /* Named from map data alone - nothing in the code or in any name list mentions it: moonpass/MMP_seqobje objId= param=bit18; moonpass/HitAnimator objId= param=target; table 2 */
     GAMEBIT_MoonSeedSpot1Planted = 0x866,                /* One of the eleven moon-seed planting spots MSPlantingS maps from its placement ident: spot 1, ident 0x41A5B, which Rena places in moonpass. This is its planted bit; planting also decrements the shared GAMEBIT_ITEM_MoonSeed_Count */
@@ -1341,24 +1431,37 @@ enum GameBitId {
     GAMEBIT_SH_WarpStoneRelated0884 = 0x884,             /* table 2 */
     GAMEBIT_ITEM_RockCandyRelated0886 = 0x886,           /* table 2; related to rock candy */
     GAMEBIT_SH_SawWarpStoneIntro = 0x887,                /* table 2 */
+    GAMEBIT_MMP_TrenchFEnable088A = 0x88A,               /* Read out of the retail placement data: moonpass/MMP_trenchF enableGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_MMP_AsteroidRelated088B = 0x88B,             /* Cleared by the Moon Mountain Pass asteroid once its own clear-timer runs out, with nothing in the code setting it */
     GAMEBIT_MMP_MoonRockPedestalCount = 0x88C,           /* How many moon rocks are on their pedestals - a count, not a flag. MMP_moonroc reads it beside GAMEBIT_MMP_MoonRockInventoryCount, and the Moon Mountain Pass asteroid reads that same count straight into its own intensity, except while GAMEBIT_MMP_AsteroidForceIntensity pins it to 1 */
+    GAMEBIT_MMP_GyserveDisable088E = 0x88E,              /* Read out of the retail placement data: moonpass/MMP_gyserve disableGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_MMP_GyserveDisable088F = 0x88F,              /* Read out of the retail placement data: moonpass/MMP_gyserve disableGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_MMP_GyserveDisable0890 = 0x890,              /* Read out of the retail placement data: moonpass/MMP_gyserve disableGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_MMP_GyserveDisable0891 = 0x891,              /* Read out of the retail placement data: moonpass/MMP_gyserve disableGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_MMP_GyserveDisable0892 = 0x892,              /* Read out of the retail placement data: moonpass/MMP_gyserve disableGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_MMP_GyserveDisable0893 = 0x893,              /* Read out of the retail placement data: moonpass/MMP_gyserve disableGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_MMP_MoonRockInventoryCount = 0x894,          /* The DLL names this one itself: MMP_MOON_ROCK_INVENTORY_COUNT_GAMEBIT in MMP_moonroc.c */
+    GAMEBIT_MMP_MoonrocKind0895 = 0x895,                 /* Read out of the retail placement data: moonpass/MMP_moonroc kindGameBit x1; 1 placement; BITTABLE gives it a width of 3 bits, so it is a field rather than a flag. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_MMP_MoonrocKind0896 = 0x896,                 /* Read out of the retail placement data: moonpass/MMP_moonroc kindGameBit x1; 1 placement; BITTABLE gives it a width of 3 bits, so it is a field rather than a flag. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_MMP_MoonrocKind0897 = 0x897,                 /* Read out of the retail placement data: moonpass/MMP_moonroc kindGameBit x1; 1 placement; BITTABLE gives it a width of 3 bits, so it is a field rather than a flag. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_WM_SeqStarted0899 = 0x899,                   /* Named from map data alone - nothing in the code or in any name list mentions it: warlock/WM_seqpoint objId= param=seqStarted; table 2 */
     GAMEBIT_MMP_MovedMeteor = 0x89B,                     /* table 2; hint 310; ref moonpass/HitAnimator target */
     GAMEBIT_DIM_LevelControl089D = 0x89D,                /* The DLL names this one itself: DIM_LEVEL_CONTROL_GAMEBIT_089D in DIM_LevelCo.c */
+    GAMEBIT_DIMLogFireDouse089F = 0x89F,                 /* Read out of the retail placement data: snowmines4/DIMLogFire douseGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_ITEM_Spirit3_Released = 0x8A0,               /* table 2; hint 357: "Released Third Krazoa Spirit". Backs the collectable item C-menu entry the game labels "Unknown" (its owned bit) */
     GAMEBIT_WM_Warp1Enabled = 0x8A1,                     /* table 2; ref warlock/Transporter enabled */
     GAMEBIT_WM_SpiritPlace3Ready = 0x8A2,                /* table 2; gates spirit-place 3 and its return pad. Backs the collectable item C-menu entry the game labels "Unknown" (its used bit) */
     GAMEBIT_VFP_Param2008A3 = 0x8A3,                     /* Named from map data alone - nothing in the code or in any name list mentions it: temple/VFP_seqpoin objId= param=_20; table 2 */
     GAMEBIT_DIM_LevelControl08A4 = 0x8A4,                /* The DLL names this one itself: DIM_LEVEL_CONTROL_GAMEBIT_08A4 in DIM_LevelCo.c */
     GAMEBIT_DIM_LevelControl08A5 = 0x8A5,                /* The DLL names this one itself: DIM_LEVEL_CONTROL_GAMEBIT_08A5 in DIM_LevelCo.c */
+    GAMEBIT_SH_SfxPlayerBit08A8 = 0x8A8,                 /* Read out of the retail placement data: hollow/sfxPlayer gameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_VFP_Param2008B6 = 0x8B6,                     /* Named from map data alone - nothing in the code or in any name list mentions it: temple/VFP_seqpoin objId= param=_20; table 2 */
     GAMEBIT_VFP_Param2008B7 = 0x8B7,                     /* Named from map data alone - nothing in the code or in any name list mentions it: temple/VFP_seqpoin objId= param=_20; table 2 */
     GAMEBIT_CF_Item8B8 = 0x8B8,                          /* Rena's U0 dataset; table 2 */
     GAMEBIT_CF_Item8B9 = 0x8B9,                          /* Rena's U0 dataset; table 2 */
     GAMEBIT_CF_Item8BA = 0x8BA,                          /* Rena's U0 dataset; table 2 */
     GAMEBIT_CF_HitAnimTarget08BF = 0x8BF,                /* Named from map data alone - nothing in the code or in any name list mentions it: fortress/HitAnimator objId= param=target; fortress/CFseqobject objId= param=bit1A; fortress/StaffLeverO objId= param=activated; table 2 */
+    GAMEBIT_CF_FallLadderBase08C0 = 0x8C0,               /* Read out of the retail placement data: fortress/Fall_Ladder baseGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_TREX_LevelName8C5 = 0x8C5,                   /* Rena's U0 dataset; table 0 */
     GAMEBIT_CF_LeverActivated08C8 = 0x8C8,               /* Named from map data alone - nothing in the code or in any name list mentions it: fortress/StaffLeverT objId= param=activated; table 2 */
     GAMEBIT_CF_HitAnimTarget08C9 = 0x8C9,                /* Named from map data alone - nothing in the code or in any name list mentions it: fortress/HitAnimator objId= param=target; fortress/ExplodePlan objId= param=exploded; fortress/ExplodePlan objId= param=collected; table 2 */
@@ -1368,13 +1471,16 @@ enum GameBitId {
     GAMEBIT_CF_GuardianLanded = 0x8E9,                   /* The DLL names this one itself: GAMEBIT_CFGUARDIAN_LANDED in CFGuardian.c */
     GAMEBIT_KP_ActNo = 0x8EC,                            /* table 1; size 4; old "krazoapalace" map */
     GAMEBIT_KP_ObjGroups = 0x8ED,                        /* table 3; size 32 */
+    GAMEBIT_OFB_DFPseqpoinDisable08EE = 0x8EE,           /* Read out of the retail placement data: kraztest/DFP_seqpoin disableGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_WM_Seq8F4 = 0x8F4,                           /* Rena's U0 dataset; table 2 */
     GAMEBIT_CF_Open08FC = 0x8FC,                         /* Named from map data alone - nothing in the code or in any name list mentions it: fortress/SH_Portcull objId= param=open; table 2 */
+    GAMEBIT_CF_SHPortcullOpen08FD = 0x8FD,               /* Read out of the retail placement data: fortress/SH_Portcull open x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_BabyCloudRunnerCaptureCount = 0x901,         /* The DLL names this one itself: BABYCLOUDRUNNER_CAPTURE_COUNT_GAME_BIT in 332.c */
     GAMEBIT_ITEM_WaterSpellStone1_902 = 0x902,           /* table 1 */
     GAMEBIT_WM_SwitchCamActive = 0x905,                  /* table 2; camera pointing at door opened by pressure switch */
     GAMEBIT_CF_SeqBit180909 = 0x909,                     /* Named from map data alone - nothing in the code or in any name list mentions it: fortress/CFseqobject objId= param=bit18; table 1 */
     GAMEBIT_SC_LVBlock2Related090B = 0x90B,              /* One of the three bits sc_levelcontrol raises the moment GAMEBIT_ITEM_LVBlock2_Used is set */
+    GAMEBIT_SC_SteppingClosedLatch090C = 0x90C,          /* Read out of the retail placement data: swapcircle/SC_stepping closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_SawMagic = 0x90D,                            /* table 2; Have collected a Staff Energy Gem (if 0, explain it when you collect one). CAUTION: DLL 255 names the same bit its magic-gem claimed latch, describing it as a per-frame single-pickup latch rather than anything the player saw */
     GAMEBIT_SawBigHealth = 0x90E,                        /* table 2 */
     GAMEBIT_SawApple = 0x90F,                            /* table 2; small health pickup */
@@ -1389,11 +1495,14 @@ enum GameBitId {
     GAMEBIT_CF_HitAnimTarget0920 = 0x920,                /* Named from map data alone - nothing in the code or in any name list mentions it: clouddungeon/HitAnimator objId= param=target; table 1 */
     GAMEBIT_LearnedToSpeak = 0x92A,                      /* table 2; Told how to speak to NPCs */
     GAMEBIT_SC_Open092E = 0x92E,                         /* Named from map data alone - nothing in the code or in any name list mentions it: swapcircle/SC_capeclaw objId= param=open; swapcircle/HitAnimator objId= param=target; table 2 */
+    GAMEBIT_SC_CapeclawClosedLatch092F = 0x92F,          /* Read out of the retail placement data: swapcircle/SC_capeclaw closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_SawCMenuExplanation = 0x930,                 /* table 2 */
     GAMEBIT_CC_Seq931 = 0x931,                           /* Rena's U0 dataset; table 2 */
     GAMEBIT_CF_KytesMumRelated0933 = 0x933,              /* table 1; cleared as Kyte's mum enters either of her quest modes, beside GAMEBIT_CF_KytesMumRelated0934 */
     GAMEBIT_CF_KytesMumRelated0934 = 0x934,              /* table 1; cleared as Kyte's mum enters either of her quest modes */
+    GAMEBIT_CF_PickKrystHide0938 = 0x938,                /* Read out of the retail placement data: clouddungeon/CFPickKryst hideGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_CF_EscapedDungeon = 0x939,                   /* table 2; hint 327; Exploded dungeon ceiling to be able to get disguise */
+    GAMEBIT_CF_WinPrisonClosedLatch093A = 0x93A,         /* Read out of the retail placement data: clouddungeon/CFWinPrison closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_CF_Activate093F = 0x93F,                     /* Named from map data alone - nothing in the code or in any name list mentions it: fortress/TrigPln objId= param=activate; table 1 */
     GAMEBIT_CF_RescuedBabies = 0x940,                    /* table 2; hint 330 */
     GAMEBIT_CF_BabyRelated941 = 0x941,                   /* Rena's U0 dataset; table 2 */
@@ -1431,6 +1540,22 @@ enum GameBitId {
     GAMEBIT_CloudRaceResetBit0983 = 0x983,               /* One of the bits CRCloudRace clears as it resets the CloudRunner race; Rena's U0 dataset spells it CFRelated0983, which carries no reading of its own */
     GAMEBIT_CloudRaceResetBit0984 = 0x984,               /* One of the bits CRCloudRace clears as it resets the CloudRunner race; Rena's U0 dataset spells it CFRelated0984, which carries no reading of its own */
     GAMEBIT_ITEM_FireBlaster_Disabled = 0x986,           /* table 2. Backs the staff ability C-menu entry the game labels "Fire Blaster" (its active bit) */
+    GAMEBIT_MMP_MSBushPlanted098A = 0x98A,               /* Read out of the retail placement data: moonpass/MSBush plantedGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_MMP_MSBushGrowthTrigger098B = 0x98B,         /* Read out of the retail placement data: moonpass/MSBush growthTriggerGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_MMP_MSVinePlanted098C = 0x98C,               /* Read out of the retail placement data: moonpass/MSVine plantedGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_MMP_MSVineGrowthTrigger098D = 0x98D,         /* Read out of the retail placement data: moonpass/MSVine growthTriggerGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_MMP_MSBushPlanted098E = 0x98E,               /* Read out of the retail placement data: moonpass/MSBush plantedGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_MMP_MSBushGrowthTrigger098F = 0x98F,         /* Read out of the retail placement data: moonpass/MSBush growthTriggerGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_MMP_MSVinePlanted0990 = 0x990,               /* Read out of the retail placement data: moonpass/MSVine plantedGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_MMP_MSVineGrowthTrigger0991 = 0x991,         /* Read out of the retail placement data: moonpass/MSVine growthTriggerGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_MMP_MSBushPlanted0992 = 0x992,               /* Read out of the retail placement data: moonpass/MSBush plantedGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_MMP_MSBushGrowthTrigger0993 = 0x993,         /* Read out of the retail placement data: moonpass/MSBush growthTriggerGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_MMP_MSVinePlanted0994 = 0x994,               /* Read out of the retail placement data: moonpass/MSVine plantedGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_MMP_MSVineGrowthTrigger0995 = 0x995,         /* Read out of the retail placement data: moonpass/MSVine growthTriggerGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_MMP_MSBushPlanted0996 = 0x996,               /* Read out of the retail placement data: moonpass/MSBush plantedGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_MMP_MSBushGrowthTrigger0997 = 0x997,         /* Read out of the retail placement data: moonpass/MSBush growthTriggerGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_MMP_MSVinePlanted0998 = 0x998,               /* Read out of the retail placement data: moonpass/MSVine plantedGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_MMP_MSVineGrowthTrigger0999 = 0x999,         /* Read out of the retail placement data: moonpass/MSVine growthTriggerGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_MoonSeedSpot5Harvested = 0x99A,              /* One of the eleven moon-seed planting spots MSPlantingS maps from its placement ident: spot 5, ident 0x43E04, which Rena places in moonpass. This is its harvested bit, raised once the grown plant is cut and taken */
     GAMEBIT_MMP_SeqBit18099B = 0x99B,                    /* Named from map data alone - nothing in the code or in any name list mentions it: moonpass/MMP_seqobje objId= param=bit18; moonpass/HitAnimator objId= param=target; table 2 */
     GAMEBIT_MoonSeedSpot6Harvested = 0x99C,              /* One of the eleven moon-seed planting spots MSPlantingS maps from its placement ident: spot 6, ident 0x43E1F, which Rena places in moonpass. This is its harvested bit, raised once the grown plant is cut and taken */
@@ -1453,9 +1578,13 @@ enum GameBitId {
     GAMEBIT_MMP_SeqBit1809AF = 0x9AF,                    /* Named from map data alone - nothing in the code or in any name list mentions it: moonpass/MMP_seqobje objId= param=bit18; table 2 */
     GAMEBIT_VFP_PodiumPrereq09B1 = 0x9B1,                /* One of the two bits VFP_LevelCo waits on before it raises GAMEBIT_VFP_PodiumsActivated */
     GAMEBIT_VFP_PodiumPrereq09B2 = 0x9B2,                /* The other bit GAMEBIT_VFP_PodiumsActivated waits on */
+    GAMEBIT_VFP_LiftgraGameBitB09B3 = 0x9B3,             /* Read out of the retail placement data: temple/VFP_liftgra gameBitB x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_DR_GeneratorArmed09B9 = 0x9B9,               /* The Dragon Rock generator latches its own armed flag the first update it sees this set */
     GAMEBIT_VFP_Param1E09BA = 0x9BA,                     /* Named from map data alone - nothing in the code or in any name list mentions it: temple/VFP_seqpoin objId= param=_1E; table 2 */
     GAMEBIT_VFP_HitAnimTarget09BC = 0x9BC,               /* Named from map data alone - nothing in the code or in any name list mentions it: temple/HitAnimator objId= param=target; temple/VFP_flamepo objId= param=activated; temple/CAMERAseqob objId= param=bit1A; table 2 */
+    GAMEBIT_DR_CFWindLiftActivation09C0 = 0x9C0,         /* Read out of the retail placement data: dragrock/CFWindLift activationGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_DR_CFWindLiftActivation09C1 = 0x9C1,         /* Read out of the retail placement data: dragrock/CFWindLift activationGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_DR_CFWindLiftActivation09C2 = 0x9C2,         /* Read out of the retail placement data: dragrock/CFWindLift activationGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_DR_HighTopSwitch1 = 0x9C7,                   /* table 1 */
     GAMEBIT_DR_HighTopSwitch2 = 0x9C9,                   /* table 1 */
     GAMEBIT_DR_HighTopSwitch3 = 0x9CB,                   /* table 1 */
@@ -1472,6 +1601,7 @@ enum GameBitId {
     GAMEBIT_DR_Param2009E5 = 0x9E5,                      /* Named from map data alone - nothing in the code or in any name list mentions it: dragrock/DR_TowerSwi objId= param=_20; table 0 */
     GAMEBIT_DR_Param2009E6 = 0x9E6,                      /* Named from map data alone - nothing in the code or in any name list mentions it: dragrock/DR_TowerSwi objId= param=_20; table 0 */
     GAMEBIT_DR_TowerSwitch4 = 0x9E7,                     /* Fourth Dragon Rock tower switch */
+    GAMEBIT_DR_CreatorSpawn09E8 = 0x9E8,                 /* Read out of the retail placement data: dragrock/DR_Creator spawnGameBit x2; 2 placements. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_DR_FlewTo = 0x9E9,                           /* table 2; hint 385; cleared when Arwing flies to Dragon Rock */
     GAMEBIT_DR_EarthWarriorUnknown_1 = 0x9EC,            /* read by DR_EarthWar.c  */
     GAMEBIT_DIM_BitIncOnDeath09ED = 0x9ED,               /* Named from map data alone - nothing in the code or in any name list mentions it: snowmines/sharpclawSn objId= param=bit_incOnDeath; table 2 */
@@ -1490,15 +1620,26 @@ enum GameBitId {
     GAMEBIT_DRBOT_SeqBit1A0A04 = 0xA04,                  /* Named from map data alone - nothing in the code or in any name list mentions it: dragbot/DR_SeqobjBo objId= param=bit1A; table 1 */
     GAMEBIT_DRBOT_SeqBit1A0A05 = 0xA05,                  /* Named from map data alone - nothing in the code or in any name list mentions it: dragbot/DR_SeqobjBo objId= param=bit1A; table 1 */
     GAMEBIT_DRBOT_OnExplode0A07 = 0xA07,                 /* Named from map data alone - nothing in the code or in any name list mentions it: dragbot/ExplodeWall objId= param=onExplode; table 1 */
+    GAMEBIT_VFP_SCsettelmeClosedLatch0A09 = 0xA09,       /* Read out of the retail placement data: temple/SC_settelme closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_VFP_StatuebActivation0A0A = 0xA0A,           /* Read out of the retail placement data: temple/VFP_statueb activationGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_VFP_StatuebActivation0A0B = 0xA0B,           /* Read out of the retail placement data: temple/VFP_statueb activationGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_VFP_StatuebActivation0A0C = 0xA0C,           /* Read out of the retail placement data: temple/VFP_statueb activationGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_PushableRelated0A1A = 0xA1A,                 /* table 0 */
     GAMEBIT_DIM_TrickyTrigger = 0xA1B,                   /* The DLL names this one itself: DIMTRICKY_TRIGGER_GAMEBIT in DIM_tricky.c */
     GAMEBIT_DRBOT_SeqBit180A1C = 0xA1C,                  /* Named from map data alone - nothing in the code or in any name list mentions it: dragbot/DR_SeqobjBo objId= param=bit18; table 1 */
     GAMEBIT_DRBOT_SeqBit1A0A1D = 0xA1D,                  /* Named from map data alone - nothing in the code or in any name list mentions it: dragbot/DR_SeqobjBo objId= param=bit1A; dragbot/DR_SeqobjBo objId= param=bit18; table 1 */
     GAMEBIT_DIM_CannonRelated0A21 = 0xA21,               /* table 2; related to DIM cannon */
+    GAMEBIT_DIM_TruthHorVisibility0A23 = 0xA23,          /* Read out of the retail placement data: snowmines/DIMTruthHor visibilityGameBit x1; snowmines/DIMTruthHor gameBit x1; 2 placements. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_SH_TrickyGuardTrickyInRange0A29 = 0xA29,     /* Read out of the retail placement data: hollow/TrickyGuard trickyInRangeGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_SH_TrickyGuardTrickyInRange0A2A = 0xA2A,     /* Read out of the retail placement data: hollow/TrickyGuard trickyInRangeGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_SH_TrickyGuardTrickyInRange0A2B = 0xA2B,     /* Read out of the retail placement data: hollow/TrickyGuard trickyInRangeGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_SH_TrickyGuardTrickyInRange0A2C = 0xA2C,     /* Read out of the retail placement data: hollow/TrickyGuard trickyInRangeGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_SH_Enabled0A2D = 0xA2D,                      /* Named from map data alone - nothing in the code or in any name list mentions it: hollow/CNTcounter objId= param=enabled; table 0 */
     GAMEBIT_SH_Target0A2F = 0xA2F,                       /* Named from map data alone - nothing in the code or in any name list mentions it: hollow/CNTcounter objId= param=target; hollow/SH_newseqob objId= param=needBit; table 0 */
     GAMEBIT_SH_RescuedEggs = 0xA31,                      /* table 1; hint 358; ref hollow/CNTstopwatc target */
     GAMEBIT_TTH_MusicLatch0A32 = 0xA32,                  /* ThornTail Hollow - SH_LevelCon's GameBitLatch condition for music trigger 0x98 */
+    GAMEBIT_MMP_GroundAnimaSunk0A35 = 0xA35,             /* Read out of the retail placement data: moonpass/GroundAnima sunkGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_MMP_GroundAnimaSunk0A36 = 0xA36,             /* Read out of the retail placement data: moonpass/GroundAnima sunkGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_SB_GalleonCycleAPending = 0xA3C,             /* One of the galleon protection minigame's four cycle bits, per SB_Galleon's own aliases - pending and done for cycles A and B; Rena had it only as SBRelated0A3C */
     GAMEBIT_SB_IsRaining = 0xA3D,                        /* table 0. CAUTION: SB_Galleon reads it as cycle B pending, the fourth of the galleon cycle bits 0xA3C/0xA3E/0xA3F - which would make the rain reading either wrong or the same cycle seen from outside */
     GAMEBIT_SB_GalleonCycleADone = 0xA3E,                /* Cycle A of the galleon protection minigame is done, per SB_Galleon's own alias */
@@ -1506,7 +1647,10 @@ enum GameBitId {
     GAMEBIT_DR_SeqBit1A0A41 = 0xA41,                     /* Named from map data alone - nothing in the code or in any name list mentions it: dragrock/DR_Seqobj objId= param=bit1A; table 0 */
     GAMEBIT_VFP_Open0A42 = 0xA42,                        /* Named from map data alone - nothing in the code or in any name list mentions it: temple/VFP_PodiumP objId= param=open; temple/VFPSeqObj objId= param=bit1A; table 2 */
     GAMEBIT_VFP_ReturnedWithSpellStone = 0xA43,          /* table 2; hint 370; ref temple/HitAnimator target */
+    GAMEBIT_DR_ProjectilBit0A44 = 0xA44,                 /* Read out of the retail placement data: dragrock/DRProjectil gameBitId x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_WarpstoneRelated0A45 = 0xA45,                /* table 2; Rena's U0 name - SH_swapston drives the WarpStone's look-at-player behaviour straight from it */
+    GAMEBIT_DR_ProjectilBit0A46 = 0xA46,                 /* Read out of the retail placement data: dragrock/DRProjectil gameBitId x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_DR_ProjectilBit0A47 = 0xA47,                 /* Read out of the retail placement data: dragrock/DRProjectil gameBitId x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_SB_DoorOpen = 0xA4B,                         /* table 0; ref frontend/HitAnimator target */
     GAMEBIT_SC_TotemBondRing4 = 0xA4C,                   /* LightFoot Village totem-bond puzzle - ring slot 4 bonded, gTotemBondRingGameBits[4]; set to 1 when the ring is bonded and passed as the spawned orb's activeGameBit */
     GAMEBIT_SC_TotemBondRing5 = 0xA4D,                   /* LightFoot Village totem-bond puzzle - ring slot 5 bonded, gTotemBondRingGameBits[5]; set to 1 when the ring is bonded and passed as the spawned orb's activeGameBit */
@@ -1518,6 +1662,7 @@ enum GameBitId {
     GAMEBIT_SC_TotemBondOrb7 = 0xA53,                    /* LightFoot Village totem-bond puzzle - orb slot 7 consumed, gTotemBondOrbGameBits[7]; the spawned orb's eventGameBit, and slot 7 counts as still available while this reads 0 */
     GAMEBIT_DR_SeqBit180A54 = 0xA54,                     /* Named from map data alone - nothing in the code or in any name list mentions it: dragrock/DR_Seqobj objId= param=bit18; table 0 */
     GAMEBIT_DR_Open0A55 = 0xA55,                         /* Named from map data alone - nothing in the code or in any name list mentions it: dragrock/DR_CloudDoo objId= param=open; table 1 */
+    GAMEBIT_DR_CloudDooClosedLatch0A56 = 0xA56,          /* Read out of the retail placement data: dragrock/DR_CloudDoo closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_WM_DestroyedWall1 = 0xA58,                   /* table 2; cracked wall to inside as Krystal */
     GAMEBIT_WM_Wall1Related0A59 = 0xA59,                 /* table 2; set after blowing up wall */
     GAMEBIT_WM_DestroyedWall2 = 0xA5A,                   /* table 2; past flamethrowers */
@@ -1527,6 +1672,11 @@ enum GameBitId {
     GAMEBIT_ECSH_BarrelSpawning = 0xA61,                 /* table 0 */
     GAMEBIT_FinalBoss_ObjGroups = 0xA62,                 /* table 3; size 32 */
     GAMEBIT_WorldMapRelated0A66 = 0xA66,                 /* table 2 */
+    GAMEBIT_MMP_CFTreasWindActivation0A68 = 0xA68,       /* Read out of the retail placement data: moonpass/CFTreasWind activationGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_MMP_CFTreasWindActivation0A69 = 0xA69,       /* Read out of the retail placement data: moonpass/CFTreasWind activationGameBit x1; moonpass/TrigCyl activate x1; 2 placements. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_MMP_CFTreasWindActivation0A6A = 0xA6A,       /* Read out of the retail placement data: moonpass/CFTreasWind activationGameBit x1; moonpass/TrigCyl activate x1; 2 placements. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_MMP_CFTreasWindActivation0A6B = 0xA6B,       /* Read out of the retail placement data: moonpass/CFTreasWind activationGameBit x1; moonpass/TrigCyl activate x1; 2 placements. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_MMP_CFTreasWindActivation0A6C = 0xA6C,       /* Read out of the retail placement data: moonpass/CFTreasWind activationGameBit x1; moonpass/TrigCyl activate x1; 2 placements. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_ECSH_Shrine0A6D = 0xA6D,                     /* The DLL names this one itself: ECSH_SHRINE_GAMEBIT_0A6D in ECSH_Shrine.c */
     GAMEBIT_ECSH_Shrine0A6F = 0xA6F,                     /* The DLL names this one itself: ECSH_SHRINE_GAMEBIT_0A6F in ECSH_Shrine.c */
     GAMEBIT_ECSH_Shrine0A70 = 0xA70,                     /* The DLL names this one itself: ECSH_SHRINE_GAMEBIT_0A70 in ECSH_Shrine.c */
@@ -1574,6 +1724,7 @@ enum GameBitId {
     GAMEBIT_GalleonDefeated0AC8 = 0xAC8,                 /* SB_Galleon calls it the defeated bit; Rena filed it under WM, and the game has both a WM_Galleon and an SB_Galleon DLL, so the name carries neither prefix */
     GAMEBIT_DIM2_LavaControl0ACD = 0xACD,                /* The DLL names this one itself: DIM2_LAVA_CONTROL_GAMEBIT_0ACD in DIM2LavaCon.c */
     GAMEBIT_CF_StaffBoostACF = 0xACF,                    /* Rena's U0 dataset; table 2 */
+    GAMEBIT_CF_LargeCrateBroken0AD0 = 0xAD0,             /* Read out of the retail placement data: fortress/LargeCrate brokenGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_Activate0AD1 = 0xAD1,                        /* Named from map data alone - nothing in the code or in any name list mentions it: arwingcloud/TrigBits objId= param=activate; fortress/CFLandingPa objId= param=bit1A; table 1 */
     GAMEBIT_SHOP_Unk0AD3 = 0xAD3,                        /* table 2; set when entering shop */
     GAMEBIT_WM_SeqAD4 = 0xAD4,                           /* Rena's U0 dataset; table 2 */
@@ -1586,6 +1737,7 @@ enum GameBitId {
     GAMEBIT_IM_SeqBit180ADF = 0xADF,                     /* Named from map data alone - nothing in the code or in any name list mentions it: newicemount/IMSeqObject objId= param=bit18; table 2 */
     GAMEBIT_DR_HighTop_RidingAE0 = 0xAE0,                /* Rena's kiosk dataset; table 0 */
     GAMEBIT_DFSH_Open0AE1 = 0xAE1,                       /* Named from map data alone - nothing in the code or in any name list mentions it: dfshrine/SC_Shrine_d objId= param=open; table 0 */
+    GAMEBIT_DFSH_SCShrinedClosedLatch0AE2 = 0xAE2,       /* Read out of the retail placement data: dfshrine/SC_Shrine_d closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_MMSH_Shrine0AE4 = 0xAE4,                     /* The DLL names this one itself: MMSH_SHRINE_GAMEBIT_0AE4 in MMSH_Shrine.c */
     GAMEBIT_MMSH_Shrine0AE5 = 0xAE5,                     /* The DLL names this one itself: MMSH_SHRINE_GAMEBIT_0AE5 in MMSH_Shrine.c */
     GAMEBIT_MMSH_Shrine0AE6 = 0xAE6,                     /* The DLL names this one itself: MMSH_SHRINE_GAMEBIT_0AE6 in MMSH_Shrine.c */
@@ -1593,8 +1745,28 @@ enum GameBitId {
     GAMEBIT_GPSH_Pressed0AE8 = 0xAE8,                    /* Named from map data alone - nothing in the code or in any name list mentions it: gpshrine/ECSH_Pressu objId= param=pressed; gpshrine/SC_settelme objId= param=open; table 0 */
     GAMEBIT_GPSH_Open0AE9 = 0xAE9,                       /* Named from map data alone - nothing in the code or in any name list mentions it: gpshrine/SC_settelme objId= param=open; table 0 */
     GAMEBIT_GPSH_Open0AEA = 0xAEA,                       /* Named from map data alone - nothing in the code or in any name list mentions it: gpshrine/SC_settelme objId= param=open; gpshrine/ECSH_Pressu objId= param=pressed; table 0 */
+    GAMEBIT_GPSH_CFTreasWindActivation0AEB = 0xAEB,      /* Read out of the retail placement data: gpshrine/CFTreasWind activationGameBit x1; gpshrine/TrigCyl activate x1; 2 placements. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_GPSH_CFTreasWindActivation0AEC = 0xAEC,      /* Read out of the retail placement data: gpshrine/CFTreasWind activationGameBit x1; gpshrine/TrigCyl activate x1; 2 placements. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_GPSH_CFTreasWindActivation0AED = 0xAED,      /* Read out of the retail placement data: gpshrine/CFTreasWind activationGameBit x1; gpshrine/TrigCyl activate x1; 2 placements. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_GPSH_CFTreasWindActivation0AEE = 0xAEE,      /* Read out of the retail placement data: gpshrine/CFTreasWind activationGameBit x1; gpshrine/TrigCyl activate x1; 2 placements. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_GPSH_CFTreasWindActivation0AEF = 0xAEF,      /* Read out of the retail placement data: gpshrine/CFTreasWind activationGameBit x1; gpshrine/TrigCyl activate x1; 2 placements. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_GPSH_CFTreasWindActivation0AF1 = 0xAF1,      /* Read out of the retail placement data: gpshrine/CFTreasWind activationGameBit x1; gpshrine/TrigCyl activate x1; 2 placements. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_GPSH_CFTreasWindActivation0AF2 = 0xAF2,      /* Read out of the retail placement data: gpshrine/CFTreasWind activationGameBit x1; gpshrine/TrigCyl activate x1; 2 placements. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_CC_GoldbarHide0AF3 = 0xAF3,                  /* Read out of the retail placement data: capeclaw/CCgoldbar hideGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_CC_GoldbarHide0AF4 = 0xAF4,                  /* Read out of the retail placement data: capeclaw/CCgoldbar hideGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_CC_GoldbarHide0AF5 = 0xAF5,                  /* Read out of the retail placement data: capeclaw/CCgoldbar hideGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_CC_GoldbarHide0AF6 = 0xAF6,                  /* Read out of the retail placement data: capeclaw/CCgoldbar hideGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_ITEM_CCGoldBar_Count = 0xAF7,                /* table 2; size 3. Backs the collectable item C-menu entry the game labels "Give Gold" (its owned bit) */
+    GAMEBIT_CC_GroundAnimaSunk0AF8 = 0xAF8,              /* Read out of the retail placement data: capeclaw/GroundAnima sunkGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_CC_GroundAnimaSunk0AF9 = 0xAF9,              /* Read out of the retail placement data: capeclaw/GroundAnima sunkGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_CC_GroundAnimaSunk0AFA = 0xAFA,              /* Read out of the retail placement data: capeclaw/GroundAnima sunkGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_CC_GroundAnimaSunk0AFB = 0xAFB,              /* Read out of the retail placement data: capeclaw/GroundAnima sunkGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_CC_GoldbarCollect0AFC = 0xAFC,               /* Read out of the retail placement data: capeclaw/CCgoldbar collectGameBit x4; 4 placements. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_CC_GroundAnimaEnable0AFD = 0xAFD,            /* Read out of the retail placement data: capeclaw/GroundAnima enableGameBit x1; capeclaw/LargeCrate brokenGameBit x1; 2 placements. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_CC_HitAnimTarget0AFE = 0xAFE,                /* Named from map data alone - nothing in the code or in any name list mentions it: capeclaw/HitAnimator objId= param=target; capeclaw/CCseqobj objId= param=usedBit; table 2 */
+    GAMEBIT_GPSH_CFTreasWindActivation0AFF = 0xAFF,      /* Read out of the retail placement data: gpshrine/CFTreasWind activationGameBit x1; gpshrine/TrigCyl activate x1; 2 placements. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_TrigCylActivate0B01 = 0xB01,                 /* Read out of the retail placement data: gpshrine/CFTreasWind activationGameBit x1; gpshrine/TrigCyl activate x1; hollow/TrigCyl activate x1; 3 placements. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_DBSH_CFTreasWindActivation0B03 = 0xB03,      /* Read out of the retail placement data: dbshrine/CFTreasWind activationGameBit x1; dbshrine/TrigCyl activate x1; 2 placements. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_CF_SeqBit1A0B04 = 0xB04,                     /* Named from map data alone - nothing in the code or in any name list mentions it: fortress/CFseqobject objId= param=bit1A; fortress/SC_Shrine_d objId= param=open; fortress/StaffLeverO objId= param=activated; table 2 */
     GAMEBIT_TTH_FuelCell_B05 = 0xB05,                    /* Rena's U0 dataset; table 2 */
     GAMEBIT_TTH_FuelCell_B06 = 0xB06,                    /* Rena's U0 dataset; table 2 */
@@ -1602,11 +1774,14 @@ enum GameBitId {
     GAMEBIT_CF_HitAnimTarget0B09 = 0xB09,                /* Named from map data alone - nothing in the code or in any name list mentions it: fortress/HitAnimator objId= param=target; fortress/HitAnimator objId= param=target; table 1 */
     GAMEBIT_CF_HitAnimTarget0B0A = 0xB0A,                /* Named from map data alone - nothing in the code or in any name list mentions it: fortress/HitAnimator objId= param=target; fortress/HitAnimator objId= param=target; fortress/HitAnimator objId= param=target (+2 more); table 2 */
     GAMEBIT_CF_Activate0B0B = 0xB0B,                     /* Named from map data alone - nothing in the code or in any name list mentions it: clouddungeon/TrigCyl objId= param=activate; table 2 */
+    GAMEBIT_CF_WindLiftRider0B0C = 0xB0C,                /* Read out of the retail placement data: clouddungeon/CFWindLift riderGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_CF_Pressed0B0D = 0xB0D,                      /* Named from map data alone - nothing in the code or in any name list mentions it: clouddungeon/CFPressureS objId= param=pressed; table 2 */
     GAMEBIT_CF_HitAnimTarget0B0E = 0xB0E,                /* Named from map data alone - nothing in the code or in any name list mentions it: clouddungeon/ExplodeWall objId= param=exploded; clouddungeon/HitAnimator objId= param=target; clouddungeon/HitAnimator objId= param=target; table 2 */
     GAMEBIT_CF_OnExplode0B0F = 0xB0F,                    /* Named from map data alone - nothing in the code or in any name list mentions it: clouddungeon/ExplodeWall objId= param=onExplode; clouddungeon/CFseqobject objId= param=bit1A; table 2 */
     GAMEBIT_Open0B10 = 0xB10,                            /* Named from map data alone - nothing in the code or in any name list mentions it: gamefront/GF_DoorLeft objId= param=open; greatfox/GF_DoorLeft objId= param=open; table 0 */
+    GAMEBIT_GFDoorLeftClosedLatch0B11 = 0xB11,           /* Read out of the retail placement data: gamefront/GF_DoorLeft closedLatchGameBit x1; greatfox/GF_DoorLeft closedLatchGameBit x1; 2 placements. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_Open0B12 = 0xB12,                            /* Named from map data alone - nothing in the code or in any name list mentions it: gamefront/GF_DoorLeft objId= param=open; greatfox/GF_DoorLeft objId= param=open; table 0 */
+    GAMEBIT_GFDoorLeftClosedLatch0B13 = 0xB13,           /* Read out of the retail placement data: gamefront/GF_DoorLeft closedLatchGameBit x1; greatfox/GF_DoorLeft closedLatchGameBit x1; 2 placements. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_DBSH_LeverActivated0B14 = 0xB14,             /* Named from map data alone - nothing in the code or in any name list mentions it: dbshrine/StaffLeverO objId= param=activated; table 0 */
     GAMEBIT_DBSH_HitAnimTarget0B19 = 0xB19,              /* Named from map data alone - nothing in the code or in any name list mentions it: dbshrine/ExplodeWall objId= param=exploded; dbshrine/HitAnimator objId= param=target; dbshrine/HitAnimator objId= param=target; table 0 */
     GAMEBIT_DBSH_OnExplode0B1A = 0xB1A,                  /* Named from map data alone - nothing in the code or in any name list mentions it: dbshrine/ExplodeWall objId= param=onExplode; table 0 */
@@ -1614,10 +1789,12 @@ enum GameBitId {
     GAMEBIT_CF_Open0B1C = 0xB1C,                         /* Named from map data alone - nothing in the code or in any name list mentions it: fortress/SC_Shrine_d objId= param=open; fortress/CNTstopwatc objId= param=enabled; table 1 */
     GAMEBIT_CF_Open0B1D = 0xB1D,                         /* Named from map data alone - nothing in the code or in any name list mentions it: fortress/SC_Shrine_d objId= param=open; fortress/CNTstopwatc objId= param=enabled; table 1 */
     GAMEBIT_CF_SeqBit1A0B1E = 0xB1E,                     /* Named from map data alone - nothing in the code or in any name list mentions it: fortress/CFseqobject objId= param=bit1A; fortress/HitAnimator objId= param=target; fortress/CFExplosive objId= param=open; table 2 */
+    GAMEBIT_CF_ExplosiveClosedLatch0B1F = 0xB1F,         /* Read out of the retail placement data: fortress/CFExplosive closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_CF_SeqBit180B23 = 0xB23,                     /* Named from map data alone - nothing in the code or in any name list mentions it: fortress/CFseqobject objId= param=bit18; table 2 */
     GAMEBIT_CC_LevelControlMusicC0 = 0xB24,              /* The DLL names this one itself: CC_LEVEL_CONTROL_MUSIC_C0_GAMEBIT in CClevcontro.c */
     GAMEBIT_CF_SeqBit1A0B25 = 0xB25,                     /* Named from map data alone - nothing in the code or in any name list mentions it: fortress/CAMERAseqob objId= param=bit1A; table 1 */
     GAMEBIT_CF_Activate0B26 = 0xB26,                     /* Named from map data alone - nothing in the code or in any name list mentions it: fortress/TrigPln objId= param=activate; table 1 */
+    GAMEBIT_CF_SCShrinedClosedLatch0B28 = 0xB28,         /* Read out of the retail placement data: fortress/SC_Shrine_d closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_CFRelated0B2A = 0xB2A,                       /* table 1 */
     GAMEBIT_CFRelated0B2B = 0xB2B,                       /* table 1 */
     GAMEBIT_CFRelated0B2C = 0xB2C,                       /* table 1 */
@@ -1646,14 +1823,20 @@ enum GameBitId {
     GAMEBIT_CF_ClawDeadB4D = 0xB4D,                      /* Rena's U0 dataset; table 2 */
     GAMEBIT_CF_ClawDeadB4E = 0xB4E,                      /* Rena's U0 dataset; table 2 */
     GAMEBIT_CF_ClawDeadB4F = 0xB4F,                      /* Rena's U0 dataset; table 2 */
+    GAMEBIT_CF_SCShrinedClosedLatch0B51 = 0xB51,         /* Read out of the retail placement data: fortress/SC_Shrine_d closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_CF_ClawDeadB52 = 0xB52,                      /* Rena's U0 dataset; table 2 */
     GAMEBIT_CF_ClawDeadB53 = 0xB53,                      /* Rena's U0 dataset; table 2 */
     GAMEBIT_CF_Open0B54 = 0xB54,                         /* Named from map data alone - nothing in the code or in any name list mentions it: fortress/SC_Shrine_d objId= param=open; table 2 */
+    GAMEBIT_CF_SCShrinedClosedLatch0B55 = 0xB55,         /* Read out of the retail placement data: fortress/SC_Shrine_d closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_CF_SeqB56 = 0xB56,                           /* Rena's U0 dataset; table 2 */
+    GAMEBIT_CF_ForceFielCollapse0B59 = 0xB59,            /* Read out of the retail placement data: fortress/CFForceFiel collapseGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_CF_SeqB5A = 0xB5A,                           /* Rena's U0 dataset; table 2 */
     GAMEBIT_CF_HitAnimTarget0B62 = 0xB62,                /* Named from map data alone - nothing in the code or in any name list mentions it: fortress/HitAnimator objId= param=target; fortress/HitAnimator objId= param=target; fortress/CFseqobject objId= param=bit1A; table 2 */
     GAMEBIT_CF_SeqB63 = 0xB63,                           /* Rena's U0 dataset; table 2 */
     GAMEBIT_CF_SeqB64 = 0xB64,                           /* Rena's U0 dataset; table 2 */
+    GAMEBIT_CF_FallLadderBase0B66 = 0xB66,               /* Read out of the retail placement data: fortress/Fall_Ladder baseGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_CF_FallLadderBase0B67 = 0xB67,               /* Read out of the retail placement data: fortress/Fall_Ladder baseGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_CF_PrisonGuaDisable0B68 = 0xB68,             /* Read out of the retail placement data: clouddungeon/CFPrisonGua disableGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_CFRelated0B6C = 0xB6C,                       /* table 1 */
     GAMEBIT_DFSH_TestFailed = 0xB70,                     /* table 0; raised where the Test of Combat shrine reaches its post-finish state without success, on the way to reset */
     GAMEBIT_DFSH_Related0B71 = 0xB71,                    /* table 0; the Test of Combat shrine only ever clears it, as part of its reset block */
@@ -1666,6 +1849,7 @@ enum GameBitId {
     GAMEBIT_DIM2_ClawDeadB78 = 0xB78,                    /* Rena's U0 dataset; table 2 */
     GAMEBIT_DIM2_ClawDeadB79 = 0xB79,                    /* Rena's U0 dataset; table 2 */
     GAMEBIT_DIM2_Open0B7A = 0xB7A,                       /* Named from map data alone - nothing in the code or in any name list mentions it: snowmines2/DIM2PuzzleD objId= param=open; snowmines2/DIM2SeqObje objId= param=bit1A; snowmines2/HitAnimator objId= param=target; table 2 */
+    GAMEBIT_DIM2_PuzzleDClosedLatch0B7B = 0xB7B,         /* Read out of the retail placement data: snowmines2/DIM2PuzzleD closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_DIM2_SeqBit180B7C = 0xB7C,                   /* Named from map data alone - nothing in the code or in any name list mentions it: snowmines2/DIM2SeqObje objId= param=bit18; table 2 */
     GAMEBIT_SequenceLatch0B7D = 0xB7D,                   /* Read by DLL 604's sequence case 4, purely to raise that sequence's latch A */
     GAMEBIT_LINKA_ActNo = 0xB81,                         /* table 1; size 4 */
@@ -1678,6 +1862,10 @@ enum GameBitId {
     GAMEBIT_OFB_PinPonDeadB8C = 0xB8C,                   /* table 2; Rena's U0 name - DFP_LevelCo gates on it together with 0x792 */
     GAMEBIT_OFB_PinPonDeadB8D = 0xB8D,                   /* Rena's U0 dataset; table 2 */
     GAMEBIT_OFB_Open0B8E = 0xB8E,                        /* Named from map data alone - nothing in the code or in any name list mentions it: kraztest/DFP_Bridge objId= param=open; table 2 */
+    GAMEBIT_WM_LargeCrateBroken0B90 = 0xB90,             /* Read out of the retail placement data: warlock/LargeCrate brokenGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_WM_LargeCrateBroken0B91 = 0xB91,             /* Read out of the retail placement data: warlock/LargeCrate brokenGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_WM_LargeCrateBroken0B92 = 0xB92,             /* Read out of the retail placement data: warlock/LargeCrate brokenGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_WM_LargeCrateBroken0B93 = 0xB93,             /* Read out of the retail placement data: warlock/LargeCrate brokenGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_CF_DeathGasActive = 0xB97,                   /* table 1; ref fortress/deathGasNoF active */
     GAMEBIT_ITEM_BombSpore_ShowCount = 0xB98,            /* table 2; on HUD */
     GAMEBIT_ITEM_TrickyFood_ShowCount = 0xB99,           /* table 2 */
@@ -1685,9 +1873,11 @@ enum GameBitId {
     GAMEBIT_ITEM_MoonSeed_ShowCount = 0xB9B,             /* table 2 */
     GAMEBIT_ITEM_Scarab_ShowCount = 0xB9C,               /* table 2 */
     GAMEBIT_ECSH_TestObservRunning = 0xB9D,              /* table 0; ref ecshrine/HitAnimator target */
+    GAMEBIT_CF_BrokenPilClosedLatch0BA3 = 0xBA3,         /* Read out of the retail placement data: fortress/CFBrokenPil closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_CF_HitAnimTarget0BA4 = 0xBA4,                /* Named from map data alone - nothing in the code or in any name list mentions it: fortress/HitAnimator objId= param=target; fortress/CFBrokenPil objId= param=open; table 2 */
     GAMEBIT_ECSH_Entered = 0xBA5,                        /* table 1; hint 248; Krystal entered shrine */
     GAMEBIT_WC_PushBlockTimerActive = 0xBA6,             /* Set while either Walled City push-block timed puzzle (A or B) is actively counting down/up; cleared on completion, timeout, or reset; gates the ambient-music latch in wclevelcont_syncProgressBits */
+    GAMEBIT_WM_SCsettelmeClosedLatch0BAC = 0xBAC,        /* Read out of the retail placement data: warlock/SC_settelme closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_CF_SeqBit180BAE = 0xBAE,                     /* Named from map data alone - nothing in the code or in any name list mentions it: fortress/CFseqobject objId= param=bit18; fortress/TrigBits objId= param=activate; table 1 */
     GAMEBIT_TestCombatClawDeadB83 = 0xBB3,               /* Rena's U0 dataset; table 0 */
     GAMEBIT_TestCombatClawDeadB84 = 0xBB4,               /* Rena's U0 dataset; table 0 */
@@ -1717,12 +1907,22 @@ enum GameBitId {
     GAMEBIT_WC_FinalPuzzleComplete = 0xBCF,              /* The Walled City final puzzle is done - wclevelcont tears down the stopwatch and its animator, saves a checkpoint and raises WCLEVELCTL_FLAG_FINAL, which init reads back from this bit */
     GAMEBIT_WC_FinalAnimTarget0BD0 = 0xBD0,              /* Wallcity HitAnimator 0x4917B's target, cleared as the final puzzle completes */
     GAMEBIT_DRBOT_SeqBit180BDA = 0xBDA,                  /* Named from map data alone - nothing in the code or in any name list mentions it: dragbot/DR_SeqobjBo objId= param=bit18; table 0 */
+    GAMEBIT_SC_SteppingClosedLatch0BDB = 0xBDB,          /* Read out of the retail placement data: swapcircle/SC_stepping closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_SC_LVBlock3Related0BDC = 0xBDC,              /* One of the three bits sc_levelcontrol raises the moment GAMEBIT_ITEM_LVBlock3_Used is set */
+    GAMEBIT_SC_SteppingClosedLatch0BDD = 0xBDD,          /* Read out of the retail placement data: swapcircle/SC_stepping closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_ITEM_LVBlock3_Used = 0xBDE,                  /* table 2; ref swapcircle/SC_blockpla open. Backs the collectable item C-menu entry the game labels "Place Block" (its used bit) */
     GAMEBIT_SC_LVBlock1Related0BDF = 0xBDF,              /* One of the three bits sc_levelcontrol raises the moment GAMEBIT_ITEM_LVBlock1_Used is set; Rena has this one as the target of swapcircle's HitAnimator 0x49433 */
+    GAMEBIT_SC_SteppingClosedLatch0BE0 = 0xBE0,          /* Read out of the retail placement data: swapcircle/SC_stepping closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_SC_LVBlock1Related0BE1 = 0xBE1,              /* One of the three bits sc_levelcontrol raises the moment GAMEBIT_ITEM_LVBlock1_Used is set */
+    GAMEBIT_SC_SteppingClosedLatch0BE2 = 0xBE2,          /* Read out of the retail placement data: swapcircle/SC_stepping closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_SC_LVBlock1Related0BE3 = 0xBE3,              /* One of the three bits sc_levelcontrol raises the moment GAMEBIT_ITEM_LVBlock1_Used is set */
+    GAMEBIT_SC_SteppingClosedLatch0BE4 = 0xBE4,          /* Read out of the retail placement data: swapcircle/SC_stepping closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_ITEM_LVBlock1_Used = 0xBE5,                  /* table 2; ref swapcircle/SC_blockpla open. Backs the collectable item C-menu entry the game labels "Place Block" (its used bit) */
+    GAMEBIT_DrakorCrateBroken0BE6 = 0xBE6,               /* Read out of the retail placement data: finalboss/DrakorCrate brokenGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_DrakorCrateBroken0BE7 = 0xBE7,               /* Read out of the retail placement data: finalboss/DrakorCrate brokenGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_DrakorCrateBroken0BE8 = 0xBE8,               /* Read out of the retail placement data: finalboss/DrakorCrate brokenGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_DrakorCrateBroken0BE9 = 0xBE9,               /* Read out of the retail placement data: finalboss/DrakorCrate brokenGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_DrakorCrateBroken0BEA = 0xBEA,               /* Read out of the retail placement data: finalboss/DrakorCrate brokenGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_IM_Unk0BEB = 0xBEB,                          /* table 0; set when first entering */
     GAMEBIT_IM_Unk0BEC = 0xBEC,                          /* table 0; set when first entering */
     GAMEBIT_IM_Unk0BED = 0xBED,                          /* table 0; set when first entering */
@@ -1745,6 +1945,7 @@ enum GameBitId {
     GAMEBIT_MaybeHaveTricky = 0xC11,                     /* table 2; maybe wrong */
     GAMEBIT_DIM_HitAnimTarget0C14 = 0xC14,               /* Named from map data alone - nothing in the code or in any name list mentions it: snowmines/HitAnimator objId= param=target; snowmines/DIMWoodDoor objId= param=open; table 2 */
     GAMEBIT_DIM_HitAnimTarget0C15 = 0xC15,               /* Named from map data alone - nothing in the code or in any name list mentions it: snowmines/HitAnimator objId= param=target; snowmines/DIMWoodDoor objId= param=open; snowmines/CAMERAseqob objId= param=bit1A; table 2 */
+    GAMEBIT_DIM_WoodDoorClosedLatch0C16 = 0xC16,         /* Read out of the retail placement data: snowmines/DIMWoodDoor closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_DIM_CannonRelated0C17 = 0xC17,               /* table 2; related to DIM cannon */
     GAMEBIT_DIM_ClawDeadC18 = 0xC18,                     /* Rena's U0 dataset; table 2 */
     GAMEBIT_DIM_ClawDeadC19 = 0xC19,                     /* Rena's U0 dataset; table 2 */
@@ -1760,7 +1961,11 @@ enum GameBitId {
     GAMEBIT_ITEM_LVBlock1_Got = 0xC25,                   /* table 2; ref swapcircle/SC_blockpla key. Backs the collectable item C-menu entry the game labels "Place Block" (its owned bit) */
     GAMEBIT_ITEM_LVBlock2_Got = 0xC26,                   /* table 2; ref swapcircle/SC_blockpla key. Backs the collectable item C-menu entry the game labels "Place Block" (its owned bit) */
     GAMEBIT_ITEM_LVBlock3_Got = 0xC27,                   /* table 2; ref swapcircle/SC_blockpla key. Backs the collectable item C-menu entry the game labels "Place Block" (its owned bit) */
+    GAMEBIT_SC_GroundAnimaSunk0C28 = 0xC28,              /* Read out of the retail placement data: swapcircle/GroundAnima sunkGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_SC_GroundAnimaSunk0C29 = 0xC29,              /* Read out of the retail placement data: swapcircle/GroundAnima sunkGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_SC_GroundAnimaSunk0C2A = 0xC2A,              /* Read out of the retail placement data: swapcircle/GroundAnima sunkGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_DIM2_ClawDeadC2B = 0xC2B,                    /* Rena's U0 dataset; table 2 */
+    GAMEBIT_DIM2_DIMCannonHold0C2C = 0xC2C,              /* Read out of the retail placement data: snowmines2/DIMCannon holdGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_CannonRelated0C2D = 0xC2D,                   /* table 2 */
     GAMEBIT_CannonRelated0C2E = 0xC2E,                   /* table 2 */
     GAMEBIT_PlayerIsDisguised = 0xC30,                   /* table 0 */
@@ -1794,7 +1999,9 @@ enum GameBitId {
     GAMEBIT_SC_SeqBit180C4C = 0xC4C,                     /* Named from map data alone - nothing in the code or in any name list mentions it: swapcircle/SC_sequence objId= param=bit18; table 2 */
     GAMEBIT_SC_SeqBit180C4D = 0xC4D,                     /* Named from map data alone - nothing in the code or in any name list mentions it: swapcircle/SC_sequence objId= param=bit18; table 2 */
     GAMEBIT_SC_Enabled0C4E = 0xC4E,                      /* Named from map data alone - nothing in the code or in any name list mentions it: swapcircle/StaffBoostP objId= param=enabled; swapcircle/SC_sequence objId= param=bit18; table 2 */
+    GAMEBIT_CC_SfxPlayerBit0C4F = 0xC4F,                 /* Read out of the retail placement data: capeclaw/sfxPlayer gameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_SC_Open0C50 = 0xC50,                         /* Named from map data alone - nothing in the code or in any name list mentions it: swapcircle/SC_hutdoor objId= param=open; table 2 */
+    GAMEBIT_SC_HutdoorClosedLatch0C51 = 0xC51,           /* Read out of the retail placement data: swapcircle/SC_hutdoor closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_LV_ChallengeGate1Complete = 0xC52,           /* challenge-gate NPC 1 reward latch (ident 0x46A51) */
     GAMEBIT_LV_ChallengeGate2Complete = 0xC53,           /* One-shot reward latch for LightFoot Village challenge-gate NPC 2 (ident 0x46A55): fires once bits 0xc3b/0xc3c/0xc3d (the three baby-lightfoot-delivered flags) are all set, permanently disabling that NPC's interaction and unlocking swapcircle map objgroup 0xa */
     GAMEBIT_SC_ChallengeGate3Complete = 0xC54,           /* One-shot latch: Lightfoot Village's third target-hit challenge gate (encounterType 0x49928) has been completed and its reward sequence (7) already played */
@@ -1813,6 +2020,8 @@ enum GameBitId {
     GAMEBIT_LINKC_Disable0C66 = 0xC66,                   /* Named from map data alone - nothing in the code or in any name list mentions it: linkc/CCriverflow objId= param=disable; linkc/CCriverflow objId= param=disable; linkc/CCriverflow objId= param=disable (+38 more); table 2 */
     GAMEBIT_DR_Related0C67 = 0xC67,                      /* Read by DLL 620: while set, the object tests its X against a narrow window and raises either its placement's own openedGameBit or GAMEBIT_DR_ChimneyReset0EA4 */
     GAMEBIT_LINKC_HitAnimTarget0C68 = 0xC68,             /* Named from map data alone - nothing in the code or in any name list mentions it: linkc/LINK_Portcu objId= param=open; linkc/HitAnimator objId= param=target; linkc/HitAnimator objId= param=target; table 2 */
+    GAMEBIT_LINKC_LINKPortcuClosedLatch0C6A = 0xC6A,     /* Read out of the retail placement data: linkc/LINK_Portcu closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_LINKC_LINKPortcuClosedLatch0C6B = 0xC6B,     /* Read out of the retail placement data: linkc/LINK_Portcu closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_ITEM_SpiritTestStrength_Got = 0xC6E,         /* table 2; hint 380 */
     GAMEBIT_ITEM_Spirit4_Used = 0xC70,                   /* table 2; hint 382 */
     GAMEBIT_WM_SpiritPlace4Ready = 0xC71,                /* table 2; gates spirit-place 4 and its return pad */
@@ -1821,16 +2030,23 @@ enum GameBitId {
     GAMEBIT_LINKJ_SeqNeed0C75 = 0xC75,                   /* Named from map data alone - nothing in the code or in any name list mentions it: linkj/LINKJseqobj objId= param=needBit; linkj/SC_Shrine_d objId= param=open; table 2 */
     GAMEBIT_LINKJ_HitAnimTarget0C76 = 0xC76,             /* Named from map data alone - nothing in the code or in any name list mentions it: linkj/HitAnimator objId= param=target; table 2 */
     GAMEBIT_LINKJ_HitAnimTarget0C77 = 0xC77,             /* Named from map data alone - nothing in the code or in any name list mentions it: linkj/HitAnimator objId= param=target; table 1 */
+    GAMEBIT_LINKJ_XYZAnimatorCompletion0C78 = 0xC78,     /* Read out of the retail placement data: linkj/XYZAnimator completionGameBit x3; 3 placements. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_DRBOT_DRDrakorDoClosedLatch0C79 = 0xC79,     /* Read out of the retail placement data: dragbot/DR_DrakorDo closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_LINKJ_Open0C7A = 0xC7A,                      /* Named from map data alone - nothing in the code or in any name list mentions it: linkj/SC_Shrine_d objId= param=open; linkj/HitAnimator objId= param=target; table 2 */
+    GAMEBIT_LINKJ_SCShrinedClosedLatch0C7B = 0xC7B,      /* Read out of the retail placement data: linkj/SC_Shrine_d closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_ITEM_RockCandy_Got = 0xC7C,                  /* table 2. Backs the collectable item C-menu entry the game labels "Give Gift" (its owned bit) */
     GAMEBIT_ITEM_RockCandy_Used = 0xC7D,                 /* table 2; hint 258. Backs the collectable item C-menu entry the game labels "Give Gift" (its used bit) */
     GAMEBIT_SH_WarpStoneComplainingAboutGifts = 0xC7E,   /* table 2; triggers "nobody brings me gifts" scene */
     GAMEBIT_LINKJ_Open0C7F = 0xC7F,                      /* Named from map data alone - nothing in the code or in any name list mentions it: linkj/SC_Shrine_d objId= param=open; linkj/HitAnimator objId= param=target; table 2 */
+    GAMEBIT_LINKJ_SCShrinedClosedLatch0C80 = 0xC80,      /* Read out of the retail placement data: linkj/SC_Shrine_d closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_CD_SeqC81 = 0xC81,                           /* Rena's U0 dataset; table 2 */
     GAMEBIT_OFB_LeverActivated0C82 = 0xC82,              /* Named from map data alone - nothing in the code or in any name list mentions it: kraztest/StaffLeverO objId= param=activated; table 2 */
     GAMEBIT_DFSH_ObjGroups = 0xC84,                      /* table 3; size 32 */
     GAMEBIT_ITEM_Spirit5_Got = 0xC85,                    /* table 2; hint 417 */
     GAMEBIT_CF_BitIncOnDeath0C86 = 0xC86,                /* Named from map data alone - nothing in the code or in any name list mentions it: fortress/GCRobotPatr objId= param=bit_incOnDeath; fortress/GCRobotPatr objId= param=bit_incOnDeath; fortress/GCRobotPatr objId= param=bit_incOnDeath; table 1 */
+    GAMEBIT_LINKE_CFTreasWindActivation0C88 = 0xC88,     /* Read out of the retail placement data: linke/CFTreasWind activationGameBit x1; linke/TrigCyl activate x1; 2 placements. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_LINKE_CFTreasWindActivation0C89 = 0xC89,     /* Read out of the retail placement data: linke/CFTreasWind activationGameBit x1; linke/TrigCyl activate x1; 2 placements. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_LINKE_CFTreasWindActivation0C8A = 0xC8A,     /* Read out of the retail placement data: linke/CFTreasWind activationGameBit x1; linke/TrigCyl activate x1; 2 placements. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_LINKE_TunnelOpen = 0xC8B,                    /* table 2; broke open wind tunnel in LinkE */
     GAMEBIT_LINKE_OnExplode0C8C = 0xC8C,                 /* Named from map data alone - nothing in the code or in any name list mentions it: linke/LINKE_Explo objId= param=onExplode; table 2 */
     GAMEBIT_ITEM_PDA_Got = 0xC8D,                        /* table 2; Set when landing at TTH. Backs the collectable item C-menu entry the game labels "PDA On/Off" (its owned bit) */
@@ -1848,6 +2064,7 @@ enum GameBitId {
     GAMEBIT_SHBOT_BombPlantedC9A = 0xC9A,                /* Rena's U0 dataset; table 2 */
     GAMEBIT_SHBOT_BombPlantedC9B = 0xC9B,                /* Rena's U0 dataset; table 2 */
     GAMEBIT_SHBOT_SeqC9E = 0xC9E,                        /* Rena's U0 dataset; table 2 */
+    GAMEBIT_SHBOT_SHPortcullOpen0C9F = 0xC9F,            /* Read out of the retail placement data: hollow2/SH_Portcull open x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_ITEM_CCGoldBar1_NotReturned = 0xCA3,         /* table 2 */
     GAMEBIT_ITEM_CCGoldBar2_NotReturned = 0xCA4,         /* table 2 */
     GAMEBIT_ITEM_CCGoldBar3_NotReturned = 0xCA5,         /* table 2 */
@@ -1861,6 +2078,7 @@ enum GameBitId {
     GAMEBIT_WM_SpiritPlace5Ready = 0xCB6,                /* table 2; gates spirit-place 5 and its return pad */
     GAMEBIT_ITEM_Spirit6_Released = 0xCB7,               /* table 2; hint 423; hint: "Andross Revealed" */
     GAMEBIT_WM_SpiritPlace6Ready = 0xCB8,                /* table 2; gates spirit-place 6 and its return pad */
+    GAMEBIT_OFB_DFPseqpoinDisable0CB9 = 0xCB9,           /* Read out of the retail placement data: kraztest/DFP_seqpoin disableGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_SHRINE_MUSIC_LOCK = 0xCBB,                   /* Krazoa-shrine music lock: set (success-gated in GPSH) when a Krazoa shrine object (MMSH/ECSH/DFSH/DBSH/GPSH) frees; every area's level-control DLL watches it via GameBitLatch_Update to start/stop MUSICTRIG_PU3_Adventure_c4 and hand back its own ambient music, and it also raises audio.c's SFX reverb bus and suppresses doorf4's door-close SFX during the transition */
     GAMEBIT_ITEM_SpellStone_Disabled = 0xCBC,            /* table 2; dims them in the menu. Backs the collectable item C-menu entry the game labels "Use SpellStone" (its active bit) */
     GAMEBIT_SawFuelCell = 0xCBE,                         /* table 2 */
@@ -1883,6 +2101,7 @@ enum GameBitId {
     GAMEBIT_SH_ThornTailRelated0CD5 = 0xCD5,             /* table 2; probably "talked to guy who tells you to get a lantern" */
     GAMEBIT_SH_ThornTailRelated0CD6 = 0xCD6,             /* table 2 */
     GAMEBIT_SHBOT_SeqUsed0CD9 = 0xCD9,                   /* Named from map data alone - nothing in the code or in any name list mentions it: hollow2/SH_BottomSe objId= param=usedBit; table 2 */
+    GAMEBIT_SHOP_FogControlEnable0CDA = 0xCDA,           /* Read out of the retail placement data: swapstore/fogControl enableGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_LINKC_HitAnimTarget0CDB = 0xCDB,             /* Named from map data alone - nothing in the code or in any name list mentions it: linkc/LINK_Portcu objId= param=open; linkc/HitAnimator objId= param=target; linkc/HitAnimator objId= param=target; table 2 */
     GAMEBIT_SC_HelpTextEnabled = 0xCDC,                  /* While set, sc_levelcontrol shows game text 0x429 for the first 300 frames the player is in swapcircle */
     GAMEBIT_NW_ReturnedTo = 0xCE1,                       /* table 2; hint 277 */
@@ -1933,6 +2152,7 @@ enum GameBitId {
     GAMEBIT_DIM_SeqBit180D13 = 0xD13,                    /* Named from map data alone - nothing in the code or in any name list mentions it: snowmines/CAMERAseqob objId= param=bit18; table 2 */
     GAMEBIT_DIM_HitAnimTarget0D14 = 0xD14,               /* Named from map data alone - nothing in the code or in any name list mentions it: snowmines/HitAnimator objId= param=target; table 2 */
     GAMEBIT_NW_Key_Used = 0xD16,                         /* table 2; ref wastes/HitAnimator target. Backs the collectable item C-menu entry the game labels "Use Gate Key" (its used bit) */
+    GAMEBIT_NW_PortcullClosedLatch0D17 = 0xD17,          /* Read out of the retail placement data: wastes/NW_Portcull closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_NW_FuelCellsVisibleD18 = 0xD18,              /* Rena's U0 dataset; table 2 */
     GAMEBIT_WM_HitAnimTarget0D19 = 0xD19,                /* Named from map data alone - nothing in the code or in any name list mentions it: warlock/HitAnimator objId= param=target; warlock/CCclawOnlyD objId= param=open; table 1 */
     GAMEBIT_NW_SeqBit180D1A = 0xD1A,                     /* Named from map data alone - nothing in the code or in any name list mentions it: wastes/CAMERAseqob objId= param=bit18; table 2 */
@@ -1951,6 +2171,7 @@ enum GameBitId {
     GAMEBIT_SawStaffBoostPad = 0xD2A,                    /* table 2; StaffActivated checks for this (hardcoded) in some case relating to sequences */
     GAMEBIT_SHBOT_StaffBoostEnabled = 0xD2B,             /* Rena's U0 dataset; table 2 */
     GAMEBIT_LINKC_Open0D2E = 0xD2E,                      /* Named from map data alone - nothing in the code or in any name list mentions it: linkc/LINK_Portcu objId= param=open; table 2 */
+    GAMEBIT_LINKC_LINKPortcuClosedLatch0D2F = 0xD2F,     /* Read out of the retail placement data: linkc/LINK_Portcu closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_DFSH_SeqBit1A0D30 = 0xD30,                   /* Named from map data alone - nothing in the code or in any name list mentions it: dfshrine/CAMERAseqob objId= param=bit1A; dfshrine/HitAnimator objId= param=target; table 0 */
     GAMEBIT_DFSH_SeqBit180D31 = 0xD31,                   /* Named from map data alone - nothing in the code or in any name list mentions it: dfshrine/CAMERAseqob objId= param=bit18; table 0 */
     GAMEBIT_NW_GateKeeperAirMeterActive = 0xD32,         /* SnowHorn Gate Keeper tumbleweed-rescue air-meter phase is active; set when the gatekeeper enlists Tricky/tumbleweed help, cleared when the air meter completes */
@@ -1962,8 +2183,10 @@ enum GameBitId {
     GAMEBIT_SH_BloopEventDone = 0xD39,                   /* table 2 */
     GAMEBIT_CFRestartPointRelated0D3D = 0xD3D,           /* table 1 */
     GAMEBIT_VFP_HitAnimTarget0D3E = 0xD3E,               /* Named from map data alone - nothing in the code or in any name list mentions it: temple/HitAnimator objId= param=target; temple/VFPSeqObj objId= param=bit18; table 2 */
+    GAMEBIT_VFP_DoorlocClosedLatch0D41 = 0xD41,          /* Read out of the retail placement data: temple/VFP_Doorloc closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_VFPLightRelated0D44 = 0xD44,                 /* table 3; ref temple/LGTDirectio 0x1E */
     GAMEBIT_MMP_HitAnimTarget0D45 = 0xD45,               /* Named from map data alone - nothing in the code or in any name list mentions it: moonpass/HitAnimator objId= param=target; moonpass/MMP_MagicCa objId= param=open; table 2 */
+    GAMEBIT_MMP_MagicCaClosedLatch0D46 = 0xD46,          /* Read out of the retail placement data: moonpass/MMP_MagicCa closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_MMP_LevelControlEnvironmentA = 0xD47,        /* The DLL names this one itself: MMP_LEVEL_CONTROL_GAMEBIT_ENVIRONMENT_A in MMP_levelco.c */
     GAMEBIT_MoonSeedSpot10Harvested = 0xD4B,             /* One of the eleven moon-seed planting spots MSPlantingS maps from its placement ident: spot 10, ident 0x4B26E, whose map Rena does not record. This is its harvested bit, raised once the grown plant is cut and taken */
     GAMEBIT_MoonSeedSpot10Planted = 0xD4D,               /* One of the eleven moon-seed planting spots MSPlantingS maps from its placement ident: spot 10, ident 0x4B26E, whose map Rena does not record. This is its planted bit; planting also decrements the shared GAMEBIT_ITEM_MoonSeed_Count */
@@ -1971,6 +2194,8 @@ enum GameBitId {
     GAMEBIT_DBSH_OnExplode0D4F = 0xD4F,                  /* Named from map data alone - nothing in the code or in any name list mentions it: dbshrine/ExplodeWall objId= param=onExplode; table 0 */
     GAMEBIT_MMP_AsteroidForceIntensity = 0xD52,          /* Pins the Moon Mountain Pass asteroid's intensity at 1 regardless of GAMEBIT_MMP_MoonRockPedestalCount; Rena has it as moonpass HitAnimator 0x4B451's target */
     GAMEBIT_WarpPointRelatedD53 = 0xD53,                 /* table 1 */
+    GAMEBIT_MMP_FogControlEnable0D54 = 0xD54,            /* Read out of the retail placement data: moonpass/fogControl enableGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_MMP_FogControlEnable0D55 = 0xD55,            /* Read out of the retail placement data: moonpass/fogControl enableGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_OFT_ClawAliveD56 = 0xD56,                    /* Rena's U0 dataset; table 2 */
     GAMEBIT_DFP_LevelControlSfxTriggerD59 = 0xD59,       /* The DLL names this one itself: DFP_LEVEL_CONTROL_SFX_TRIGGER_D59 in DFP_LevelCo.c */
     GAMEBIT_DFP_LevelControlSfxTriggerD5A = 0xD5A,       /* The DLL names this one itself: DFP_LEVEL_CONTROL_SFX_TRIGGER_D5A in DFP_LevelCo.c */
@@ -1992,8 +2217,15 @@ enum GameBitId {
     GAMEBIT_VFP_SkyPending = 0xD72,                      /* The VFP DLL that uses it calls it sky-pending; Rena had it only as VFPRelated0D72 */
     GAMEBIT_CloudRaceResetBit0D73 = 0xD73,               /* One of the bits CRCloudRace clears as it resets the CloudRunner race; Rena's U0 dataset spells it CFRelated0D73, which carries no reading of its own */
     GAMEBIT_LINKH_ObjGroups = 0xD75,                     /* table 3; size 32 */
+    GAMEBIT_DrakorCrateBroken0D76 = 0xD76,               /* Read out of the retail placement data: finalboss/DrakorCrate brokenGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_DrakorCrateBroken0D77 = 0xD77,               /* Read out of the retail placement data: finalboss/DrakorCrate brokenGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_DrakorCrateBroken0D78 = 0xD78,               /* Read out of the retail placement data: finalboss/DrakorCrate brokenGameBit x2; 2 placements. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_DrakorCrateBroken0D79 = 0xD79,               /* Read out of the retail placement data: finalboss/DrakorCrate brokenGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_DrakorCrateBroken0D7A = 0xD7A,               /* Read out of the retail placement data: finalboss/DrakorCrate brokenGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_DrakorCrateBroken0D7B = 0xD7B,               /* Read out of the retail placement data: finalboss/DrakorCrate brokenGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_WC_MagicCaveVisible = 0xD7D,                 /* table 2; ref wallcity/MagicCaveTo Visible */
     GAMEBIT_WC_BombPlantedD7E = 0xD7E,                   /* Rena's U0 dataset; table 2 */
+    GAMEBIT_WC_XYZAnimatorCompletion0D7F = 0xD7F,        /* Read out of the retail placement data: wallcity/XYZAnimator completionGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_WC_SeqUsed0D81 = 0xD81,                      /* Named from map data alone - nothing in the code or in any name list mentions it: wallcity/CAMERAnewse objId= param=usedBit; table 2 */
     GAMEBIT_WC_SeqUsed0D82 = 0xD82,                      /* Named from map data alone - nothing in the code or in any name list mentions it: wallcity/CAMERAnewse objId= param=usedBit; table 2 */
     GAMEBIT_NW_GotPastBribeClaw = 0xD83,                 /* table 2; hint 266 */
@@ -2017,15 +2249,22 @@ enum GameBitId {
     GAMEBIT_WC_SeqBit180D95 = 0xD95,                     /* Named from map data alone - nothing in the code or in any name list mentions it: wallcity/WCSeqObject objId= param=bit18; table 2 */
     GAMEBIT_WC_SeqBit1A0D96 = 0xD96,                     /* Named from map data alone - nothing in the code or in any name list mentions it: wallcity/WCSeqObject objId= param=bit1A; table 2 */
     GAMEBIT_ITEM_FuelCell_ShowCount = 0xD97,             /* table 2; on HUD */
+    GAMEBIT_WC_SHPortcullOpen0D98 = 0xD98,               /* Read out of the retail placement data: wallcity/SH_Portcull open x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_DIM2_LavaControl0D99 = 0xD99,                /* The DLL names this one itself: DIM2_LAVA_CONTROL_GAMEBIT_0D99 in DIM2LavaCon.c */
     GAMEBIT_DIM_MaybeEnabled0D9A = 0xD9A,                /* Named from map data alone - nothing in the code or in any name list mentions it: snowmines/VFP_flamepo objId= param=maybeEnabled; snowmines/VFP_flamepo objId= param=maybeEnabled; snowmines/VFP_flamepo objId= param=maybeEnabled (+6 more); table 0 */
+    GAMEBIT_DIM_WoodDoorClosedLatch0D9B = 0xD9B,         /* Read out of the retail placement data: snowmines/DIMWoodDoor closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_DIM_WoodDoorClosedLatch0D9C = 0xD9C,         /* Read out of the retail placement data: snowmines/DIMWoodDoor closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_DIM_WoodDoorClosedLatch0D9D = 0xD9D,         /* Read out of the retail placement data: snowmines/DIMWoodDoor closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_DIM_WoodDoorClosedLatch0D9E = 0xD9E,         /* Read out of the retail placement data: snowmines/DIMWoodDoor closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_WC_Exists0DA1 = 0xDA1,                       /* Named from map data alone - nothing in the code or in any name list mentions it: wallcity/BombPlant objId= param=exists; table 2 */
     GAMEBIT_WC_HitAnimTarget0DA2 = 0xDA2,                /* Named from map data alone - nothing in the code or in any name list mentions it: wallcity/HitAnimator objId= param=target; table 2 */
     GAMEBIT_WC_Exists0DA3 = 0xDA3,                       /* Named from map data alone - nothing in the code or in any name list mentions it: wallcity/BombPlant objId= param=exists; table 2 */
     GAMEBIT_WC_HitAnimTarget0DA4 = 0xDA4,                /* Named from map data alone - nothing in the code or in any name list mentions it: wallcity/HitAnimator objId= param=target; table 2 */
     GAMEBIT_DIM2_AreaMusicActive = 0xDA5,                /* The DLL names this one itself: DIM2_GAMEBIT_AREA_MUSIC_ACTIVE in 478_DIM2LavaCon.h */
+    GAMEBIT_CF_FogControlEnable0DA6 = 0xDA6,             /* Read out of the retail placement data: fortress/fogControl enableGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_DIM_HitAnimTarget0DA7 = 0xDA7,               /* Named from map data alone - nothing in the code or in any name list mentions it: snowmines/HitAnimator objId= param=target; table 2 */
     GAMEBIT_WC_StopwatchEnabled = 0xDA9,                 /* Walled City countdown stopwatch enabled - Rena has it driving wallcity's CNTstopwatc 'enabled' param; wclevelcont treats it, or gameTimerIsRunning, as 'a countdown is up' while the push-block timer is off, and clears it when the final sequence completes */
+    GAMEBIT_CF_SCShrinedClosedLatch0DAA = 0xDAA,         /* Read out of the retail placement data: fortress/SC_Shrine_d closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_DIMLightRelatedDAB = 0xDAB,                  /* Rena's U0 dataset; table 3 */
     GAMEBIT_CC_Currents2_Disable = 0xDB5,                /* Disables more water currents in Cape Claw when some switch is activated; Rena's U0 dataset; table 2 */
     GAMEBIT_CC_HitAnimTarget0DB6 = 0xDB6,                /* Named from map data alone - nothing in the code or in any name list mentions it: capeclaw/HitAnimator objId= param=target; capeclaw/ExplodeWall objId= param=exploded; table 2 */
@@ -2043,6 +2282,7 @@ enum GameBitId {
     GAMEBIT_MMP_SeqBit180DC4 = 0xDC4,                    /* Named from map data alone - nothing in the code or in any name list mentions it: moonpass/CAMERAseqob objId= param=bit18; table 2 */
     GAMEBIT_CC_Pedestal0DC5 = 0xDC5,                     /* The DLL names this one itself: CC_PEDESTAL_GAMEBIT_0DC5 in CCpedstal.c */
     GAMEBIT_CC_SeqUsed0DC6 = 0xDC6,                      /* Named from map data alone - nothing in the code or in any name list mentions it: capeclaw/CAMERAnewse objId= param=usedBit; table 2 */
+    GAMEBIT_MMP_MoonrocPickupGate0DC7 = 0xDC7,           /* Read out of the retail placement data: moonpass/MMP_moonroc pickupGateGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_CloudRaceCompletionEvent = 0xDCA,            /* CRCloudRace calls it its completion event; Rena had it only as CFRelated0DCA */
     GAMEBIT_CloudRaceEffectClear = 0xDCB,                /* CRCloudRace calls it its effect-clear bit */
     GAMEBIT_OFP_MusicLatch = 0xDCE,                      /* Ocean Force Point level-controller music latch */
@@ -2082,6 +2322,9 @@ enum GameBitId {
     GAMEBIT_LINKF_Open0DF9 = 0xDF9,                      /* Named from map data alone - nothing in the code or in any name list mentions it: linkf/LINK_Portcu objId= param=open; linkf/HitAnimator objId= param=target; table 2 */
     GAMEBIT_LINKF_Open0DFA = 0xDFA,                      /* Named from map data alone - nothing in the code or in any name list mentions it: linkf/LINK_Portcu objId= param=open; linkf/HitAnimator objId= param=target; table 2 */
     GAMEBIT_LINKF_Open0DFB = 0xDFB,                      /* Named from map data alone - nothing in the code or in any name list mentions it: linkf/LINK_Portcu objId= param=open; linkf/HitAnimator objId= param=target; linkf/StaffLeverO objId= param=activated; table 2 */
+    GAMEBIT_LINKF_LINKPortcuClosedLatch0DFC = 0xDFC,     /* Read out of the retail placement data: linkf/LINK_Portcu closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_LINKF_LINKPortcuClosedLatch0DFD = 0xDFD,     /* Read out of the retail placement data: linkf/LINK_Portcu closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_LINKF_LINKPortcuClosedLatch0DFE = 0xDFE,     /* Read out of the retail placement data: linkf/LINK_Portcu closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_SH_PushedSwitchInWell = 0xDFF,               /* table 2 */
     GAMEBIT_CC_GotPastGuardClaw = 0xE00,                 /* Rena's U0 dataset; table 2 */
     GAMEBIT_OFB_SeqBit180E01 = 0xE01,                    /* Named from map data alone - nothing in the code or in any name list mentions it: kraztest/CAMERAseqob objId= param=bit18; table 2 */
@@ -2092,6 +2335,10 @@ enum GameBitId {
     GAMEBIT_MMP_WallExplodedE08 = 0xE08,                 /* Rena's U0 dataset; table 2 */
     GAMEBIT_MMP_WallExplodingE09 = 0xE09,                /* Rena's U0 dataset; table 2 */
     GAMEBIT_MMP_BombPlantedE0A = 0xE0A,                  /* Rena's U0 dataset; table 2 */
+    GAMEBIT_VFP_MSBushGrowthTrigger0E0C = 0xE0C,         /* Read out of the retail placement data: temple/MSBush growthTriggerGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_VFP_MSBushPlanted0E0D = 0xE0D,               /* Read out of the retail placement data: temple/MSBush plantedGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_VFP_MSVineGrowthTrigger0E0E = 0xE0E,         /* Read out of the retail placement data: temple/MSVine growthTriggerGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_VFP_MSVinePlanted0E0F = 0xE0F,               /* Read out of the retail placement data: temple/MSVine plantedGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_MoonSeedSpot11Harvested = 0xE10,             /* One of the eleven moon-seed planting spots MSPlantingS maps from its placement ident: spot 11, ident 0x4BEA3, which Rena places in temple. This is its harvested bit, raised once the grown plant is cut and taken */
     GAMEBIT_VFP_SeqBit180E11 = 0xE11,                    /* Named from map data alone - nothing in the code or in any name list mentions it: temple/MSSeqObject objId= param=bit18; temple/HitAnimator objId= param=target; table 2 */
     GAMEBIT_VFP_SeqUsed0E16 = 0xE16,                     /* Named from map data alone - nothing in the code or in any name list mentions it: temple/CAMERAnewse objId= param=usedBit; table 2 */
@@ -2132,9 +2379,14 @@ enum GameBitId {
     GAMEBIT_DR_SeqUsed0E40 = 0xE40,                      /* Named from map data alone - nothing in the code or in any name list mentions it: dragrock/CAMERAnewse objId= param=usedBit; table 2 */
     GAMEBIT_CF_ClawAliveE41 = 0xE41,                     /* Rena's U0 dataset; table 2 */
     GAMEBIT_CF_ClawAliveE42 = 0xE42,                     /* Rena's U0 dataset; table 2 */
+    GAMEBIT_DR_VFPPuzzlePPressed0E43 = 0xE43,            /* Read out of the retail placement data: dragrock/VFP_PuzzleP pressedGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_DR_VFPPuzzlePPressed0E44 = 0xE44,            /* Read out of the retail placement data: dragrock/VFP_PuzzleP pressedGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_LINKJ_SeqUsed0E48 = 0xE48,                   /* Named from map data alone - nothing in the code or in any name list mentions it: linkj/LINKJseqobj objId= param=usedBit; linkj/LINKJseqobj objId= param=usedBit; table 1 */
     GAMEBIT_WM_NewCrystalAmbientFx = 0xE49,              /* WMnewcrystal calls it its ambient-fx bit; Rena had it only as WM_KrystalRelated0E49 */
     GAMEBIT_DR_SeqUsed0E4A = 0xE4A,                      /* Named from map data alone - nothing in the code or in any name list mentions it: dragrock/CAMERAnewse objId= param=usedBit; table 2 */
+    GAMEBIT_WM_VFPstatuebActivation0E4E = 0xE4E,         /* Read out of the retail placement data: warlock/VFP_statueb activationGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_WM_VFPstatuebActivation0E4F = 0xE4F,         /* Read out of the retail placement data: warlock/VFP_statueb activationGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_WM_DRLaserCanDestroyed0E50 = 0xE50,          /* Read out of the retail placement data: warlock/DR_LaserCan destroyedGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_DBSH_Param240E51 = 0xE51,                    /* Named from map data alone - nothing in the code or in any name list mentions it: dbshrine/FireWorkSou objId= param=_24; dbshrine/FireWorkSou objId= param=_24; dbshrine/FireWorkSou objId= param=_24 (+4 more); table 0 */
     GAMEBIT_CC_ClawDeadE52 = 0xE52,                      /* Rena's U0 dataset; table 2 */
     GAMEBIT_WM_HitAnimTarget0E53 = 0xE53,                /* Named from map data alone - nothing in the code or in any name list mentions it: warlock/TrigCyl objId= param=activate; warlock/HitAnimator objId= param=target; warlock/HitAnimator objId= param=target; table 0 */
@@ -2183,6 +2435,7 @@ enum GameBitId {
     GAMEBIT_SC_SeqBit180E87 = 0xE87,                     /* Named from map data alone - nothing in the code or in any name list mentions it: swapcircle/SC_sequence objId= param=bit18; table 2 */
     GAMEBIT_CF_SeqBit180E88 = 0xE88,                     /* Named from map data alone - nothing in the code or in any name list mentions it: fortress/CAMERAseqob objId= param=bit18; table 2 */
     GAMEBIT_CF_LandingPadE89 = 0xE89,                    /* Rena's U0 dataset; table 1 */
+    GAMEBIT_CF_LargeCrateBroken0E8A = 0xE8A,             /* Read out of the retail placement data: fortress/LargeCrate brokenGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_SC_SeqBit180E8F = 0xE8F,                     /* Named from map data alone - nothing in the code or in any name list mentions it: swapcircle/SC_sequence objId= param=bit18; table 2 */
     GAMEBIT_TestFearStaffBoostEnabled = 0xE91,           /* Rena's U0 dataset; table 2 */
     GAMEBIT_CF_Activate0E93 = 0xE93,                     /* Named from map data alone - nothing in the code or in any name list mentions it: fortress/TrigPln objId= param=activate; table 2 */
@@ -2193,6 +2446,8 @@ enum GameBitId {
     GAMEBIT_DR_WallExplodedE9A = 0xE9A,                  /* Rena's U0 dataset; table 2 */
     GAMEBIT_DR_WallExplodedE9B = 0xE9B,                  /* Rena's U0 dataset; table 2 */
     GAMEBIT_DR_ShutDownRobotShields = 0xE9C,             /* table 2; hint 389 */
+    GAMEBIT_DIM_GroundAnimaSunk0E9D = 0xE9D,             /* Read out of the retail placement data: snowmines/GroundAnima sunkGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_DIM_GroundAnimaSunk0E9E = 0xE9E,             /* Read out of the retail placement data: snowmines/GroundAnima sunkGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_WM_DestroyedBox5 = 0xE9F,                    /* table 2; second set */
     GAMEBIT_WM_DestroyedBox6 = 0xEA0,                    /* table 2 */
     GAMEBIT_WC_EnteredShrine = 0xEA1,                    /* table 0; hint 413 */
@@ -2219,23 +2474,35 @@ enum GameBitId {
     GAMEBIT_VFP_Entered = 0xECE,                         /* table 0; hint 301 */
     GAMEBIT_FoundSpellStoneWarpPad_0ECF = 0xECF,         /* table 0; hint 304 */
     GAMEBIT_OFP_FoundSpellStoneWarpPad = 0xED0,          /* table 0; hint 341 */
+    GAMEBIT_DrakorCrateBroken0ED1 = 0xED1,               /* Read out of the retail placement data: finalboss/DrakorCrate brokenGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_DrakorCrateBroken0ED2 = 0xED2,               /* Read out of the retail placement data: finalboss/DrakorCrate brokenGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_DrakorCrateBroken0ED3 = 0xED3,               /* Read out of the retail placement data: finalboss/DrakorCrate brokenGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_DrakorCrateBroken0ED4 = 0xED4,               /* Read out of the retail placement data: finalboss/DrakorCrate brokenGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_DrakorCrateBroken0ED5 = 0xED5,               /* Read out of the retail placement data: finalboss/DrakorCrate brokenGameBit x1; wallcity/SH_Portcull open x1; 2 placements. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_DR_OnCloudRunner = 0xED7,                    /* table 0 */
+    GAMEBIT_OFB_FogControlEnable0ED8 = 0xED8,            /* Read out of the retail placement data: kraztest/fogControl enableGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_WC_TempleBridgeActive = 0xEDB,               /* Walled City temple bridge live - WCTempleBri raises it as the bridge solves and drops it when the bridge goes inactive or the player passes 1000 units away; KT_RexLevel_free also clears it so its arena leaves no stale global state */
     GAMEBIT_WC_TimedPuzzleBTimerActive = 0xEDC,          /* Walled City timed push-block puzzle B - countdown displayed; raised with GAMEBIT_WC_PushBlockTimerActive while B runs and cleared on solve, timeout or abort */
     GAMEBIT_WC_TimedPuzzleATimerActive = 0xEDD,          /* Walled City timed push-block puzzle A - countdown displayed; raised with GAMEBIT_WC_PushBlockTimerActive while A runs and cleared on solve, timeout or abort */
     GAMEBIT_SH_Related0EDE = 0xEDE,                      /* table 2; Triggers a communication after pushing switch at bottom of well */
     GAMEBIT_DFP_RotatepRingActive = 0xEDF,               /* The DLL names this one itself: DFP_ROTATEP_GAMEBIT_RING_ACTIVE in 562_DFP_RotateP.h */
     GAMEBIT_OFB_MaybeEnabled0EE0 = 0xEE0,                /* Named from map data alone - nothing in the code or in any name list mentions it: kraztest/VFP_flamepo objId= param=maybeEnabled; table 2 */
+    GAMEBIT_OFB_DFPseqpoinDisable0EE1 = 0xEE1,           /* Read out of the retail placement data: kraztest/DFP_seqpoin disableGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_WC_SeqBit1A0EE2 = 0xEE2,                     /* Named from map data alone - nothing in the code or in any name list mentions it: wallcity/WCSeqObject objId= param=bit1A; table 2 */
     GAMEBIT_WC_SeqBit180EE3 = 0xEE3,                     /* Named from map data alone - nothing in the code or in any name list mentions it: wallcity/WCSeqObject objId= param=bit18; table 2 */
     GAMEBIT_DR_SeqBit180EE4 = 0xEE4,                     /* Named from map data alone - nothing in the code or in any name list mentions it: dragrock/DR_Seqobj objId= param=bit18; table 2 */
     GAMEBIT_ITEM_SnowHornArtifactEE5 = 0xEE5,            /* table 2; set when using artifact */
     GAMEBIT_ITEM_SnowHornArtifactEE6 = 0xEE6,            /* table 2; set when using artifact */
+    GAMEBIT_WC_GroundQuakePressed0EE8 = 0xEE8,           /* Read out of the retail placement data: wallcity/GroundQuake pressedGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_WC_FinalPuzzleRelated0EEC = 0xEEC,           /* Cleared alongside the stopwatch and animator bits as the Walled City final puzzle completes; nothing in the code sets it or reads it, and Rena records no objref */
     GAMEBIT_WC_HitAnimTarget0EED = 0xEED,                /* Named from map data alone - nothing in the code or in any name list mentions it: wallcity/HitAnimator objId= param=target; table 1 */
     GAMEBIT_WC_HitAnimTarget0EEE = 0xEEE,                /* Named from map data alone - nothing in the code or in any name list mentions it: wallcity/HitAnimator objId= param=target; table 2 */
     GAMEBIT_WM_Param200EEF = 0xEEF,                      /* Named from map data alone - nothing in the code or in any name list mentions it: warlock/WM_seqpoint objId= param=_20; table 2 */
+    GAMEBIT_WC_SunInsideClosedLatch0EF0 = 0xEF0,         /* Read out of the retail placement data: wallcity/WCSunInside closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_WC_TrexAnimTarget0EF1 = 0xEF1,               /* Wallcity HitAnimator 0x4CB88's target - raised while a T-rex run is being armed and cleared on both of the run's endings */
+    GAMEBIT_WC_SunInsideClosedLatch0EF2 = 0xEF2,         /* Read out of the retail placement data: wallcity/WCSunInside closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_OFB_DFPBridgeClosedLatch0EF4 = 0xEF4,        /* Read out of the retail placement data: kraztest/DFP_Bridge closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_OFB_DFPBridgeClosedLatch0EF5 = 0xEF5,        /* Read out of the retail placement data: kraztest/DFP_Bridge closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_VFP_EnvironmentRelated0EF6 = 0xEF6,           /* table 2; transporter-controlled VFP environment state */
     GAMEBIT_OFP_SeqPointTriggered0EF7 = 0xEF7,           /* Raised by DFP_seqpoin the update its own pending flag comes up, which it then clears */
     GAMEBIT_WC_Activate0EF9 = 0xEF9,                     /* Named from map data alone - nothing in the code or in any name list mentions it: wallcity/TrigPln objId= param=activate; table 1 */
@@ -2249,6 +2516,7 @@ enum GameBitId {
     GAMEBIT_DR_HitAnimTarget0F02 = 0xF02,                /* Named from map data alone - nothing in the code or in any name list mentions it: dragrock/HitAnimator objId= param=target; dragrock/CAMERAnewse objId= param=needBit; table 2 */
     GAMEBIT_DR_SeqUsed0F03 = 0xF03,                      /* Named from map data alone - nothing in the code or in any name list mentions it: dragrock/CAMERAnewse objId= param=usedBit; table 2 */
     GAMEBIT_DIM2_LavaControl0F04 = 0xF04,                /* The DLL names this one itself: DIM2_LAVA_CONTROL_GAMEBIT_0F04 in DIM2LavaCon.c */
+    GAMEBIT_CF_LargeCrateBroken0F06 = 0xF06,             /* Read out of the retail placement data: fortress/LargeCrate brokenGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_LV_LocatedKrazoaShrine = 0xF07,              /* table 0; hint 351 */
     GAMEBIT_NW_DidPadHornTest = 0xF08,                   /* table 0; hint 379 */
     GAMEBIT_WM_Activate0F09 = 0xF09,                     /* Named from map data alone - nothing in the code or in any name list mentions it: warlock/TrigPln objId= param=activate; table 0 */
@@ -2270,12 +2538,21 @@ enum GameBitId {
     GAMEBIT_SC_TotemStrengthSequenceActive = 0xF1D,      /* The DLL names this one itself: SC_TOTEM_STRENGTH_GAMEBIT_SEQUENCE_ACTIVE in SC_totemstr.c */
     GAMEBIT_SB_CanShootPropeller = 0xF1E,                /* Rena's U0 dataset; table 2. Three readings, all of one galleon-fight phase: SB_Galleon sets it as a dive begins and clears it as that ends, SB_Cloudrun gates the CloudRunner's hit SFX on it, and Rena's name has it as when the propeller can be shot */
     GAMEBIT_OFT_SeqBit180F1F = 0xF1F,                    /* Named from map data alone - nothing in the code or in any name list mentions it: dfptop/CAMERAseqob objId= param=bit18; table 2 */
+    GAMEBIT_SHBOT_SfxPlayerBit0F20 = 0xF20,              /* Read out of the retail placement data: hollow2/sfxPlayer gameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_SHBOT_XYZAnimatorCompletion0F21 = 0xF21,     /* Read out of the retail placement data: hollow2/XYZAnimator completionGameBit x1; hollow2/sfxPlayer gameBit x1; 2 placements. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_NW_RescueBush1Cleared = 0xF22,               /* SnowHorn Gate Keeper rescue: tumbleweed bush cleared marker reset by NW_levcontr and consumed by NW_mammoth */
     GAMEBIT_NW_RescueBush2Cleared = 0xF23,               /* SnowHorn Gate Keeper rescue: tumbleweed bush cleared marker reset by NW_levcontr and consumed by NW_mammoth */
     GAMEBIT_NW_RescueBush3Cleared = 0xF24,               /* SnowHorn Gate Keeper rescue: tumbleweed bush cleared marker reset by NW_levcontr and consumed by NW_mammoth */
     GAMEBIT_NW_RescueBush4Cleared = 0xF25,               /* SnowHorn Gate Keeper rescue: tumbleweed bush cleared marker reset by NW_levcontr and consumed by NW_mammoth */
     GAMEBIT_CC_LevelControlGoldBarCompletionSfx = 0xF26, /* The DLL names this one itself: CC_LEVEL_CONTROL_GOLD_BAR_COMPLETION_SFX_GAMEBIT in CClevcontro.c */
     GAMEBIT_WM_Open0F27 = 0xF27,                         /* Named from map data alone - nothing in the code or in any name list mentions it: warlock/WMFinalDoor objId= param=open; table 2 */
+    GAMEBIT_WM_FinalDoorClosedLatch0F28 = 0xF28,         /* Read out of the retail placement data: warlock/WMFinalDoor closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_DFSH_XYZAnimatorCompletion0F29 = 0xF29,      /* Read out of the retail placement data: dfshrine/XYZAnimator completionGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_DFSH_SfxPlayerBit0F2A = 0xF2A,               /* Read out of the retail placement data: dfshrine/sfxPlayer gameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_OFB_DFPRoundDoClosedLatch0F2C = 0xF2C,       /* Read out of the retail placement data: kraztest/DFP_RoundDo closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_OFB_DFPRoundDoClosedLatch0F2D = 0xF2D,       /* Read out of the retail placement data: kraztest/DFP_RoundDo closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_OFB_DFPRoundDoClosedLatch0F2E = 0xF2E,       /* Read out of the retail placement data: kraztest/DFP_RoundDo closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_OFB_DFPRoundDoClosedLatch0F2F = 0xF2F,       /* Read out of the retail placement data: kraztest/DFP_RoundDo closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_CountdownTimerRunning = 0xF31,               /* A countdown is running: NW_levcontr writes its own timer-active flag straight into it and latches its timer-end music off it, and WCLevelCont writes the same flag computed from the push-block timer, GAMEBIT_WC_StopwatchEnabled and gameTimerIsRunning */
     GAMEBIT_VFP_Param200F32 = 0xF32,                     /* Named from map data alone - nothing in the code or in any name list mentions it: temple/VFP_seqpoin objId= param=_20; table 2 */
     GAMEBIT_MMP_LevelControlEnvironmentB = 0xF33,        /* The DLL names this one itself: MMP_LEVEL_CONTROL_GAMEBIT_ENVIRONMENT_B in MMP_levelco.c */
