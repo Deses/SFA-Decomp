@@ -419,6 +419,7 @@ enum GameBitId {
     GAMEBIT_LV_Totem3_Activated = 0x83,                  /* Rena's U0 dataset; table 2, corroborated by SC_totempol naming the same bit the totem pole's RIGHT face */
     GAMEBIT_LV_Totem4_Activated = 0x84,                  /* Rena's U0 dataset; table 2, corroborated by SC_totempol naming the same bit the totem pole's REAR face */
     GAMEBIT_SC_HitAnimTarget0085 = 0x85,                 /* Rena has it as the target of swapcircle's HitAnimator 0x4C837; sc_levelcontrol raises it whenever GAMEBIT_SC_TestPhaseOver007A is up and clears it as a timed totem run starts */
+    GAMEBIT_SC_MounddooClosedLatch0086 = 0x86,           /* Read out of the retail placement data: swapcircle/SC_mounddoo closedLatchGameBit, its DoorPlacement's field at 0x1A. Restored after a too-blunt audit removed it - the struct fits its record and the slot was never in question */
     GAMEBIT_SC_LVBlock2Related0087 = 0x87,               /* One of the three bits sc_levelcontrol raises the moment GAMEBIT_ITEM_LVBlock2_Used is set */
     GAMEBIT_SH_WarpStonePathOpen = 0x88,                 /* table 2; did blow up wall leading to WarpStone */
     GAMEBIT_SC_SteppingClosedLatch0089 = 0x89,           /* Read out of the retail placement data: swapcircle/SC_stepping closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
@@ -945,6 +946,7 @@ enum GameBitId {
     GAMEBIT_SB_ObjGroups = 0x3E0,                        /* table 3; size 32; frontend, galleonship, Ship Battle */
     GAMEBIT_DIM_TriggerLostInBlizzard = 0x3E2,           /* table 0; Trigger scene where Fox walks off into blizzard and comes back */
     GAMEBIT_NW_SnowHorn03E3 = 0x3E3,                     /* table 0; related to riding SnowHorn */
+    GAMEBIT_DIM_PushBlocBit03E5 = 0x3E5,                 /* A DarkIce push-block's gamebit, from its placement's field at 0x18. That slot is corroborated rather than assumed: the Walled City push blocks are the same DLL and read the same offset, and the three ids they hold there are exactly GAMEBIT_WC_Switch1/2/3Activated, which were named from WCLevelCont's code. PushableObjectDef overruns the 0x24 record at its tail, but this field is inside it */
     GAMEBIT_DIM_LostInBlizzard = 0x3E8,                  /* table 0; Triggered by 0x3E2, actually starts the scene */
     GAMEBIT_ITEM_NWFood_Got = 0x3E9,                     /* table 0; Alpine Root while riding SnowHorn through blizzard; collecting one sets this to 1, then 0 */
     GAMEBIT_SH_Open03EB = 0x3EB,                         /* Named from map data alone - nothing in the code or in any name list mentions it: hollow/SH_Portcull objId= param=open; hollow/StaffLeverO objId= param=activated; table 2 */
@@ -1347,6 +1349,7 @@ enum GameBitId {
     GAMEBIT_ITEM_SpellStone7BD_Got = 0x7BD,              /* table 2; unused?. Backs the collectable item C-menu entry the game labels "Use SpellStone" (its owned bit) */
     GAMEBIT_OFB_Open07BE = 0x7BE,                        /* Named from map data alone - nothing in the code or in any name list mentions it: kraztest/DFP_RoundDo objId= param=open; kraztest/StaffLeverO objId= param=activated; kraztest/CAMERAseqob objId= param=bit1A (+1 more); table 2 */
     GAMEBIT_ITEM_SpellStone7BF_Got = 0x7BF,              /* table 1. Backs the collectable item C-menu entry the game labels "Use SpellStone" (its owned bit) */
+    GAMEBIT_OFB_DFPseqpoinDisable07C1 = 0x7C1,           /* A DFP sequence point's disable bit, from its placement's field at 0x20. Two of the ids that slot holds - 0xCB1 and 0xEE0 - were already named from other evidence, which is what vindicates the slot; DfpSeqPointPlacement overruns the 0x24 record at its tail, but this field is inside it */
     GAMEBIT_OFP_Reopened = 0x7C2,                        /* table 2; hint 403; ref dfptop/HitAnimator target */
     GAMEBIT_HT_ObjStates = 0x7CE,                        /* table 3; size 32 */
     GAMEBIT_SC_TotemRunRelated07CF = 0x7CF,              /* Raised beside GAMEBIT_SC_TotemRunCompleted on the fade-out path and nowhere else, with nothing in the code reading it back */
@@ -1475,6 +1478,7 @@ enum GameBitId {
     GAMEBIT_CF_GuardianLanded = 0x8E9,                   /* The DLL names this one itself: GAMEBIT_CFGUARDIAN_LANDED in CFGuardian.c */
     GAMEBIT_KP_ActNo = 0x8EC,                            /* table 1; size 4; old "krazoapalace" map */
     GAMEBIT_KP_ObjGroups = 0x8ED,                        /* table 3; size 32 */
+    GAMEBIT_OFB_DFPseqpoinDisable08EE = 0x8EE,           /* A DFP sequence point's disable bit, from its placement's field at 0x20. Two of the ids that slot holds - 0xCB1 and 0xEE0 - were already named from other evidence, which is what vindicates the slot; DfpSeqPointPlacement overruns the 0x24 record at its tail, but this field is inside it */
     GAMEBIT_WM_Seq8F4 = 0x8F4,                           /* Rena's U0 dataset; table 2 */
     GAMEBIT_CF_Open08FC = 0x8FC,                         /* Named from map data alone - nothing in the code or in any name list mentions it: fortress/SH_Portcull objId= param=open; table 2 */
     GAMEBIT_CF_SHPortcullOpen08FD = 0x8FD,               /* Read out of the retail placement data: fortress/SH_Portcull open x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
@@ -2081,6 +2085,7 @@ enum GameBitId {
     GAMEBIT_WM_SpiritPlace5Ready = 0xCB6,                /* table 2; gates spirit-place 5 and its return pad */
     GAMEBIT_ITEM_Spirit6_Released = 0xCB7,               /* table 2; hint 423; hint: "Andross Revealed" */
     GAMEBIT_WM_SpiritPlace6Ready = 0xCB8,                /* table 2; gates spirit-place 6 and its return pad */
+    GAMEBIT_OFB_DFPseqpoinDisable0CB9 = 0xCB9,           /* A DFP sequence point's disable bit, from its placement's field at 0x20. Two of the ids that slot holds - 0xCB1 and 0xEE0 - were already named from other evidence, which is what vindicates the slot; DfpSeqPointPlacement overruns the 0x24 record at its tail, but this field is inside it */
     GAMEBIT_SHRINE_MUSIC_LOCK = 0xCBB,                   /* Krazoa-shrine music lock: set (success-gated in GPSH) when a Krazoa shrine object (MMSH/ECSH/DFSH/DBSH/GPSH) frees; every area's level-control DLL watches it via GameBitLatch_Update to start/stop MUSICTRIG_PU3_Adventure_c4 and hand back its own ambient music, and it also raises audio.c's SFX reverb bus and suppresses doorf4's door-close SFX during the transition */
     GAMEBIT_ITEM_SpellStone_Disabled = 0xCBC,            /* table 2; dims them in the menu. Backs the collectable item C-menu entry the game labels "Use SpellStone" (its active bit) */
     GAMEBIT_SawFuelCell = 0xCBE,                         /* table 2 */
@@ -2472,6 +2477,8 @@ enum GameBitId {
     GAMEBIT_WM_SeqEB4 = 0xEB4,                           /* Rena's U0 dataset; table 2 */
     GAMEBIT_ITEM_Flute_Disabled = 0xEB5,                 /* table 2. Backs the collectable item C-menu entry the game labels "Blow Flute" (its active bit) */
     GAMEBIT_CF_KytesMumQuestStage1 = 0xEB9,              /* Written as a boolean of Kyte's mum's quest count being exactly 1, so it tracks her first quest stage; Rena has it as fortress HitAnimator 0x4CD31's target */
+    GAMEBIT_OFB_DIMPushBlocBit0EBB = 0xEBB,              /* A DarkIce push-block's gamebit, from its placement's field at 0x18. That slot is corroborated rather than assumed: the Walled City push blocks are the same DLL and read the same offset, and the three ids they hold there are exactly GAMEBIT_WC_Switch1/2/3Activated, which were named from WCLevelCont's code. PushableObjectDef overruns the 0x24 record at its tail, but this field is inside it */
+    GAMEBIT_OFB_DIMPushBlocBit0EBC = 0xEBC,              /* A DarkIce push-block's gamebit, from its placement's field at 0x18. That slot is corroborated rather than assumed: the Walled City push blocks are the same DLL and read the same offset, and the three ids they hold there are exactly GAMEBIT_WC_Switch1/2/3Activated, which were named from WCLevelCont's code. PushableObjectDef overruns the 0x24 record at its tail, but this field is inside it */
     GAMEBIT_ECSH_CameraLookingAtDoor = 0xECA,            /* table 2; focuses camera on door */
     GAMEBIT_NW_EscapedFromSnowClearing = 0xECC,          /* table 0; hint 265 */
     GAMEBIT_NW_WalkSequenceRunning = 0xECD,              /* table 0; raised as NW_levcontr starts its walk-table sequence off GAMEBIT_SnowHornArtifact19D, and cleared again by its cleanup mode */
@@ -2493,6 +2500,7 @@ enum GameBitId {
     GAMEBIT_SH_Related0EDE = 0xEDE,                      /* table 2; Triggers a communication after pushing switch at bottom of well */
     GAMEBIT_DFP_RotatepRingActive = 0xEDF,               /* The DLL names this one itself: DFP_ROTATEP_GAMEBIT_RING_ACTIVE in 562_DFP_RotateP.h */
     GAMEBIT_OFB_MaybeEnabled0EE0 = 0xEE0,                /* Named from map data alone - nothing in the code or in any name list mentions it: kraztest/VFP_flamepo objId= param=maybeEnabled; table 2 */
+    GAMEBIT_OFB_DFPseqpoinDisable0EE1 = 0xEE1,           /* A DFP sequence point's disable bit, from its placement's field at 0x20. Two of the ids that slot holds - 0xCB1 and 0xEE0 - were already named from other evidence, which is what vindicates the slot; DfpSeqPointPlacement overruns the 0x24 record at its tail, but this field is inside it */
     GAMEBIT_WC_SeqBit1A0EE2 = 0xEE2,                     /* Named from map data alone - nothing in the code or in any name list mentions it: wallcity/WCSeqObject objId= param=bit1A; table 2 */
     GAMEBIT_WC_SeqBit180EE3 = 0xEE3,                     /* Named from map data alone - nothing in the code or in any name list mentions it: wallcity/WCSeqObject objId= param=bit18; table 2 */
     GAMEBIT_DR_SeqBit180EE4 = 0xEE4,                     /* Named from map data alone - nothing in the code or in any name list mentions it: dragrock/DR_Seqobj objId= param=bit18; table 2 */
