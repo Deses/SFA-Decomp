@@ -702,11 +702,11 @@ any of them is acted on.
 | 0x289 | SPitembeam | RAW | dlls/objects/649_SPitembeam/SPitembeam.c | = (canonical) | Exact complete TU; descriptor is followed by a DOL-proven 76-byte SnowBike table |
 | 0x28A | — | NO-RETAIL-NAME | dlls/objects/650/650.c | = (canonical) | Exact ten-function EarthWalker TU with its recovered 20-byte constant pool; [corrected boundary](dll_650_651_boundary.md) preserves the numbered slot |
 | 0x28B | — | NO-RETAIL-NAME | dlls/objects/651/651.c | = (canonical) | Exact seventeen-function TU including its eight state handlers and complete 48-byte constant pool; the former assignment of those handlers to 650 is superseded by [pool and ownership evidence](dll_650_651_boundary.md) |
-| 0x28C | WCBouncyCra | RAW | dlls/objects/652_WCBouncyCra/WCBouncyCra.c | = (canonical) | Exact complete TU containing the trailing shared `wcblock_*` helper and descriptor at the physical end |
+| 0x28C | WCBouncyCra | RAW | dlls/objects/652_WCBouncyCra/WCBouncyCra.c | = (canonical) | Nine exact callbacks with descriptor last and a complete 48-byte constant pool; the former trailing cell test belongs to 656 ([boundary audit](dll_652_656_boundary.md)) |
 | 0x28D | WCLevelCont | RAW | dlls/objects/653_WCLevelCont/WCLevelCont.c | = (canonical) | Exact complete 27-function TU with descriptor at the physical end |
 | 0x28E | WCBeacon | RAW | dlls/objects/654_WCBeacon/WCBeacon.c | = (canonical) | Exact complete six-function TU with descriptor at the physical end |
 | 0x28F | WCPressureS | RAW | dlls/objects/655_WCPressureS/WCPressureS.c | = (canonical) | DOL-confirmed ten-function TU; descriptor is followed by its trailing activation-format string |
-| 0x290 | WCPushBlock | RAW | dlls/objects/656_WCPushBlock/WCPushBlock.c | = (canonical) | Exact complete TU; descriptor placement precedes the function bodies and four trailing tile-grid tables remain in the same DOL object |
+| 0x290 | WCPushBlock | RAW | dlls/objects/656_WCPushBlock/WCPushBlock.c | = (canonical) | Ten exact functions including the leading stored-cell test, complete 84-byte constant pool; descriptor retains its early position and four trailing tile-grid tables remain in the same DOL object ([boundary audit](dll_652_656_boundary.md)) |
 | 0x291 | WCTile | RAW | dlls/objects/657_WCTile/WCTile.c | = (canonical) | Exact complete nine-function TU with its sole descriptor at the physical end |
 | 0x292 | WCTrexStatu | RAW | dlls/objects/658_WCTrexStatu/WCTrexStatu.c | = (canonical) | Exact complete ten-function TU with its sole descriptor at the physical end |
 | 0x293 | — | NO-RETAIL-NAME | dlls/objects/659/659.c | = (canonical) | Exact complete ten-function TU; `SunTemple` is an internal object alias, not a recovered DLL basename |

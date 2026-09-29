@@ -3,18 +3,6 @@
 
 #include "game/objects/object.h"
 #include "game/objects/object_setup.h"
-#include "main/dll/WC/wc_block_state.h"
-
-typedef struct WCBlockGridInterface {
-    char pad0[0x20];
-    void (*getCellWorldA)(int obj, s16 cellX, s16 cellZ, f32* worldX, f32* worldZ, struct WCBlockGridInterface* self);
-    char pad24[0x0C];
-    void (*getCellXYA)(u8 tileIndex, s16* cellX, s16* cellZ, struct WCBlockGridInterface* self);
-    char pad34[0x08];
-    void (*getCellWorldB)(int obj, s16 cellX, s16 cellZ, f32* worldX, f32* worldZ, struct WCBlockGridInterface* self);
-    char pad40[0x0C];
-    void (*getCellXYB)(u8 tileIndex, s16* cellX, s16* cellZ, struct WCBlockGridInterface* self);
-} WCBlockGridInterface;
 
 typedef struct WCBouncyCrateState {
     f32 homeY;

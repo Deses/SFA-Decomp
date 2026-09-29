@@ -63,19 +63,21 @@ interpreted as evidence that the definitions belonged to another TU. That
 conclusion was too strong: the qualifier affected the reconstructed expression,
 and the same-TU recovery below preserves both code and data.
 
-`WCPushBlock`, `WORLDAstero`'s trailing pair and `ARWArwing`'s tuning values
+`WORLDAstero`'s trailing pair and `ARWArwing`'s tuning values
 still need ownership recovery. Neither an external declaration in reconstructed
 source nor a qualifier-induced register change establishes an original boundary.
 The former `650` gap is resolved by the independently aligned pools and handler
 ownership at the [650 / 651 boundary](dll_650_651_boundary.md).
+The push-block pool is resolved by the [652 / 656 boundary](dll_652_656_boundary.md).
 
 ## Bouncy-crate constant ownership (2026-09-29)
 
-The existing `WCBouncyCra.c` now defines its nine bounce parameters before the
-functions and its cell-margin parameter immediately before the shared cell test.
-Every reference to these ten symbols belongs to this TU. The complete pool is
-52 bytes: nine floats, four bytes of natural double alignment, the cooldown's
-conversion double, and the cell-margin float. Its descriptor remains last.
+The existing `WCBouncyCra.c` defines its nine bounce parameters before the
+functions. The complete pool is 48 bytes: nine floats, four bytes of natural
+double alignment, and the cooldown's conversion double. Its descriptor remains
+last. The first recovery also claimed the following cell-margin float and
+helper; the subsequent [boundary audit](dll_652_656_boundary.md) establishes
+that both start WCPushBlock's independently aligned pool and code.
 
 The reads use `*(const f32*)&name`, as already used by `rcp_dolphin.c`, to preserve
 the named objects without anonymous literal duplicates. Plain scalar reads and
@@ -91,19 +93,17 @@ This is a verified reconstruction, not a claim to know the original spelling.
 
 | Version | Complete `.sdata2` range |
 | --- | --- |
-| GSAE01 | `803E6D20..803E6D54` |
-| GSAE01_rev1 | `803E79B8..803E79EC` |
-| GSAJ01 | `803E6E40..803E6E74` |
-| GSAP01 | `803E8550..803E8584` |
-| GSAP01_rev1 | `803E8718..803E874C` |
+| GSAE01 | `803E6D20..803E6D50` |
+| GSAE01_rev1 | `803E79B8..803E79E8` |
+| GSAJ01 | `803E6E40..803E6E70` |
+| GSAP01 | `803E8550..803E8580` |
+| GSAP01_rev1 | `803E8718..803E8748` |
 
-All five versions retain ten exact functions and now own 108 exact data bytes,
-up from 64. Both `ninja all_source` and the native strict retail checksum pass
-with the complete pool linked from source. The adjacent push-block constants
-remain outside this unit.
-Regional projection reproduces the full unit's ranges in each secondary target.
-An independent retail operand audit confirms all ten constants, their bytes,
-and fourteen paired r2-relative references per secondary version.
+After the boundary correction, all five versions retain nine exact functions
+and own 104 exact data bytes. Both `ninja all_source` and the native strict
+retail checksum pass with the complete pool linked from source. Regional
+projection and the combined retail operand audit are recorded in the boundary
+report.
 
 ## Asteroid render-scale recovery (2026-09-29)
 

@@ -30,6 +30,4 @@ STATIC_ASSERT(offsetof(WCBlockState, cellZ) == 0x280);
 STATIC_ASSERT(offsetof(WCBlockState, pushDir) == 0x282);
 STATIC_ASSERT(offsetof(WCBlockState, tileIndex) == 0x283);
 
-int wcblock_isPlayerAwayFromStoredCell(GameObject* obj, WCBlockState* state, GameObject* player);
-
 #endif

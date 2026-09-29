@@ -3949,14 +3949,14 @@ dlls/objects/651/651.c:
 	.sdata2     start:0x803E86E8 end:0x803E8718
 
 dlls/objects/652_WCBouncyCra/WCBouncyCra.c:
-	.text       start:0x80224924 end:0x80224C8C
+	.text       start:0x80224924 end:0x80224B40
 	.data       start:0x8032C910 end:0x8032C948
-	.sdata2     start:0x803E8718 end:0x803E874C
+	.sdata2     start:0x803E8718 end:0x803E8748
 
 dlls/objects/656_WCPushBlock/WCPushBlock.c:
-	.text       start:0x80224C8C end:0x80225A4C
-	.data       start:0x8032C948 end:0x8032C9A0
-	.sdata2     start:0x803E8790 end:0x803E879C
+	.text       start:0x80224B40 end:0x80225A4C
+	.data       start:0x8032C948 end:0x8032C99C
+	.sdata2     start:0x803E8748 end:0x803E879C
 
 dlls/objects/653_WCLevelCont/WCLevelCont.c:
 	.text       start:0x80225A4C end:0x80227BB8
