@@ -10,10 +10,10 @@ from test_tricky_backend_graph import simplification_fixture
 
 class BackendTraceTests(unittest.TestCase):
     def test_temporary_birth_capture_rejects_unsupported_modes_before_compiling(self):
-        for platform, graph in [("linux", True), ("win32", True), ("darwin", False)]:
+        for platform, graph in [("linux", True), ("win32", False), ("darwin", False)]:
             with self.subTest(platform=platform, graph=graph), patch.object(trace.sys, "platform", platform), \
                     patch.object(trace.subprocess, "run") as run, \
-                    self.assertRaisesRegex(ValueError, "requires macOS and --graph"):
+                    self.assertRaisesRegex(ValueError, "requires macOS or Windows and --graph"):
                 trace.run_capture(Path("unused.c"), Path("unused"), ["unused"], graph=graph,
                                   temporary_names=["@1899"])
             run.assert_not_called()

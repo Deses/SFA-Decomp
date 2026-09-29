@@ -19,7 +19,7 @@ import tempfile
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from tricky_backend_ir import COMPILER_SHA256, capture_snapshot
-from tricky_backend_graph import capture_graph_snapshot, register_kind
+from tricky_backend_graph import capture_graph_snapshot, match_temporary_births, register_kind
 
 
 BASE = 0x400000
@@ -43,17 +43,6 @@ def emulate_hook(pc, sp, ebx, word, write_word):
         write_word(sp - 4, ebx & 0xFFFFFFFF)
         return sp - 4, pc + 1
     raise ValueError("unrecognized compiler hook")
-
-
-def match_temporary_births(graph, births, identity):
-    """Join observed factory results to graph objects, not to register numbers."""
-    matched = {}
-    for register, node in enumerate(graph):
-        address = node["prefix"][1]
-        if address in births and identity(address) == (births[address]["name"], births[address]["type"]):
-            entry = matched.setdefault(address, dict(births[address], registers=[]))
-            entry["registers"].append(register)
-    return list(matched.values())
 
 
 def page_reader(read):

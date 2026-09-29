@@ -144,8 +144,8 @@ def inspect(snapshots, obj, functions, require_graph=False, unit=UNIT, required_
 def run_capture(source, directory, functions, graph=False, unit=UNIT, register_class=4,
                 final_allocation_attempt=False, temporary_names=()):
     register_kind(register_class)
-    if temporary_names and (sys.platform != "darwin" or not graph):
-        raise ValueError("temporary birth capture currently requires macOS and --graph")
+    if temporary_names and (sys.platform not in ("darwin", "win32") or not graph):
+        raise ValueError("temporary birth capture requires macOS or Windows and --graph")
     if sys.platform == "darwin":
         from mwcc_backend_capture_lldb import capture
     elif sys.platform.startswith("linux"):
@@ -215,7 +215,7 @@ def main():
     parser.add_argument("--register-class", choices=("gpr", "fpr"), help="Graph class (default: gpr)")
     parser.add_argument("--register", type=int, action="append", help="Virtual register graph index; requires --graph when capturing")
     parser.add_argument("--temporary-name", action="append", default=[],
-                        help="Trace an observed compiler temporary name back to its object-factory caller; repeatable, macOS --graph captures only")
+                        help="Trace an observed compiler temporary name back to its object-factory caller; repeatable, macOS/Windows --graph captures only")
     parser.add_argument("--read", type=Path, help="Inspect a previous trace and its adjacent traced.o without compiling")
     args = parser.parse_args()
     if args.instruction and len(args.function or []) != 1:
@@ -226,8 +226,8 @@ def main():
         parser.error("--register-class requires --graph when capturing")
     if args.final_allocation_attempt and not (args.graph or args.read):
         parser.error("--final-allocation-attempt requires --graph or --read")
-    if args.temporary_name and (args.read or not args.graph or sys.platform != "darwin"):
-        parser.error("--temporary-name requires a fresh macOS --graph capture")
+    if args.temporary_name and (args.read or not args.graph or sys.platform not in ("darwin", "win32")):
+        parser.error("--temporary-name requires a fresh macOS or Windows --graph capture")
     if args.read:
         document = json.loads(args.read.read_text(encoding="utf-8"))
         if document["schema"] != 1:
