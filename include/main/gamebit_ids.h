@@ -321,6 +321,8 @@ enum GameBitId {
     GAMEBIT_AndrossRelated0003 = 0x3,                    /* table 0; polled before Andross's post-fight warp */
     GAMEBIT_AndrossRelated0004 = 0x4,                    /* table 0; polled before Andross's post-fight warp */
     GAMEBIT_SH_KilledBloop1 = 0x5,                       /* table 1 */
+    GAMEBIT_WBCounter0006 = 0x6,                         /* Read out of the retail placement data: snowmines2/WB counterGameBit x1; dfshrine/Firebat counterGameBit x1. The field is called a counter but BITTABLE gives the id a width of 1, so it holds a flag - most likely "this one has been killed" rather than a tally */
+    GAMEBIT_SpittingEbaVisibility0007 = 0x7,             /* Read out of the retail placement data: dragrock/SpittingEba visibilityGameBit x5; dfptop/PinPon counterGameBit x3. CAUTION: the objects that carry it name the field differently (counterGameBit, visibilityGameBit), so which reading is right is unsettled */
     GAMEBIT_SH_KilledBloop2 = 0x8,                       /* table 1 */
     GAMEBIT_CC_LightFootEncounterTriggered = 0x9,        /* The DLL names this one itself: CC_LIGHTFOOT_ENCOUNTER_TRIGGERED_GAMEBIT in CClightfoot.c */
     GAMEBIT_NW_GeyserDisable = 0xA,                      /* The DLL names this one itself: NW_GEYSER_DISABLE_GAMEBIT in NW_geyser.c */
@@ -332,6 +334,7 @@ enum GameBitId {
     GAMEBIT_AndrossRelated0012 = 0x12,                   /* table 0 */
     GAMEBIT_SH_KilledBloop3 = 0x13,                      /* table 1 */
     GAMEBIT_SH_KilledBloop4 = 0x14,                      /* table 1 */
+    GAMEBIT_OFT_SharpclawCoCounter0015 = 0x15,           /* Read out of the retail placement data: dfptop/sharpclawCo counterGameBit x1. The field is called a counter but BITTABLE gives the id a width of 1, so it holds a flag - most likely "this one has been killed" rather than a tally */
     GAMEBIT_DIM_HitAnimTarget0016 = 0x16,                /* Named from map data alone - nothing in the code or in any name list mentions it: snowmines/DIMSeqObjec objId= param=bit18; snowmines/HitAnimator objId= param=target; snowmines/HitAnimator objId= param=target (+2 more); table 1 */
     GAMEBIT_DIM_BossDefeatStateB0017 = 0x17,             /* Two DarkIce DLLs name it and differently: DIM_Boss raises it as its defeat state B, and DIM_LevelCo reads it as one half of a compound condition. Both fit the boss going down, but nothing in the code proves that, so the id stays in the name */
     GAMEBIT_NW_ClimbOnSnowHorn = 0x18,                   /* table 0; climbing onto SnowHorn (will warp you to nearby one) */
@@ -339,6 +342,7 @@ enum GameBitId {
     GAMEBIT_DIM_Open001A = 0x1A,                         /* Named from map data alone - nothing in the code or in any name list mentions it: snowmines/DIMUseObjec objId= param=open; table 2 */
     GAMEBIT_DIM_SeqUsed001B = 0x1B,                      /* Named from map data alone - nothing in the code or in any name list mentions it: snowmines/CAMERAnewse objId= param=usedBit; table 2 */
     GAMEBIT_DIM_SeqUsed001C = 0x1C,                      /* Named from map data alone - nothing in the code or in any name list mentions it: snowmines/CAMERAnewse objId= param=usedBit; table 2 */
+    GAMEBIT_DIM2_SharpclawSnCounter001E = 0x1E,          /* Read out of the retail placement data: snowmines2/sharpclawSn counterGameBit x2. The field is called a counter but BITTABLE gives the id a width of 1, so it holds a flag - most likely "this one has been killed" rather than a tally */
     GAMEBIT_DIM_SeqUsed0020 = 0x20,                      /* Named from map data alone - nothing in the code or in any name list mentions it: snowmines/CAMERAnewse objId= param=usedBit; table 2 */
     GAMEBIT_PlayerPeriodicHitImmune = 0x21,              /* While set the player stops taking the repeating damage surface type 28 deals - the surface handler only runs its periodic-hit timer while this is clear */
     GAMEBIT_SH_FoundQueen = 0x22,                        /* table 2; hint 256 */
@@ -512,6 +516,7 @@ enum GameBitId {
     GAMEBIT_DFSH_ObjCreatorDroppedItem = 0xFC,           /* The DLL names this one itself: DFSH_OBJ_CREATOR_DROPPED_ITEM_GAME_BIT in DFSH_ObjCre.c */
     GAMEBIT_WGSH_warpEnabled0FD = 0xFD,                  /* table 0; Rena's U0 name, annotated there as belonging to an unused map - the Krazoa Test 1 controller latches it once in its COMPLETE phase */
     GAMEBIT_ITEM_SpiritTestFear_Got = 0xFF,              /* table 2; hint 355; have the Krazoa Spirit from Test of Fear (and haven't released it) */
+    GAMEBIT_OFB_DFPObjCreaGameBitA0100 = 0x100,          /* Read out of the retail placement data: kraztest/DFP_ObjCrea gameBitA x2 */
     GAMEBIT_NW_RescuedSnowHornGateKeeper = 0x102,        /* table 2; hint 279 */
     GAMEBIT_PushableSequence = 0x103,                    /* The DLL names this one itself: PUSHABLE_SEQUENCE_GAME_BIT in 239.c */
     GAMEBIT_SH_KilledBloop17 = 0x104,                    /* table 1 */
@@ -540,6 +545,7 @@ enum GameBitId {
     GAMEBIT_WM_EnteredKrazoaTest1_0129 = 0x129,          /* table 0; set when entering Krazoa test 1, cleared when talking to spirit */
     GAMEBIT_MMSH_Shrine012A = 0x12A,                     /* The DLL names this one itself: MMSH_SHRINE_GAMEBIT_012A in MMSH_Shrine.c */
     GAMEBIT_SHRINE_SpiritGranted012B = 0x12B,            /* Shared across the Krazoa shrines rather than belonging to one: GPSH raises it as it grants its spirit, beside GAMEBIT_ITEM_Spirit5_Got, and MMSH clears it in its own reset - hence the SHRINE_ prefix it shares with GAMEBIT_SHRINE_MUSIC_LOCK. MMSH_Shrine has only a placeholder alias for it */
+    GAMEBIT_CF_GCRobotPatrCounter012C = 0x12C,           /* Read out of the retail placement data: fortress/GCRobotPatr counterGameBit x13. The field is called a counter but BITTABLE gives the id a width of 1, so it holds a flag - most likely "this one has been killed" rather than a tally */
     GAMEBIT_MMSH_Shrine012D = 0x12D,                     /* The DLL names this one itself: MMSH_SHRINE_GAMEBIT_012D in MMSH_Shrine.c */
     GAMEBIT_ITEM_TrickyFood_GrabInProgress = 0x12E,      /* Global latch: set by dll_01A7 EdibleMushroom when a GrubTub Fungus offers itself to the player (grab in range), cleared once the grab-complete reply lands and TrickyFood_Count (or the romDefNo-0x658 variant's bit) increments; read by Tricky's food check as a stand-in for already owning TrickyFood */
     GAMEBIT_HintTexts0 = 0x12F,                          /* table 2; size 32; related to hint texts; flags, set when Krystal boards ship */
@@ -860,6 +866,7 @@ enum GameBitId {
     GAMEBIT_CFRelated02FD = 0x2FD,                       /* table 1 */
     GAMEBIT_CFRelated02FE = 0x2FE,                       /* table 1 */
     GAMEBIT_CFRelated02FF = 0x2FF,                       /* table 1 */
+    GAMEBIT_OFB_DFPObjCreaGameBitA0300 = 0x300,          /* Read out of the retail placement data: kraztest/DFP_ObjCrea gameBitA x2 */
     GAMEBIT_CF_Open0302 = 0x302,                         /* Named from map data alone - nothing in the code or in any name list mentions it: fortress/SC_Shrine_d objId= param=open; fortress/SC_Shrine_d objId= param=open; table 1 */
     GAMEBIT_CF_Open0303 = 0x303,                         /* Named from map data alone - nothing in the code or in any name list mentions it: fortress/SC_Shrine_d objId= param=open; table 2 */
     GAMEBIT_WC_SeqBit1A0304 = 0x304,                     /* Named from map data alone - nothing in the code or in any name list mentions it: wallcity/WCSeqObject objId= param=bit1A; table 2 */
@@ -941,6 +948,7 @@ enum GameBitId {
     GAMEBIT_SB_ObjGroups = 0x3E0,                        /* table 3; size 32; frontend, galleonship, Ship Battle */
     GAMEBIT_DIM_TriggerLostInBlizzard = 0x3E2,           /* table 0; Trigger scene where Fox walks off into blizzard and comes back */
     GAMEBIT_NW_SnowHorn03E3 = 0x3E3,                     /* table 0; related to riding SnowHorn */
+    GAMEBIT_DIM_PushBlocBit03E5 = 0x3E5,                 /* Read out of the retail placement data: snowmines/DIMPushBloc gameBit x1 */
     GAMEBIT_DIM_LostInBlizzard = 0x3E8,                  /* table 0; Triggered by 0x3E2, actually starts the scene */
     GAMEBIT_ITEM_NWFood_Got = 0x3E9,                     /* table 0; Alpine Root while riding SnowHorn through blizzard; collecting one sets this to 1, then 0 */
     GAMEBIT_SH_Open03EB = 0x3EB,                         /* Named from map data alone - nothing in the code or in any name list mentions it: hollow/SH_Portcull objId= param=open; hollow/StaffLeverO objId= param=activated; table 2 */
@@ -1128,6 +1136,7 @@ enum GameBitId {
     GAMEBIT_DR_KTrexBranchState3 = 0x556,                /* Galdon T-rex arena branch field 3; moves with field 2 */
     GAMEBIT_DR_KTrexPathA = 0x55A,                       /* Dragon Rock K-Trex (Galdon) arena - path A active; toggles with 0x55b when a floor plate is charged to max, selecting which branch-path bits ktrexlevel applies */
     GAMEBIT_DR_KTrexPathB = 0x55B,                       /* Alternate branch-path selector for the Galdon T-rex arena (Dragon Rock); mutually exclusive with 0x55a, set when a floor switch's charge cycle maxes out and polled by ktrexlevel_updatePathGameBits to choose the arena's second path-bit layout */
+    GAMEBIT_DR_LFXEmitterEnable055D = 0x55D,             /* Read out of the retail placement data: trexboss/LFXEmitter enableGameBit x1 */
     GAMEBIT_DR_KTrexArenaEnvReady = 0x55E,               /* Raised on the Galdon arena's first update tick, in the same breath as its sky slot flag, its three envfx and its light index */
     GAMEBIT_DR_SeqBit18055F = 0x55F,                     /* Named from map data alone - nothing in the code or in any name list mentions it: trexboss/KT_RexSeque objId= param=bit18; table 0 */
     GAMEBIT_DR_KTrexLane0Mode = 0x560,                   /* Dragon Rock K-Trex (Galdon) arena - lane 0 mode selector, gKTRexLaneModeGameBits[0]; ktrex_update ORs lane 0 into KTRexArenaState.laneMode only while the lane is in currentLaneMask and this bit is set */
@@ -2100,6 +2109,7 @@ enum GameBitId {
     GAMEBIT_SHBOT_HitAnimTarget0CD4 = 0xCD4,             /* Named from map data alone - nothing in the code or in any name list mentions it: hollow2/HitAnimator objId= param=target; table 2 */
     GAMEBIT_SH_ThornTailRelated0CD5 = 0xCD5,             /* table 2; probably "talked to guy who tells you to get a lantern" */
     GAMEBIT_SH_ThornTailRelated0CD6 = 0xCD6,             /* table 2 */
+    GAMEBIT_SHBOT_SHboulderBit0CD8 = 0xCD8,              /* Read out of the retail placement data: hollow2/SH_boulder gameBit x1 */
     GAMEBIT_SHBOT_SeqUsed0CD9 = 0xCD9,                   /* Named from map data alone - nothing in the code or in any name list mentions it: hollow2/SH_BottomSe objId= param=usedBit; table 2 */
     GAMEBIT_SHOP_FogControlEnable0CDA = 0xCDA,           /* Read out of the retail placement data: swapstore/fogControl enableGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_LINKC_HitAnimTarget0CDB = 0xCDB,             /* Named from map data alone - nothing in the code or in any name list mentions it: linkc/LINK_Portcu objId= param=open; linkc/HitAnimator objId= param=target; linkc/HitAnimator objId= param=target; table 2 */
@@ -2291,6 +2301,7 @@ enum GameBitId {
     GAMEBIT_LINKD_ObjGroups = 0xDD1,                     /* table 3; size 32 */
     GAMEBIT_GPSH_TestKnowledgeRunning = 0xDD2,           /* GPSH shrine (Test Of Knowledge) trial-active latch - set on activation, cleared on solve/timeout/reset; gates MUSICTRIG_krazoa_tunnel_2 via GameBitLatch_Update, mirroring GAMEBIT_ECSH_TestObservRunning */
     GAMEBIT_DBSH_ShrineApproach = 0xDD3,                 /* The DLL names this one itself: DBSH_SHRINE_GAMEBIT_APPROACH in DBSH_Shrine.c */
+    GAMEBIT_CF_AreaFXEmitEnable0DD6 = 0xDD6,             /* Read out of the retail placement data: fortress/AreaFXEmit enableGameBit x1 */
     GAMEBIT_CC_HitAnimTarget0DD8 = 0xDD8,                /* Named from map data alone - nothing in the code or in any name list mentions it: capeclaw/HitAnimator objId= param=target; table 2 */
     GAMEBIT_CC_FuelCellVisible_DDA = 0xDDA,              /* Rena's U0 dataset; table 2 */
     GAMEBIT_ITEM_CheatToken0_Got = 0xDDC,                /* table 2; Display Credits. Backs the collectable item C-menu entry the game labels "Drop Token" (its owned bit) */
@@ -2468,6 +2479,8 @@ enum GameBitId {
     GAMEBIT_WM_SeqEB4 = 0xEB4,                           /* Rena's U0 dataset; table 2 */
     GAMEBIT_ITEM_Flute_Disabled = 0xEB5,                 /* table 2. Backs the collectable item C-menu entry the game labels "Blow Flute" (its active bit) */
     GAMEBIT_CF_KytesMumQuestStage1 = 0xEB9,              /* Written as a boolean of Kyte's mum's quest count being exactly 1, so it tracks her first quest stage; Rena has it as fortress HitAnimator 0x4CD31's target */
+    GAMEBIT_OFB_DIMPushBlocBit0EBB = 0xEBB,              /* Read out of the retail placement data: kraztest/DIMPushBloc gameBit x1 */
+    GAMEBIT_OFB_DIMPushBlocBit0EBC = 0xEBC,              /* Read out of the retail placement data: kraztest/DIMPushBloc gameBit x1 */
     GAMEBIT_ECSH_CameraLookingAtDoor = 0xECA,            /* table 2; focuses camera on door */
     GAMEBIT_NW_EscapedFromSnowClearing = 0xECC,          /* table 0; hint 265 */
     GAMEBIT_NW_WalkSequenceRunning = 0xECD,              /* table 0; raised as NW_levcontr starts its walk-table sequence off GAMEBIT_SnowHornArtifact19D, and cleared again by its cleanup mode */
@@ -2481,6 +2494,8 @@ enum GameBitId {
     GAMEBIT_DrakorCrateBroken0ED5 = 0xED5,               /* Read out of the retail placement data: finalboss/DrakorCrate brokenGameBit x1; wallcity/SH_Portcull open x1; 2 placements. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_DR_OnCloudRunner = 0xED7,                    /* table 0 */
     GAMEBIT_OFB_FogControlEnable0ED8 = 0xED8,            /* Read out of the retail placement data: kraztest/fogControl enableGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
+    GAMEBIT_AreaFXEmitEnable0ED9 = 0xED9,                /* Read out of the retail placement data: finalboss/AreaFXEmit enableGameBit x1 */
+    GAMEBIT_AreaFXEmitEnable0EDA = 0xEDA,                /* Read out of the retail placement data: finalboss/AreaFXEmit enableGameBit x1 */
     GAMEBIT_WC_TempleBridgeActive = 0xEDB,               /* Walled City temple bridge live - WCTempleBri raises it as the bridge solves and drops it when the bridge goes inactive or the player passes 1000 units away; KT_RexLevel_free also clears it so its arena leaves no stale global state */
     GAMEBIT_WC_TimedPuzzleBTimerActive = 0xEDC,          /* Walled City timed push-block puzzle B - countdown displayed; raised with GAMEBIT_WC_PushBlockTimerActive while B runs and cleared on solve, timeout or abort */
     GAMEBIT_WC_TimedPuzzleATimerActive = 0xEDD,          /* Walled City timed push-block puzzle A - countdown displayed; raised with GAMEBIT_WC_PushBlockTimerActive while A runs and cleared on solve, timeout or abort */
