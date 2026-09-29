@@ -317,15 +317,14 @@ track/intersect_render.c:
 	.sbss2      start:0x803E9C70 end:0x803E9C78
 
 track/intersect_memcard.c:
-	.text       start:0x8007D854 end:0x8007EB1C
-	.data       start:0x80310158 end:0x803101F8
+	.text       start:0x8007D854 end:0x80080170
+	.data       start:0x80310158 end:0x8031028C
+	.sdata      start:0x803DCEF0 end:0x803DCF00
 	.sbss       start:0x803DE838 end:0x803DE858
 	.sdata2     start:0x803E0798 end:0x803E07A8
 
 dlls/engine/2/maketex.c:
-	.text       start:0x8007EB1C end:0x80080554
-	.data       start:0x803101F8 end:0x80310290
-	.sdata      start:0x803DCEF0 end:0x803DCF00
+	.text       start:0x80080170 end:0x80080554
 	.sdata2     start:0x803E07A8 end:0x803E07B8
 
 dlls/engine/2/2.c:

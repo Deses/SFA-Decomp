@@ -300,7 +300,6 @@ force_active:
   # maketex.c: the retail link retained the memory-card banner asset name
   # table and the .sdata tail atom even though nothing references them by
   # name; dropping them would shorten .data and shift every later address.
-  - gMemoryCardBannerAssetNames
   - lbl_803DB70C
   # dll_012B_fxemit.c: the retail link retained this unreferenced .sdata2 zero
   # atom; dropping it would shorten the pool and shift later SDA2 references.

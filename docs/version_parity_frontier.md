@@ -1,5 +1,11 @@
 # The version-parity frontier — seven units, one function each
 
+> **2026-09-28 correction:** The v1.1 memory-card holdout is solved by recovering
+> its shared compiler-generated string pool and correcting the boundary with
+> the preceding card code. Both resulting units match code and data in all five
+> versions. The claims below that `saveCardBuildComment` requires a different
+> compiler are superseded; see [the recovery](memory_card_pool_recovery.md).
+
 `complete_code_percent` for the non-EN versions is gated by exactly seven shared units, and in every
 one of them a **single function** is unmatched. Closing all seven closes the whole gap:
 `tools/version_progress.py GSAP01` plus the per-unit rows give **+3.883 pts**, and the measured gap is

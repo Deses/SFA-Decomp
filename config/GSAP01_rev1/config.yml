@@ -209,7 +209,6 @@ extract:
 force_active:
   # Retain retail data the linker would dead-strip (computed from the link).
   - sShaderObjLoadMessages
-  - gMemoryCardBannerAssetNames
   - sFastFloorZeroTail
   - lbl_803DB744
   - lbl_803DB74C
