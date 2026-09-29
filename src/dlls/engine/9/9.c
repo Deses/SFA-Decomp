@@ -1,4 +1,5 @@
 #include "main/dll/cloudaction.h"
+#include "main/render_envfx_api.h"
 #include "main/rcp_dolphin_api.h"
 #include "main/texture.h"
 #include "main/dll/ppcwgpipe_struct.h"
@@ -346,8 +347,8 @@ void cloudaction_update(int p1, int p2, u8* state, int p4, int val) {
     if ((cfg->flags2 & 1) == 0) {
         return;
     }
-    lbl_803DB618[0] = lbl_803DB618[1];
-    lbl_803DB618[1] = (u16)val;
+    gCloudActionEnvfxActIndices[0] = gCloudActionEnvfxActIndices[1];
+    gCloudActionEnvfxActIndices[1] = (u16)val;
     gCloudActionRuntime.textureScrollStep = cfg->scrollSpeed / 3.0f;
     gCloudActionRuntime.pad19 = 0;
     if ((cfg->flags2 & 4) != 0) {
@@ -415,8 +416,8 @@ void cloudaction_release(void) {
 }
 
 void cloudaction_initialise(void) {
-    lbl_803DB618[0] = -1;
-    lbl_803DB618[1] = -1;
+    gCloudActionEnvfxActIndices[0] = -1;
+    gCloudActionEnvfxActIndices[1] = -1;
     gCloudOverrideObject = NULL;
 }
 

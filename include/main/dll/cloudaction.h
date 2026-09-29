@@ -14,7 +14,6 @@ STATIC_ASSERT(sizeof(CloudEnvTbl) == 0x38);
 
 extern CloudEnvTbl gCloudActionEnvTbl;
 extern f32 gCloudActionGlareQuadSize[2];
-extern s32 lbl_803DB618[2];
 
 void cloudaction_func08_nop(void);
 void cloudaction_func09_nop(void);

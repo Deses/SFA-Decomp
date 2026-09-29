@@ -133,10 +133,10 @@ int dll411_processAnimEvents(GameObject* obj, int unusedArg, ObjSeqState* animUp
                 getEnvfxAct(obj, obj, DLL19B_ENVFX_A, 0);
                 break;
             case DLL19B_ANIM_EVENT_ENVFX_OVERRIDE:
-                if (gSky2EnvfxActIndex == -1) {
+                if (gSky2EnvfxActIndices[0] == -1) {
                     getEnvfxAct(obj, obj, DLL19B_ENVFX_B, 0);
                 } else {
-                    getEnvfxAct(obj, obj, gSky2EnvfxActIndex, 0);
+                    getEnvfxAct(obj, obj, gSky2EnvfxActIndices[0], 0);
                 }
                 break;
             case DLL19B_ANIM_EVENT_PENDING:

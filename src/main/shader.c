@@ -144,6 +144,9 @@ typedef struct MapInfoRecord {
 } MapInfoRecord;
 extern WarpVec gCameraPosByTransformSpace[];
 
+int gSky2EnvfxActIndices[2] = {0, 0};
+int gCloudActionEnvfxActIndices[2] = {0, 0};
+
 int lbl_803DB620 = -1;
 s8 gMapLayerOffsets[8] = {0, -2, -1, 1, 2, 0, 0, 0};
 f32 gMotionBlurAmount = 0.5f;

@@ -277,7 +277,7 @@ main/shader.c:
 	.rodata     start:0x802C25D8 end:0x802C2628
 	.data       start:0x8030F070 end:0x8030F424
 	.bss        start:0x8037ED20 end:0x80388610
-	.sdata      start:0x803DC280 end:0x803DC2AC
+	.sdata      start:0x803DC270 end:0x803DC2AC
 	.sbss       start:0x803DDA48 end:0x803DDB54
 	.sdata2     start:0x803DF830 end:0x803DF8D8
 	.sbss2      start:0x803E90C0 end:0x803E90CC

@@ -721,8 +721,8 @@ void sky2_onMapSetup(void) {
     f32 b;
     f32 a;
 
-    gSky2EnvfxActIndex = -1;
-    (&gSky2EnvfxActIndex)[1] = -1;
+    gSky2EnvfxActIndices[0] = -1;
+    gSky2EnvfxActIndices[1] = -1;
     i = 0;
     slot = (void**)gSky2States;
     a = 1150.0f;
@@ -763,7 +763,7 @@ void sky2_update(int a, int b, u8* cfg) {
     flags = 0;
     env = saveGameGetEnvState();
     if (cfg != NULL) {
-        (&gSky2EnvfxActIndex)[1] = gSky2EnvfxActIndex = (s16)((Sky2Config*)cfg)->envfxActId - 1;
+        gSky2EnvfxActIndices[1] = gSky2EnvfxActIndices[0] = (s16)((Sky2Config*)cfg)->envfxActId - 1;
         env->sky2EnvfxActId = (s16)((Sky2Config*)cfg)->envfxActId - 1;
         flags58 = ((Sky2Config*)cfg)->flags;
         b1 = (flags58 & 0x80) ? 1 : 0;
@@ -849,8 +849,8 @@ void sky2_release(void) {
 void sky2_initialise(void) {
     u8* state;
 
-    gSky2EnvfxActIndex = -1;
-    (&gSky2EnvfxActIndex)[1] = -1;
+    gSky2EnvfxActIndices[0] = -1;
+    gSky2EnvfxActIndices[1] = -1;
     if (gSky2States[0] != NULL) {
         mm_free(gSky2States[0]);
     }

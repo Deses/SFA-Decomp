@@ -96,10 +96,10 @@ int dll409_processAnimEvents(GameObject* obj, int unused, ObjSeqState* animUpdat
                 getEnvfxAct(obj, obj, DLL199_ENVFX_A, 0);
                 break;
             case 2:
-                if (gSky2EnvfxActIndex == -1) {
+                if (gSky2EnvfxActIndices[0] == -1) {
                     getEnvfxAct(obj, obj, DLL199_ENVFX_B, 0);
                 } else {
-                    getEnvfxAct(obj, obj, gSky2EnvfxActIndex, 0);
+                    getEnvfxAct(obj, obj, gSky2EnvfxActIndices[0], 0);
                 }
                 break;
             case 3:
