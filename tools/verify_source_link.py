@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 from pathlib import Path
 import subprocess
 import tempfile
@@ -43,13 +44,16 @@ def verify(version: str, units: set[str], output: Path) -> str:
         response = output / f"{label}.rsp"
         response.write_bytes(("\r\n".join(objects) + "\r\n").encode())
         elf, dol = output / f"{label}.elf", output / f"{label}.dol"
-        command = ["build/tools/wibo", "build/compilers/GC/1.3.2/mwldeppc.exe",
+        command = [str(ROOT / "build/compilers/GC/1.3.2/mwldeppc.exe"),
                    "-fp", "hardware", "-nodefaults", "-lcf", config["ldscript"],
                    "-o", str(elf), "@" + str(response)]
+        if os.name != "nt":
+            command.insert(0, str(ROOT / "build/tools/wibo"))
+        dtk = ROOT / "build/tools" / ("dtk.exe" if os.name == "nt" else "dtk")
         with (output / f"{label}.log").open("w") as log:
             subprocess.run(command, cwd=ROOT, check=True, timeout=30,
                            stdout=log, stderr=subprocess.STDOUT)
-            subprocess.run(["build/tools/dtk", "elf2dol", str(elf), str(dol)],
+            subprocess.run([str(dtk), "elf2dol", str(elf), str(dol)],
                            cwd=ROOT, check=True, timeout=30, stdout=log, stderr=subprocess.STDOUT)
         result = dol.read_bytes()
         if result != original.data:
