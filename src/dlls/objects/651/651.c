@@ -136,7 +136,8 @@ int dll_28B_stateHandler2(GameObject* obj, BaddieState* ai) {
     obj->anim.rotX = getAngle(-state->route.tangentX, -state->route.tangentZ);
     /* Retail rounds both squared components before adding; do not fuse them. */
     ObjAnim_SampleRootCurvePhase(
-        &obj->anim, sqrtf((f32)(obj->anim.velocityX * obj->anim.velocityX) + (f32)(obj->anim.velocityZ * obj->anim.velocityZ)),
+        &obj->anim,
+        sqrtf((f32)(obj->anim.velocityX * obj->anim.velocityX) + (f32)(obj->anim.velocityZ * obj->anim.velocityZ)),
         &ai->moveSpeed);
     return 0;
 }
@@ -151,37 +152,30 @@ int dll_28B_stateHandler1(GameObject* obj, BaddieState* ai) {
 int dll_28B_stateHandler0(void) {
     return 0x2;
 }
-int dll_28B_getExtraSize(void)
-{
+int dll_28B_getExtraSize(void) {
     return sizeof(Dll28BState);
 }
 
-int dll_28B_getObjectTypeId(void)
-{
+int dll_28B_getObjectTypeId(void) {
     return 0x0;
 }
 
-void dll_28B_free(GameObject* obj)
-{
+void dll_28B_free(GameObject* obj) {
     objFreeObjectType(obj, DLL28B_OBJ_GROUP);
 }
 
-void dll_28B_render(GameObject* obj, int p2, int p3, int p4, int p5, s8 visible)
-{
+void dll_28B_render(GameObject* obj, int p2, int p3, int p4, int p5, s8 visible) {
     Dll28BState* state = obj->extra;
-    if (visible != 0)
-    {
+    if (visible != 0) {
         objRenderModelAndHitVolumes(obj, p2, p3, p4, p5, 1.0f);
         dll_2E_setTargetFromPathPoint(obj, &state->moveLib, 0);
     }
 }
 
-void dll_28B_hitDetect_nop(void)
-{
+void dll_28B_hitDetect_nop(void) {
 }
 
-void dll_28B_update(GameObject* obj)
-{
+void dll_28B_update(GameObject* obj) {
     f32 oz, oy, ox;
     f32 dt;
     MatrixTransform xform;
@@ -193,12 +187,9 @@ void dll_28B_update(GameObject* obj)
     state->baddie.flags0 |= OBJFLAG_BIT_2000000;
     dt = timeDelta;
     (*gPlayerInterface)->update(obj, state, dt, dt, gDll28BStateHandlers, gDll28BSubstateHandlers);
-    if ((state->flagsAC0 & 1) != 0)
-    {
+    if ((state->flagsAC0 & 1) != 0) {
         state->moveLib.modeBits &= ~1;
-    }
-    else
-    {
+    } else {
         state->moveLib.modeBits |= 1;
     }
     dll_2E_updateLookAt(obj, &state->moveLib);
@@ -211,7 +202,8 @@ void dll_28B_update(GameObject* obj)
     xform.rotZ = obj->anim.rotZ;
     xform.scale = 1.0f;
     setMatrixFromObjectPos(mtx, &xform);
-    Matrix_TransformPoint(mtx, (*(const f32*)&gWcEarthWalkerIdleTimerThreshold), (*(const f32*)&gWcEarthWalkerIdleTimerThreshold),
+    Matrix_TransformPoint(mtx, (*(const f32*)&gWcEarthWalkerIdleTimerThreshold),
+                          (*(const f32*)&gWcEarthWalkerIdleTimerThreshold),
                           (*(const f32*)&gWcEarthWalkerIdleTimerThreshold), &ox, &oy, &oz);
     playerShadowSetPositionOverride(obj, ox, oy, oz);
 }
@@ -220,8 +212,7 @@ static const f32 gDll28BCurveInitParam = 1000.0f;
 
 void* gDll28BStateHandlers[4];
 
-void dll_28B_init(GameObject* obj)
-{
+void dll_28B_init(GameObject* obj) {
     int curveParam;
     Dll28BMoveBlendData blockA;
     Dll28BMoveBlendData blockB;
@@ -238,12 +229,10 @@ void dll_28B_init(GameObject* obj)
     objAddObjectType(obj, DLL28B_OBJ_GROUP);
 }
 
-void dll_28B_release_nop(void)
-{
+void dll_28B_release_nop(void) {
 }
 
-void dll_28B_initialise(void)
-{
+void dll_28B_initialise(void) {
     gDll28BStateHandlers[0] = dll_28B_stateHandler0;
     gDll28BStateHandlers[1] = dll_28B_stateHandler1;
     gDll28BStateHandlers[2] = dll_28B_stateHandler2;

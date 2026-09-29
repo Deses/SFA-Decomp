@@ -59,5 +59,4 @@ void earthwalker_update(GameObject* obj);
 int earthwalker_SeqFn(GameObject* ewObj, int unused, ObjSeqState* animUpdate, int shouldAdvanceMove);
 void earthwalker_init(GameObject* obj, EarthWalkerPlacement* setup);
 
-
 #endif

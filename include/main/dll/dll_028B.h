@@ -8,8 +8,7 @@
 #include "main/dll/dll_002E_moveLib.h"
 #include "game/objects/object.h"
 
-typedef struct Dll28BState
-{
+typedef struct Dll28BState {
     BaddieState baddie;
     MoveLibState moveLib;
     CharacterEyeAnimState eyeAnimState;
@@ -21,8 +20,7 @@ typedef struct Dll28BState
     u8 padAC1[0xAC4 - 0xAC1];
 } Dll28BState;
 
-typedef struct Dll28BMoveBlendData
-{
+typedef struct Dll28BMoveBlendData {
     int values[4];
 } Dll28BMoveBlendData;
 
@@ -41,7 +39,6 @@ extern const Dll28BMoveBlendData gDll28BMoveBlendDataB;
 extern void* gDll28BSubstateHandlers[4];
 extern void* gDll28BStateHandlers[4];
 
-
 int dll_28B_getExtraSize(void);
 int dll_28B_getObjectTypeId(void);
 void dll_28B_free(GameObject* obj);
@@ -51,7 +48,6 @@ void dll_28B_update(GameObject* obj);
 void dll_28B_init(GameObject* obj);
 void dll_28B_release_nop(void);
 void dll_28B_initialise(void);
-
 
 int dll_28B_substateHandler0(void);
 int dll_28B_stateHandler0(void);
