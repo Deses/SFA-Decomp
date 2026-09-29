@@ -7,6 +7,7 @@
  * game bit (watchGameBit).
  */
 #include "main/dll/partfx_interface.h"
+#include "main/gamebit_ids.h"
 #include "main/dll/DR/dll_026F_drgenerator.h"
 #include "main/objfx.h"
 #include "main/dll/objfx_api.h"
@@ -113,7 +114,7 @@ void drgenerator_update(GameObject* obj)
     DrgeneratorState* state = obj->extra;
     DrgeneratorPlacement* placement = (DrgeneratorPlacement*)obj->anim.placementData;
     int n;
-    if (state->flags.b4 == 0 && mainGetBit(0x9b9) != 0)
+    if (state->flags.b4 == 0 && mainGetBit(GAMEBIT_DR_GeneratorArmed09B9) != 0)
     {
         state->flags.b4 = 1;
     }
@@ -187,7 +188,7 @@ void drgenerator_init(GameObject* obj, DrgeneratorPlacement* placement)
     }
     state->timerDurationFrames *= 0x3c;
     state->unk124 = 0.018f;
-    if (mainGetBit(0x9b9) != 0)
+    if (mainGetBit(GAMEBIT_DR_GeneratorArmed09B9) != 0)
     {
         state->flags.b0 = 1;
         state->flags.b4 = 1;

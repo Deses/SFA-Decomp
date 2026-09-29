@@ -1021,7 +1021,7 @@ int arwarwing_SeqFn(GameObject* obj, int unused, ObjSeqState* animUpdate) {
                 mainSetBits(GAMEBIT_CD_ObjGroups, 0);
                 mainSetBits(GAMEBIT_CF_ObjGroups2, 0);
                 (*gMapEventInterface)->setObjGroupStatus(0xc, 0, 1);
-                mainSetBits(GAMEBIT_CFRelated0D73, 0);
+                mainSetBits(GAMEBIT_CloudRaceResetBit0D73, 0);
                 break;
             case 0x3e:
                 mainSetBits(GAMEBIT_DR_ObjGroups, 0);

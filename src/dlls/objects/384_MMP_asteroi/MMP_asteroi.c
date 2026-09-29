@@ -130,10 +130,10 @@ void mmpAsteroidRe_update(GameObject* obj) {
     MMPAsteroidReState* state = obj->extra;
 
     if ((state->eventFlags & MMP_ASTEROID_RE_SEQ_TICK) == 0) {
-        if (mainGetBit(0xD52) != 0) {
+        if (mainGetBit(GAMEBIT_MMP_AsteroidForceIntensity) != 0) {
             state->intensity = 1;
         } else {
-            state->intensity = mainGetBit(0x88C);
+            state->intensity = mainGetBit(GAMEBIT_MMP_MoonRockPedestalCount);
         }
         state->phase = MMP_ASTEROID_RE_PHASE_RISEN;
         Sfx_KeepAliveLoopedObjectSound(obj, SFXTRIG_lwfl1_c);
@@ -227,7 +227,7 @@ void mmpAsteroidRe_update(GameObject* obj) {
         if (timer > zero) {
             state->gameBitClearTimer = timer - timeDelta;
             if (state->gameBitClearTimer <= zero) {
-                mainSetBits(0x88B, 0);
+                mainSetBits(GAMEBIT_MMP_AsteroidRelated088B, 0);
             }
         }
     }
@@ -240,7 +240,7 @@ void mmpAsteroidRe_init(GameObject* obj) {
     obj->objectFlags |= (OBJECT_OBJFLAG_HIDDEN | OBJECT_OBJFLAG_HITDETECT_DISABLED);
     obj->animEventCallback = mmpAsteroidRe_processAnimEvents;
     state->eventFlags = 0;
-    state->intensity = mainGetBit(0x88C);
+    state->intensity = mainGetBit(GAMEBIT_MMP_MoonRockPedestalCount);
     state->phase = mainGetBit(GAMEBIT_MMPAsteroidRelated087B);
     switch ((s32)state->phase) {
     case MMP_ASTEROID_RE_PHASE_HIDDEN:

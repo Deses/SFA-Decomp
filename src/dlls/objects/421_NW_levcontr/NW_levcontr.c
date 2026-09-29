@@ -187,9 +187,9 @@ void nwLevelControl_update(GameObject* obj) {
             }
         }
     }
-    GameBitLatch_Update((GameBitLatchState*)&state->flags, 8, -1, -1, 0x3a0, 0x35);
-    GameBitLatch_Update((GameBitLatchState*)&state->flags, 0x10, -1, -1, 0x3a1, (int)state->dayNightMusicId);
-    GameBitLatch_Update((GameBitLatchState*)&state->flags, 0x20, -1, -1, 0x393, 0x36);
+    GameBitLatch_Update((GameBitLatchState*)&state->flags, 8, -1, -1, GAMEBIT_IM_WaterRelated03A0, 0x35);
+    GameBitLatch_Update((GameBitLatchState*)&state->flags, 0x10, -1, -1, GAMEBIT_IM_Done, (int)state->dayNightMusicId);
+    GameBitLatch_Update((GameBitLatchState*)&state->flags, 0x20, -1, -1, GAMEBIT_WarpActive0393, 0x36);
     GameBitLatch_Update((GameBitLatchState*)&state->flags, 0x40, -1, -1, GAMEBIT_SHRINE_MUSIC_LOCK,
                         MUSICTRIG_PU3_Adventure_c4);
     timerActive = 0;
@@ -198,8 +198,9 @@ void nwLevelControl_update(GameObject* obj) {
     if (((rescueBit ^ gameBit) != 0) && (timerRunning = gameTimerIsRunning(), timerRunning != 0)) {
         timerActive = 1;
     }
-    mainSetBits(0xf31, timerActive);
-    GameBitLatch_Update((GameBitLatchState*)&state->flags, 0x80, -1, -1, 0xf31, NW_LEVEL_CONTROL_TIMER_END_MUSIC_ID);
+    mainSetBits(GAMEBIT_CountdownTimerRunning, timerActive);
+    GameBitLatch_Update((GameBitLatchState*)&state->flags, 0x80, -1, -1, GAMEBIT_CountdownTimerRunning,
+                        NW_LEVEL_CONTROL_TIMER_END_MUSIC_ID);
     gameBit = mainGetBit(GAMEBIT_NW_GeyserComplete);
     if ((gameBit != 0) &&
         (status = (*gMapEventInterface)->getObjGroupStatus((int)obj->anim.mapEventSlot, NW_GEYSER_OBJECT_GROUP),
@@ -216,14 +217,14 @@ void nwLevelControl_update(GameObject* obj) {
             if (gameBit != 0) {
                 (*gObjectTriggerInterface)->runSequence(0, obj, -1);
                 state->mode = NW_LEVEL_CONTROL_MODE_WALK_TABLE;
-                mainSetBits(0xecd, 1);
+                mainSetBits(GAMEBIT_NW_WalkSequenceRunning, 1);
             }
             break;
         case NW_LEVEL_CONTROL_MODE_INIT_START:
             (*gObjectTriggerInterface)->preempt((int)obj, 0x64a);
             (*gObjectTriggerInterface)->runSequence(0, obj, 0x20);
             state->mode = NW_LEVEL_CONTROL_MODE_WALK_TABLE;
-            mainSetBits(0xecd, 1);
+            mainSetBits(GAMEBIT_NW_WalkSequenceRunning, 1);
             break;
         case NW_LEVEL_CONTROL_MODE_WALK_TABLE:
             sequenceResult = nwLevelControl_advanceSequenceTable(state);
@@ -278,9 +279,9 @@ void nwLevelControl_update(GameObject* obj) {
             }
             break;
         case NW_LEVEL_CONTROL_MODE_CLEANUP:
-            gameBit = mainGetBit(0xecd);
+            gameBit = mainGetBit(GAMEBIT_NW_WalkSequenceRunning);
             if (gameBit != 0) {
-                mainSetBits(0xecd, 0);
+                mainSetBits(GAMEBIT_NW_WalkSequenceRunning, 0);
             }
             break;
         case NW_LEVEL_CONTROL_MODE_RESCUE_RETRIGGER:

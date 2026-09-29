@@ -276,7 +276,7 @@ void dfshShrine_update(GameObject* obj) {
         }
     }
         if ((obj->anim.resetHitboxFlags & INTERACT_FLAG_ACTIVATED) != 0) {
-            mainSetBits(0x589, 0);
+            mainSetBits(GAMEBIT_DFSH_ShrineIdle, 0);
             state->mode = DFSH_SHRINE_MODE_BEGIN_TRANS;
             Music_Trigger(MUSICTRIG_DIM_Snow, 1);
             (*gObjectTriggerInterface)->runSequence(0, (void*)obj, -1);
@@ -292,7 +292,7 @@ void dfshShrine_update(GameObject* obj) {
     case DFSH_SHRINE_MODE_AWAIT_OPEN:
         if (state->flags.openedBySequence == 1) {
             state->mode = DFSH_SHRINE_MODE_GRANT_REWARDS;
-            mainSetBits(0xB76, 1);
+            mainSetBits(GAMEBIT_DFSH_RewardAnimTarget0B76, 1);
             gameTimerInit(GAME_TIMER_COUNT_DOWN | GAME_TIMER_END_SOUND | GAME_TIMER_DISPLAY, 0xD2);
             gameTimerResume();
         }
@@ -348,14 +348,14 @@ void dfshShrine_update(GameObject* obj) {
             state->mode = DFSH_SHRINE_MODE_RESET;
         } else if (state->flags.success == 0) {
             state->mode = DFSH_SHRINE_MODE_RESET;
-            mainSetBits(0xB70, 1);
+            mainSetBits(GAMEBIT_DFSH_TestFailed, 1);
         } else {
             state->mode = DFSH_SHRINE_MODE_RESET;
             audioStopByMask(3);
             (*gObjectTriggerInterface)->runSequence(1, (void*)obj, -1);
         }
         mainSetBits(GAMEBIT_WM_EnteredKrazoaTest1_0129, 1);
-        mainSetBits(0xB76, 0);
+        mainSetBits(GAMEBIT_DFSH_RewardAnimTarget0B76, 0);
         break;
     case DFSH_SHRINE_MODE_RESET:
         state->mode = DFSH_SHRINE_MODE_IDLE;
@@ -363,10 +363,10 @@ void dfshShrine_update(GameObject* obj) {
         state->rewardIndex = 0;
         state->rewardTimer = 0.0f;
         mainSetBits(GAMEBIT_WM_EnteredKrazoaTest1_0129, 1);
-        mainSetBits(0xB70, 0);
-        mainSetBits(0xB71, 0);
-        mainSetBits(0xB76, 0);
-        mainSetBits(0x589, 1);
+        mainSetBits(GAMEBIT_DFSH_TestFailed, 0);
+        mainSetBits(GAMEBIT_DFSH_Related0B71, 0);
+        mainSetBits(GAMEBIT_DFSH_RewardAnimTarget0B76, 0);
+        mainSetBits(GAMEBIT_DFSH_ShrineIdle, 1);
         {
             s16 j;
             for (j = 0, required = (u16*)((u8*)rewardTableCursor[0] + 40); j < 10; j++) {

@@ -18,6 +18,7 @@
 #include "main/dll/player_api.h"
 #include "main/dll/tricky_api.h"
 #include "main/frame_timing.h"
+#include "main/gamebit_ids.h"
 #include "main/gamebits.h"
 #include "main/mapEvent.h"
 #include "main/objprint_character_api.h"
@@ -160,7 +161,7 @@ void sh_queenearthwalker_updatePortal(GameObject* obj, QueenEarthWalkerState* st
 
     player = Obj_GetPlayerObject();
     obj->anim.resetHitboxFlags &= ~INTERACT_FLAG_DISABLED;
-    if (mainGetBit(0xc48) != 0) {
+    if (mainGetBit(GAMEBIT_SH_QueenQuestComplete0C48) != 0) {
         state->eventTable = gQueenEarthWalkerEventTableComplete;
     } else if (mainGetBit(GAMEBIT_SH_Related023C) != 0) {
         state->eventTable = gQueenEarthWalkerEventTablePortalReady;
@@ -169,7 +170,7 @@ void sh_queenearthwalker_updatePortal(GameObject* obj, QueenEarthWalkerState* st
         if (playerHasSpell(player, QUEEN_EARTH_WALKER_PORTAL_SPELL_ID) != 0 &&
             getXZDistanceSquared(&player->anim.worldPosX, &obj->anim.worldPosX) <
                 QUEEN_EARTH_WALKER_PORTAL_SPELL_DISTANCE_SQ) {
-            mainSetBits(0x23b, 1);
+            mainSetBits(GAMEBIT_SH_QueenPortalSpellCast023B, 1);
         }
     } else if (mainGetBit(GAMEBIT_SH_RescuedEggs) != 0) {
         state->eventTable = gQueenEarthWalkerEventTableComplete;
@@ -310,7 +311,7 @@ void sh_queenearthwalker_update(GameObject* obj) {
             characterHeadLookCalm(obj, (s16*)&state->look, QUEEN_EARTH_WALKER_HEAD_LOOK_BLEND);
             break;
         case 7:
-            if (mainGetBit(0x199) != 0) {
+            if (mainGetBit(GAMEBIT_TTH_ThornTailTriggerAct7) != 0) {
                 state->eventTable = gQueenEarthWalkerEventTableComplete;
             } else {
                 state->eventTable = gQueenEarthWalkerEventTableBerry;

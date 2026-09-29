@@ -322,10 +322,10 @@ void NW_mammoth_updateGatekeeper(GameObject* obj, NwMammothState* state, NwMammo
         break;
     case NW_MAMMOTH_STATE_GATEKEEPER_COLLECTING: {
         int n = 4;
-        if (mainGetBit(0x120) == 0) {
+        if (mainGetBit(GAMEBIT_NW_ClawDead120) == 0) {
             n = 3;
         }
-        if (mainGetBit(0x121) == 0) {
+        if (mainGetBit(GAMEBIT_NW_ClawDead121) == 0) {
             n -= 1;
         }
         {
@@ -438,7 +438,7 @@ void NW_mammoth_updateGatekeeper(GameObject* obj, NwMammothState* state, NwMammo
         break;
     case NW_MAMMOTH_STATE_GATEKEEPER_POST_RESCUE:
     default:
-        if (mainGetBit(0x224) != 0) {
+        if (mainGetBit(GAMEBIT_MammothVariantZero0224) != 0) {
             state->triggerList = gNwMammothGatekeeperBit224TriggerList;
         } else {
             if (mainGetBit(GAMEBIT_NW_GateKeeperCommsPlayed) == 0) {
@@ -572,7 +572,7 @@ void NW_mammoth_updateFeedQuest(GameObject* obj, NwMammothState* state, NwMammot
     switch (state->stateIndex) {
     case NW_MAMMOTH_STATE_FEED_INTRO:
         state->triggerList = gNwMammothFeedIntroTriggerList;
-        if (mainGetBit(211) != 0) {
+        if (mainGetBit(GAMEBIT_NW_ClawDead0D3) != 0) {
             state->stateIndex = NW_MAMMOTH_STATE_FEED_FIRST_ROOT;
         }
         break;

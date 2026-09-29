@@ -5,6 +5,7 @@
 #include "main/audio/music_trigger_ids.h"
 #include "main/dll/player_motion.h"
 #include "main/frame_timing.h"
+#include "main/gamebit_ids.h"
 #include "main/gamebits.h"
 #include "main/objtype.h"
 #include "main/object_render.h"
@@ -53,9 +54,9 @@ int gWindLiftDurationTable[WINDLIFT_DURATION_ENTRY_COUNT][2] = {
 };
 
 int gWindLiftEnableGameBitTable[WINDLIFT_ENABLE_GAME_BIT_ENTRY_COUNT][2] = {
-    {0xA94, 0x95},
-    {0xA98, 0x95},
-    {0xA99, 0x95},
+    {GAMEBIT_WM_WindLiftActivation0A94, GAMEBIT_Always1},
+    {GAMEBIT_WM_WindLiftActivation0A98, GAMEBIT_Always1},
+    {GAMEBIT_WM_WindLiftActivation0A99, GAMEBIT_Always1},
 };
 
 static void windLift_resetSlot(WindLiftSlot* slot) {

@@ -558,7 +558,7 @@ void warpstone_update(GameObject* obj) {
                 (state->behaviorFlags.lookAtPlayer == 0);
         }
         if (state->behaviorFlags.lookAtPlayer == 0) {
-            state->behaviorFlags.lookAtPlayer = mainGetBit(0xa45);
+            state->behaviorFlags.lookAtPlayer = mainGetBit(GAMEBIT_WarpstoneRelated0A45);
         }
     }
 

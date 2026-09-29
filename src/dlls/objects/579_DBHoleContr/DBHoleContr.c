@@ -8,6 +8,7 @@
 #include "sys/objects/lifecycle.h"
 #include "main/dll/dbholecontrol1state_struct.h"
 #include "main/objseq.h"
+#include "main/gamebit_ids.h"
 #include "main/gamebits.h"
 #include "sys/objects.h"
 #include "main/dll/dll_0243_dbholecontrol1.h"
@@ -49,7 +50,7 @@ int dbholecontrol1_SeqFn(GameObject* obj, int unused, ObjSeqState* animUpdate) {
             childPlacement->base.posY = obj->anim.localPosY;
             childPlacement->base.posZ = obj->anim.localPosZ;
             childPlacement->base.ident = -1;
-            childPlacement->gameBitC = 149;
+            childPlacement->gameBitC = GAMEBIT_Always1;
             loadObjectAtObject(obj, &childPlacement->base);
             break;
         }

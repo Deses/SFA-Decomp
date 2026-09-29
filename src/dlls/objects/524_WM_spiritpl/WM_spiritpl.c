@@ -16,6 +16,7 @@
 #include "main/dll/WM/dll_020C_wmspiritplace.h"
 #include "main/dll/partfx_interface.h"
 #include "main/dll/tricky_api.h"
+#include "main/gamebit_ids.h"
 #include "main/gamebits.h"
 #include "main/mapEventTypes.h"
 #include "main/map_load.h"
@@ -537,7 +538,8 @@ void WM_spiritplace_init(GameObject* obj, WmSpiritPlaceMapData* placement)
 
     if (obj->anim.placement->ident == WMSPIRITPLACE_IDENT_2)
     {
-        if (mainGetBit(GAMEBIT_WM_FoundKrystal) != 0 || mainGetBit(0xeaf) != 0 || state->mapEventMode > 2)
+        if (mainGetBit(GAMEBIT_WM_FoundKrystal) != 0 || mainGetBit(GAMEBIT_WM_SpiritPlaceShifted0EAF) != 0 ||
+            state->mapEventMode > 2)
         {
             obj->anim.localPosX -= 25.0f;
         }

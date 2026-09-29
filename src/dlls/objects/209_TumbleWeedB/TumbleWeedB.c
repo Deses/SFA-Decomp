@@ -692,7 +692,7 @@ void tumbleweed_updateStateMachine(GameObject* obj) {
             player = Obj_GetPlayerObject();
             playerDistance = getXZDistanceSquared(&player->anim.worldPosX, &obj->anim.worldPosX);
             if (playerDistance < 625.0f) {
-                state->triggerGameBit = 0x195;
+                state->triggerGameBit = GAMEBIT_TumbleWeedPickup0195;
                 state->pickupMsgValue = 0;
                 state->unk29C = 0.5f;
                 ObjMsg_SendToObject(player, TUMBLEWEED_MESSAGE_IN_RANGE, obj, (u32)&state->triggerGameBit);

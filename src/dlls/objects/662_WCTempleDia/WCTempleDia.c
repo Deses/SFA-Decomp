@@ -12,8 +12,10 @@
 #include "main/model.h"
 #include "main/objseq.h"
 
-s16 gWcTempleDiaGameBitsA[4] = {0x2F8, 0x2D1, 0x2D2, 0};
-s16 gWcTempleDiaGameBitsB[4] = {0x203, 0x2EC, 0x2EF, 0};
+s16 gWcTempleDiaGameBitsA[4] = {GAMEBIT_WC_TempleDiaAStage0, GAMEBIT_WC_TempleDiaAStage1,
+                                  GAMEBIT_WC_TempleDiaAStage2, 0};
+s16 gWcTempleDiaGameBitsB[4] = {GAMEBIT_WC_TempleDiaBStage0, GAMEBIT_WC_TempleDiaBStage1,
+                                  GAMEBIT_WC_TempleDiaBStage2, 0};
 
 #define WCTEMPLE_DIA_EXTRA_SIZE       0x14
 #define WCTEMPLE_DIA_STAGE_COUNT      3

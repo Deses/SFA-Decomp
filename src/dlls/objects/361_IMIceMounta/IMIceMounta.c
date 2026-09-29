@@ -1,5 +1,6 @@
 /* Ice Mountain event and world-map controller. */
 #include "dlls/objects/361_IMIceMounta.h"
+#include "main/gamebit_ids.h"
 
 #include "dlls/objects/common/vehicle.h"
 
@@ -90,7 +91,7 @@ void IMIceMountain_exitWorldMap(GameObject* obj, IMIceMountainState* state) {
             mainSetBits(GAMEBIT_IM_BikeRelated0379, 1);
         } else {
             state->eventState = IM_ICE_MOUNTAIN_HUD_STATE_HIDDEN;
-            mainSetBits(0xcb, 1);
+            mainSetBits(GAMEBIT_IM_HudHidden00CB, 1);
         }
     }
 }
@@ -282,9 +283,11 @@ void IMIceMountain_update(GameObject* obj) {
             }
         }
     }
-    GameBitLatch_Update(&state->gameBitLatch, 2, GAMEBIT_IM_TrickyRelated02C1, 568, GAMEBIT_IM_TrickyRelated01ED,
+    GameBitLatch_Update(&state->gameBitLatch, 2, GAMEBIT_IM_TrickyRelated02C1, GAMEBIT_IM_TrickyRelated0238,
+                          GAMEBIT_IM_TrickyRelated01ED,
                           178);
-    GameBitLatch_Update(&state->gameBitLatch, 16, 442, GAMEBIT_IM_TrickyRelated01B9, GAMEBIT_IM_TrickyRelated01D6,
+    GameBitLatch_Update(&state->gameBitLatch, 16, GAMEBIT_MusicLatchClear01BA,
+                          GAMEBIT_IM_TrickyRelated01B9, GAMEBIT_IM_TrickyRelated01D6,
                           180);
     GameBitLatch_Update(&state->gameBitLatch, 4, -1, -1, GAMEBIT_IM_WaterRelated03A0, 233);
     GameBitLatch_Update(&state->gameBitLatch, IM_ICE_MOUNTAIN_MUSIC_LATCH_MASK, -1, -1, GAMEBIT_IM_Done,
@@ -315,7 +318,7 @@ void IMIceMountain_init(GameObject* obj) {
             } else {
                 mainSetBits(GAMEBIT_IM_BikeRelated03A3, 0);
                 mainSetBits(GAMEBIT_IM_BikeRelated03A2, 0);
-                mainSetBits(0xcb, 0);
+                mainSetBits(GAMEBIT_IM_HudHidden00CB, 0);
                 mainSetBits(GAMEBIT_IM_BikeRelated0379, 0);
                 state->eventState = 3;
             }
@@ -341,8 +344,8 @@ void IMIceMountain_init(GameObject* obj) {
         mainSetBits(GAMEBIT_IMRelated00CE, 0);
         mainSetBits(GAMEBIT_IMRelated037B, 0);
         mainSetBits(GAMEBIT_IM_OnBike, 0);
-        mainSetBits(0x374, 0);
-        mainSetBits(0x37c, 0);
+        mainSetBits(GAMEBIT_IM_BikeRelated0374, 0);
+        mainSetBits(GAMEBIT_IM_BikeRelated037C, 0);
         (*gMapEventInterface)->setObjGroupStatus(obj->anim.mapEventSlot, 2, 0);
         break;
     case 3:

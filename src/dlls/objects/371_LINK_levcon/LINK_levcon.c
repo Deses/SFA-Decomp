@@ -1,4 +1,5 @@
 #include "dlls/objects/371_LINK_levcon.h"
+#include "main/gamebit_ids.h"
 
 #include "main/audio/music_api.h"
 #include "main/audio/music_trigger_ids.h"
@@ -31,7 +32,6 @@ enum {
 };
 
 enum {
-    LINK_GAMEBIT_AREA_48_DISABLED = 0xE1E,
     LINK_GAMEBIT_AREA_48_ALIEN_MUSIC = 0xB72,
 };
 
@@ -70,7 +70,7 @@ void linkLevelControl_updateAreaMusic(GameObject* obj) {
         }
         break;
     case LINK_LEVEL_CONTROL_AREA_CELL_48:
-        if (mainGetBit(LINK_GAMEBIT_AREA_48_DISABLED) == 0) {
+        if (mainGetBit(GAMEBIT_WarpActive0E1E) == 0) {
             if (mainGetBit(LINK_GAMEBIT_AREA_48_ALIEN_MUSIC) != 0) {
                 if (state->musicTriggerId != MUSICTRIG_mmpassalien) {
                     state->musicTriggerId = MUSICTRIG_mmpassalien;
@@ -86,7 +86,7 @@ void linkLevelControl_updateAreaMusic(GameObject* obj) {
                 Music_Trigger(MUSICTRIG_KP_Text, 1);
             }
         }
-        GameBitLatch_Update(&state->musicLatch, 1, -1, -1, LINK_GAMEBIT_AREA_48_DISABLED, MUSICTRIG_Teleport);
+        GameBitLatch_Update(&state->musicLatch, 1, -1, -1, GAMEBIT_WarpActive0E1E, MUSICTRIG_Teleport);
         break;
     }
 }

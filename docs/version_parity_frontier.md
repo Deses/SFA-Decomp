@@ -1311,6 +1311,94 @@ So this row is one compiler-behaviour difference wide, fully localized, with the
 right and every reachable knob measured. It is the closest row at 3 diffs and the least likely to move
 without a different codegen.
 
+### Why the reservation was uniquely effective: the threshold is the allocatable-register count
+
+Tracing `bossdrakor_update` with and without the reservation isolates the whole mechanism, and the
+result is worth more than the hack was.
+
+The reservation's *only* effect on what the allocator sees is one extra entry in `blocked`
+(`[1,2,13]` -> `[1,2,13,14]`). Because the reserved register is a precoloured node that interferes with
+everything, **every node's degree rises by exactly one** -- `obj` 104 -> 105, `state` 102 -> 103,
+`moveResult` 31 -> 32, and so on uniformly. Relative degrees are therefore unchanged. What changes is the
+**order of the colouring worklist's high-degree prefix**:
+
+| | prefix | assignment |
+|---|---|---|
+| plain | `[temp164, state, moveResult, obj]` | state=r31, moveResult=r30, obj=r29 |
+| reserved | `[obj, temp164, state, moveResult]` | obj=r31, state=r30, moveResult=r29 (**retail**) |
+
+`obj` moves from last to first while everything else keeps its relative order. Since the degrees all
+shifted equally, the prefix cannot be ordered *by* degree -- it is ordered by **when each node crosses a
+degree threshold** as the interference graph is built, and that threshold is the number of allocatable
+GPRs: 29 plain (32 minus `r1`, `r2`, `r13`), 28 with one reserved. Lowering it by one makes the densest
+node -- `obj`, live across the whole function -- cross first instead of last.
+
+That is why nothing else worked. Declaration order, scope, the local set, expression spellings, inlined
+helpers, compilers and ~90 flag settings all leave the allocatable count at 29, so they permute values
+*within* the prefix shape but never reorder the crossings. Confirmed again here: `-sdata 0`,
+`-sdata2 0`, both together, `-use_lmw_stmw on` and `-fp software` all change register usage but produce
+size mismatches, and `-fp fmadd`, `-opt nointrinsics`, `-rostr` and `-msgstyle gcc` leave 150 diffs.
+
+So the row reduces to a single sentence: **`bossdrakor_update` matches when the compiler has 28
+allocatable GPRs instead of 29**, and the only construct that arranges that is the banned global register
+reservation. Anyone resuming this should either find a legitimate way to reach that count, or treat the
+row as capped -- but not re-grind the source axes, which are provably orthogonal to the threshold.
+
+### What is measured about the colouring order, and what is NOT a law
+
+This section has twice stated a "rule" for the colouring order that a later sample broke. Both are
+retracted, and the standing instruction is: **treat prefix-ordering statements here as observations on
+named samples, never as laws.** The two retracted claims were (a) that the prefix is always ordered by
+descending node index, so `obj` must colour last and only K=28 could help; and (b) that prefix *size* is
+what reorders it. Neither survives.
+
+**What is solidly measured.**
+
+The colour rule itself holds up: `colour = min(enabled - blockers)`, with the saved bank expanding one
+register at a time in reserve order, `blockers` being the colours of already-coloured neighbours only.
+Every assignment below was reproduced from the traced graph with that rule.
+
+`bossdrakor_update` (K=29, 184 nodes, prefix members are the four nodes of degree >= 29):
+
+| variant | prefix | result |
+|---|---|---|
+| plain | `temp164, state, moveResult, obj` | state=r31, obj=r29 |
+| one value hoisted | `temp164, mode, state, moveResult, obj` | hoisted=r31, obj=r29 |
+| **two values hoisted** | `obj, temp164, temp63, mode, state, moveResult` | **obj=r31**, state=r29 |
+| one register reserved (banned) | `obj, temp164, state, moveResult` | obj=r31, state=r30 (retail) |
+
+Hoisting the two values the PAL-gated arm already computes -- the `gRenderModeObj` load and the
+`&GXEurgb60Hz480IntDf` address -- to the top of the function, inside the existing `#if`, is
+**instruction-neutral** (659 instructions, band still 7 wide, `_savegpr_25`) and **EN-safe** (EN and JP
+byte-identical), and it produces `mr r31,r3` -- retail's register for `obj`. That is real and repeatable.
+
+Why it then stops: `state` interferes with both `obj` (r31) and `temp63` (r30), so its blockers are
+{31,30} and `min` forces it to **r29** where retail needs r30. `state` is defined at instruction 11, so
+any value hoisted to the top overlaps it, and the hoisted value's temp is numbered above all named locals
+so it always colours before `state`. Measured floors: 206 diffs with the gated pair declared first, 211 at
+positions 7 and 14, with **496 ordinary-declaration orderings across two gated-pair positions completely
+flat**.
+
+`askProgressiveScanMode` (K=29, 104 nodes) shows the ordering is *not* size-driven. Its prefix is four
+nodes all at degree 35, ordered by descending index -- `box`'s temp 53 -> r31, `counter` 40 -> r30,
+`sel` 39 -> r29, `savedAlignment` 34 -> r28 -- and retail wants `savedAlignment` first, i.e. the
+*lowest*-index member first, which is what the bossdrakor hoist appeared to do for `obj`. Forcing the
+prefix to six members here (two extra long-lived gated values) leaves the order strictly descending-index
+with `savedAlignment` still fourth. So whatever pulls `obj` to the front in bossdrakor is **not** prefix
+size, and it is still unidentified.
+
+**Also closed: the reserved-register set is not a flag.** `K = 32 - |blocked|` with
+`blocked = {r1, r2, r13}` in every configuration tried. Ten `-proc` targets (`gekko`, `750`, `7400`,
+`603e`, `604e`, `821`, `860`, `generic`, `e500`) all leave `bossdrakor_update` at 150 diffs, as do the
+sdata/sdata2/lmw_stmw/fp-software options, ~90 other flag settings and all 20 compilers. So K is not
+reachable through configuration, and the only construct that moves it remains the banned register
+reservation.
+
+**Where that leaves the two rows.** `bossdrakor_update` has an EN-safe configuration that gets its
+hardest register right and is blocked on one further swap whose cause is understood. `askProgressiveScanMode`
+needs its lowest-index prefix member to colour first and no known lever does that. Neither is proven
+capped -- only unsolved.
+
 ## See also
 
 - `docs/source_shape_levers.md` — levers 9, 14 and 16 are the ones this frontier keeps invoking.

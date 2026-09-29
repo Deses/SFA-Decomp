@@ -6359,7 +6359,7 @@ int playerStateMountBike(GameObject* obj, PlayerState* state, f32 fv) {
             inner->moveSequence = (s16*)(base + 0x3f0);
             inner->moveSequenceFlags = 3;
             if (coordsToMapCell(obj->anim.localPosX, obj->anim.localPosZ) == 0x13) {
-                mainSetBits(0xf0a, 1);
+                mainSetBits(GAMEBIT_PlayerBoardedVehicle0F0A, 1);
             }
             (*gCameraInterface)->setMode(0x45, 1, 0, 0, NULL, 0, 0xff);
             break;
@@ -8470,7 +8470,7 @@ int playerState08(GameObject* obj, struct PlayerState* state, f32 fv) {
     if (inner->curAnimId != 0x44 && (*gGameUIInterface)->isAnyItemBeingUsed() != 0 &&
         (*gGameUIInterface)->isItemBeingUsed(0x13e) != 0 &&
         (objGetAllOfType(LANTERNFIREFLY_OBJGROUP, &cnt30), cnt30 == 0)) {
-        gameBitDecrement(0x13d);
+        gameBitDecrement(GAMEBIT_ITEM_Firefly_Count);
         if ((u8)Obj_CanSetupObject() != 0) {
             ObjPlacement* setup = Obj_AllocObjectSetup(0x24, 0x43b);
             setup->objectId = 0x43b;
@@ -13943,7 +13943,7 @@ void playerUpdateSurfaceResponse(GameObject* obj, PlayerState* state, PlayerStat
             ObjHits_RecordObjectHit(obj, NULL, 1, 0, 0);
             break;
         case 28:
-            if (mainGetBit(0x21) == 0) {
+            if (mainGetBit(GAMEBIT_PlayerPeriodicHitImmune) == 0) {
                 state->periodicHitTimer += dt;
                 if (0x78 < state->periodicHitTimer) {
                     state->periodicHitTimer -= 0x78;
@@ -13984,7 +13984,7 @@ void playerUpdateSurfaceResponse(GameObject* obj, PlayerState* state, PlayerStat
             }
             break;
         case 31:
-            mainSetBits(0x643, 1);
+            mainSetBits(GAMEBIT_PlayerTouchedSurface31, 1);
             break;
         default:
             state->hitIntervalTimer = 0;
@@ -14648,7 +14648,7 @@ int player_SeqFn(int obj, int obj2, ObjSeqState* seq, int endFlag) {
                     case 0x72:
                     case SNOWBIKE_CR_BIKE_OBJ:
                         Music_Trigger(MUSICTRIG_drako_2, 1);
-                        mainSetBits(0xc1f, 0);
+                        mainSetBits(GAMEBIT_DIM_WarpActive0C1F, 0);
                         ((PlayerState*)inner)->moveSequence = (s16*)(tbl + 0x3f0);
                         ((PlayerState*)inner)->moveSequenceFlags = 3;
                         ObjAnim_SetCurrentMove((void*)obj, 0x17, 0.0f, 1);

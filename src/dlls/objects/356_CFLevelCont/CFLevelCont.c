@@ -53,7 +53,7 @@ int cflevelcontrol_sequenceCallback(GameObject* obj, int unused, ObjSeqState* an
         int eventId = animUpdate->eventIds[eventIndex];
         switch (eventId) {
         case CFLEVELCONTROL_EXIT_EVENT_ID:
-            mainSetBits(GAMEBIT_CFRaceRelated0DCB, 1);
+            mainSetBits(GAMEBIT_CloudRaceEffectClear, 1);
             mainSetBits(GAMEBIT_CF_ObjGroups2, 0);
             loadMapAndParent(CFLEVELCONTROL_EXIT_MAP_ID);
             unlockLevel(0, 0, 1);
@@ -131,20 +131,20 @@ void cflevelcontrol_update(GameObject* obj) {
 
     if (obj->userData1 == 0) {
         getEnvfxActImmediately(obj, obj, CFLEVELCONTROL_ENVFX_PRIMARY, 0);
-        if (mainGetBit(GAMEBIT_CFRelated0D73) == 0) {
+        if (mainGetBit(GAMEBIT_CloudRaceResetBit0D73) == 0) {
             getEnvfxActImmediately(obj, obj, CFLEVELCONTROL_ENVFX_SHARED, 0);
             getEnvfxActImmediately(obj, obj, CFLEVELCONTROL_ENVFX_DAY_A, 0);
             getEnvfxActImmediately(obj, obj, CFLEVELCONTROL_ENVFX_DAY_B, 0);
             skySetLightIndex(0, 0.0f);
-            mainSetBits(GAMEBIT_CFRelated0D73, 1);
+            mainSetBits(GAMEBIT_CloudRaceResetBit0D73, 1);
         }
 
-        if (mainGetBit(GAMEBIT_CFRelated0DCA) != 0) {
+        if (mainGetBit(GAMEBIT_CloudRaceCompletionEvent) != 0) {
             getEnvfxActImmediately(obj, obj, CFLEVELCONTROL_ENVFX_SHARED, 0);
             getEnvfxActImmediately(obj, obj, CFLEVELCONTROL_ENVFX_NIGHT_A, 0);
             getEnvfxActImmediately(obj, obj, CFLEVELCONTROL_ENVFX_NIGHT_B, 0);
             skySetLightIndex(1, 0.0f);
-            mainSetBits(GAMEBIT_CFRelated0DCA, 0);
+            mainSetBits(GAMEBIT_CloudRaceCompletionEvent, 0);
             unlockLevel(0, 0, 1);
         }
 
@@ -185,26 +185,26 @@ void cflevelcontrol_update(GameObject* obj) {
     }
     state->previousCameraMode = (s8)(*gCameraInterface)->getMode();
 
-    GameBitLatch_Update(&state->gameBitLatch, 4, -1, -1, GAMEBIT_CFRelated0983, 0xB0);
-    GameBitLatch_Update(&state->gameBitLatch, 8, -1, -1, GAMEBIT_CFRelated0983, 0x38);
-    GameBitLatch_UpdateInverted(&state->gameBitLatch, 0x100, -1, -1, GAMEBIT_CFRelated0983, 0x16);
-    GameBitLatch_UpdateInverted(&state->gameBitLatch, 0x80, -1, -1, GAMEBIT_CFRelated0983, 0x39);
+    GameBitLatch_Update(&state->gameBitLatch, 4, -1, -1, GAMEBIT_CloudRaceResetBit0983, 0xB0);
+    GameBitLatch_Update(&state->gameBitLatch, 8, -1, -1, GAMEBIT_CloudRaceResetBit0983, 0x38);
+    GameBitLatch_UpdateInverted(&state->gameBitLatch, 0x100, -1, -1, GAMEBIT_CloudRaceResetBit0983, 0x16);
+    GameBitLatch_UpdateInverted(&state->gameBitLatch, 0x80, -1, -1, GAMEBIT_CloudRaceResetBit0983, 0x39);
 
-    if (mainGetBit(GAMEBIT_CFRelated0983) == 0) {
-        if (mainGetBit(GAMEBIT_CFRelated0E23) == 0) {
-            GameBitLatch_UpdateInverted(&state->gameBitLatch, 0x200, -1, -1, GAMEBIT_CFRelated0984, 0xAD);
-            GameBitLatch_Update(&state->gameBitLatch, 0x40, -1, -1, GAMEBIT_CFRelated0984, 0x16);
+    if (mainGetBit(GAMEBIT_CloudRaceResetBit0983) == 0) {
+        if (mainGetBit(GAMEBIT_CloudRaceResetBit0E23) == 0) {
+            GameBitLatch_UpdateInverted(&state->gameBitLatch, 0x200, -1, -1, GAMEBIT_CloudRaceResetBit0984, 0xAD);
+            GameBitLatch_Update(&state->gameBitLatch, 0x40, -1, -1, GAMEBIT_CloudRaceResetBit0984, 0x16);
         }
-        if (mainGetBit(GAMEBIT_CFRelated0984) != 0) {
-            GameBitLatch_Update(&state->gameBitLatch, 0x20, -1, -1, GAMEBIT_CFRelated0E23, 0x17);
-            GameBitLatch_UpdateInverted(&state->gameBitLatch, 0x400, -1, -1, GAMEBIT_CFRelated0E23, 0x16);
+        if (mainGetBit(GAMEBIT_CloudRaceResetBit0984) != 0) {
+            GameBitLatch_Update(&state->gameBitLatch, 0x20, -1, -1, GAMEBIT_CloudRaceResetBit0E23, 0x17);
+            GameBitLatch_UpdateInverted(&state->gameBitLatch, 0x400, -1, -1, GAMEBIT_CloudRaceResetBit0E23, 0x16);
         }
     }
 
     GameBitLatch_Update(&state->gameBitLatch, 1, GAMEBIT_SH_WarpStoneRelated01A8, GAMEBIT_SH_Entered00C0,
-                          GAMEBIT_CFRelated0DB8, 0xAE);
-    GameBitLatch_Update(&state->gameBitLatch, 0x10, -1, -1, GAMEBIT_CFRelated0E1D, 0x36);
-    GameBitLatch_Update(&state->gameBitLatch, 0x1000, -1, -1, GAMEBIT_CFRelated0E1D, 0xF1);
+                          GAMEBIT_CloudRaceResetBit0DB8, 0xAE);
+    GameBitLatch_Update(&state->gameBitLatch, 0x10, -1, -1, GAMEBIT_CloudRaceResetBit0E1D, 0x36);
+    GameBitLatch_Update(&state->gameBitLatch, 0x1000, -1, -1, GAMEBIT_CloudRaceResetBit0E1D, 0xF1);
     GameBitLatch_Update(&state->gameBitLatch, 2, -1, -1, GAMEBIT_CFRelated0B46, 0xAF);
     GameBitLatch_Update(&state->gameBitLatch, 0x800, -1, -1, GAMEBIT_SHRINE_MUSIC_LOCK,
                         MUSICTRIG_PU3_Adventure_c4);
@@ -221,7 +221,7 @@ void cflevelcontrol_init(GameObject* obj, CfLevelControlPlacement* unusedPlaceme
     s16toFloat(&state->timer, 0x1E0);
     state->flags.unknown40 = 0;
     obj->animEventCallback = cflevelcontrol_sequenceCallback;
-    mainSetBits(GAMEBIT_CFRelated0983,
+    mainSetBits(GAMEBIT_CloudRaceResetBit0983,
                 ((CfLevelControlPlacement*)obj->anim.placementData)->base.ident != CFLEVELCONTROL_SPECIAL_MAP_ID);
     if (mainGetBit(GAMEBIT_CFRelated02FE) == 0) {
         for (gameBitIndex = 0; gameBitIndex < CFLEVELCONTROL_RESET_GAME_BIT_COUNT; gameBitIndex++) {

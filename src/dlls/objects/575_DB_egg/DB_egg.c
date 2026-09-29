@@ -34,6 +34,7 @@
 #include "main/obj_message.h"
 #include "main/dll/rom_curve_interface.h"
 #include "main/dll/waterfx_interface.h"
+#include "main/gamebit_ids.h"
 #include "main/gamebits.h"
 #include "main/gameloop_gamebit_api.h"
 #include "main/pad.h"
@@ -497,7 +498,7 @@ void dbegg_update(GameObject* obj) {
                 obj->anim.velocityX += (data->base.posX - obj->anim.localPosX) / (fz = 1000.0f);
                 obj->anim.velocityY += (data->base.posY - obj->anim.localPosY) / fz;
                 obj->anim.velocityZ += (data->base.posZ - obj->anim.localPosZ) / fz;
-                if (mainGetBit(0x44d) != 0) {
+                if (mainGetBit(GAMEBIT_DBEggCurveStart) != 0) {
                     egg->mode = DBEGG_MODE_CURVE_INIT;
                 }
             }
@@ -536,11 +537,11 @@ void dbegg_update(GameObject* obj) {
                                       obj->anim.rotX, randomGetRange(1, 10), 1);
                 }
             }
-            if (mainGetBit(0x426) != 0) {
+            if (mainGetBit(GAMEBIT_DBEggSinkEnabled) != 0) {
                 obj->anim.resetHitboxFlags &= ~INTERACT_FLAG_DISABLED;
                 egg->waterOffset -= 0.1f * timeDelta;
                 if (egg->waterOffset < -7.0f) {
-                    mainSetBits(0x428, mainGetBit(0x428) + 1);
+                    mainSetBits(GAMEBIT_DBEggsSunkCount, mainGetBit(GAMEBIT_DBEggsSunkCount) + 1);
                     egg->mode = DBEGG_MODE_SINKING;
                     fz = 0.0f;
                     obj->anim.velocityY = 0.0f;
@@ -563,8 +564,8 @@ void dbegg_update(GameObject* obj) {
                 placement = (DbEggPlacementPrefix*)obj->anim.placementData;
                 objFreeObjectType(obj, DBEGG_OBJGROUP);
                 pickupState->mode = DBEGG_MODE_RELEASED;
-                mainSetBits(0x3c4, 1);
-                mainSetBits(0x86d, 1);
+                mainSetBits(GAMEBIT_DBEggCarried, 1);
+                mainSetBits(GAMEBIT_DBEggPickedUp086D, 1);
                 obj->anim.resetHitboxFlags |= INTERACT_FLAG_DISABLED;
                 mainSetBits(placement->triggerGameBit, 1);
                 pickupState->triggerGameBit = -1;
@@ -603,7 +604,7 @@ void dbegg_update(GameObject* obj) {
             }
             break;
         case DBEGG_MODE_RESPAWN_WAIT:
-            if (mainGetBit(0x42a) != 0) {
+            if (mainGetBit(GAMEBIT_DBEggRespawn) != 0) {
                 dbegg_setupFromDef(obj, (u8*)egg);
             } else if (randomGetRange(0, 10) == 0) {
                 (*gPartfxInterface)->spawnObject(obj, DBEGG_PARTFX_RESPAWN_WAIT, NULL, 0, -1, NULL);
@@ -688,7 +689,7 @@ void dbegg_update(GameObject* obj) {
                 ObjHits_EnableObject(obj);
             }
         } else if (obj->anim.resetHitboxFlags & INTERACT_FLAG_ACTIVATED) {
-            if (mainGetBit(0x3c4) == 0) {
+            if (mainGetBit(GAMEBIT_DBEggCarried) == 0) {
                 if (Vec_xzDistance(&obj->anim.worldPosX, &player->anim.worldPosX) < 25.0f) {
                     if ((egg->flags & DBEGG_FLAG_CARRY_BEFORE_PICKUP) == 0) {
                         DbEggPlacementPrefix* placement;
@@ -698,8 +699,8 @@ void dbegg_update(GameObject* obj) {
                         placement = (DbEggPlacementPrefix*)obj->anim.placementData;
                         objFreeObjectType(obj, DBEGG_OBJGROUP);
                         pickupState->mode = DBEGG_MODE_RELEASED;
-                        mainSetBits(0x3c4, 1);
-                        mainSetBits(0x86d, 1);
+                        mainSetBits(GAMEBIT_DBEggCarried, 1);
+                        mainSetBits(GAMEBIT_DBEggPickedUp086D, 1);
                         obj->anim.resetHitboxFlags |= INTERACT_FLAG_DISABLED;
                         mainSetBits(placement->triggerGameBit, 1);
                         pickupState->triggerGameBit = -1;

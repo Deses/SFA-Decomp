@@ -31,6 +31,7 @@
 #include "main/dll/tricky_api.h"
 #include "main/frame_timing.h"
 #include "main/game_ui_interface.h"
+#include "main/gamebit_ids.h"
 #include "main/gamebits.h"
 #include "main/gametext_show_api.h"
 #include "main/lightmap_api.h"
@@ -810,7 +811,7 @@ int SnowBike_SeqFn(GameObject* obj, int unused, ObjSeqState* seq) {
         case 2:
             if (obj->anim.romDefNo != SNOWBIKE_IM_CLAWBIKE_V0_OBJ &&
                 obj->anim.romDefNo != SNOWBIKE_IM_CLAWBIKE_V1_OBJ) {
-                mainSetBits(0x499, 1);
+                mainSetBits(GAMEBIT_CloudRaceInFinishVolume, 1);
             }
             break;
         case 3:

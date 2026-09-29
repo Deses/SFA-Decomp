@@ -7,6 +7,7 @@
  * (DR_Creator_SeqFn).
  */
 #include "main/dll/DR/dll_0265_drcreator.h"
+#include "main/gamebit_ids.h"
 #include "MSL_C/PPCEABI/bare/H/math_api.h"
 #include "main/debug.h"
 #include "main/frame_timing.h"
@@ -39,7 +40,7 @@ int DR_Creator_SeqFn(GameObject* obj, int unused, ObjSeqState* animUpdate)
 #if defined(VERSION_GSAE01_rev1) || defined(VERSION_GSAP01_rev1)
         if (animUpdate->eventIds[i] == 10 && mainGetBit(seqState->spawnGameBit) != 0)
         {
-            mainSetBits(0x631, 1);
+            mainSetBits(GAMEBIT_DR_HighTopRideOver, 1);
         }
 #endif
         switch (placement->behaviorMode)

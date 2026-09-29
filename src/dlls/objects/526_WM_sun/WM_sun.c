@@ -11,6 +11,7 @@
 #include "main/camera.h"
 #include "main/dll/WM/dll_020E_wmsun.h"
 #include "main/frame_timing.h"
+#include "main/gamebit_ids.h"
 #include "main/gamebits.h"
 #include "main/mapEventTypes.h"
 #include "main/object_render.h"
@@ -251,7 +252,7 @@ void wmsun_update(GameObject* obj)
     spd = 0.0f;
     if (obj->anim.romDefNo == WMSUN_SEQID_CRYSTAL) /* WM_Crystal */
     {
-        if (mainGetBit(0x38f) != 0)
+        if (mainGetBit(GAMEBIT_WM_FinaleQuakeDone) != 0)
         {
             Obj_FreeObject(obj);
         }
@@ -266,11 +267,11 @@ void wmsun_update(GameObject* obj)
                     t->offsetT = 0;
                 }
             }
-            if (mainGetBit(0x21b) != 0)
+            if (mainGetBit(GAMEBIT_WM_CrystalRiseStage1) != 0)
             {
                 thresh = 100;
             }
-            if (mainGetBit(0x21c) != 0)
+            if (mainGetBit(GAMEBIT_WM_CrystalRiseStage2) != 0)
             {
                 thresh = 200;
             }
@@ -278,15 +279,15 @@ void wmsun_update(GameObject* obj)
             {
                 thresh = 400;
             }
-            if (mainGetBit(0x21f) != 0)
+            if (mainGetBit(GAMEBIT_WM_CrystalRiseStage4) != 0)
             {
                 thresh = 800;
             }
-            if (mainGetBit(0x221) != 0)
+            if (mainGetBit(GAMEBIT_WM_CrystalRiseStage5) != 0)
             {
                 thresh = 0x640;
             }
-            if (mainGetBit(0x222) != 0)
+            if (mainGetBit(GAMEBIT_WM_CrystalRiseStage6) != 0)
             {
                 thresh = 0x1900;
                 mult = 3;
@@ -298,17 +299,17 @@ void wmsun_update(GameObject* obj)
                 obj->anim.rootMotionScale = -(spd * timeDelta - obj->anim.rootMotionScale);
                 obj->anim.localPosY = 50.0f * (spd * timeDelta) + obj->anim.localPosY;
             }
-            else if (mainGetBit(0x222) != 0 && mainGetBit(GAMEBIT_WM_FinaleQuakeActive) == 0)
+            else if (mainGetBit(GAMEBIT_WM_CrystalRiseStage6) != 0 && mainGetBit(GAMEBIT_WM_FinaleQuakeActive) == 0)
             {
                 mainSetBits(GAMEBIT_WM_FinaleQuakeActive, 1);
-                mainSetBits(0x370, 0);
+                mainSetBits(GAMEBIT_WM_CrystalRumbleActive, 0);
                 state->renderEnabled = 0;
             }
             if (mainGetBit(GAMEBIT_WM_FinaleQuakeActive) == 0 && state->riseStep > 0x960 &&
                 randomGetRange(0, 100) == 0)
             {
                 CameraShake_SetOffset(0.8f * ((f32)(state->riseStep - 0x960) / 2400.0f));
-                mainSetBits(0x370, 1);
+                mainSetBits(GAMEBIT_WM_CrystalRumbleActive, 1);
             }
             obj->anim.rotX += state->riseStep;
             if (state->renderEnabled == 0)
@@ -319,7 +320,7 @@ void wmsun_update(GameObject* obj)
         return;
     }
     if (obj->anim.romDefNo == 0x2c2) {
-        if (mainGetBit(0x38f) != 0)
+        if (mainGetBit(GAMEBIT_WM_FinaleQuakeDone) != 0)
         {
             curAlpha = objAnim->alpha;
             if (curAlpha < 0xfa)
@@ -343,7 +344,7 @@ void wmsun_update(GameObject* obj)
         }
         return;
     }
-    if (mainGetBit(0x38f) != 0)
+    if (mainGetBit(GAMEBIT_WM_FinaleQuakeDone) != 0)
     {
         bank = objAnim->bankIndex;
         if (bank == 0 && (curAlpha = objAnim->alpha) != 0xff)
@@ -413,7 +414,7 @@ void wmsun_update(GameObject* obj)
                     {
                         gWmSunQuakeTimer = 0;
                         mainSetBits(GAMEBIT_WM_FinaleQuakeActive, 0);
-                        mainSetBits(0x38f, 1);
+                        mainSetBits(GAMEBIT_WM_FinaleQuakeDone, 1);
                     }
                 }
             }
@@ -462,9 +463,9 @@ void wmsun_init(GameObject* obj, WmSunMapData* mapData)
     objAnim = &obj->anim;
     obj->animEventCallback = wmsun_animEventCallback;
     mapAct = (*gMapEventInterface)->getMapAct((int)obj->anim.mapEventSlot);
-    if (mapAct == 3 && mainGetBit(0x21b) == 0)
+    if (mapAct == 3 && mainGetBit(GAMEBIT_WM_CrystalRiseStage1) == 0)
     {
-        mainSetBits(0x21b, 1);
+        mainSetBits(GAMEBIT_WM_CrystalRiseStage1, 1);
     }
     state->glareParams = NULL;
     state->renderEnabled = 1;

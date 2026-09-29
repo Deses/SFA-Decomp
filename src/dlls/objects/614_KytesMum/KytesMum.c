@@ -19,6 +19,7 @@
  * game bit.
  */
 #include "dlls/object_descriptor.h"
+#include "main/gamebit_ids.h"
 #include "main/dll/dll_0266_kytesmum.h"
 #include "sys/objects.h"
 #include "main/object_render.h"
@@ -61,7 +62,7 @@ s16 gKytesMumQuestEventSfxTable[4] = {0x336, 0x337, 0x337, 0};
 #define KYTESMUM_MODE_ROAMING    2
 #define KYTESMUM_MODE_QUEST_B    3
 
-const s32 gKytesMumQuestBits[3] = {0x43, 0x30A, -1};
+const s32 gKytesMumQuestBits[3] = {GAMEBIT_CF_SavedQueen, GAMEBIT_KytesMumQuestB, -1};
 const s32 gKytesMumTriggerIds[3] = {0, 2, -1};
 
 int kytesmum_updateInteractionRangeCallback(GameObject* obj, int unused, u8* arg)
@@ -110,7 +111,7 @@ int kytesmum_updateQuestStateCallback(GameObject* obj, int unused, u8* arg)
     {
         runtime->idleSfxTable = (ObjSoundDef*)gKytesMumQuestIdleSfxTable;
     }
-    mainSetBits(0xeb9, count == 1);
+    mainSetBits(GAMEBIT_CF_KytesMumQuestStage1, count == 1);
     next = triggerIds[count];
     if (next == -1)
     {
@@ -407,8 +408,8 @@ void kytesmum_init(GameObject* obj, KytesMumSetup* setup)
         break;
     case KYTESMUM_MODE_QUEST_A:
     case KYTESMUM_MODE_QUEST_B:
-        mainSetBits(0x934, 0);
-        mainSetBits(0x933, 0);
+        mainSetBits(GAMEBIT_CF_KytesMumRelated0934, 0);
+        mainSetBits(GAMEBIT_CF_KytesMumRelated0933, 0);
         runtime->moveSet = &moveSets[2];
         runtime->updateCallback = (KytesMumUpdateCallback)kytesmum_updateQuestStateCallback;
         runtime->eventSfxTable = gKytesMumQuestEventSfxTable;

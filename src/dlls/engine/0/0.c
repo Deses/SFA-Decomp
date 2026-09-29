@@ -3175,9 +3175,9 @@ void timeListPromptUpdate(void) {
     if ((buttons & PAD_BUTTON_A) != 0) {
         buttonDisable(0, PAD_BUTTON_A);
         if (gTimeListPromptSelection == 1) {
-            mainSetBits(0x2b3, 1);
+            mainSetBits(GAMEBIT_TimeListPromptAccepted, 1);
         } else {
-            mainSetBits(0x781, 1);
+            mainSetBits(GAMEBIT_TimeListPromptDeclined, 1);
         }
         gTimeListPromptSelection = 0;
         cutsceneFadeInOut(0);

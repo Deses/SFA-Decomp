@@ -257,13 +257,13 @@ void SH_LevelControl_setMusic(ShLevelControlState* state) {
         if (mainGetBit(GAMEBIT_SH_Landed064B) != 0) {
             mainSetBits(GAMEBIT_KrazTest1Related0390, 1);
         }
-        GameBitLatch_Update((GameBitLatchState*)&state->flags, 1, 0x1a7, GAMEBIT_SH_Landed064B,
+        GameBitLatch_Update((GameBitLatchState*)&state->flags, 1, GAMEBIT_MusicLatchClear01A7, GAMEBIT_SH_Landed064B,
                             GAMEBIT_KrazTest1Related0372, state->dayNightMusicLatch);
         GameBitLatch_Update((GameBitLatchState*)&state->flags, 2, GAMEBIT_SH_WarpStoneRelated01A8,
                             GAMEBIT_SH_Entered00C0, GAMEBIT_KrazTest1Related0390, state->musicLatch);
-        GameBitLatch_Update((GameBitLatchState*)&state->flags, 4, -1, -1, 0x393, 0x36);
-        GameBitLatch_Update((GameBitLatchState*)&state->flags, 8, -1, -1, 0xa32, 0x98);
-        GameBitLatch_Update((GameBitLatchState*)&state->flags, 0x10, -1, -1, 0xbfe, 0xc3);
+        GameBitLatch_Update((GameBitLatchState*)&state->flags, 4, -1, -1, GAMEBIT_WarpActive0393, 0x36);
+        GameBitLatch_Update((GameBitLatchState*)&state->flags, 8, -1, -1, GAMEBIT_TTH_MusicLatch0A32, 0x98);
+        GameBitLatch_Update((GameBitLatchState*)&state->flags, 0x10, -1, -1, GAMEBIT_TTH_MusicLatch0BFE, 0xc3);
     }
 }
 
@@ -292,7 +292,7 @@ void SH_LevelControl_runBloopEvent(GameObject* obj, ShLevelControlState* state) 
         }
         break;
     case 1:
-        if (mainGetBit(0x124) != 0) {
+        if (mainGetBit(GAMEBIT_TTH_SeqUsedBit124) != 0) {
             (*gMapEventInterface)->savePoint(&player->anim.localPosX, player->anim.rotX, 1, 0);
             state->airMeterTimer = 100000.0f;
             (*gGameUIInterface)->initAirMeter(100000, SHLEVELCONTROL_AIRMETER_BGTEXTURE);

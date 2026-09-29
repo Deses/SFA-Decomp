@@ -11,6 +11,7 @@
  */
 #include "dolphin/mtx.h"
 #include "main/frame_timing.h"
+#include "main/gamebit_ids.h"
 #include "main/gamebits.h"
 #include "main/object_render.h"
 #include "main/dll/WC/dll_0298_wcfloortile.h"
@@ -57,7 +58,7 @@ void wcfloortile_update(GameObject* obj)
     int i;
     WcFloorTileSetup* setup = (WcFloorTileSetup*)obj->anim.placementData;
 
-    if (mainGetBit(824) != 0)
+    if (mainGetBit(GAMEBIT_WC_FloorTilesReset) != 0)
     {
         obj->anim.localPosY = setup->base.posY;
         state->phase = WCFLOORTILE_PHASE_RESTORE;
@@ -85,7 +86,7 @@ void wcfloortile_update(GameObject* obj)
                 }
             }
         }
-        else if (mainGetBit(613) != 0)
+        else if (mainGetBit(GAMEBIT_WC_FloorTileRelated0265) != 0)
         {
             state->flags |= 4;
         }

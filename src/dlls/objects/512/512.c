@@ -107,7 +107,7 @@ void dll_200_updateMapAct6(GameObject* obj) {
     if ((obj->anim.resetHitboxFlags & INTERACT_FLAG_DISABLED) != 0) {
         obj->anim.resetHitboxFlags ^= INTERACT_FLAG_DISABLED;
     }
-    if (mainGetBit(763) == 0) {
+    if (mainGetBit(GAMEBIT_WM_NpcIdleSuppressed02FB) == 0) {
         if (obj->anim.currentMove != 7) {
             ObjAnim_SetCurrentMove(obj, 7, 0.0f, 0);
         }
@@ -118,13 +118,14 @@ void dll_200_updateMapAct6(GameObject* obj) {
         }
         ObjAnim_AdvanceCurrentMove(obj, 0.005f, (f32)(u32)framesThisStep, NULL);
     }
-    if ((obj->anim.resetHitboxFlags & INTERACT_FLAG_ACTIVATED) != 0 && mainGetBit(763) == 0) {
-        mainSetBits(763, 1);
+    if ((obj->anim.resetHitboxFlags & INTERACT_FLAG_ACTIVATED) != 0 &&
+        mainGetBit(GAMEBIT_WM_NpcIdleSuppressed02FB) == 0) {
+        mainSetBits(GAMEBIT_WM_NpcIdleSuppressed02FB, 1);
         state->interactionCount = 0;
         buttonDisable(0, PAD_BUTTON_A);
     } else if ((obj->anim.resetHitboxFlags & INTERACT_FLAG_ACTIVATED) != 0) {
         if ((*gGameUIInterface)->isOneOfItemsBeingUsed(itemSet.itemIds, DLL200_ITEM_COUNT) > -1) {
-            mainSetBits(784, 1);
+            mainSetBits(GAMEBIT_WM_NpcItemUsed0310, 1);
             state->interactionCount += 1;
             buttonDisable(0, PAD_BUTTON_A);
         }
@@ -151,9 +152,9 @@ void dll_200_updateMapAct2(GameObject* obj) {
         obj->anim.resetHitboxFlags &= ~INTERACT_FLAG_DISABLED;
         if ((obj->anim.resetHitboxFlags & INTERACT_FLAG_ACTIVATED) != 0 &&
             (*gGameUIInterface)->isOneOfItemsBeingUsed(itemSet.itemIds, DLL200_ITEM_COUNT) > -1) {
-            mainSetBits(0x4d1, 1);
+            mainSetBits(GAMEBIT_WM_NpcItemUsed04D1, 1);
             state->interactionCount += 1;
-            mainSetBits(0x310, 1);
+            mainSetBits(GAMEBIT_WM_NpcItemUsed0310, 1);
             buttonDisable(0, PAD_BUTTON_A);
         }
     } else {
@@ -281,7 +282,9 @@ void dll_200_updateMapAct1(GameObject* obj) {
                 state->sequenceMode = 2;
                 (*gObjectTriggerInterface)->runSequence(2, (void*)obj, -1);
                 buttonDisable(0, PAD_BUTTON_A);
-            } else if (mainGetBit(177) == 0 || mainGetBit(178) == 0 || mainGetBit(179) == 0) {
+            } else if (mainGetBit(GAMEBIT_WM_NpcHintPrereq00B1) == 0 ||
+                       mainGetBit(GAMEBIT_WM_NpcHintPrereq00B2) == 0 ||
+                       mainGetBit(GAMEBIT_WM_NpcHintPrereq00B3) == 0) {
                 state->sequenceMode = 1;
                 (*gObjectTriggerInterface)->runSequence(1, (void*)obj, -1);
                 buttonDisable(0, PAD_BUTTON_A);
@@ -345,7 +348,7 @@ int dll_200_sequenceCallback(GameObject* obj, int unusedArg2, ObjSeqState* animU
                 break;
             case 1:
                 if (state->interactionCount >= 2) {
-                    mainSetBits(0x314, 1);
+                    mainSetBits(GAMEBIT_WM_NpcSecondItemUsed, 1);
                 }
                 break;
             }
@@ -373,7 +376,7 @@ void dll_200_render(GameObject* obj, int renderArg2, int renderArg3, int renderA
     }
     mapAct = (*gMapEventInterface)->getMapAct((int)obj->anim.mapEventSlot);
     if ((u8)mapAct == DLL200_MAP_ACT_RENDER_GATED) {
-        if (mainGetBit(0x2bd) == 0u) {
+        if (mainGetBit(GAMEBIT_WM_NpcRenderGate02BD) == 0u) {
             return;
         }
         objRenderModelAndHitVolumes(obj, renderArg2, renderArg3, renderArg4, renderArg5, DLL200_RENDER_SCALE);

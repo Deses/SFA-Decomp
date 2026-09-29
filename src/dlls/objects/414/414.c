@@ -6,6 +6,7 @@
  * with a named object, so the unit retains a numbered namespace.
  */
 #include "dlls/objects/414.h"
+#include "main/gamebit_ids.h"
 
 #include "MSL_C/PPCEABI/bare/H/math_api.h"
 #include "main/audio/sfx_ids.h"
@@ -206,7 +207,7 @@ void dll414_update(GameObject* obj) {
                 gDll19ESequenceStage = DLL19E_SEQUENCE_STAGE_COMPLETE;
                 state->resetTimer = DLL19E_SEQUENCE_RESET_TIME;
                 if (state->sequenceIndex == 2) {
-                    mainSetBits(0x1d1, 1);
+                    mainSetBits(GAMEBIT_WM_KrazTest1Solved, 1);
                 }
             }
         }
@@ -251,7 +252,7 @@ void dll414_update(GameObject* obj) {
                 }
                 if ((gDll19ESequenceStage == DLL19E_SEQUENCE_STAGE_SECOND) && (state->sequenceIndex == 2) &&
                     (mainGetBit(state->gameBitId) != 0)) {
-                    mainSetBits(0x1d1, 1);
+                    mainSetBits(GAMEBIT_WM_KrazTest1Solved, 1);
                     gDll19ESequenceStage = DLL19E_SEQUENCE_STAGE_COMPLETE;
                 }
                 state->needsOpenSfx = 1;
@@ -270,8 +271,8 @@ void dll414_update(GameObject* obj) {
                     gDll19ESequenceStage = DLL19E_SEQUENCE_STAGE_NONE;
                 }
                 if ((gDll19ESequenceStage == DLL19E_SEQUENCE_STAGE_COMPLETE) && (state->sequenceIndex == 2) &&
-                    (mainGetBit(0x1d5) == 0)) {
-                    mainSetBits(0x1d1, 0);
+                    (mainGetBit(GAMEBIT_WM_KrazTest1KeepSolved01D5) == 0)) {
+                    mainSetBits(GAMEBIT_WM_KrazTest1Solved, 0);
                     gDll19ESequenceStage = DLL19E_SEQUENCE_STAGE_NONE;
                 }
             }

@@ -4161,7 +4161,7 @@ int trickyShouldGoToWarpPoint(GameObject* tricky, TrickyState* state) {
 
         if ((playerObj->objectFlags & OBJECT_OBJFLAG_PARENT_SLACK) != 0) {
             if (coordsToMapCell(tricky->anim.localPosX, tricky->anim.localPosZ) == 0x38) {
-                if ((mainGetBit(0x385) == 0) && (mainGetBit(0x384) != 0)) {
+                if ((mainGetBit(GAMEBIT_LINKB_Stage2Reached) == 0) && (mainGetBit(GAMEBIT_LINKB_Stage1Reached) != 0)) {
                     if ((mainGetBit(GAMEBIT_ITEM_TrickyFood_Count) != 0) ||
                         (mainGetBit(GAMEBIT_ITEM_TrickyFood_GrabInProgress) != 0)) {
                         result = 1;

@@ -39,11 +39,11 @@ int KT_RexLevel_getObjectTypeId(void)
 void KT_RexLevel_free(void)
 {
     mainSetBits(GAMEBIT_SETPIECE_ACTIVE, 0);
-    mainSetBits(0xcd1, 0);
-    mainSetBits(0xccd, 0);
-    mainSetBits(0xccf, 0);
-    mainSetBits(0xcd0, 0);
-    mainSetBits(0xedb, 0);
+    mainSetBits(GAMEBIT_MusicLatch0CD1, 0);
+    mainSetBits(GAMEBIT_MusicLatch0CCD, 0);
+    mainSetBits(GAMEBIT_MusicLatch0CCF, 0);
+    mainSetBits(GAMEBIT_WC_MusicLatch0CD0, 0);
+    mainSetBits(GAMEBIT_WC_TempleBridgeActive, 0);
     mainSetBits(GAMEBIT_SHRINE_MUSIC_LOCK, 0);
 }
 
@@ -61,27 +61,27 @@ void KT_RexLevel_hitDetect(void)
 
 void ktrexlevel_clearPathGameBits(void)
 {
-    mainSetBits(0x54a, 0);
-    mainSetBits(0x54e, 0);
-    mainSetBits(0x552, 0);
-    mainSetBits(0x556, 0);
+    mainSetBits(GAMEBIT_DR_KTrexBranchState0, 0);
+    mainSetBits(GAMEBIT_DR_KTrexBranchState1, 0);
+    mainSetBits(GAMEBIT_DR_KTrexBranchState2, 0);
+    mainSetBits(GAMEBIT_DR_KTrexBranchState3, 0);
 }
 
 void ktrexlevel_updatePathGameBits(void)
 {
     if (mainGetBit(GAMEBIT_DR_KTrexPathA) != 0)
     {
-        mainSetBits(0x54a, 2);
-        mainSetBits(0x54e, 2);
-        mainSetBits(0x552, 1);
-        mainSetBits(0x556, 1);
+        mainSetBits(GAMEBIT_DR_KTrexBranchState0, 2);
+        mainSetBits(GAMEBIT_DR_KTrexBranchState1, 2);
+        mainSetBits(GAMEBIT_DR_KTrexBranchState2, 1);
+        mainSetBits(GAMEBIT_DR_KTrexBranchState3, 1);
     }
     else if (mainGetBit(GAMEBIT_DR_KTrexPathB) != 0)
     {
-        mainSetBits(0x54a, 1);
-        mainSetBits(0x54e, 1);
-        mainSetBits(0x552, 2);
-        mainSetBits(0x556, 2);
+        mainSetBits(GAMEBIT_DR_KTrexBranchState0, 1);
+        mainSetBits(GAMEBIT_DR_KTrexBranchState1, 1);
+        mainSetBits(GAMEBIT_DR_KTrexBranchState2, 2);
+        mainSetBits(GAMEBIT_DR_KTrexBranchState3, 2);
     }
 }
 
@@ -93,7 +93,7 @@ void KT_RexLevel_update(GameObject* obj)
         getEnvfxAct(obj, obj, KTREXLEVEL_ENVFX_B, 0);
         getEnvfxAct(obj, obj, KTREXLEVEL_ENVFX_C, 0);
         skySetLightIndex(1, 0.0f);
-        mainSetBits(0x55e, 1);
+        mainSetBits(GAMEBIT_DR_KTrexArenaEnvReady, 1);
         obj->userData1 = 1;
     }
     gKTRexPhaseCounter = mainGetBit(GAMEBIT_DR_KTrexPhaseCounter);
@@ -104,15 +104,15 @@ void KT_RexLevel_init(GameObject* obj)
     char* extra = obj->extra;
     setDrawCloudsAndLights(0);
     mainSetBits(GAMEBIT_DR_KTrexPhaseCounter, 0);
-    mainSetBits(0x56e, 1);
-    mainSetBits(0x566, 1);
-    mainSetBits(0x569, 1);
+    mainSetBits(GAMEBIT_DR_KTrexArenaEntered, 1);
+    mainSetBits(GAMEBIT_DR_KTrexLane0Enabled, 1);
+    mainSetBits(GAMEBIT_DR_KTrexLane3Enabled, 1);
     *(f32*)extra = 6e+02f;
     mainSetBits(GAMEBIT_DR_KTrexPathA, 1);
-    mainSetBits(0x54a, 2);
-    mainSetBits(0x54e, 2);
-    mainSetBits(0x552, 1);
-    mainSetBits(0x556, 1);
+    mainSetBits(GAMEBIT_DR_KTrexBranchState0, 2);
+    mainSetBits(GAMEBIT_DR_KTrexBranchState1, 2);
+    mainSetBits(GAMEBIT_DR_KTrexBranchState2, 1);
+    mainSetBits(GAMEBIT_DR_KTrexBranchState3, 1);
     obj->userData1 = 0;
     mainSetBits(GAMEBIT_SETPIECE_ACTIVE, 1);
 }

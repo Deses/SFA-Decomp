@@ -13,6 +13,7 @@
 #include "dlls/objects/196_Tricky.h"
 #include "main/dll/partfx_interface.h"
 #include "main/frame_timing.h"
+#include "main/gamebit_ids.h"
 #include "main/gamebits.h"
 #include "main/object_render.h"
 #include "main/objtype.h"
@@ -176,7 +177,7 @@ void wmwallcrawler_update(GameObject* obj) {
                  ? Obj_GetPlayerObject()
                  : objGetNearestTypeTo(VEHICLE_OBJECT_GROUP, ob, &best);
     if (player != 0) {
-        sq = mainGetBit(0x789);
+        sq = mainGetBit(GAMEBIT_WallCrawlerSpeedLevel);
         gWallCrawlerSpeedCap = 0.1f * sq + 0.1f;
         if (state->mode == WMWALLCRAWLER_MODE_DIE) {
             ob->anim.resetHitboxFlags |= INTERACT_FLAG_DISABLED;
@@ -339,7 +340,7 @@ void wmwallcrawler_update(GameObject* obj) {
                         }
                     } else {
                         dist = Vec_xzDistance(&player->anim.worldPosX, &ob->anim.worldPosX);
-                        if (dist < state->triggerRadius || mainGetBit(0x1d9) != 0) {
+                        if (dist < state->triggerRadius || mainGetBit(GAMEBIT_CC_BridgeNeedBit) != 0) {
                             mode = state->mode;
                             if (mode == WMWALLCRAWLER_MODE_IDLE) {
                                 state->mode = WMWALLCRAWLER_MODE_DESCEND;
@@ -419,7 +420,7 @@ void wmwallcrawler_update(GameObject* obj) {
                                                             1);
                                         gWallCrawlerHitCount = 0;
                                     }
-                                    if (mainGetBit(0x1d9) != 0) {
+                                    if (mainGetBit(GAMEBIT_CC_BridgeNeedBit) != 0) {
                                         gWallCrawlerHitCount = 0;
                                     } else if (gWallCrawlerHitCount >= 3 ||
                                                ((state->flags & WMWALLCRAWLER_FLAG_TARGET_NEAREST) != 0 &&

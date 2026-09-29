@@ -17,6 +17,7 @@
 #include "sys/objects.h"
 #include "dlls/objects/430_SH_LevelCon.h"
 #include "main/mapEventTypes.h"
+#include "main/gamebit_ids.h"
 #include "main/gamebits.h"
 #include "main/frame_timing.h"
 #include "main/audio/sfx_trigger_ids.h"
@@ -52,14 +53,16 @@ void DFP_LevelControl_updateAct2(GameObject* obj) {
         gDFPLevelControlInitialiseAct2 = 0;
     }
 
-    if (mainGetBit(0x5e3) == 0 && mainGetBit(0x5e0) != 0 && mainGetBit(0x5e1) != 0) {
+    if (mainGetBit(GAMEBIT_OFP_SparkLatch05E3) == 0 && mainGetBit(GAMEBIT_OFP_SparkPrereqA05E0) != 0 &&
+        mainGetBit(GAMEBIT_OFP_SparkPrereqB05E1) != 0) {
         Sfx_PlayFromObject(obj, SFXTRIG_wp_espk2_c);
-        mainSetBits(0x5e3, 1);
+        mainSetBits(GAMEBIT_OFP_SparkLatch05E3, 1);
     }
 
-    if (mainGetBit(0x792) == 0 && mainGetBit(0xb8c) != 0 && mainGetBit(0xb8c) != 0) {
+    if (mainGetBit(GAMEBIT_OFP_SparkLatch0792) == 0 && mainGetBit(GAMEBIT_OFB_PinPonDeadB8C) != 0 &&
+        mainGetBit(GAMEBIT_OFB_PinPonDeadB8C) != 0) {
         Sfx_PlayFromObject(obj, SFXTRIG_wp_espk2_c);
-        mainSetBits(0x792, 1);
+        mainSetBits(GAMEBIT_OFP_SparkLatch0792, 1);
     }
 
     if (mainGetBit(GAMEBIT_OFP_ElectricFloorPuzzleAct2Complete) == 0) {
@@ -107,9 +110,9 @@ void DFP_LevelControl_updateAct1(GameObject* obj) {
         gDFPLevelControlInitialiseAct1 = 0;
     }
 
-    if (mainGetBit(0x5e3) == 0) {
-        if (mainGetBit(0x5e0) != 0 && mainGetBit(0x5e1) != 0) {
-            mainSetBits(0x5e3, 1);
+    if (mainGetBit(GAMEBIT_OFP_SparkLatch05E3) == 0) {
+        if (mainGetBit(GAMEBIT_OFP_SparkPrereqA05E0) != 0 && mainGetBit(GAMEBIT_OFP_SparkPrereqB05E1) != 0) {
+            mainSetBits(GAMEBIT_OFP_SparkLatch05E3, 1);
         }
     }
 
@@ -195,8 +198,9 @@ void DFP_LevelControl_update(GameObject* obj) {
     state->previousSfxState.triggerD59 = sfxTriggerD59;
     state->previousSfxState.triggerD5a = sfxTriggerD5a;
 
-    if (mainGetBit(0x5e8) == 0 && mainGetBit(0x5ee) != 0 && mainGetBit(0x5ef) != 0) {
-        mainSetBits(0x5e8, 1);
+    if (mainGetBit(GAMEBIT_OFP_LeverLatch05E8) == 0 && mainGetBit(GAMEBIT_OFP_LeverPrereqA05EE) != 0 &&
+        mainGetBit(GAMEBIT_OFP_LeverPrereqB05EF) != 0) {
+        mainSetBits(GAMEBIT_OFP_LeverLatch05E8, 1);
     }
     coordsToMapCell(player->anim.localPosX, player->anim.localPosZ);
 

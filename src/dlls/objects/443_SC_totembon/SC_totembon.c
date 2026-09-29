@@ -18,6 +18,7 @@
 #include "main/dll/tricky_api.h"
 #include "main/frame_timing.h"
 #include "main/game_ui_interface.h"
+#include "main/gamebit_ids.h"
 #include "main/gamebits_api.h"
 #include "main/mapEventTypes.h"
 #include "main/obj_list.h"
@@ -364,11 +365,15 @@ int sc_totembond_insertOrderedGameBit(u16* gameBitIds, u16 newValue) {
 }
 
 u16 gTotemBondRingGameBits[SC_TOTEM_BOND_GAMEBIT_COUNT] = {
-    0x064D, 0x064E, 0x064F, 0x0650, 0x0A4C, 0x0A4D, 0x0A4E, 0x0A4F,
+    GAMEBIT_SC_TotemBondRing0, GAMEBIT_SC_TotemBondRing1, GAMEBIT_SC_TotemBondRing2,
+    GAMEBIT_SC_TotemBondRing3, GAMEBIT_SC_TotemBondRing4, GAMEBIT_SC_TotemBondRing5,
+    GAMEBIT_SC_TotemBondRing6, GAMEBIT_SC_TotemBondRing7,
 };
 
 u16 gTotemBondOrbGameBits[SC_TOTEM_BOND_GAMEBIT_COUNT] = {
-    0x0768, 0x0769, 0x076A, 0x076B, 0x0A50, 0x0A51, 0x0A52, 0x0A53,
+    GAMEBIT_SC_TotemBondOrb0, GAMEBIT_SC_TotemBondOrb1, GAMEBIT_SC_TotemBondOrb2,
+    GAMEBIT_SC_TotemBondOrb3, GAMEBIT_SC_TotemBondOrb4, GAMEBIT_SC_TotemBondOrb5,
+    GAMEBIT_SC_TotemBondOrb6, GAMEBIT_SC_TotemBondOrb7,
 };
 
 ObjectDescriptor gSC_totembondObjDescriptor = {

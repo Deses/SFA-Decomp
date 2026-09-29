@@ -370,7 +370,7 @@ typedef struct TrickyCurveObjectDef
 #define DFPFORCEAW_MSG_PLAYER_BURST           0x60004 /* knock the player back with a burst hit */
 
 /* partfx ids spawned on the player-burst trigger: single burst flash plus a
- * 10-count spray of burst particles (same shape in both mainGetBit(0x1d9) arms) */
+ * 10-count spray of burst particles (same shape in both mainGetBit(GAMEBIT_CC_BridgeNeedBit) arms) */
 #define DFPFORCEAW_PARTFX_BURST          0x5ed /* spawned once */
 #define DFPFORCEAW_PARTFX_BURST_PARTICLE 0x5fd /* spawned 10x */
 
@@ -472,7 +472,7 @@ void TrickyCurve_updateBurstTrigger(GameObject* obj)
             fxParams.rotX = 0x3fff;
         }
 
-        if (mainGetBit(0x1d9) != 0)
+        if (mainGetBit(GAMEBIT_CC_BridgeNeedBit) != 0)
         {
             mainSetBits(GAMEBIT_TRICKYCURVE_PLAYER_HIT, 1);
             ObjMsg_SendToObject((void*)player, DFPFORCEAW_MSG_PLAYER_BURST, obj, 0);

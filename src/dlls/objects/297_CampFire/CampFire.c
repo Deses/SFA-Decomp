@@ -11,6 +11,7 @@
 #include "main/audio/sfx_trigger_ids.h"
 #include "main/dll_000A_expgfx.h"
 #include "main/frame_timing.h"
+#include "main/gamebit_ids.h"
 #include "main/gamebits.h"
 #include "main/objanim_internal.h"
 #include "main/object_render.h"
@@ -151,7 +152,7 @@ void CampFire_init(GameObject* obj, CampFirePlacement* placement) {
     if (scalePercent != 0) {
         obj->anim.rootMotionScale = CAMPFIRE_PLACEMENT_SCALE_FACTOR * scalePercent;
     }
-    if (mainGetBit(0x8C) != 0) {
+    if (mainGetBit(GAMEBIT_CampFireRelated008C) != 0) {
         state->flags |= CAMPFIRE_STATE_FLAG_GAME_BIT_8C_SET;
     }
     state->placementGameBit = placement->gameBit;

@@ -178,7 +178,7 @@ int gpshShrine_processAnimEvents(GameObject* obj, int unused, ObjSeqState* animU
                 break;
             case GPSH_SHRINE_ANIM_EVENT_GRANT_SPIRIT:
                 objSetAnimStateFlags(player, GPSH_SHRINE_PLAYER_ANIM_STATE_FLAG, 1);
-                mainSetBits(0x12b, 1);
+                mainSetBits(GAMEBIT_SHRINE_SpiritGranted012B, 1);
                 mainSetBits(GAMEBIT_ITEM_Spirit5_Got, 1);
                 (*gMapEventInterface)->setMapAct(GPSH_SHRINE_MAP_ID, GPSH_SHRINE_REWARD_MAP_ACT);
                 break;
@@ -393,7 +393,7 @@ void gpshShrine_update(GameObject* obj) {
             case GPSH_SHRINE_PHASE_FAIL_TRANSITION:
                 state->phase = GPSH_SHRINE_PHASE_RESET;
                 mainSetBits(GAMEBIT_GPSH_TestKnowledgeRunning, 0);
-                mainSetBits(0xe37, 1);
+                mainSetBits(GAMEBIT_GPSH_TestKnowledgeFailed, 1);
                 break;
             case GPSH_SHRINE_PHASE_SUCCESS_TRANSITION:
                 state->phase = GPSH_SHRINE_PHASE_SUCCESS;
@@ -430,8 +430,8 @@ void gpshShrine_update(GameObject* obj) {
                 mainSetBits(GAMEBIT_GPSH_KnowledgeSymbol3Solved, 0);
                 mainSetBits(GAMEBIT_GPSH_ResetSymbolCreators, 1);
                 mainSetBits(GAMEBIT_GPSH_SpawnKnowledgeSymbols, 0);
-                mainSetBits(0xe37, 0);
-                mainSetBits(0xe3a, 0);
+                mainSetBits(GAMEBIT_GPSH_TestKnowledgeFailed, 0);
+                mainSetBits(GAMEBIT_GPSH_Related0E3A, 0);
                 state->puzzleFlags.symbol1SolvedLatched = 0;
                 state->puzzleFlags.symbol4SolvedLatched = 0;
                 state->puzzleFlags.symbol5SolvedLatched = 0;
@@ -457,7 +457,7 @@ void gpshShrine_init(GameObject* obj, const void* placement) {
     state->phase = GPSH_SHRINE_PHASE_IDLE;
     state->puzzleFlags.activated = 0;
     mainSetBits(GAMEBIT_WM_EnteredKrazoaTest1_0129, 1);
-    mainSetBits(0x12b, 0);
+    mainSetBits(GAMEBIT_SHRINE_SpiritGranted012B, 0);
     mainSetBits(GAMEBIT_GPSH_KnowledgeSymbol1Solved, 0);
     mainSetBits(GAMEBIT_GPSH_KnowledgeSymbol4Solved, 0);
     mainSetBits(GAMEBIT_GPSH_KnowledgeSymbol5Solved, 0);

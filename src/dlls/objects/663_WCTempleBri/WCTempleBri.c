@@ -16,6 +16,7 @@
 #include "MSL_C/PPCEABI/bare/H/math_api.h"
 #include "dolphin/mtx.h"
 #include "main/frame_timing.h"
+#include "main/gamebit_ids.h"
 #include "main/gamebits.h"
 #include "main/objhits.h"
 #include "main/objtexture.h"
@@ -31,7 +32,6 @@
 #define WCTEMPLEBRI_RENDER_TYPE_SHIFT 0xb
 
 #define WCTEMPLEBRI_FLAG_SOLVED       1
-#define WCTEMPLEBRI_GLOBAL_ACTIVE_BIT 0xedb
 
 #define WCTEMPLEBRI_PAYLOAD_TRIGGER    1
 #define WCTEMPLEBRI_PAYLOAD_BLOCK_FLAG 0x20
@@ -175,7 +175,7 @@ void wctemplebri_update(GameObject* obj) {
     }
     if (state->active != 0) {
         if ((state->flags & WCTEMPLEBRI_FLAG_SOLVED) == 0) {
-            mainSetBits(WCTEMPLEBRI_GLOBAL_ACTIVE_BIT, 1);
+            mainSetBits(GAMEBIT_WC_TempleBridgeActive, 1);
             state->flags |= WCTEMPLEBRI_FLAG_SOLVED;
             mainSetBits(setup->solvedBit, 1);
         }
@@ -190,13 +190,13 @@ void wctemplebri_update(GameObject* obj) {
         }
         ObjHits_EnableObject(obj);
     } else {
-        mainSetBits(WCTEMPLEBRI_GLOBAL_ACTIVE_BIT, 0);
+        mainSetBits(GAMEBIT_WC_TempleBridgeActive, 0);
         ObjHits_DisableObject(obj);
     }
     if ((void*)Obj_GetPlayerObject() != NULL) {
         if (PSVECDistance((const Vec*)&obj->anim.worldPosX,
                           (const Vec*)&((GameObject*)Obj_GetPlayerObject())->anim.worldPosX) > 1000.0f) {
-            mainSetBits(WCTEMPLEBRI_GLOBAL_ACTIVE_BIT, 0);
+            mainSetBits(GAMEBIT_WC_TempleBridgeActive, 0);
         }
     }
 }

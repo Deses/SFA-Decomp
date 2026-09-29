@@ -24,6 +24,7 @@
 #include "main/game_ui_interface.h"
 #include "sys/objects.h"
 #include "main/objseq.h"
+#include "main/gamebit_ids.h"
 #include "main/gamebits.h"
 #include "main/objfx.h"
 #include "main/audio/sfx_trigger_ids.h"
@@ -329,48 +330,48 @@ void MoonSeedPlantingSpot_init(GameObject* obj, MoonSeedPlantingSpotPlacement* i
     switch (ident)
     {
     case 0x41a5b:
-        inner->plantedGameBit = 0x866;
-        inner->harvestedGameBit = 0x856;
+        inner->plantedGameBit = GAMEBIT_MoonSeedSpot1Planted;
+        inner->harvestedGameBit = GAMEBIT_MoonSeedSpot1Harvested;
         break;
     case 0x41a59:
-        inner->plantedGameBit = 0x867;
-        inner->harvestedGameBit = 0x858;
+        inner->plantedGameBit = GAMEBIT_MoonSeedSpot2Planted;
+        inner->harvestedGameBit = GAMEBIT_MoonSeedSpot2Harvested;
         break;
     case 0x41a5c:
-        inner->plantedGameBit = 0x868;
-        inner->harvestedGameBit = 0x85a;
+        inner->plantedGameBit = GAMEBIT_MoonSeedSpot3Planted;
+        inner->harvestedGameBit = GAMEBIT_MoonSeedSpot3Harvested;
         break;
     case 0x41a5d:
-        inner->plantedGameBit = 0x869;
-        inner->harvestedGameBit = 0x864;
+        inner->plantedGameBit = GAMEBIT_MoonSeedSpot4Planted;
+        inner->harvestedGameBit = GAMEBIT_MoonSeedSpot4Harvested;
         break;
     case 0x43e04:
-        inner->plantedGameBit = 0x9a2;
-        inner->harvestedGameBit = 0x99a;
+        inner->plantedGameBit = GAMEBIT_MoonSeedSpot5Planted;
+        inner->harvestedGameBit = GAMEBIT_MoonSeedSpot5Harvested;
         break;
     case 0x43e1f:
-        inner->plantedGameBit = 0x9a3;
-        inner->harvestedGameBit = 0x99c;
+        inner->plantedGameBit = GAMEBIT_MoonSeedSpot6Planted;
+        inner->harvestedGameBit = GAMEBIT_MoonSeedSpot6Harvested;
         break;
     case 0x43e20:
-        inner->plantedGameBit = 0x9a4;
-        inner->harvestedGameBit = 0x99e;
+        inner->plantedGameBit = GAMEBIT_MoonSeedSpot7Planted;
+        inner->harvestedGameBit = GAMEBIT_MoonSeedSpot7Harvested;
         break;
     case 0x43e21:
-        inner->plantedGameBit = 0x9a5;
-        inner->harvestedGameBit = 0x9a0;
+        inner->plantedGameBit = GAMEBIT_MoonSeedSpot8Planted;
+        inner->harvestedGameBit = GAMEBIT_MoonSeedSpot8Harvested;
         break;
     case 0x476ae:
-        inner->plantedGameBit = 0x3d5;
-        inner->harvestedGameBit = 0x3d2;
+        inner->plantedGameBit = GAMEBIT_MoonSeedSpot9Planted;
+        inner->harvestedGameBit = GAMEBIT_MoonSeedSpot9Harvested;
         break;
     case 0x4b26e:
-        inner->plantedGameBit = 0xd4d;
-        inner->harvestedGameBit = 0xd4b;
+        inner->plantedGameBit = GAMEBIT_MoonSeedSpot10Planted;
+        inner->harvestedGameBit = GAMEBIT_MoonSeedSpot10Harvested;
         break;
     case 0x4bea3:
-        inner->plantedGameBit = 0xe21;
-        inner->harvestedGameBit = 0xe10;
+        inner->plantedGameBit = GAMEBIT_MoonSeedSpot11Planted;
+        inner->harvestedGameBit = GAMEBIT_MoonSeedSpot11Harvested;
         break;
     }
     inner->flags = 0;
