@@ -54,15 +54,54 @@ Recovered this way: `MagicPlant` (two stripped event helpers), `284` (the shared
 power-of-two division into a multiply by the reciprocal, which retail's `0.015625` came
 from, and a `* 0.015625f` literal is hoisted differently.
 
-## Constants defined outside the reading TU
+## Unresolved external constant declarations
 
 C rejects `extern f32 x;` followed by `const f32 x = ...;` in one TU. For
-`WCBouncyCra`, plain `extern f32` declarations reproduce retail's code exactly, and
-`extern const` does not, even without a local definition: the qualifier alone changes
-register allocation. Its named block therefore was defined in another TU. The
-same shape (a named block between one DLL's literals and the next DLL's) covers
-`WCPushBlock`, `650`, `WORLDAstero`'s trailing pair and `ARWArwing`'s 39 tuning values.
-Assigning those definitions is a TU-boundary decision and is not made here.
+`WCBouncyCra`, plain `extern f32` declarations reproduced retail's code, while
+changing them to `extern const` changed register allocation. This was previously
+interpreted as evidence that the definitions belonged to another TU. That
+conclusion was too strong: the qualifier affected the reconstructed expression,
+and the same-TU recovery below preserves both code and data.
+
+`WCPushBlock`, `650`, `WORLDAstero`'s trailing pair and `ARWArwing`'s tuning values
+still need ownership recovery. Neither an external declaration in reconstructed
+source nor a qualifier-induced register change establishes an original boundary.
+
+## Bouncy-crate constant ownership (2026-09-29)
+
+The existing `WCBouncyCra.c` now defines its nine bounce parameters before the
+functions and its cell-margin parameter immediately before the shared cell test.
+Every reference to these ten symbols belongs to this TU. The complete pool is
+52 bytes: nine floats, four bytes of natural double alignment, the cooldown's
+conversion double, and the cell-margin float. Its descriptor remains last.
+
+The reads use `*(const f32*)&name`, as already used by `rcp_dolphin.c`, to preserve
+the named objects without anonymous literal duplicates. Plain scalar reads and
+`*&name` or `(&name)[0]` fold the values and emit a second pool. Making these
+definitions `static` also changes pool order by deferring emission until use;
+external linkage is retained. No forced section, dummy data, extra source file,
+or compiler-profile change is needed.
+
+The local copy of the nearest-object distance is `const f32`. This retains the
+retail floating-point register allocation after the constants gain their correct
+qualifiers; the unqualified copy swaps two registers in the falloff calculation.
+This is a verified reconstruction, not a claim to know the original spelling.
+
+| Version | Complete `.sdata2` range |
+| --- | --- |
+| GSAE01 | `803E6D20..803E6D54` |
+| GSAE01_rev1 | `803E79B8..803E79EC` |
+| GSAJ01 | `803E6E40..803E6E74` |
+| GSAP01 | `803E8550..803E8584` |
+| GSAP01_rev1 | `803E8718..803E874C` |
+
+All five versions retain ten exact functions and now own 108 exact data bytes,
+up from 64. Both `ninja all_source` and the native strict retail checksum pass
+with the complete pool linked from source. The adjacent push-block constants
+remain outside this unit.
+Regional projection reproduces the full unit's ranges in each secondary target.
+An independent retail operand audit confirms all ten constants, their bytes,
+and fourteen paired r2-relative references per secondary version.
 
 ## Asteroid render-scale recovery (2026-09-29)
 

@@ -3951,7 +3951,7 @@ dlls/objects/651/651.c:
 dlls/objects/652_WCBouncyCra/WCBouncyCra.c:
 	.text       start:0x8022417C end:0x802244E4
 	.data       start:0x8032B098 end:0x8032B0D0
-	.sdata2     start:0x803E6E68 end:0x803E6E70
+	.sdata2     start:0x803E6E40 end:0x803E6E74
 
 dlls/objects/656_WCPushBlock/WCPushBlock.c:
 	.text       start:0x802244E4 end:0x802252A4
