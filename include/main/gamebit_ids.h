@@ -322,12 +322,10 @@ enum GameBitId {
     GAMEBIT_AndrossRelated0004 = 0x4,                    /* table 0; polled before Andross's post-fight warp */
     GAMEBIT_SH_KilledBloop1 = 0x5,                       /* table 1 */
     GAMEBIT_WBCounter0006 = 0x6,                         /* Read out of the retail placement data: snowmines2/WB counterGameBit x1; dfshrine/Firebat counterGameBit x1. The field is called a counter but BITTABLE gives the id a width of 1, so it holds a flag - most likely "this one has been killed" rather than a tally */
-    GAMEBIT_SpittingEbaVisibility0007 = 0x7,             /* Read out of the retail placement data: dragrock/SpittingEba visibilityGameBit x5; dfptop/PinPon counterGameBit x3. CAUTION: the objects that carry it name the field differently (counterGameBit, visibilityGameBit), so which reading is right is unsettled */
     GAMEBIT_SH_KilledBloop2 = 0x8,                       /* table 1 */
     GAMEBIT_CC_LightFootEncounterTriggered = 0x9,        /* The DLL names this one itself: CC_LIGHTFOOT_ENCOUNTER_TRIGGERED_GAMEBIT in CClightfoot.c */
     GAMEBIT_NW_GeyserDisable = 0xA,                      /* The DLL names this one itself: NW_GEYSER_DISABLE_GAMEBIT in NW_geyser.c */
     GAMEBIT_SH_TalkedToPepper = 0xB,                     /* table 2; when first landing there */
-    GAMEBIT_LargeCrateHide000C = 0xC,                    /* Read out of the retail placement data: hollow/LargeCrate hideGameBit x3; ecshrine/SmallBasket hideGameBit x2; kraztest/MagicPlant hideGameBit x1. Reached only because the object's Placement struct declares this one field a gamebit and the bytes agree, while another field of the same struct does not - so it is the field, not the whole struct, that is warranted here */
     GAMEBIT_AndrossRelated000D = 0xD,                    /* table 0; toggled by Andross attack states */
     GAMEBIT_AndrossRelated000E = 0xE,                    /* table 0; set during Andross's phase-five transition */
     GAMEBIT_AndrossRelated000F = 0xF,                    /* table 0; set when Andross's missile attack timer expires */
@@ -343,9 +341,6 @@ enum GameBitId {
     GAMEBIT_DIM_Open001A = 0x1A,                         /* Named from map data alone - nothing in the code or in any name list mentions it: snowmines/DIMUseObjec objId= param=open; table 2 */
     GAMEBIT_DIM_SeqUsed001B = 0x1B,                      /* Named from map data alone - nothing in the code or in any name list mentions it: snowmines/CAMERAnewse objId= param=usedBit; table 2 */
     GAMEBIT_DIM_SeqUsed001C = 0x1C,                      /* Named from map data alone - nothing in the code or in any name list mentions it: snowmines/CAMERAnewse objId= param=usedBit; table 2 */
-    GAMEBIT_SC_SmallBasketHide001D = 0x1D,               /* Read out of the retail placement data: swapcircle/SmallBasket hideGameBit x1; swapcircle/LargeCrate hideGameBit x1. BITTABLE gives it a width of 2 bits, so it is a field rather than a flag. Reached only because the object's Placement struct declares this one field a gamebit and the bytes agree, while another field of the same struct does not - so it is the field, not the whole struct, that is warranted here */
-    GAMEBIT_DIM2_SharpclawSnCounter001E = 0x1E,          /* Read out of the retail placement data: snowmines2/sharpclawSn counterGameBit x2. The field is called a counter but BITTABLE gives the id a width of 1, so it holds a flag - most likely "this one has been killed" rather than a tally */
-    GAMEBIT_DIM2_LargeCrateHide001F = 0x1F,              /* Read out of the retail placement data: snowmines2/LargeCrate hideGameBit x2. Reached only because the object's Placement struct declares this one field a gamebit and the bytes agree, while another field of the same struct does not - so it is the field, not the whole struct, that is warranted here */
     GAMEBIT_DIM_SeqUsed0020 = 0x20,                      /* Named from map data alone - nothing in the code or in any name list mentions it: snowmines/CAMERAnewse objId= param=usedBit; table 2 */
     GAMEBIT_PlayerPeriodicHitImmune = 0x21,              /* While set the player stops taking the repeating damage surface type 28 deals - the surface handler only runs its periodic-hit timer while this is clear */
     GAMEBIT_SH_FoundQueen = 0x22,                        /* table 2; hint 256 */
@@ -355,7 +350,6 @@ enum GameBitId {
     GAMEBIT_NW_TreebridBit0026 = 0x26,                   /* Read out of the retail placement data: wastes/NW_treebrid gameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_DIM_FoundInjuredSnowHorn = 0x27,             /* table 2; hint 284 */
     GAMEBIT_ITEM_AlpineRoot_028 = 0x28,                  /* table 2 */
-    GAMEBIT_MagicPlantHide0029 = 0x29,                   /* Read out of the retail placement data: snowmines/MagicPlant hideGameBit x1; mazecave/LargeBasket hideGameBit x1. Reached only because the object's Placement struct declares this one field a gamebit and the bytes agree, while another field of the same struct does not - so it is the field, not the whole struct, that is warranted here */
     GAMEBIT_DIM_ReleasedSnowHorn = 0x2A,                 /* table 2; hint 283; ref snowmines/DIMSnowHornShackle open. Backs the collectable item C-menu entry the game labels "Use Shackle Key" (its used bit) */
     GAMEBIT_ITEM_DIMShackleKey_Got = 0x2B,               /* table 2; ref snowmines/DIMSnowHornShackle key. Backs the collectable item C-menu entry the game labels "Use Shackle Key" (its owned bit) */
     GAMEBIT_DoorF4InteractionEnable = 0x2C,              /* The DLL names this one itself: DOORF4_INTERACTION_ENABLE_GAMEBIT in 244.c */
@@ -365,7 +359,6 @@ enum GameBitId {
     GAMEBIT_DIM_SeqBit1A0031 = 0x31,                     /* Named from map data alone - nothing in the code or in any name list mentions it: snowmines/DIMSeqObjec objId= param=bit1A; table 0 */
     GAMEBIT_DIM_SeqBit180032 = 0x32,                     /* Named from map data alone - nothing in the code or in any name list mentions it: snowmines/DIMSeqObjec objId= param=bit18; table 2 */
     GAMEBIT_DIM_HitAnimTarget0033 = 0x33,                /* Named from map data alone - nothing in the code or in any name list mentions it: snowmines/HitAnimator objId= param=target; snowmines/HitAnimator objId= param=target; table 2 */
-    GAMEBIT_SC_LargeCrateHide0034 = 0x34,                /* Read out of the retail placement data: swapcircle/LargeCrate hideGameBit x1. Reached only because the object's Placement struct declares this one field a gamebit and the bytes agree, while another field of the same struct does not - so it is the field, not the whole struct, that is warranted here */
     GAMEBIT_DIM_LavaBallTrigger0036 = 0x36,              /* Read out of the retail placement data: snowmines/DIMLavaBall triggerGameBit x1; snowmines/DIMLavaSmas gateGameBit x1; 2 placements. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_DIM_SeqBit1A0037 = 0x37,                     /* Named from map data alone - nothing in the code or in any name list mentions it: snowmines/DIMSeqObjec objId= param=bit1A; table 0 */
     GAMEBIT_DIM_SeqBit180038 = 0x38,                     /* Named from map data alone - nothing in the code or in any name list mentions it: snowmines/DIMSeqObjec objId= param=bit18; table 2 */
@@ -375,7 +368,6 @@ enum GameBitId {
     GAMEBIT_DIM_LavaBallTrigger003C = 0x3C,              /* Read out of the retail placement data: snowmines/DIMLavaBall triggerGameBit x1; snowmines/DIMLavaSmas gateGameBit x1; 2 placements. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_DIMLavaBallTrigger003D = 0x3D,               /* Read out of the retail placement data: snowmines/DIMLavaBall triggerGameBit x1; snowmines/DIMLavaSmas gateGameBit x1; swapcircle/TrigCyl activate x1; 3 placements. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_CF_HitAnimTarget003E = 0x3E,                 /* Named from map data alone - nothing in the code or in any name list mentions it: fortress/HitAnimator objId= param=target; table 1 */
-    GAMEBIT_MagicPlantHide003F = 0x3F,                   /* Read out of the retail placement data: fortress/MagicPlant hideGameBit x1; temple/MagicPlant hideGameBit x1. Reached only because the object's Placement struct declares this one field a gamebit and the bytes agree, while another field of the same struct does not - so it is the field, not the whole struct, that is warranted here */
     GAMEBIT_CF_EnteredFort = 0x41,                       /* table 1; hint 326 */
     GAMEBIT_CF_SeqBit1A0042 = 0x42,                      /* Named from map data alone - nothing in the code or in any name list mentions it: fortress/CFseqobject objId= param=bit1A; table 0 */
     GAMEBIT_CF_SavedQueen = 0x43,                        /* table 2; hint 329; ref fortress/CFExplodeFl onExplode */
@@ -402,26 +394,17 @@ enum GameBitId {
     GAMEBIT_CF_LeverActivated005B = 0x5B,                /* Named from map data alone - nothing in the code or in any name list mentions it: clouddungeon/StaffLeverT objId= param=activated; table 2 */
     GAMEBIT_CF_LeverActivated005C = 0x5C,                /* Named from map data alone - nothing in the code or in any name list mentions it: fortress/StaffLeverT objId= param=activated; fortress/StaffLeverT objId= param=activated; fortress/StaffLeverT objId= param=activated; table 2 */
     GAMEBIT_CF_LeverActivated005D = 0x5D,                /* Named from map data alone - nothing in the code or in any name list mentions it: fortress/StaffLeverT objId= param=activated; fortress/StaffLeverT objId= param=activated; fortress/StaffLeverT objId= param=activated; table 2 */
-    GAMEBIT_MagicPlantHide005E = 0x5E,                   /* Read out of the retail placement data: mazecave/MagicPlant hideGameBit x1; warlock/MagicPlant hideGameBit x1. BITTABLE gives it a width of 24 bits, so it is a field rather than a flag. Reached only because the object's Placement struct declares this one field a gamebit and the bytes agree, while another field of the same struct does not - so it is the field, not the whole struct, that is warranted here */
     GAMEBIT_ITEM_CFPowerKey_Used = 0x5F,                 /* table 2; ref fortress/HitAnimator target */
     GAMEBIT_ITEM_CFPowerKey_Got = 0x60,                  /* table 2; ref fortress/CFPowerLock key. Backs the collectable item C-menu entry the game labels "Use Power Key" (its owned bit) */
-    GAMEBIT_SC_MagicPlantHide0061 = 0x61,                /* Read out of the retail placement data: swapcircle/MagicPlant hideGameBit x1. Reached only because the object's Placement struct declares this one field a gamebit and the bytes agree, while another field of the same struct does not - so it is the field, not the whole struct, that is warranted here */
-    GAMEBIT_MagicPlantHide0063 = 0x63,                   /* Read out of the retail placement data: fortress/MagicPlant hideGameBit x1; moonpass/MagicPlant hideGameBit x1. Reached only because the object's Placement struct declares this one field a gamebit and the bytes agree, while another field of the same struct does not - so it is the field, not the whole struct, that is warranted here */
     GAMEBIT_DRBOT_Param1A0064 = 0x64,                    /* Named from map data alone - nothing in the code or in any name list mentions it: dragbot/DR_LightBea objId= param=_1A; table 1 */
     GAMEBIT_BabyCloudRunnerAirMeter = 0x66,              /* The DLL names this one itself: BABYCLOUDRUNNER_AIR_METER_GAME_BIT in 332.c */
     GAMEBIT_CF_FXEmitDisable0068 = 0x68,                 /* Read out of the retail placement data: fortress/FXEmit disableGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
-    GAMEBIT_MagicPlantHide0069 = 0x69,                   /* Read out of the retail placement data: kraztest/MagicPlant hideGameBit x1; warlock/MagicPlant hideGameBit x1; wastes/LargeCrate hideGameBit x1. Reached only because the object's Placement struct declares this one field a gamebit and the bytes agree, while another field of the same struct does not - so it is the field, not the whole struct, that is warranted here */
-    GAMEBIT_MagicPlantHide006A = 0x6A,                   /* Read out of the retail placement data: dragrock/MagicPlant hideGameBit x1; temple/MagicPlant hideGameBit x1; wallcity/MagicPlant hideGameBit x1. Reached only because the object's Placement struct declares this one field a gamebit and the bytes agree, while another field of the same struct does not - so it is the field, not the whole struct, that is warranted here */
     GAMEBIT_IM_SeqBit1A006D = 0x6D,                      /* Named from map data alone - nothing in the code or in any name list mentions it: newicemount/IMSeqObject objId= param=bit1A; table 2 */
     GAMEBIT_IM_TrickyRelated006E = 0x6E,                 /* table 2; set after Tricky landing scene */
     GAMEBIT_IM_TrickyRelated006F = 0x6F,                 /* table 2; set when entering hut */
     GAMEBIT_IM_RescuedTricky = 0x70,                     /* table 2; hint 261; set at start of bike scene */
-    GAMEBIT_MagicPlantHide0071 = 0x71,                   /* Read out of the retail placement data: snowmines3/MagicPlant hideGameBit x2; wallcity/MagicPlant hideGameBit x2; fortress/MagicPlant hideGameBit x1 (+3 more). Reached only because the object's Placement struct declares this one field a gamebit and the bytes agree, while another field of the same struct does not - so it is the field, not the whole struct, that is warranted here */
     GAMEBIT_IM_RaceStarted = 0x72,                       /* table 2; set when the race actually starts */
-    GAMEBIT_NW_LargeCrateHide0073 = 0x73,                /* Read out of the retail placement data: wastes/LargeCrate hideGameBit x1. Reached only because the object's Placement struct declares this one field a gamebit and the bytes agree, while another field of the same struct does not - so it is the field, not the whole struct, that is warranted here */
     GAMEBIT_ITEM_Staff_Got = 0x75,                       /* table 1; clearing on Galleon restarts ship battle. CAUTION: SB_Galleon names the same bit its intro gate. Having the staff plausibly gates that intro, but the two readings have not been reconciled against the code */
-    GAMEBIT_OFT_MagicPlantHide0076 = 0x76,               /* Read out of the retail placement data: dfptop/MagicPlant hideGameBit x1. Reached only because the object's Placement struct declares this one field a gamebit and the bytes agree, while another field of the same struct does not - so it is the field, not the whole struct, that is warranted here */
-    GAMEBIT_GPSH_MagicPlantHide0077 = 0x77,              /* Read out of the retail placement data: gpshrine/MagicPlant hideGameBit x1. Reached only because the object's Placement struct declares this one field a gamebit and the bytes agree, while another field of the same struct does not - so it is the field, not the whole struct, that is warranted here */
     GAMEBIT_WM_Galleon_despawn = 0x78,                   /* table 2 */
     GAMEBIT_IM_StartRace = 0x79,                         /* table 1; setting starts the race scene */
     GAMEBIT_SC_TestPhaseOver007A = 0x7A,                 /* Swapcircle (the LightFoot totem circle) has left its test phase - while set, sc_levelcontrol raises GAMEBIT_SC_HitAnimTarget0085 at every opportunity; while clear it instead watches 0x627 and GAMEBIT_SC_TotemRunCompleted for GAMEBIT_LV_DoneTests */
@@ -436,7 +419,6 @@ enum GameBitId {
     GAMEBIT_LV_Totem3_Activated = 0x83,                  /* Rena's U0 dataset; table 2, corroborated by SC_totempol naming the same bit the totem pole's RIGHT face */
     GAMEBIT_LV_Totem4_Activated = 0x84,                  /* Rena's U0 dataset; table 2, corroborated by SC_totempol naming the same bit the totem pole's REAR face */
     GAMEBIT_SC_HitAnimTarget0085 = 0x85,                 /* Rena has it as the target of swapcircle's HitAnimator 0x4C837; sc_levelcontrol raises it whenever GAMEBIT_SC_TestPhaseOver007A is up and clears it as a timed totem run starts */
-    GAMEBIT_SC_MounddooClosedLatch0086 = 0x86,           /* Read out of the retail placement data: swapcircle/SC_mounddoo closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_SC_LVBlock2Related0087 = 0x87,               /* One of the three bits sc_levelcontrol raises the moment GAMEBIT_ITEM_LVBlock2_Used is set */
     GAMEBIT_SH_WarpStonePathOpen = 0x88,                 /* table 2; did blow up wall leading to WarpStone */
     GAMEBIT_SC_SteppingClosedLatch0089 = 0x89,           /* Read out of the retail placement data: swapcircle/SC_stepping closedLatchGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
@@ -456,18 +438,12 @@ enum GameBitId {
     GAMEBIT_SH_HitAnimTarget0097 = 0x97,                 /* Named from map data alone - nothing in the code or in any name list mentions it: hollow/HitAnimator objId= param=target; hollow/SH_BombWall objId= param=exploded; table 2 */
     GAMEBIT_CC_DoorRequired0098 = 0x98,                  /* The bit doorf4 requires of its sequence-283 and 284 doors, the way its 193 and 196 doors require GAMEBIT_ITEM_PrisonKey_Got; Rena places it in capeclaw */
     GAMEBIT_SH_KilledBloop7 = 0x99,                      /* table 1 */
-    GAMEBIT_OFB_MagicPlantHide009A = 0x9A,               /* Read out of the retail placement data: kraztest/MagicPlant hideGameBit x1. Reached only because the object's Placement struct declares this one field a gamebit and the bytes agree, while another field of the same struct does not - so it is the field, not the whole struct, that is warranted here */
-    GAMEBIT_MagicPlantHide009B = 0x9B,                   /* Read out of the retail placement data: kraztest/MagicPlant hideGameBit x2; dfshrine/MagicPlant hideGameBit x1; dragrock/MagicPlant hideGameBit x1 (+3 more). Reached only because the object's Placement struct declares this one field a gamebit and the bytes agree, while another field of the same struct does not - so it is the field, not the whole struct, that is warranted here */
-    GAMEBIT_DIM2_MagicPlantHide009C = 0x9C,              /* Read out of the retail placement data: snowmines2/MagicPlant hideGameBit x1. Reached only because the object's Placement struct declares this one field a gamebit and the bytes agree, while another field of the same struct does not - so it is the field, not the whole struct, that is warranted here */
-    GAMEBIT_MagicPlantHide009D = 0x9D,                   /* Read out of the retail placement data: dbshrine/MagicPlant hideGameBit x1; snowmines/MagicPlant hideGameBit x1. Reached only because the object's Placement struct declares this one field a gamebit and the bytes agree, while another field of the same struct does not - so it is the field, not the whole struct, that is warranted here */
     GAMEBIT_Tricky_Learned_Distract = 0x9E,              /* table 2; DP names this Tricky_Learned_Distract; set by SH_queenear after the Queen EarthWalker accepts all required white grubtubs; gates Tricky's Baddie Alert/Distract prompt. CAUTION: DIM_Boss names the same bit its LightFoot snowball gate. Needing Tricky's distract for that would explain it, but nothing here proves the two are the same thing */
     GAMEBIT_SB_GalleonTransitionArmed = 0x9F,            /* SB_Galleon's protection minigame arms its transition with this; Rena's U0 name for it was NpcTalkRelated009F, which says nothing */
     GAMEBIT_SB_GalleonTransitionUsed = 0xA0,             /* The used half of GAMEBIT_SB_GalleonTransitionArmed's pair, per SB_Galleon's own alias */
     GAMEBIT_TTH_BombPlanted0A1 = 0xA1,                   /* Rena's U0 dataset; table 2 */
-    GAMEBIT_MagicPlantHide00A2 = 0xA2,                   /* Read out of the retail placement data: fortress/MagicPlant hideGameBit x1; hollow/MagicPlant hideGameBit x1; wallcity/MagicPlant hideGameBit x1. Reached only because the object's Placement struct declares this one field a gamebit and the bytes agree, while another field of the same struct does not - so it is the field, not the whole struct, that is warranted here */
     GAMEBIT_CC_GasVentPuzzleComplete = 0xA3,             /* CCgasventCo calls it the puzzle-complete bit; Rena had it only as CC_SeqNeedBit0A3 */
     GAMEBIT_WM_GalleonRelated00A4 = 0xA4,                /* table 1 */
-    GAMEBIT_WM_MagicPlantHide00A5 = 0xA5,                /* Read out of the retail placement data: warlock/MagicPlant hideGameBit x1. Reached only because the object's Placement struct declares this one field a gamebit and the bytes agree, while another field of the same struct does not - so it is the field, not the whole struct, that is warranted here */
     GAMEBIT_CC_Currents1_Disable = 0xA6,                 /* Disables some water currents in Cape Claw when some switch is activated; Rena's U0 dataset; table 2 */
     GAMEBIT_WM_SwitchRelatedA7 = 0xA7,                   /* table 0; related to KP pressure switch door; toggled repeatedly during Krystal getting captured scene */
     GAMEBIT_NW_HitAnimTarget00A8 = 0xA8,                 /* Named from map data alone - nothing in the code or in any name list mentions it: wastes/HitAnimator objId= param=target; table 2 */
@@ -482,7 +458,6 @@ enum GameBitId {
     GAMEBIT_WM_NpcHintPrereq00B2 = 0xB2,                 /* One of three bits DLL 0x200's NPC checks together: with the player out of magic, any one of them still clear sends the NPC down its sequence 1 instead of its sequence 2. Retail spells all three in decimal */
     GAMEBIT_WM_NpcHintPrereq00B3 = 0xB3,                 /* One of three bits DLL 0x200's NPC checks together: with the player out of magic, any one of them still clear sends the NPC down its sequence 1 instead of its sequence 2. Retail spells all three in decimal */
     GAMEBIT_ITEM_Unknown_Used = 0xB4,                    /* table 2; Item name is "Unknown". Backs the collectable item C-menu entry the game labels "Unknown" (its used bit) */
-    GAMEBIT_MagicPlantHide00B8 = 0xB8,                   /* Read out of the retail placement data: dfptop/MagicPlant hideGameBit x1; hollow/MagicPlant hideGameBit x1; linkg/MagicPlant hideGameBit x1 (+1 more). Reached only because the object's Placement struct declares this one field a gamebit and the bytes agree, while another field of the same struct does not - so it is the field, not the whole struct, that is warranted here */
     GAMEBIT_SH_KilledBloop11 = 0xBE,                     /* table 1 */
     GAMEBIT_SH_ReturnedToQueen = 0xBF,                   /* table 2; hint 270; Talked to queen after bringing Tricky back from Ice Mountain */
     GAMEBIT_SH_Entered00C0 = 0xC0,                       /* table 0; also toggled when leaving queen cave, and in CRFort */
@@ -500,12 +475,9 @@ enum GameBitId {
     GAMEBIT_SH_OpenedTunnelToWell = 0xCC,                /* table 2; ref hollow/HitAnimator target */
     GAMEBIT_IM_SeqBit1800CD = 0xCD,                      /* Named from map data alone - nothing in the code or in any name list mentions it: newicemount/IMSeqObject objId= param=bit18; newicemount3/IMSeqObject objId= param=bit18; table 2 */
     GAMEBIT_IMRelated00CE = 0xCE,                        /* table 2 */
-    GAMEBIT_OFB_MagicPlantHide00CF = 0xCF,               /* Read out of the retail placement data: kraztest/MagicPlant hideGameBit x1. Reached only because the object's Placement struct declares this one field a gamebit and the bytes agree, while another field of the same struct does not - so it is the field, not the whole struct, that is warranted here */
     GAMEBIT_WM_GalleonRelated00D0 = 0xD0,                /* table 2 */
     GAMEBIT_WM_GalleonClearDoor = 0xD1,                  /* The DLL names this one itself: WM_GALLEON_GAMEBIT_CLEAR_DOOR in WM_Galleon.c */
     GAMEBIT_NW_ClawDead0D3 = 0xD3,                       /* Rena's U0 dataset; table 2 */
-    GAMEBIT_VFP_MagicPlantHide00D4 = 0xD4,               /* Read out of the retail placement data: temple/MagicPlant hideGameBit x1. Reached only because the object's Placement struct declares this one field a gamebit and the bytes agree, while another field of the same struct does not - so it is the field, not the whole struct, that is warranted here */
-    GAMEBIT_SH_MagicPlantHide00DA = 0xDA,                /* Read out of the retail placement data: hollow/MagicPlant hideGameBit x1. Reached only because the object's Placement struct declares this one field a gamebit and the bytes agree, while another field of the same struct does not - so it is the field, not the whole struct, that is warranted here */
     GAMEBIT_SawCannonExplanation = 0xDB,                 /* table 2; Rena's U0 name - DIMCannon raises it the first time it explains itself and tests it to skip the explanation thereafter */
     GAMEBIT_DIM_LevelControlInitialDialogue = 0xDC,      /* The DLL names this one itself: DIM_LEVEL_CONTROL_INITIAL_DIALOGUE_GAMEBIT in DIM_LevelCo.c */
     GAMEBIT_ITEM_TrickyCall_Got = 0xDD,                  /* table 2; hint 264 */
@@ -973,7 +945,6 @@ enum GameBitId {
     GAMEBIT_SB_ObjGroups = 0x3E0,                        /* table 3; size 32; frontend, galleonship, Ship Battle */
     GAMEBIT_DIM_TriggerLostInBlizzard = 0x3E2,           /* table 0; Trigger scene where Fox walks off into blizzard and comes back */
     GAMEBIT_NW_SnowHorn03E3 = 0x3E3,                     /* table 0; related to riding SnowHorn */
-    GAMEBIT_DIM_PushBlocBit03E5 = 0x3E5,                 /* Read out of the retail placement data: snowmines/DIMPushBloc gameBit x1 */
     GAMEBIT_DIM_LostInBlizzard = 0x3E8,                  /* table 0; Triggered by 0x3E2, actually starts the scene */
     GAMEBIT_ITEM_NWFood_Got = 0x3E9,                     /* table 0; Alpine Root while riding SnowHorn through blizzard; collecting one sets this to 1, then 0 */
     GAMEBIT_SH_Open03EB = 0x3EB,                         /* Named from map data alone - nothing in the code or in any name list mentions it: hollow/SH_Portcull objId= param=open; hollow/StaffLeverO objId= param=activated; table 2 */
@@ -1376,7 +1347,6 @@ enum GameBitId {
     GAMEBIT_ITEM_SpellStone7BD_Got = 0x7BD,              /* table 2; unused?. Backs the collectable item C-menu entry the game labels "Use SpellStone" (its owned bit) */
     GAMEBIT_OFB_Open07BE = 0x7BE,                        /* Named from map data alone - nothing in the code or in any name list mentions it: kraztest/DFP_RoundDo objId= param=open; kraztest/StaffLeverO objId= param=activated; kraztest/CAMERAseqob objId= param=bit1A (+1 more); table 2 */
     GAMEBIT_ITEM_SpellStone7BF_Got = 0x7BF,              /* table 1. Backs the collectable item C-menu entry the game labels "Use SpellStone" (its owned bit) */
-    GAMEBIT_OFB_DFPseqpoinDisable07C1 = 0x7C1,           /* Read out of the retail placement data: kraztest/DFP_seqpoin disableGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_OFP_Reopened = 0x7C2,                        /* table 2; hint 403; ref dfptop/HitAnimator target */
     GAMEBIT_HT_ObjStates = 0x7CE,                        /* table 3; size 32 */
     GAMEBIT_SC_TotemRunRelated07CF = 0x7CF,              /* Raised beside GAMEBIT_SC_TotemRunCompleted on the fade-out path and nowhere else, with nothing in the code reading it back */
@@ -1505,7 +1475,6 @@ enum GameBitId {
     GAMEBIT_CF_GuardianLanded = 0x8E9,                   /* The DLL names this one itself: GAMEBIT_CFGUARDIAN_LANDED in CFGuardian.c */
     GAMEBIT_KP_ActNo = 0x8EC,                            /* table 1; size 4; old "krazoapalace" map */
     GAMEBIT_KP_ObjGroups = 0x8ED,                        /* table 3; size 32 */
-    GAMEBIT_OFB_DFPseqpoinDisable08EE = 0x8EE,           /* Read out of the retail placement data: kraztest/DFP_seqpoin disableGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_WM_Seq8F4 = 0x8F4,                           /* Rena's U0 dataset; table 2 */
     GAMEBIT_CF_Open08FC = 0x8FC,                         /* Named from map data alone - nothing in the code or in any name list mentions it: fortress/SH_Portcull objId= param=open; table 2 */
     GAMEBIT_CF_SHPortcullOpen08FD = 0x8FD,               /* Read out of the retail placement data: fortress/SH_Portcull open x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
@@ -2112,7 +2081,6 @@ enum GameBitId {
     GAMEBIT_WM_SpiritPlace5Ready = 0xCB6,                /* table 2; gates spirit-place 5 and its return pad */
     GAMEBIT_ITEM_Spirit6_Released = 0xCB7,               /* table 2; hint 423; hint: "Andross Revealed" */
     GAMEBIT_WM_SpiritPlace6Ready = 0xCB8,                /* table 2; gates spirit-place 6 and its return pad */
-    GAMEBIT_OFB_DFPseqpoinDisable0CB9 = 0xCB9,           /* Read out of the retail placement data: kraztest/DFP_seqpoin disableGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_SHRINE_MUSIC_LOCK = 0xCBB,                   /* Krazoa-shrine music lock: set (success-gated in GPSH) when a Krazoa shrine object (MMSH/ECSH/DFSH/DBSH/GPSH) frees; every area's level-control DLL watches it via GameBitLatch_Update to start/stop MUSICTRIG_PU3_Adventure_c4 and hand back its own ambient music, and it also raises audio.c's SFX reverb bus and suppresses doorf4's door-close SFX during the transition */
     GAMEBIT_ITEM_SpellStone_Disabled = 0xCBC,            /* table 2; dims them in the menu. Backs the collectable item C-menu entry the game labels "Use SpellStone" (its active bit) */
     GAMEBIT_SawFuelCell = 0xCBE,                         /* table 2 */
@@ -2504,8 +2472,6 @@ enum GameBitId {
     GAMEBIT_WM_SeqEB4 = 0xEB4,                           /* Rena's U0 dataset; table 2 */
     GAMEBIT_ITEM_Flute_Disabled = 0xEB5,                 /* table 2. Backs the collectable item C-menu entry the game labels "Blow Flute" (its active bit) */
     GAMEBIT_CF_KytesMumQuestStage1 = 0xEB9,              /* Written as a boolean of Kyte's mum's quest count being exactly 1, so it tracks her first quest stage; Rena has it as fortress HitAnimator 0x4CD31's target */
-    GAMEBIT_OFB_DIMPushBlocBit0EBB = 0xEBB,              /* Read out of the retail placement data: kraztest/DIMPushBloc gameBit x1 */
-    GAMEBIT_OFB_DIMPushBlocBit0EBC = 0xEBC,              /* Read out of the retail placement data: kraztest/DIMPushBloc gameBit x1 */
     GAMEBIT_ECSH_CameraLookingAtDoor = 0xECA,            /* table 2; focuses camera on door */
     GAMEBIT_NW_EscapedFromSnowClearing = 0xECC,          /* table 0; hint 265 */
     GAMEBIT_NW_WalkSequenceRunning = 0xECD,              /* table 0; raised as NW_levcontr starts its walk-table sequence off GAMEBIT_SnowHornArtifact19D, and cleared again by its cleanup mode */
@@ -2527,7 +2493,6 @@ enum GameBitId {
     GAMEBIT_SH_Related0EDE = 0xEDE,                      /* table 2; Triggers a communication after pushing switch at bottom of well */
     GAMEBIT_DFP_RotatepRingActive = 0xEDF,               /* The DLL names this one itself: DFP_ROTATEP_GAMEBIT_RING_ACTIVE in 562_DFP_RotateP.h */
     GAMEBIT_OFB_MaybeEnabled0EE0 = 0xEE0,                /* Named from map data alone - nothing in the code or in any name list mentions it: kraztest/VFP_flamepo objId= param=maybeEnabled; table 2 */
-    GAMEBIT_OFB_DFPseqpoinDisable0EE1 = 0xEE1,           /* Read out of the retail placement data: kraztest/DFP_seqpoin disableGameBit x1; 1 placement. Nothing in the code names it and no objref lists it - the object def and the Placement field are all the evidence there is */
     GAMEBIT_WC_SeqBit1A0EE2 = 0xEE2,                     /* Named from map data alone - nothing in the code or in any name list mentions it: wallcity/WCSeqObject objId= param=bit1A; table 2 */
     GAMEBIT_WC_SeqBit180EE3 = 0xEE3,                     /* Named from map data alone - nothing in the code or in any name list mentions it: wallcity/WCSeqObject objId= param=bit18; table 2 */
     GAMEBIT_DR_SeqBit180EE4 = 0xEE4,                     /* Named from map data alone - nothing in the code or in any name list mentions it: dragrock/DR_Seqobj objId= param=bit18; table 2 */
