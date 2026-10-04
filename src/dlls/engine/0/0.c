@@ -6973,7 +6973,7 @@ void drawViewFinderHud(void) {
         viewScale = 0.57735 / mathTanf((f32)(3.1415927f * fovY / 360.0));
         sprintf(buf, sTrickyDebugXCoordFormat, viewScale);
         gameTextSetColor(0, 0xff, 0, 255.0f * gViewFinderFadeLevel);
-        gameTextShowStr(buf, 0x93, 0x21c, 0x46);
+        gameTextShowStr(buf, 147, 540, 70);
 
         {
             gridX = 0.0f;
@@ -7010,11 +7010,11 @@ void drawViewFinderHud(void) {
             fadeAmount = viewScale - 4.0;
             minorLabelFadeScale = 20.0;
             t = (int)(fadeAmount * minorLabelFadeScale);
-            minorLabelAlpha = (t < 0) ? 0 : ((t > 0x8c) ? 0x8c : t);
+            minorLabelAlpha = (t < 0) ? 0 : ((t > 140) ? 140 : t);
             fadeAmount = viewScale - 1.0;
             majorLabelFadeScale = 170.0;
             t = (int)(fadeAmount * majorLabelFadeScale);
-            majorLabelAlpha = (t < 0) ? 0 : ((t > 0xc8) ? 0xc8 : t);
+            majorLabelAlpha = (t < 0) ? 0 : ((t > 200) ? 200 : t);
             angleUnitsPerDegree = 182.04445f;
             headingIndex = (int)((f32)gViewFinderCamAngle / angleUnitsPerDegree);
             headingOffset = gViewFinderCamAngle - headingIndex * angleUnitsPerDegree;
@@ -7029,51 +7029,51 @@ void drawViewFinderHud(void) {
             tickX += tickSpacing;
             heading++;
             if (heading < 0) {
-                heading += 0x168;
+                heading += 360;
             }
             for (; tickX < 640.0f; tickX += tickSpacing) {
                 u8 alpha;
                 u8 textAlpha = 0xff;
                 int tickAlpha = 0xff;
-                int tickHeight = 0xf;
-                if (heading >= 0x168) {
-                    heading -= 0x168;
+                int tickHeight = 15;
+                if (heading >= 360) {
+                    heading -= 360;
                 }
                 headingDivision = heading / 10.0;
                 if (headingDivision != (int)headingDivision) {
-                    tickAlpha = 0xc8;
+                    tickAlpha = 200;
                     headingDivision = heading / 5.0;
                     if (headingDivision != (int)headingDivision) {
                         textAlpha = minorLabelAlpha;
                         tickHeight = 7;
                     } else {
                         textAlpha = majorLabelAlpha;
-                        tickHeight = 0xa;
+                        tickHeight = 10;
                     }
                 }
                 switch (heading) {
                 case 0:
                     sprintf(buf, sViewFinderDirN, heading);
                     break;
-                case 0x5a:
+                case 90:
                     sprintf(buf, sViewFinderDirE, heading);
                     break;
-                case 0xb4:
+                case 180:
                     sprintf(buf, sViewFinderDirS, heading);
                     break;
-                case 0x10e:
+                case 270:
                     sprintf(buf, sViewFinderDirW, heading);
                     break;
-                case 0x2d:
+                case 45:
                     sprintf(buf, sViewFinderDirNE, heading);
                     break;
-                case 0x87:
+                case 135:
                     sprintf(buf, sViewFinderDirSE, heading);
                     break;
-                case 0xe1:
+                case 225:
                     sprintf(buf, sViewFinderDirSW, heading);
                     break;
-                case 0x13b:
+                case 315:
                     sprintf(buf, sViewFinderDirNW, heading);
                     break;
                 default:
@@ -7093,7 +7093,7 @@ void drawViewFinderHud(void) {
                     drawViewFinderSegment(tickX, gViewFinderBaseY + (480.0f + getViewFinderWaveOffset(tickX)),
                                           (f32)(0.98 * (tickX - 320.0) + 320.0),
                                           gViewFinderBaseY +
-                                              ((f32)((u8)tickHeight + 0x1e0) + getViewFinderWaveOffset(tickX)),
+                                              ((f32)((u8)tickHeight + 480) + getViewFinderWaveOffset(tickX)),
                                           1.0f, alpha);
                 }
             }
@@ -7101,12 +7101,12 @@ void drawViewFinderHud(void) {
         {
             f32 farP = Camera_GetFarPlane();
             f32 nearP = Camera_GetNearPlane();
-            int depth = depthReadRequestPoll(0x140, 0xf0, drawViewFinderHud);
+            int depth = depthReadRequestPoll(320, 240, drawViewFinderHud);
             f32 dist = (-farP * nearP) / (((f32)(u32)depth / 16777215.0f - 1.0f) * (farP - nearP) - nearP);
             if (dist > 0.0f && dist < 10000.0f) {
                 sprintf(buf, lbl_803DBB40, dist / 10.0f);
                 gameTextSetColor(0, 0xff, 0, 255.0f * gViewFinderFadeLevel);
-                gameTextShowStr(buf, 0x93, 0x32, 0x46);
+                gameTextShowStr(buf, 0x93, 50, 70);
             }
         }
     }
